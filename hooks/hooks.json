@@ -1,19 +1,16 @@
 {
-  "_comment": "示例 Hook 配置，默认未启用。如需脚本级强制拦截，将下方 hooks 配置取消注释并配置对应脚本。",
+  "_comment": "示例 Hook 配置，默认未启用。如需启用，将下方 _enabled 改为 true。",
   "hooks": {
     "PreToolUse": [
       {
-        "_comment": "在 Claude 调用文件写入工具前触发，检查设计文档是否存在。取消下方注释以启用。",
-        "_disabled_hooks": [
+        "_comment": "在 Claude 调用文件写入工具前触发，检查设计文档是否存在。",
+        "_enabled": false,
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
           {
-            "matcher": "Write|Edit|MultiEdit",
-            "hooks": [
-              {
-                "type": "command",
-                "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/check-design-doc.cmd\"",
-                "async": false
-              }
-            ]
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/check-design-doc.cmd\"",
+            "async": false
           }
         ]
       }
