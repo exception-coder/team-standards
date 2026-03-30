@@ -4,14 +4,42 @@
 
 - **Java 编码规范**（阿里巴巴黄山版·强制项精简版）
 - **功能设计文档强制约束**（开发前必须有设计文档，否则引导创建）
+- **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息）
 
 ## 安装
 
-```bash
-/plugin install github:你的组织名/team-standards
+> Claude Code 插件通过 marketplace 机制安装，需要两步完成。
+
+**第一步：注册 marketplace**
+
+在 Claude Code 中执行：
+
+```
+/plugin marketplace add exception-coder/team-standards
 ```
 
-安装后执行 `/reload-plugins` 生效。
+**第二步：安装插件**
+
+```
+/plugin install team-standards@team-standards
+```
+
+**第三步：重载生效**
+
+```
+/reload-plugins
+```
+
+完成后可通过 `/plugin` → Installed 标签页确认插件已安装。
+
+## 升级
+
+当插件有更新时，执行以下命令同步最新版本：
+
+```
+/plugin update team-standards
+/reload-plugins
+```
 
 ## 包含的 Skills
 
