@@ -1,0 +1,178 @@
+---
+name: git-commit-standards
+description: Use when about to run git commit, when asked to commit code, or when generating a commit message. MUST analyze actual code changes before composing the message. Do not write commit messages without reading the diff first.
+---
+
+# Git 提交规范
+
+## 核心原则
+
+**提交信息必须基于实际代码变更分析生成，禁止凭记忆或猜测填写。**
+
+每次提交前先执行 `git diff --staged`，读取变更内容后再撰写提交信息。
+
+---
+
+## 提交信息格式
+
+```
+<type>(<scope>): <标题——用一句话说清楚做了什么>
+
+<body——中文说明，解释为什么这样改、改了哪些地方、解决了什么问题>
+
+Author: <姓名> <邮箱>
+```
+
+### 格式规则
+
+| 部分 | 规则 |
+|------|------|
+| `type` | 必填，见下表 |
+| `scope` | 可选，填模块/功能名，如 `order`、`user-auth` |
+| 标题 | 不超过 72 字符；动词开头；不加句号 |
+| body | 必填；中文；说清楚改了什么、为什么改；多点用换行 |
+| Author | 必填；格式：`姓名 <邮箱>` |
+
+---
+
+## Type 类型表
+
+| Type | 含义 | 示例场景 |
+|------|------|----------|
+| `feat` | 新功能 | 新增接口、新增业务流程 |
+| `fix` | Bug 修复 | 修复空指针、修复逻辑错误 |
+| `refactor` | 重构 | 不改变功能的代码改善，如提取方法、替换实现 |
+| `perf` | 性能优化 | 优化 SQL、减少 N+1 查询、加缓存 |
+| `docs` | 文档 | 修改注释、更新 Javadoc、更新设计文档 |
+| `test` | 测试 | 新增/修改单元测试或集成测试 |
+| `style` | 格式 | 不影响逻辑的格式调整（空格、换行、命名） |
+| `chore` | 杂项 | 依赖升级、配置修改、构建脚本 |
+| `ci` | CI/CD | 流水线配置变更 |
+| `revert` | 回滚 | 回滚某次提交 |
+
+---
+
+## 分析步骤（每次提交必须执行）
+
+### 第一步：获取变更内容
+
+```bash
+git diff --staged          # 查看已暂存的变更
+git diff --staged --stat   # 查看变更文件列表和行数统计
+```
+
+若无已暂存内容，提示用户先执行 `git add`。
+
+### 第二步：分析变更，确定 type 和 scope
+
+根据变更内容判断：
+- 新增了类/方法/接口 → `feat`
+- 修改了已有逻辑修复问题 → `fix`
+- 改了代码结构但功能不变 → `refactor`
+- 只改了注释/文档 → `docs`
+- 改了测试文件 → `test`
+- 改了 pom.xml/build 配置 → `chore`
+- 涉及多个 type → 选主要的，其余在 body 中说明
+
+scope 从变更的包路径或模块名中提取（取最小公共前缀）。
+
+### 第三步：撰写 body
+
+body 须回答以下问题（按实际情况选择）：
+
+- **改了什么**：列出核心变更点（类名用全类名，方法名用 `类名#方法名`）
+- **为什么改**：背景原因、需求来源、Bug 根因
+- **影响范围**：哪些功能/接口受影响
+- **注意事项**：是否需要配套 DB 变更、配置变更、上下游通知
+
+### 第四步：输出提交信息并确认
+
+将完整提交信息输出给用户确认后再执行 `git commit`，禁止直接执行不经确认的提交。
+
+---
+
+## 示例
+
+### 新功能提交
+```
+feat(order): 新增订单支付状态回调接口
+
+新增 PayCallbackController#callback() 接口，接收支付网关异步通知。
+实现 OrderPayService#handleCallback() 处理支付结果，包含：
+- 幂等校验（基于 payOrderNo 去重）
+- 订单状态流转（待支付→已支付/支付失败）
+- 发布 OrderPaidEvent 触发后续业务
+
+Author: 张凯 <kai.zhang@example.com>
+```
+
+### Bug 修复提交
+```
+fix(user-auth): 修复 token 刷新时并发导致的重复登出问题
+
+根因：TokenRefreshServiceImpl#refresh() 未加锁，并发请求同时判断 token 过期，
+导致旧 token 被多次删除，后续请求因 token 不存在而被登出。
+修复方式：对 userId 维度加分布式锁，确保同一用户同一时刻只有一个刷新操作执行。
+
+Author: 李明 <li.ming@example.com>
+```
+
+### 重构提交
+```
+refactor(payment): 替换 BeanUtils 为 MapStruct 转换器
+
+将 PaymentServiceImpl 中 BeanUtils.copyProperties 替换为 PaymentConvert.INSTANCE 转换，
+新增 com.example.payment.convert.PaymentConvert 接口。
+无业务逻辑变更，仅优化转换方式，消除反射带来的类型安全隐患。
+
+Author: 王芳 <wang.fang@example.com>
+```
+
+---
+
+## 多文件变更的 body 组织方式
+
+变更文件超过 5 个时，按模块分组描述，不逐文件列举：
+
+```
+feat(inventory): 新增库存预占与释放功能
+
+【新增】
+- InventoryReserveService 及其实现，支持库存预占、确认、释放三态流转
+- inventory_reserve 表及对应 DO/Repository
+
+【修改】
+- OrderCreateServiceImpl#create()：下单时调用库存预占接口
+- InventoryController：新增预占查询接口
+
+【依赖】
+- 新增 com.example.inventory.feign.InventoryFeignClient，需同步部署库存服务
+
+Author: 张凯 <kai.zhang@example.com>
+```
+
+---
+
+## 禁止行为
+
+| 错误写法 | 原因 |
+|----------|------|
+| `fix: bug修复` | 无实质内容，不知道改了什么 |
+| `update code` | 没有 type，没有说明 |
+| `feat: 完成需求` | 不知道完成了什么需求 |
+| 不写 body 直接提交 | 必须有中文 body 说明 |
+| 先 commit 再分析 | 必须先分析再生成信息 |
+| body 用英文写 | body 须用中文 |
+
+---
+
+## 团队配置
+
+每位成员安装插件后，在项目 `CLAUDE.md` 或全局 `~/.claude/CLAUDE.md` 中配置个人署名：
+
+```markdown
+## Git 提交署名
+Author: 姓名 <邮箱>
+```
+
+Skill 生成提交信息时自动读取此配置。若未配置，则提示用户补充署名后再提交。
