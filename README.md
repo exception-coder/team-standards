@@ -68,7 +68,7 @@
 
 如需更强的拦截（Claude 调用写文件工具前由脚本检查），可启用 Hook：
 
-1. 编辑 `hooks/hooks.json`，将 `_disabled_hooks` 改为 `hooks`
+1. 编辑 `hooks/hooks.json`，将 `_disabled_PreToolUse` 改为 `PreToolUse` 并移入 `hooks` 对象内
 2. 重新安装插件或执行 `/reload-plugins`
 
 Hook 脚本说明见 `hooks/check-design-doc.cmd`。
@@ -81,6 +81,24 @@ Hook 脚本说明见 `hooks/check-design-doc.cmd`。
 ## Git 提交署名
 Author: 你的姓名 <你的邮箱>
 ```
+
+## 发版规则
+
+插件缓存系统通过 `.claude-plugin/plugin.json` 中的 `version` 字段判断是否有更新。**每次发布必须递增版本号**，否则 `/plugin update` 无法检测到变更。
+
+版本号遵循语义化版本（SemVer）：
+
+| 变更类型 | 版本递增 | 示例 |
+|---------|---------|------|
+| 新增 Skill、新增模板 | Minor（中位） | `1.0.0` → `1.1.0` |
+| 修复 Bug、调整措辞 | Patch（末位） | `1.1.0` → `1.1.1` |
+| 不兼容的结构变更 | Major（首位） | `1.1.1` → `2.0.0` |
+
+发版流程：
+
+1. 修改 `.claude-plugin/plugin.json` 中的 `version` 字段
+2. 提交并推送到远端
+3. 团队成员执行 `/plugin update team-standards` → `/reload-plugins`
 
 ## 升级编码规范
 
