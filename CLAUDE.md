@@ -1,0 +1,77 @@
+# team-standards 插件开发规范
+
+> 每次操作 skill 前必须阅读本文件，根据索引分析后再决策。
+
+---
+
+## Skill 索引
+
+| Skill 名称 | 目录 | 覆盖范围 | 关键词 |
+|-----------|------|---------|--------|
+| `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档；文档存储结构；coding-summary 自动生成 | 设计文档、需求、方案、实现前、新功能 |
+| `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名 | 提交、commit、git、分支 |
+| `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
+| `doc-index-required` | `skills/doc-index-required/` | 写文档前读取总索引与子目录索引；分析内容边界；半自动更新索引 | 文档、docs、写文档、索引、重复内容 |
+
+---
+
+## 辅助资源
+
+| 文件 | 所属 Skill | 用途 |
+|------|-----------|------|
+| `skills/design-doc-required/template.md` | design-doc-required | 18 节完整设计文档模板 |
+| `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板 |
+| `hooks/check-design-doc.cmd` | 可选 Hook | 提交前脚本级设计文档校验（默认禁用） |
+
+---
+
+## 操作前决策流程
+
+收到扩展或调整需求时，按以下顺序判断：
+
+```
+新需求进来
+    │
+    ├─ 关键词匹配已有 Skill？
+    │       ├─ 是 → 在该 Skill 的 SKILL.md 中扩展内容
+    │       └─ 否 ↓
+    │
+    ├─ 与多个已有 Skill 强相关？
+    │       ├─ 是 → 评估是否合并，或在最相关的 Skill 中新增章节
+    │       └─ 否 ↓
+    │
+    └─ 完全独立的规范领域？
+            └─ 是 → 在 skills/ 下新建目录，创建 SKILL.md
+```
+
+---
+
+## Skill 文件规范
+
+### 目录结构
+```
+skills/
+└── {skill-name}/           # kebab-case，与 frontmatter name 一致
+    ├── SKILL.md            # 必须
+    └── {辅助模板}.md       # 可选，由 SKILL.md 引用
+```
+
+### SKILL.md frontmatter 格式
+```yaml
+---
+name: skill-name            # 唯一标识，kebab-case
+description: 触发时机描述   # 明确说明何时 MUST 调用
+---
+```
+
+---
+
+## 维护规则
+
+**每次新增或修改 Skill 后，必须同步更新本文件的 Skill 索引表：**
+- 新增 Skill → 在索引表中追加一行，补充辅助资源表（如有）
+- 修改 Skill 覆盖范围 → 更新对应行的「覆盖范围」和「关键词」列
+- 删除 Skill → 从索引表和辅助资源表中移除对应行
+- 新增辅助模板文件 → 在辅助资源表中追加
+
+不更新索引视为操作未完成。
