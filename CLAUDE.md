@@ -12,6 +12,8 @@
 | `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名 | 提交、commit、git、分支 |
 | `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
 | `doc-index-required` | `skills/doc-index-required/` | 写文档前读取总索引与子目录索引；分析内容边界；半自动更新索引 | 文档、docs、写文档、索引、重复内容 |
+| `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；调用链必须用 Mermaid；根因必须用表格 | bug、缺陷、问题分析、bug文档、OOM、异常 |
+| `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
 
 ---
 
@@ -22,6 +24,7 @@
 | `skills/design-doc-required/template.md` | design-doc-required | 18 节完整设计文档模板 |
 | `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板 |
 | `hooks/check-design-doc.cmd` | 可选 Hook | 提交前脚本级设计文档校验（默认禁用） |
+| `skills/bug-doc-required/template.md` | bug-doc-required | bug 分析文档标准模板（6 节） |
 
 ---
 
