@@ -54,6 +54,7 @@
 | `doc-index-required` | 编写/创建 `docs/` 下任何文档时 | 读取总索引与子目录索引，分析内容边界，避免重复；写完后半自动更新索引 |
 | `bug-doc-required` | 编写 bug 分析文档时 | 强制规范章节结构；调用链必须用 Mermaid；根因必须用表格；内嵌调用 doc-index-required |
 | `pre-implementation-code-orientation` | 文档写完、开始实施代码前 | 从 bug/设计文档的坐标表精准 Read 关键文件，禁止重新扫描 |
+| `dev-log` | 任何 skill 或配置变更后 | 在 `docs/dev-log/YYYY-MM-DD.md` 记录变更原因和改动内容 |
 
 ## 设计文档模板
 
