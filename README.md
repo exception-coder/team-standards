@@ -35,9 +35,11 @@
 
 ## 升级
 
-当插件有更新时，执行以下命令同步最新版本：
+> Claude Code 会缓存 marketplace.json，`/plugin update` 只对比本地缓存版本，**不会自动重新拉取 GitHub**。若执行后仍显示已是最新，须用以下完整流程强制刷新缓存。
 
 ```
+/plugin marketplace remove exception-coder/team-standards
+/plugin marketplace add exception-coder/team-standards
 /plugin update team-standards
 /reload-plugins
 ```
