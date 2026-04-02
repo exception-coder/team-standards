@@ -95,5 +95,6 @@ description: 触发时机描述   # 明确说明何时 MUST 调用
 
 **发版检查清单（每次 push 前逐项确认）：**
 1. `.claude-plugin/plugin.json` 的 `version` 已按上表递增
-2. 本文件 Skill 索引表已同步（新增/修改/删除）
-3. README.md 的「包含的 Skills」表已同步（如有新增 Skill）
+2. `.claude-plugin/marketplace.json` 中对应插件的 `version` 已同步递增（两处必须一致，插件系统以 marketplace.json 为基准判断是否有更新）
+3. 本文件 Skill 索引表已同步（新增/修改/删除）
+4. README.md 的「包含的 Skills」表已同步（如有新增 Skill）
