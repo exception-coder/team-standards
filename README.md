@@ -50,6 +50,8 @@
 | `design-doc-required` | 开始任何开发任务前 | 检查设计文档，缺失时引导创建；自动生成编码摘要 `-coding.md` |
 | `git-commit-standards` | 执行 git commit 前 | 分析 staged 变更，生成标准化中文提交信息 |
 | `doc-index-required` | 编写/创建 `docs/` 下任何文档时 | 读取总索引与子目录索引，分析内容边界，避免重复；写完后半自动更新索引 |
+| `bug-doc-required` | 编写 bug 分析文档时 | 强制规范章节结构；调用链必须用 Mermaid；根因必须用表格；内嵌调用 doc-index-required |
+| `pre-implementation-code-orientation` | 文档写完、开始实施代码前 | 从 bug/设计文档的坐标表精准 Read 关键文件，禁止重新扫描 |
 
 ## 设计文档模板
 
