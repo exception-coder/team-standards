@@ -8,13 +8,14 @@
 
 | Skill 名称 | 目录 | 覆盖范围 | 关键词 |
 |-----------|------|---------|--------|
-| `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档；文档存储结构；coding-summary 自动生成 | 设计文档、需求、方案、实现前、新功能 |
+| `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档（新功能和 bug 修复均适用）；bug 修复简化版模板；文档存储结构；coding-summary 自动生成 | 设计文档、需求、方案、实现前、新功能、修复方案、实施方案、bug修复 |
 | `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名 | 提交、commit、git、分支 |
 | `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
 | `doc-index-required` | `skills/doc-index-required/` | 写文档前读取总索引与子目录索引；分析内容边界；半自动更新索引 | 文档、docs、写文档、索引、重复内容 |
 | `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；调用链必须用 Mermaid；根因必须用表格 | bug、缺陷、问题分析、bug文档、OOM、异常 |
 | `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
 | `dev-log` | `skills/dev-log/` | 每次对 team-standards 有变更时记录开发日志；在 docs/dev-log/ 下按日期创建日志文件 | 开发日志、变更记录、skill 修改、发版记录 |
+| `init-project-docs` | `skills/init-project-docs/` | 初始化项目文档：分析 controller/service/mapper 层，生成项目概要（project-overview.md）和架构能力分析（architecture-analysis.md）两份文档到 docs/ 目录 | 初始化项目文档、分析项目能力、生成项目概要、架构分析、init project docs |
 
 ---
 
@@ -26,6 +27,8 @@
 | `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板 |
 | `hooks/check-design-doc.cmd` | 可选 Hook | 提交前脚本级设计文档校验（默认禁用） |
 | `skills/bug-doc-required/template.md` | bug-doc-required | bug 分析文档标准模板（6 节） |
+| `skills/init-project-docs/overview-template.md` | init-project-docs | 项目概要文档模板（7 章节） |
+| `skills/init-project-docs/architecture-template.md` | init-project-docs | 架构能力分析文档模板（7 章节） |
 
 ---
 
@@ -82,6 +85,19 @@ description: 触发时机描述   # 明确说明何时 MUST 调用
 
 ---
 
+**每次修改 Skill 后，必须同步更新 `docs/skill-flow.md`：**
+
+| 变更程度 | 操作 |
+|---|---|
+| 轻微（措辞调整、新增红色警告、补充说明） | 直接更新 `skill-flow.md` 中对应行或节点文字 |
+| 较大（链路结构调整、skill 新增/删除、触发条件根本性变化） | 同时创建 `docs/skill-flow-{YYYYMMDD}-v{N}.md` 作为版本快照，并在 `skill-flow.md` 头部 blockquote 中更新"最后更新"和"历史版本"字段 |
+
+**判断标准**：链路图的节点或连线发生变化 = 较大变更；只有文字描述变化 = 轻微变更。
+
+不更新 skill-flow.md 视为操作未完成。
+
+---
+
 ## 发版规则（push 前必须执行）
 
 **每次 push 前，必须先更新 `.claude-plugin/plugin.json` 中的 `version` 字段，否则团队成员执行 `/plugin update` 无法检测到变更。**
@@ -98,4 +114,5 @@ description: 触发时机描述   # 明确说明何时 MUST 调用
 1. `.claude-plugin/plugin.json` 的 `version` 已按上表递增
 2. `.claude-plugin/marketplace.json` 中对应插件的 `version` 已同步递增（两处必须一致，插件系统以 marketplace.json 为基准判断是否有更新）
 3. 本文件 Skill 索引表已同步（新增/修改/删除）
-4. README.md 的「包含的 Skills」表已同步（如有新增 Skill）
+4. `docs/skill-flow.md` 已同步（链路结构变化时同时创建版本快照）
+5. README.md 的「包含的 Skills」表已同步（如有新增 Skill）

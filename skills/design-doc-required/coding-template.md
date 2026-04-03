@@ -33,6 +33,19 @@
 返回：{全类名} - 关键字段列表
 ```
 
+### 请求示例
+
+> 新增接口时必填，直接从设计文档 5.5 节提取。
+
+```http
+{HTTP方法} /v1/{path}
+Content-Type: application/json
+
+{
+  "field1": "value1"
+}
+```
+
 ### 关键方法签名（全类名）
 
 ```java

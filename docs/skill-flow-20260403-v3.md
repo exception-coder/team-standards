@@ -2,9 +2,9 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-03 v3**
+> **版本：2026-04-03 v3**
 > 变更摘要：新增 `dev-log` skill（team-standards 变更日志记录）；补充 team-standards 维护链路图；`init-project-docs` 正式纳入总览表（此前已存在但未记录版本）。
-> 历史版本：`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
+> 当前版本：`docs/skill-flow.md`
 
 ---
 

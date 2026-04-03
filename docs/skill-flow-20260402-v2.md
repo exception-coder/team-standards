@@ -2,9 +2,9 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-03 v3**
-> 变更摘要：新增 `dev-log` skill（team-standards 变更日志记录）；补充 team-standards 维护链路图；`init-project-docs` 正式纳入总览表（此前已存在但未记录版本）。
-> 历史版本：`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
+> **版本：2026-04-02 v2**
+> 变更摘要：bug 修复链路改为必须经过 design-doc-required（不再有条件分支）；doc-index-required 降为辅助步骤（嵌入其他 skill 中，不再作为独立节点出现在主链路上）。
+> 当前版本：`docs/skill-flow.md`
 
 ---
 
@@ -25,8 +25,6 @@
 | `requesting-code-review` | superpowers | 完成实现后请求代码审查 |
 | `git-commit-standards` | team-standards | 执行 git commit 前 |
 | `finishing-a-development-branch` | superpowers | 分支实现完成、决定如何集成时 |
-| `dev-log` | team-standards | 对 team-standards 有任何变更（skill/配置/模板修改）后、本次会话结束前 |
-| `init-project-docs` | team-standards | 要求初始化/分析项目文档时（独立分析类 skill，不进入开发链路） |
 
 ---
 
@@ -114,23 +112,6 @@ flowchart TD
 
 ---
 
-## team-standards 维护链路
-
-> 仅在**修改 team-standards 插件本身**时触发（修改 skill、模板、配置等）。与业务开发链路无关。
-
-```mermaid
-flowchart TD
-    M1(["对 team-standards 做了任何变更\nskill / 模板 / 配置 / 规则"]) --> M2["dev-log\n在 docs/dev-log/YYYY-MM-DD.md\n追加本次变更内容与原因"]
-    M2 --> M3{"本次会话需要发版?"}
-    M3 -- "是" --> M4["更新 plugin.json version\n同步更新 marketplace.json version\n更新 CLAUDE.md 索引表\n更新 README.md Skills 表\n更新 skill-flow.md"]
-    M3 -- "否" --> M5(["会话结束"])
-    M4 --> M5
-```
-
-> **触发判断：** 只要在本次会话中创建、修改、删除了 `skills/` 下任意文件，或调整了 `CLAUDE.md` 规则，即必须在会话结束前调用 `dev-log`。
-
----
-
 ## 文档-索引-coding 子循环详解
 
 这是最容易混淆的部分，拆解如下：
@@ -175,7 +156,6 @@ flowchart LR
 | `docs/bug/{名称}/{名称}.md` | 确认 bug 根因后 | 人 + AI 分析阶段 | 可补充，修复方案节只写方向摘要 |
 | `docs/design/{名称}修复/{名称}修复-vN.md` | bug 分析完成后 | AI 实施阶段 | 禁止修改已有版本，变更须新建 |
 | `docs/{subdir}/INDEX.md` | 首个文档创建时 | doc-index-required 读取 | 随文档新增自动追加 |
-| `docs/dev-log/YYYY-MM-DD.md` | team-standards 有变更时 | 人（追溯变更历史） | 当天可追加，禁止修改历史日期文件 |
 
 ---
 
@@ -190,6 +170,3 @@ flowchart LR
 | coding.md 和 current.md 有什么区别? | coding.md 是版本快照的精简摘要；current.md 是当前代码的终版描述，随代码直接覆盖 |
 | Bug 修复需要调 design-doc-required 吗? | **必须**。只要 bug 需要改代码，就必须有设计文档。bug 文档负责分析，设计文档负责实施方案，两者职责不同不可省略。bug 修复可用简化版模板（仅 8 节）。 |
 | bug 文档的修复方案节写什么? | 仅写方向摘要（每级一句话），加设计文档路径指引。详细实施细节写进设计文档。 |
-| dev-log 什么时候调? | 在对 team-standards 做了任何变更（skill/模板/配置）的会话结束前必须调用，记录改了什么、为什么改。 |
-| dev-log 和 git-commit-standards 有什么区别? | git-commit-standards 生成 commit 提交信息（面向 git 历史）；dev-log 记录变更背景与决策原因（面向人工追溯），两者均需执行。 |
-| init-project-docs 什么时候调? | 仅在明确要求"初始化项目文档"或"分析项目能力"时调用，是独立的分析类 skill，不属于功能开发或 bug 修复链路。 |
