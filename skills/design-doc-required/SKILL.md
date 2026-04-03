@@ -1,15 +1,19 @@
 ---
 name: design-doc-required
-description: Use when about to write any implementation code, add any feature, or start any development task. You MUST invoke this skill first, before writing a single line of code.
+description: "You MUST invoke this skill the instant a user presents any new requirement, feature request, refactoring plan, or asks you to analyze/evaluate/discuss implementation feasibility for a development task — even if they only ask for analysis, architecture discussion, or feasibility study. Do NOT wait until code-writing begins. Trigger phrases include: 'I have a requirement', 'I need to refactor', 'analyze whether X is feasible', 'how should we implement', 'I want to add/change/build', 'help me design', 'let's discuss the approach'. Invoke this skill BEFORE any analysis, planning, architecture discussion, or code."
 ---
 
 # 开发前设计文档强制检查
 
 ## 核心原则
 
-**禁止在没有设计文档的情况下编写任何实现代码。**
+**禁止在没有设计文档的情况下分析方案、讨论架构或编写任何实现代码。**
 
-这不是建议，是强制要求。无论任务看起来多简单，都必须先完成设计文档检查，再动手写代码。
+这不是建议，是强制要求。无论任务看起来多简单，也无论用户是要求「分析」还是「实现」，都必须先完成设计文档检查。
+
+<HARD-GATE>
+Do NOT analyze implementation approaches, discuss architecture, propose solutions, evaluate feasibility, or write any code until the design document check below is complete. This applies even when the user only asks for analysis or architectural discussion — design doc check comes FIRST, before any response about implementation.
+</HARD-GATE>
 
 ---
 
@@ -25,10 +29,12 @@ flowchart TD
     C -->|否| F[询问用户设计文档路径或名称]
     F --> G{用户能提供文档?}
     G -->|是| D
-    G -->|否| H[引导用户创建设计文档]
+    G -->|否| IDX["调用 doc-index-required\n完成索引读取与边界分析"]
+    IDX --> H[引导用户创建设计文档]
     H --> I[输出模板并要求填写]
     I --> J[等待用户确认文档已填写]
-    J --> Z
+    J --> IDX2["调用 doc-index-required 第五步\n更新 docs/design/INDEX.md"]
+    IDX2 --> Z
 ```
 
 ---
@@ -105,7 +111,10 @@ docs/design/
 
 1. 告知用户未找到对应需求的设计文档
 2. 询问是否有已有文档需要手动指定路径
-3. 若无文档，引导用户按规范创建：
+3. 若无文档，**立即调用 `doc-index-required`**，完成以下两项：
+   - 读取 `docs/INDEX.md` 与 `docs/design/INDEX.md`，确认内容边界（是否已有重叠文档）
+   - 分析结果告知用户后，进入文档创建引导
+4. 引导用户按规范创建：
 
 ---
 
@@ -122,6 +131,12 @@ docs/design/
 > 4. 填写完毕后告知我文件路径，我将读取后开始实现
 
 模板文件位于：`skills/design-doc-required/template.md`（安装后路径由 `$CLAUDE_PLUGIN_ROOT` 指定）
+
+### 第三·五步：文档写完后更新索引
+
+用户确认设计文档填写完毕后，**调用 `doc-index-required` 第五步**，将新文档登记到 `docs/design/INDEX.md`（含摘要和大纲）。若 `docs/INDEX.md` 中尚无 `design/` 条目，一并追加。
+
+---
 
 ### 第四步：自动生成编码摘要文档
 
@@ -205,6 +220,16 @@ docs/design/
 
 ---
 
+## 与其他 Skill 的协作关系
+
+| Skill | 何时调用 |
+|-------|---------|
+| `doc-index-required` | 文档不存在时，创建文档前必须先调用（读索引 + 边界分析）；文档写完后再次调用（更新索引） |
+| `pre-implementation-code-orientation` | 设计文档确认完毕、开始写第一行实现代码前调用 |
+| `dev-log` | 本次会话中对设计文档有实质性变更时，会话结束前调用 |
+
+---
+
 ## 红色警告
 
 以下想法出现时立即停止，回到文档检查流程：
@@ -215,3 +240,5 @@ docs/design/
 | "用户让我快点做" | 先确认文档，再快速实现 |
 | "我已经理解需求了" | 理解 ≠ 文档存在，仍须检查 |
 | "只改一个方法" | 判断是否属于例外情况，否则仍须检查 |
+| "直接建文件，不用查索引" | 必须先调用 doc-index-required，禁止跳过 |
+| "doc-index-required 会自动触发" | 不会。必须在本流程中显式调用，不依赖自动识别 |

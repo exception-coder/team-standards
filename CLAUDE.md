@@ -4,6 +4,24 @@
 
 ---
 
+## Skill 主动触发规范
+
+**Skill 必须主动触发，不等用户显式调用。** Claude 在以下场景必须自动识别并第一时间调用对应 Skill：
+
+| 用户意图 | 必须第一时间调用 |
+|---------|----------------|
+| 提出任何新需求、重构计划、技术方案讨论、可行性分析 | `design-doc-required` |
+| 报告 Bug、描述异常、请求分析问题根因 | `bug-doc-required` |
+| 即将创建或编辑 `docs/` 下任何文件 | `doc-index-required` |
+| 设计文档或 Bug 文档已确认，准备开始写第一行代码 | `pre-implementation-code-orientation` |
+| 执行 git commit 或生成提交信息 | `git-commit-standards` |
+| 编写或审查 Java 代码 | `java-coding-standards` |
+| 本次会话对 team-standards 有任何变更 | `dev-log`（会话结束前） |
+
+**核心原则：** 触发时机是用户表达意图的那一刻，而不是开始动手的那一刻。收到需求就触发 `design-doc-required`，不要等到真的要写代码时才触发。
+
+---
+
 ## Skill 索引
 
 | Skill 名称 | 目录 | 覆盖范围 | 关键词 |

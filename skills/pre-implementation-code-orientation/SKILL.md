@@ -1,6 +1,6 @@
 ---
 name: pre-implementation-code-orientation
-description: Use before writing any implementation code for a bug fix or feature. Reads the relevant doc (bug doc or design doc), extracts code coordinates from 涉及类清单 and 关键代码路径 tables, and loads each file directly by path and line number. Prevents redundant code scanning in the implementation phase.
+description: "You MUST invoke this skill after design-doc-required or bug-doc-required completes and a confirmed document exists, but BEFORE writing any implementation code. This is the mandatory bridge between documentation and coding. Trigger: user says 'start implementing', 'now write the code', 'let's begin coding', or you are about to make the first code edit for the task. Do NOT write a single line of implementation code until this skill has loaded the code coordinates from the document."
 ---
 
 # 实施前代码定位
