@@ -1,6 +1,6 @@
 ---
 name: bug-doc-required
-description: Use when writing a bug analysis document. Must invoke before creating or editing any file under docs/bug/. Enforces standard section structure, Mermaid diagrams, and index registration.
+description: "You MUST invoke this skill the moment a user reports a bug, describes an error/exception, asks you to investigate or analyze a problem, or mentions writing a bug analysis document. Trigger phrases include: 'there is a bug', 'this is broken', 'why is X happening', 'investigate this issue', 'analyze the root cause', 'we have an OOM/NPE/timeout', 'help me debug'. Invoke BEFORE starting any investigation, root cause analysis, or creating any file under docs/bug/. Pairs with doc-index-required — always invoke that skill too."
 ---
 
 # Bug 分析文档强制规范

@@ -1,6 +1,6 @@
 ---
 name: doc-index-required
-description: Use when about to write, create, or edit any documentation file under docs/. You MUST invoke this skill BEFORE writing any doc content. This includes design docs, bug analysis, API docs, changelogs, and any other markdown files under the docs/ directory. Do NOT invoke for updates to index files themselves (docs/INDEX.md, docs/*/INDEX.md).
+description: "You MUST invoke this skill BEFORE creating, writing, or editing ANY file under docs/ — no exceptions. This includes files created as part of design-doc-required, bug-doc-required, or any other workflow. If another skill is about to produce a docs/ file, invoke this skill first. Do NOT touch any docs/ file until index check is complete. Only exception: updates to index files themselves (docs/INDEX.md, docs/*/INDEX.md)."
 ---
 
 # 文档索引优先原则

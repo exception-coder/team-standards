@@ -9,7 +9,7 @@
     {
       "name": "team-standards",
       "description": "Claude Code 团队开发规范插件：Java 编码规范（阿里黄山版）+ 功能设计文档强制约束 + Git 提交规范",
-      "version": "1.3.3",
+      "version": "1.4.1",
       "source": "./",
       "author": {
         "name": "张凯",
