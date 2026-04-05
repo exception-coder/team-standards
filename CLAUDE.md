@@ -16,6 +16,7 @@
 | 设计文档或 Bug 文档已确认，准备开始写第一行代码 | `pre-implementation-code-orientation` |
 | 执行 git commit 或生成提交信息 | `git-commit-standards` |
 | 编写或审查 Java 代码 | `java-coding-standards` |
+| 生成或修改包含 Mermaid 图表的 Markdown 内容 | `markdown-writing-standards` |
 | 本次会话对 team-standards 有任何变更 | `dev-log`（会话结束前） |
 
 **核心原则：** 触发时机是用户表达意图的那一刻，而不是开始动手的那一刻。收到需求就触发 `design-doc-required`，不要等到真的要写代码时才触发。
@@ -34,6 +35,7 @@
 | `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
 | `dev-log` | `skills/dev-log/` | 每次对 team-standards 有变更时记录开发日志；在 docs/dev-log/ 下按日期创建日志文件 | 开发日志、变更记录、skill 修改、发版记录 |
 | `init-project-docs` | `skills/init-project-docs/` | 初始化项目文档：分析 controller/service/mapper 层，生成项目概要（project-overview.md）和架构能力分析（architecture-analysis.md）两份文档到 docs/ 目录 | 初始化项目文档、分析项目能力、生成项目概要、架构分析、init project docs |
+| `markdown-writing-standards` | `skills/markdown-writing-standards/` | Markdown 编写规范：Mermaid 图表语法（致命错误清单、各图类型骨架、自检清单）、表格、代码块、标题结构 | Mermaid、mermaid、图表、流程图、时序图、mindmap、状态图、markdown、表格规范 |
 
 ---
 
@@ -47,6 +49,7 @@
 | `skills/bug-doc-required/template.md` | bug-doc-required | bug 分析文档标准模板（6 节） |
 | `skills/init-project-docs/overview-template.md` | init-project-docs | 项目概要文档模板（7 章节） |
 | `skills/init-project-docs/architecture-template.md` | init-project-docs | 架构能力分析文档模板（7 章节） |
+| `skills/markdown-writing-standards/mermaid-syntax-ref.md` | markdown-writing-standards | Mermaid 各图类型语法速查手册 |
 
 ---
 

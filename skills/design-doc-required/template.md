@@ -23,14 +23,76 @@
 - 设计边界：
 
 ## 3. 功能范围
+
+### 3.1 功能模块总览图
+
+> **【必填·Mermaid】** 用 mermaid graph 绘制本次涉及的所有功能模块及其关系。
+> 要求：① 列出所有模块节点 ② 标注依赖/调用关系 ③ 区分新建与改造（虚线=已有） ④ 用 subgraph 按层/域分组
+
+```mermaid
+graph TD
+    subgraph 示例分组
+        A[模块A<br/>新建] --> B[模块B<br/>新建]
+        C[模块C<br/>改造] -.->|依赖| A
+    end
+    style C stroke-dasharray: 5 5
+```
+
+### 3.2 能力分解图
+
+> **【必填·Mermaid】** 用 mermaid mindmap 或 graph 拆解每个核心模块的具体能力点。
+
+```mermaid
+mindmap
+  root((核心模块))
+    能力域1
+      能力点A
+      能力点B
+    能力域2
+      能力点C
+```
+
+### 3.3 功能范围说明
+
 - 本次包含：
 - 本次不包含：
 - 后续扩展：
 
 ## 4. 业务流程设计
+
+> **【强制】** 本节所有流程图必须使用 mermaid 绘制，禁止 ASCII art。
+
 ### 4.1 正常流程
+
+> **【必填·Mermaid flowchart】** 用 `flowchart TD` 绘制主流程。
+
+```mermaid
+flowchart TD
+    A([开始]) --> B[步骤1]
+    B --> C{判断条件}
+    C -->|是| D[步骤2]
+    C -->|否| E[步骤3]
+    D --> F([结束])
+    E --> F
+```
+
 ### 4.2 异常流程
+
+> **【必填·Mermaid flowchart】** 用 `flowchart TD` 绘制异常处理流程。
+
 ### 4.3 状态流转
+
+> **【选填·Mermaid stateDiagram】** 若有实体状态变化，用 `stateDiagram-v2` 绘制。
+
+```mermaid
+stateDiagram-v2
+    [*] --> 初始状态
+    初始状态 --> 处理中: 触发事件
+    处理中 --> 完成: 处理成功
+    处理中 --> 失败: 处理异常
+    完成 --> [*]
+    失败 --> [*]
+```
 
 ## 5. 接口设计
 ### 5.1 接口清单
@@ -110,9 +172,14 @@ Content-Type: application/json
 
 ### 6.4 类调用关系
 
-> 描述主要调用链，使用全类名。
-> 示例：
-> `XxxController` → `XxxService#method()` → `XxxRepository#save()` → DB
+> **【必填·Mermaid】** 用 mermaid graph 或 sequenceDiagram 绘制核心调用链路，禁止纯文本箭头。
+
+```mermaid
+graph LR
+    A[XxxController] -->|method| B[XxxService]
+    B -->|save| C[XxxRepository]
+    C --> D[(Database)]
+```
 
 ## 7. 数据库设计
 ### 7.1 表设计
@@ -127,8 +194,15 @@ Content-Type: application/json
 ## 11. 消息与异步设计
 ## 12. 下游依赖设计
 
-> 列出依赖的外部服务/接口全类名或 FeignClient 全类名。
-> 示例：`com.example.pay.feign.PayFeignClient#createOrder(OrderDTO)`
+> **【必填·Mermaid graph】** 用 mermaid 绘制系统/组件间依赖关系图。
+> 同时列出依赖的外部服务/接口全类名或 FeignClient 全类名。
+
+```mermaid
+graph TD
+    A[本系统] -->|调用| B[依赖服务A]
+    A -->|调用| C[依赖服务B]
+    A -->|读写| D[(数据库)]
+```
 
 ## 13. 安全设计
 ## 14. 日志与监控设计

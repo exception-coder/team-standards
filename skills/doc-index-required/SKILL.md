@@ -1,6 +1,6 @@
 ---
 name: doc-index-required
-description: "You MUST invoke this skill BEFORE creating, writing, or editing ANY file under docs/ — no exceptions. This includes files created as part of design-doc-required, bug-doc-required, or any other workflow. If another skill is about to produce a docs/ file, invoke this skill first. Do NOT touch any docs/ file until index check is complete. Only exception: updates to index files themselves (docs/INDEX.md, docs/*/INDEX.md)."
+description: "You MUST invoke this skill BEFORE creating, writing, or editing ANY file under docs/ (at any nesting depth) — no exceptions. TRIGGER when: (1) about to call Write or Edit on any .md file whose absolute path contains /docs/ (including deeply nested paths like docs/design/xxx/yyy/file.md), (2) about to move, rename, or reorganize files under docs/, (3) user says '新建文档', '写文档', '整理文档', '移动文档', '重构文档目录', 'create doc', 'add doc', 'move doc', (4) another skill (design-doc-required, bug-doc-required, etc.) is about to produce a docs/ file — invoke this skill FIRST. Do NOT touch any docs/ file until index check is complete. Only exception: updates to index files themselves (docs/INDEX.md, docs/*/INDEX.md). IMPORTANT: This applies to ALL working directories, not just the primary project."
 ---
 
 # 文档索引优先原则

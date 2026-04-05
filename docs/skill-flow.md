@@ -2,8 +2,8 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-03 v3**
-> 变更摘要：新增 `dev-log` skill（team-standards 变更日志记录）；补充 team-standards 维护链路图；`init-project-docs` 正式纳入总览表（此前已存在但未记录版本）。
+> **最后更新：2026-04-04 v4**
+> 变更摘要：新增 `markdown-writing-standards` skill（Mermaid 图表 + Markdown 编写规范）；`design-doc-required` 的 Mermaid 语法规则拆出到新 skill，保留图表要求清单。
 > 历史版本：`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
 ---
@@ -26,6 +26,7 @@
 | `git-commit-standards` | team-standards | 执行 git commit 前 |
 | `finishing-a-development-branch` | superpowers | 分支实现完成、决定如何集成时 |
 | `dev-log` | team-standards | 对 team-standards 有任何变更（skill/配置/模板修改）后、本次会话结束前 |
+| `markdown-writing-standards` | team-standards | 生成或修改包含 Mermaid 图表的 Markdown 内容时（自动应用，与 java-coding-standards 同级） |
 | `init-project-docs` | team-standards | 要求初始化/分析项目文档时（独立分析类 skill，不进入开发链路） |
 
 ---
@@ -49,6 +50,7 @@ flowchart TD
 
     %% 文档层
     DDR["design-doc-required\n检查或创建设计文档\n（新功能 / bug 修复均适用）"]
+    MWS["markdown-writing-standards\nMermaid 语法自检"]
 
     %% 实施层
     PICO["pre-implementation-code-orientation\n从文档提取代码坐标"]
@@ -64,6 +66,10 @@ flowchart TD
 
     %% bug 分析文档完成后，必须写设计文档
     BDR -- "改代码时必须" --> DDR
+
+    %% 文档中含 Mermaid 时自动触发语法检查
+    DDR -. "含 Mermaid 图表时" .-> MWS
+    BDR -. "含 Mermaid 图表时" .-> MWS
 
     %% 汇入实施层
     DDR -- "文档就绪后" --> PICO
@@ -193,3 +199,5 @@ flowchart LR
 | dev-log 什么时候调? | 在对 team-standards 做了任何变更（skill/模板/配置）的会话结束前必须调用，记录改了什么、为什么改。 |
 | dev-log 和 git-commit-standards 有什么区别? | git-commit-standards 生成 commit 提交信息（面向 git 历史）；dev-log 记录变更背景与决策原因（面向人工追溯），两者均需执行。 |
 | init-project-docs 什么时候调? | 仅在明确要求"初始化项目文档"或"分析项目能力"时调用，是独立的分析类 skill，不属于功能开发或 bug 修复链路。 |
+| markdown-writing-standards 和 design-doc-required 的 Mermaid 章节什么关系? | design-doc-required 规定「必须画哪些图」（功能模块图、能力分解图等），markdown-writing-standards 规定「图怎么画不出错」（语法规则、自检清单）。前者定义 what，后者定义 how。 |
+| 写 Mermaid 时需要显式调用 markdown-writing-standards 吗? | 自动应用，与 java-coding-standards 同级。只要检测到要写 Mermaid 代码块，规则自动生效。 |
