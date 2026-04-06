@@ -30,11 +30,77 @@ description: Use when writing, reviewing, or modifying any Java code. You MUST f
 
 ## 3. 注释规范
 
+### 3.1 基本要求
+
 - 类、属性、方法注释必须用 Javadoc（`/** */`），禁止用 `//`
 - 所有抽象方法/接口方法必须有 Javadoc，说明做什么、返回值、参数、异常
 - 所有类必须注明创建者和创建日期
 - 枚举字段必须有注释说明用途
 - 注释掉的代码块须说明原因
+
+### 3.2 详细注释强制要求
+
+以下场景必须编写详细的中文注释，不得省略：
+
+**类级注释（必须包含）：**
+- 类的职责描述（这个类做什么、为什么存在）
+- 所属层级和模块（如：属于 Infrastructure 层控制平面模块）
+- 核心设计思路（如：基于 Semaphore 实现并发控制）
+- 与其他类的协作关系（如：被 DevPlanUseCase 调用，依赖 AgentExecutor）
+
+**方法级注释（必须包含）：**
+- 方法的业务语义（不是重复方法名，而是说明业务意图）
+- `@param` 每个参数的含义和约束（如：不能为空、取值范围）
+- `@return` 返回值的业务含义（如：返回生成的任务 ID，失败时抛异常而非返回 null）
+- `@throws` 可能抛出的异常及触发条件
+- 关键业务逻辑的步骤说明（用编号注释标注流程步骤）
+
+**行内注释（以下场景必须加）：**
+- 业务规则判断（如：`// 验证评分阈值：>=70 分视为通过`）
+- 非显而易见的技术决策（如：`// 使用 ConcurrentHashMap 而非 HashMap，因为多线程并发访问`）
+- 魔法数字/常量的含义（如：`// 最大修正次数，超过后不再重试`）
+- 降级/容错逻辑（如：`// 向量库不可用时降级为纯 LLM 分析`）
+- TODO 标记必须说明待完成的内容和原因
+
+**Record 类注释：**
+- Record 类本身须有类级 Javadoc，说明该数据结构的业务含义
+- 每个字段须有行内注释或 Javadoc 说明字段用途
+- Builder 模式的类须说明必填字段和可选字段
+
+**示例：**
+
+```java
+/**
+ * 并发控制器 — 基于 Semaphore 限制同时执行的任务数量
+ *
+ * <p>属于 Infrastructure 层控制平面模块，被 {@link DevPlanTaskManagerImpl} 调用。
+ * 通过信号量机制确保系统不会因过多并发任务而过载。</p>
+ *
+ * @author zhangkai
+ * @since 2026-04-06
+ */
+@Component
+public class ConcurrencyController {
+
+    /** 并发信号量，permits 数量由配置项 devplan.max-concurrent 决定 */
+    private final Semaphore semaphore;
+
+    /**
+     * 尝试获取一个并发执行槽位
+     *
+     * <p>使用非阻塞方式尝试获取，获取失败立即抛出异常而非排队等待，
+     * 避免请求堆积导致系统响应延迟。</p>
+     *
+     * @throws ConcurrencyExceededException 当前并发数已达上限时抛出
+     */
+    public void acquire() {
+        if (!semaphore.tryAcquire()) {
+            // 非阻塞获取失败，说明并发数已满，快速失败
+            throw new ConcurrencyExceededException("并发超限，请稍后重试");
+        }
+    }
+}
+```
 
 ## 4. OOP 规范
 
