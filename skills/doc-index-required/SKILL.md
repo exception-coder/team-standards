@@ -1,11 +1,20 @@
 ---
 name: doc-index-required
-description: "You MUST invoke this skill BEFORE creating, writing, or editing ANY file under docs/ (at any nesting depth) — no exceptions. TRIGGER when: (1) about to call Write or Edit on any .md file whose absolute path contains /docs/ (including deeply nested paths like docs/design/xxx/yyy/file.md), (2) about to move, rename, or reorganize files under docs/, (3) user says '新建文档', '写文档', '整理文档', '移动文档', '重构文档目录', 'create doc', 'add doc', 'move doc', (4) another skill (design-doc-required, bug-doc-required, etc.) is about to produce a docs/ file — invoke this skill FIRST. Do NOT touch any docs/ file until index check is complete. Only exception: updates to index files themselves (docs/INDEX.md, docs/*/INDEX.md). IMPORTANT: This applies to ALL working directories, not just the primary project."
+description: "You MUST invoke this skill BOTH BEFORE and AFTER creating, writing, or editing ANY file under docs/ (at any nesting depth). This skill has TWO phases: Phase-A (pre-write: read index + analyze boundaries) and Phase-B (post-write: update index). TRIGGER Phase-A when: (1) about to call Write or Edit on any .md file whose absolute path contains /docs/ (including deeply nested paths like docs/design/xxx/yyy/file.md), (2) about to move, rename, or reorganize files under docs/, (3) user says '新建文档', '写文档', '整理文档', '移动文档', '重构文档目录', 'create doc', 'add doc', 'move doc', (4) another skill (design-doc-required, bug-doc-required, etc.) is about to produce a docs/ file — invoke Phase-A FIRST. TRIGGER Phase-B when: docs/ file writing is complete, to update INDEX.md. Do NOT touch any docs/ file until Phase-A is complete. Only exception: updates to index files themselves (docs/INDEX.md, docs/*/INDEX.md). IMPORTANT: This applies to ALL working directories, not just the primary project."
 ---
 
 # 文档索引优先原则
 
-在编写或创建任何 `docs/` 目录下的文档之前，**必须先读取文档索引**，分析现有内容边界，再决定新建还是补充到已有文档。
+本 skill 分为 **两个阶段**，在文档编写的**前后**各执行一次：
+
+| 阶段 | 时机 | 职责 | 包含步骤 |
+|------|------|------|---------|
+| **Phase-A（前置）** | 文档编写**之前** | 读取索引、分析内容边界、判断新建还是补充 | 第一步 ~ 第三步 |
+| **Phase-B（后置）** | 文档编写**之后** | 更新索引，登记新文档或同步变更 | 第五步 |
+
+**调用方式：**
+- 其他 skill（如 `design-doc-required`、`bug-doc-required`）应在文档写作前调用 `doc-index-required Phase-A`，在文档写作后调用 `doc-index-required Phase-B`
+- 第四步（执行文档写作）由调用方自行完成，本 skill 不负责写作本身
 
 ## 不适用场景
 
@@ -15,7 +24,7 @@ description: "You MUST invoke this skill BEFORE creating, writing, or editing AN
 
 ---
 
-## 执行流程
+## Phase-A：前置阶段（文档编写前）
 
 ### 第一步：读取总索引
 
@@ -78,9 +87,13 @@ description: "You MUST invoke this skill BEFORE creating, writing, or editing AN
 
 ---
 
-### 第四步：执行文档写作
+> **Phase-A 到此结束。** 调用方现在执行文档写作，完成后再调用 Phase-B。
 
-按第三步的分析结论执行文档写作。
+---
+
+## Phase-B：后置阶段（文档编写后）
+
+### 第四步：（由调用方执行文档写作，本 skill 不介入）
 
 ---
 
