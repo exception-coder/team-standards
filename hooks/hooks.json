@@ -1,13 +1,25 @@
 {
-  "_comment": "Hook 配置，默认未启用。如需启用，将下方 _disabled_PreToolUse 改为 PreToolUse。",
+  "_comment": "Hook 配置，默认未启用。如需启用，将下方 _disabled_PreToolUse 改为 PreToolUse。Windows 使用 .cmd，macOS/Linux 使用 .sh。",
   "hooks": {},
-  "_disabled_PreToolUse": [
+  "_disabled_PreToolUse_windows": [
     {
       "matcher": "Write|Edit|MultiEdit",
       "hooks": [
         {
           "type": "command",
           "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/check-design-doc.cmd\"",
+          "async": false
+        }
+      ]
+    }
+  ],
+  "_disabled_PreToolUse_unix": [
+    {
+      "matcher": "Write|Edit|MultiEdit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/check-design-doc.sh\"",
           "async": false
         }
       ]

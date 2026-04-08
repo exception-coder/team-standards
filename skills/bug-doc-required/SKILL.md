@@ -7,7 +7,7 @@ description: "You MUST invoke this skill the moment a user reports a bug, descri
 
 ## 核心原则
 
-**编写 bug 文档必须遵守标准章节结构，调用链和状态流转必须使用 Mermaid 图。**
+**编写 bug 文档必须遵守标准章节结构，核心流程必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）。**
 
 ---
 
@@ -20,7 +20,7 @@ flowchart TD
     C -->|"是"| D["提示用户：是否补充到已有文档"]
     C -->|"否"| E["按命名规范确定文件名"]
     E --> F["按标准模板生成文档结构"]
-    F --> G["填充分析内容\n调用链用 Mermaid flowchart\n状态流转用 Mermaid stateDiagram"]
+    F --> G["填充分析内容\n核心流程必须生成 3 类图：\n时序图 + 流程图 + 泳道图"]
     G --> H["doc-index-required 第五步\n更新 INDEX.md"]
     H --> I(["完成"])
     D --> F
@@ -68,7 +68,7 @@ docs/bug/
 ## 触发条件
 ## 涉及类清单        ← 必须写全类名
 ## 关键代码路径      ← 文件路径 + 行号 + 说明
-## 调用链分析        ← 必须用 Mermaid flowchart
+## 核心流程分析      ← 必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）
 ## 相关代码 / SQL 清单
 ## 根因总结          ← 必须用表格
 ## 修复方案
@@ -117,19 +117,46 @@ docs/bug/
 - 说明聚焦「为什么这行重要」，不复述方法名
 - 核心问题代码行须加粗标注
 
-### 调用链分析
+### 核心流程分析
 
-**必须使用 Mermaid `flowchart`**，禁止用 ASCII 字符图（`├──`、`↓` 等）。
+**必须包含以下 3 类 Mermaid 图**，禁止用 ASCII 字符图（`├──`、`↓` 等）。
+
+| 图类型 | Mermaid 语法 | 侧重点 |
+|--------|-------------|--------|
+| 时序图 | `sequenceDiagram` | 组件间消息传递顺序、请求/响应方向、分支条件（alt/opt） |
+| 流程图 | `flowchart TD` | 完整决策路径、条件分支、异常处理走向 |
+| 泳道图 | `flowchart` + `subgraph` | 按职责层级划分（如 网关/业务层/数据层/外部系统），展示跨层调用关系 |
 
 Mermaid 语法规范：
 - 节点标签含 `=`、`,`、`/`、`(`、`)`、`[`、`]`、`:` 必须加双引号
 - `<` 和 `>` 改用文字替代，不得出现在标签内
 - 不使用 emoji
 - 并行分支用多条 `-->` 从同一节点分叉表示
+- 时序图中用 `rect rgb(...)` 高亮关键区域（如锁保护范围、事务边界）
+- 泳道图中 `subgraph` 标题用中文标注层级名称
 
-状态流转图使用 `stateDiagram-v2`。
+状态流转图（如有需要）使用 `stateDiagram-v2`。
 
-**示例（并行查询）：**
+**示例 — 时序图：**
+
+```mermaid
+sequenceDiagram
+    participant Client as "客户端"
+    participant Service as "业务层"
+    participant DB as "数据库"
+
+    Client->>Service: POST /api/order
+    Service->>DB: INSERT order
+    alt 写入成功
+        DB-->>Service: OK
+        Service-->>Client: 200
+    else 写入失败
+        DB-->>Service: Error
+        Service-->>Client: 500
+    end
+```
+
+**示例 — 流程图：**
 
 ```mermaid
 flowchart TD
@@ -139,6 +166,23 @@ flowchart TD
     C --> E["SQL-3 关联表 B"]
     D & E --> F["allOf join\n所有结果驻留堆内存"]
     F --> G["组装响应返回"]
+```
+
+**示例 — 泳道图：**
+
+```mermaid
+flowchart LR
+    subgraph "接入层"
+        A1["接收请求"]
+    end
+    subgraph "业务层"
+        B1["参数校验"]
+        B2["核心逻辑处理"]
+    end
+    subgraph "数据层"
+        C1["DB 读写"]
+    end
+    A1 --> B1 --> B2 --> C1
 ```
 
 ### 相关代码 / SQL 清单
@@ -179,7 +223,8 @@ flowchart TD
 
 | 想法 | 正确处理 |
 |---|---|
-| "调用链用文字描述就够了" | 必须用 Mermaid flowchart |
+| "调用链用文字描述就够了" | 必须用 3 类 Mermaid 图（时序图、流程图、泳道图） |
+| "画一种图就够了" | 3 类图各有侧重，缺一不可：时序看交互、流程看决策、泳道看分层 |
 | "根因写一段话说明" | 必须用表格，一行一个问题 |
 | "不用更新 INDEX.md" | doc-index-required 第五步是强制要求 |
 | "直接放在 docs/bug/ 根目录" | 必须建 {bug名称}/ 子目录再放文件 |

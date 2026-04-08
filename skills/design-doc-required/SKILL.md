@@ -15,6 +15,8 @@ description: "You MUST invoke this skill the instant a user presents any new req
 
 <HARD-GATE>
 Do NOT analyze implementation approaches, discuss architecture, propose solutions, evaluate feasibility, or write any code until the design document check below is complete. This applies even when the user only asks for analysis or architectural discussion — design doc check comes FIRST, before any response about implementation.
+
+Do NOT write any implementation code (Edit/Write .java, .ts, .py, etc.) until BOTH the design document AND the corresponding coding summary document (-coding.md) have been created and confirmed. The coding document is NOT optional — it is the second mandatory gate before any code change.
 </HARD-GATE>
 
 ---
@@ -27,7 +29,11 @@ flowchart TD
     B --> C{"文档存在且已填写完整?"}
     C -->|"是"| D["读取并引用文档内容"]
     D --> E["通知用户引用了哪份文档"]
-    E --> Z(["开始实现代码"])
+    E --> CODING{"coding 文档存在?"}
+    CODING -->|"是"| CODING_READ["读取 coding 文档"]
+    CODING -->|"否"| CODING_GEN["按 coding-template.md 生成"]
+    CODING_GEN --> CODING_READ
+    CODING_READ --> Z(["开始实现代码"])
     C -->|"否"| F["询问用户设计文档路径或名称"]
     F --> G{"用户能提供文档?"}
     G -->|"是"| D
@@ -41,7 +47,7 @@ flowchart TD
     H --> I["输出模板并要求填写"]
     I --> J["等待用户确认文档已填写"]
     J --> IDX_B["调用 doc-index-required Phase-B\n更新 docs/design/INDEX.md"]
-    IDX_B --> Z
+    IDX_B --> CODING
 ```
 
 ---
@@ -183,21 +189,40 @@ docs/design/
 
 ---
 
-### 第四步：自动生成编码摘要文档
+### 第四步：生成编码摘要文档（编码前第二道门禁）
 
-读取完整设计文档后，若 `-coding.md` 不存在，自动按 `coding-template.md` 生成：
+**编码摘要文档是编码前的第二道强制门禁。** 设计文档确认后、第一行实现代码之前，必须确保 `-coding.md` 存在。若不存在，立即按 `coding-template.md` 生成。
+
+> **禁止在 `-coding.md` 缺失的情况下开始编码。** 即使用户催促"直接写代码"，也必须先完成本步。
 
 文件命名：`{需求名称}-{YYYYMMDD}-v{N}-coding.md`（与完整文档版本对应）
 
-生成内容从完整文档中提取：
+#### 设计文档 vs 编码文档的职责边界
+
+| 内容 | 设计文档（template.md） | 编码文档（coding-template.md） |
+|------|----------------------|---------------------------|
+| 分层架构图 | 保留 | 不重复 |
+| 类清单 + 变更类型 + 一句话职责 | 保留（一行一类） | 展开方法级操作说明 |
+| 方法签名列表 | **不写** | 保留（全路径 + 签名 + 职责） |
+| 方法职责详细说明 | **不写** | 保留 |
+| 类调用关系图 | 保留（类级别方向） | 不重复 |
+| 表操作矩阵 | 保留（入参→表→出参概要） | 展开字段级细节 |
+| 实现伪代码 | **不写**——只放流程图 | 保留（完整实现代码） |
+
+**原则：设计文档回答"哪些类、什么职责、怎么协作"，编码文档回答"每个方法怎么写"。**
+
+#### 生成规则
+
+从完整文档中提取以下内容填入编码文档：
+
 - 变更记录 → 精简为一行摘要
-- 第 6 节类设计 → 提取**全类名**填入「涉及类清单」
-- 第 5 节接口设计 → 提取方法签名（须含全类名）
+- 第 6 节类清单 → 提取**全路径**填入「涉及类清单」，**补充方法签名和职责**（设计文档中没有方法级细节，需从业务流程和接口设计中推导）
+- 第 5 节接口设计 → 提取入口接口契约和请求示例
 - 第 8 节核心业务规则 → 原文提取
 - 第 7/9 节数据库/事务 → 提取关键字段和约束
 - 其余章节（背景、上线、风险等）**不纳入编码摘要**
 
-**全类名要求：** 类设计章节中所有类必须使用完整包路径，如 `com.example.order.service.impl.OrderServiceImpl`，禁止只写短类名，以便后期代码变更时精准定位文件。
+**全路径要求：** 类设计中所有类必须使用完整路径（包路径或文件路径），禁止只写短类名，以便精准定位代码文件。
 
 ---
 
@@ -219,10 +244,12 @@ docs/design/
 | 设计文档变更内容 | 需同步更新 coding 文档的章节 |
 |----------------|--------------------------|
 | 接口清单增删或分类调整 | 第 2 节：接口契约 |
-| 类清单增删或操作说明变更 | 第 3 节：涉及类清单 |
+| 类清单增删 | 第 3 节：涉及类清单（同步增删类条目，补充方法签名） |
 | 核心业务规则变更 | 第 1 节：核心业务规则 |
 | 数据库字段/DDL/Mapper 变更 | 第 4 节：数据结构 |
 | 约束、事务、边界说明变更 | 第 5 节：重要约束与边界 |
+
+> **注意**：设计文档的类清单只有一句话职责，coding 文档需自行补充方法签名和详细操作说明。设计文档新增一个类时，coding 文档不只是复制一行，而要展开该类的方法级细节。
 
 **变更记录必须同步追加一行**，与设计文档版本号保持一致。
 
@@ -244,7 +271,7 @@ docs/design/
 | **能力分解图** | 第 3 节（功能范围） | `mindmap` / `graph TD` | 每个功能模块的具体能力点拆解 |
 | **业务流程图** | 第 4 节（业务流程设计） | `flowchart TD` | 正常流程、异常流程的完整链路 |
 | **状态流转图** | 第 4 节（状态流转） | `stateDiagram-v2` | 实体状态变化（若有状态流转） |
-| **类调用关系图** | 第 6.4 节（类调用关系） | `graph LR` / `sequenceDiagram` | 核心调用链路可视化 |
+| **类调用关系图** | 第 6.3 节（类调用关系） | `graph LR` / `sequenceDiagram` | 核心调用链路可视化（类级别，不标方法名） |
 | **组件/接口依赖图** | 第 12 节（下游依赖） | `graph TD` | 系统间依赖关系 |
 
 ### 功能模块总览图要求
@@ -268,7 +295,7 @@ docs/design/
 - [ ] 第 3 节包含**能力分解图**（mermaid mindmap/graph），能看到每个模块的能力点
 - [ ] 第 4 节所有业务流程使用 **mermaid flowchart** 绘制，而非 ASCII art
 - [ ] 第 4.3 节状态流转使用 **mermaid stateDiagram**（若有状态变化）
-- [ ] 第 6.4 节类调用关系使用 **mermaid graph 或 sequenceDiagram**
+- [ ] 第 6.3 节类调用关系使用 **mermaid graph 或 sequenceDiagram**
 - [ ] 第 12 节下游依赖使用 **mermaid graph**
 - [ ] 文档中无任何 ASCII 框图（`┌─┐`、`│`、`└─┘`、`→`、`↓` 等字符画）
 - [ ] 所有 Mermaid 代码块已通过 `markdown-writing-standards` 自检清单
@@ -334,3 +361,5 @@ docs/design/
 | "直接建文件，不用查索引" | 必须先调用 doc-index-required Phase-A，禁止跳过 |
 | "doc-index-required 会自动触发" | 不会。必须在本流程中显式调用 Phase-A 和 Phase-B，不依赖自动识别 |
 | "子功能文件放父目录就行" | 子模块必须创建独立子目录，禁止将文件直接放在父需求目录下 |
+| "设计文档确认了，直接写代码" | 还差一步：必须确认 `-coding.md` 存在后才能编码 |
+| "coding 文档内容简单，不用生成" | 无论多简单，coding 文档是编码前的第二道强制门禁，不可跳过 |

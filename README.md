@@ -73,10 +73,10 @@
 
 如需更强的拦截（Claude 调用写文件工具前由脚本检查），可启用 Hook：
 
-1. 编辑 `hooks/hooks.json`，将 `_disabled_PreToolUse` 改为 `PreToolUse` 并移入 `hooks` 对象内
+1. 编辑 `hooks/hooks.json`，根据平台选择对应的 `_disabled_PreToolUse_windows`（Windows）或 `_disabled_PreToolUse_unix`（macOS/Linux），将其改为 `PreToolUse` 并移入 `hooks` 对象内
 2. 重新安装插件或执行 `/reload-plugins`
 
-Hook 脚本说明见 `hooks/check-design-doc.cmd`。
+Hook 脚本：Windows 使用 `hooks/check-design-doc.cmd`，macOS/Linux 使用 `hooks/check-design-doc.sh`。
 
 ## 配置个人 Git 署名
 

@@ -105,7 +105,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     BUG(["发现 Bug"]) --> DEBUG["systematic-debugging\n系统性定位根因"]
-    DEBUG --> BUGDOC["bug-doc-required\n编写 bug 分析文档\n调用链 Mermaid 根因表格\n修复方案节只写方向摘要"]
+    DEBUG --> BUGDOC["bug-doc-required\n编写 bug 分析文档\n3 类 Mermaid 图 + 根因表格\n修复方案节只写方向摘要"]
     BUGDOC -- "只要改代码（必须）" --> DDR["design-doc-required\n编写修复实施方案\ndocs/design/{名称}修复/\n使用 Bug 修复简化版模板"]
     DDR --> ORIENT["pre-implementation-code-orientation\n优先读设计文档提取代码坐标\n降级才读 bug 文档"]
     ORIENT --> CODE["java-coding-standards\n实施修复"]

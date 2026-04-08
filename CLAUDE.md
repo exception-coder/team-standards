@@ -31,7 +31,7 @@
 | `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名 | 提交、commit、git、分支 |
 | `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
 | `doc-index-required` | `skills/doc-index-required/` | 写文档前读取总索引与子目录索引；分析内容边界；半自动更新索引 | 文档、docs、写文档、索引、重复内容 |
-| `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；调用链必须用 Mermaid；根因必须用表格 | bug、缺陷、问题分析、bug文档、OOM、异常 |
+| `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；核心流程必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）；根因必须用表格 | bug、缺陷、问题分析、bug文档、OOM、异常 |
 | `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
 | `dev-log` | `skills/dev-log/` | 每次对 team-standards 有变更时记录开发日志；在 docs/dev-log/ 下按日期创建日志文件 | 开发日志、变更记录、skill 修改、发版记录 |
 | `init-project-docs` | `skills/init-project-docs/` | 初始化项目文档：分析 controller/service/mapper 层，生成项目概要（project-overview.md）和架构能力分析（architecture-analysis.md）两份文档到 docs/ 目录 | 初始化项目文档、分析项目能力、生成项目概要、架构分析、init project docs |
@@ -45,7 +45,8 @@
 |------|-----------|------|
 | `skills/design-doc-required/template.md` | design-doc-required | 18 节完整设计文档模板 |
 | `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板 |
-| `hooks/check-design-doc.cmd` | 可选 Hook | 提交前脚本级设计文档校验（默认禁用） |
+| `hooks/check-design-doc.cmd` | 可选 Hook | 设计文档校验脚本 — Windows（默认禁用） |
+| `hooks/check-design-doc.sh` | 可选 Hook | 设计文档校验脚本 — macOS/Linux（默认禁用） |
 | `skills/bug-doc-required/template.md` | bug-doc-required | bug 分析文档标准模板（6 节） |
 | `skills/init-project-docs/overview-template.md` | init-project-docs | 项目概要文档模板（7 章节） |
 | `skills/init-project-docs/architecture-template.md` | init-project-docs | 架构能力分析文档模板（7 章节） |

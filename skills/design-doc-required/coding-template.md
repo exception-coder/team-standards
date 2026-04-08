@@ -2,6 +2,9 @@
 
 > 本文档由完整设计文档精简而来，供 AI 辅助编码时使用，聚焦实现所需的最小必要信息。
 > 对应完整文档：`{需求名称}-{YYYYMMDD}-v{N}.md`
+>
+> **职责边界**：设计文档回答"哪些类、什么职责、怎么协作"，本文档回答"每个方法怎么写"。
+> 方法签名、方法职责、参数/返回值说明、实现伪代码等**只在本文档中维护**，设计文档不展开。
 
 ---
 
@@ -46,24 +49,30 @@ Content-Type: application/json
 }
 ```
 
-### 关键方法签名（全类名）
-
-```java
-// 示例
-com.example.order.service.OrderService#createOrder(OrderCreateDTO dto): OrderVO
-com.example.order.service.impl.OrderServiceImpl#validateStock(Long skuId, Integer qty): void
-```
-
 ---
 
-## 3. 涉及类清单（全类名）
+## 3. 涉及类清单（全路径）
 
-| 全类名 | 操作 | 说明 |
+> 展开每个类的具体操作：新增/修改了哪些方法，每个方法的签名和职责。
+> 这是编码的核心参考——设计文档只列类名和一句话职责，本节展开实现细节。
+
+| 全路径 | 操作 | 说明 |
 |--------|------|------|
 | `com.example.xxx.XxxController` | 新建 | |
 | `com.example.xxx.XxxServiceImpl` | 修改 | 新增 method1、method2 |
 | `com.example.xxx.domain.XxxDO` | 新增字段 | 新增 status 字段 |
 | `com.example.xxx.convert.XxxConvert` | 新建 | DO→VO 转换 |
+
+### 关键方法签名与职责
+
+> 列出所有新增/修改的方法签名，附一句话说明。
+> 格式：`全路径#方法名(参数): 返回值` — 职责说明
+
+```
+// 示例
+com.example.order.service.OrderService#createOrder(OrderCreateDTO dto): OrderVO — 创建订单主流程
+com.example.order.service.impl.OrderServiceImpl#validateStock(Long skuId, Integer qty): void — 校验库存
+```
 
 ---
 
@@ -99,8 +108,8 @@ BigDecimal amount;   // 金额，精度2位
 
 ## 6. 下游依赖调用
 
-```java
-// FeignClient / RPC 调用
+```
+// FeignClient / RPC / 内部 Service 调用
 com.example.pay.feign.PayFeignClient#pay(PayDTO): PayResultDTO
 com.example.inventory.feign.InventoryFeignClient#deduct(DeductDTO): Boolean
 ```

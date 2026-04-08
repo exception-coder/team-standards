@@ -139,45 +139,37 @@ Content-Type: application/json
 
 ## 6. 类设计
 
-> **要求：所有类名必须填写全类名（含包路径），以便后期精准定位代码文件。**
-> 示例：`com.example.order.service.impl.OrderPayServiceImpl`
+> **本节定位：回答"哪些类、什么职责、怎么协作"。**
+> 方法签名、方法职责、实现伪代码等编码级细节归入 `-coding.md`（编码摘要文档），设计文档不展开。
+>
+> **要求：所有类名必须填写全路径（含包/目录路径），以便精准定位代码文件。**
 
 ### 6.1 分层设计
 
-> 说明各层职责划分，标注每层对应的包路径前缀。
-> 示例：
-> - Controller 层：`com.example.order.controller`
-> - Service 层：`com.example.order.service` / `com.example.order.service.impl`
-> - Repository 层：`com.example.order.repository`
-> - Domain 层：`com.example.order.domain`
+> 说明各层职责划分，标注每层对应的包/目录路径前缀。
 
 ### 6.2 核心类清单
 
-| 全类名 | 类型 | 职责说明 | 是否新建 |
-|--------|------|----------|----------|
-| `com.example.xxx.XxxController` | Controller | | 是/否 |
-| `com.example.xxx.XxxService` | Interface | | 是/否 |
-| `com.example.xxx.impl.XxxServiceImpl` | Service 实现 | | 是/否 |
-| `com.example.xxx.XxxRepository` | Repository | | 是/否 |
-| `com.example.xxx.domain.XxxDO` | 数据对象 | | 是/否 |
-| `com.example.xxx.dto.XxxDTO` | 传输对象 | | 是/否 |
-| `com.example.xxx.vo.XxxVO` | 展示对象 | | 是/否 |
-| `com.example.xxx.convert.XxxConvert` | MapStruct 转换器 | | 是/否 |
+> 列出本次涉及的所有类。每类一行，标注变更类型和一句话职责。
+> **不展开方法列表**——方法级细节在 coding 文档中描述。
 
-### 6.3 类职责说明
+| 全路径 | 类型 | 变更 | 一句话职责 |
+|--------|------|------|-----------|
+| `com.example.xxx.XxxController` | Controller | 新增 | 接收请求，调用 Service |
+| `com.example.xxx.XxxServiceImpl` | Service | 修改 | 业务编排，调用 Repository |
+| `com.example.xxx.XxxRepository` | Repository | 不变 | 数据访问 |
+| `com.example.xxx.domain.XxxDO` | Domain | 新增 | 数据对象 |
+| `com.example.xxx.convert.XxxConvert` | MapStruct | 新增 | DO/DTO/VO 转换 |
 
-> 对 6.2 中每个类的职责进行详细描述，尤其是核心方法签名。
-> 示例：
-> - `com.example.order.service.impl.OrderPayServiceImpl#pay(PayRequestDTO)`：处理支付主流程，含幂等校验、状态机流转、事件发布
-
-### 6.4 类调用关系
+### 6.3 类调用关系
 
 > **【必填·Mermaid】** 用 mermaid graph 或 sequenceDiagram 绘制核心调用链路，禁止纯文本箭头。
+> 只画类级别的调用方向，不标注具体方法名。
 
 ```mermaid
 graph LR
-    A[XxxController] -->|method| B[XxxService]
-    B -->|save| C[XxxRepository]
+    A[XxxController] --> B[XxxService]
+    B --> C[XxxRepository]
     C --> D[(Database)]
 ```
 
