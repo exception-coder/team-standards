@@ -2,8 +2,9 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-10 v5**
-> 变更摘要：新增 `business-logic-orientation` skill（重构/复写前业务逻辑现状梳理，产出 3 图 + 知识图谱 + AI 速查索引）；新增重构入口路径。
+> **最后更新：2026-04-10 v5.1**
+> 变更摘要：`design-doc-required` 新增 Mermaid 分组规范（subgraph/box），要求同一主题的节点必须包裹到同一 BOX 中。
+> 上一版：v5 新增 `business-logic-orientation` skill；新增重构入口路径。
 > 历史版本：`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
 ---
