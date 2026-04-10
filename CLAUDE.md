@@ -17,6 +17,7 @@
 | 执行 git commit 或生成提交信息 | `git-commit-standards` |
 | 编写或审查 Java 代码 | `java-coding-standards` |
 | 生成或修改包含 Mermaid 图表的 Markdown 内容 | `markdown-writing-standards` |
+| 重构/复写/迁移前需要理解现有业务逻辑 | `business-logic-orientation` |
 | 本次会话对 team-standards 有任何变更 | `dev-log`（会话结束前） |
 
 **核心原则：** 触发时机是用户表达意图的那一刻，而不是开始动手的那一刻。收到需求就触发 `design-doc-required`，不要等到真的要写代码时才触发。
@@ -36,6 +37,7 @@
 | `dev-log` | `skills/dev-log/` | 每次对 team-standards 有变更时记录开发日志；在 docs/dev-log/ 下按日期创建日志文件 | 开发日志、变更记录、skill 修改、发版记录 |
 | `init-project-docs` | `skills/init-project-docs/` | 初始化项目文档：分析 controller/service/mapper 层，生成项目概要（project-overview.md）和架构能力分析（architecture-analysis.md）两份文档到 docs/ 目录 | 初始化项目文档、分析项目能力、生成项目概要、架构分析、init project docs |
 | `markdown-writing-standards` | `skills/markdown-writing-standards/` | Markdown 编写规范：Mermaid 图表语法（致命错误清单、各图类型骨架、自检清单）、表格、代码块、标题结构 | Mermaid、mermaid、图表、流程图、时序图、mindmap、状态图、markdown、表格规范 |
+| `business-logic-orientation` | `skills/business-logic-orientation/` | 重构/复写/迁移前业务逻辑现状梳理：按场景维度产出 3 图（时序图/流程图/泳道图）+ 知识图谱 + 核心代码索引 + AI 速查索引；后端附加表操作矩阵和状态扭转明细 | 现状梳理、业务逻辑、重构前分析、知识图谱、逻辑梳理、场景分析、调用链分析、AI索引 |
 
 ---
 
@@ -51,6 +53,8 @@
 | `skills/init-project-docs/overview-template.md` | init-project-docs | 项目概要文档模板（7 章节） |
 | `skills/init-project-docs/architecture-template.md` | init-project-docs | 架构能力分析文档模板（7 章节） |
 | `skills/markdown-writing-standards/mermaid-syntax-ref.md` | markdown-writing-standards | Mermaid 各图类型语法速查手册 |
+| `skills/business-logic-orientation/template.md` | business-logic-orientation | 业务逻辑梳理文档模板（7+5 章节） |
+| `skills/business-logic-orientation/ai-ref-template.md` | business-logic-orientation | AI 速查索引模板（7 章节，紧凑结构） |
 
 ---
 
