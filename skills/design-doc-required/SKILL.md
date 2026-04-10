@@ -1,6 +1,6 @@
 ---
 name: design-doc-required
-description: "You MUST invoke this skill the instant a user presents any new requirement, feature request, refactoring plan, or asks you to analyze/evaluate/discuss implementation feasibility for a development task — even if they only ask for analysis, architecture discussion, or feasibility study. Do NOT wait until code-writing begins. Trigger phrases include: 'I have a requirement', 'I need to refactor', 'analyze whether X is feasible', 'how should we implement', 'I want to add/change/build', 'help me design', 'let's discuss the approach'. Invoke this skill BEFORE any analysis, planning, architecture discussion, or code."
+description: "You MUST invoke this skill the instant a user presents any new requirement, feature request, refactoring plan, asks you to analyze/evaluate/discuss implementation feasibility, OR requests any code modification/implementation — even if they only ask for analysis, architecture discussion, feasibility study, or say 'just help me change the code'. Do NOT wait until code-writing begins. Trigger phrases include: 'I have a requirement', 'I need to refactor', 'analyze whether X is feasible', 'how should we implement', 'I want to add/change/build', 'help me design', 'let's discuss the approach', 'help me modify the code', 'change the code based on this document', 'implement according to the doc', 'update this feature', '帮我修改代码', '根据文档改代码', '按文档实现', '帮我改一下', '修改这个功能', '帮我写代码', '改一下代码', '阅读文档帮我改'. ALSO trigger when: (1) the user provides or references a document and asks you to make code changes based on it, (2) you are about to call Edit/Write on any source code file (.java, .dart, .ts, .py, .kt, etc.) and this skill has not yet been invoked in the current conversation. Invoke this skill BEFORE any analysis, planning, architecture discussion, or code."
 ---
 
 # 开发前设计文档强制检查
@@ -363,3 +363,6 @@ docs/design/
 | "子功能文件放父目录就行" | 子模块必须创建独立子目录，禁止将文件直接放在父需求目录下 |
 | "设计文档确认了，直接写代码" | 还差一步：必须确认 `-coding.md` 存在后才能编码 |
 | "coding 文档内容简单，不用生成" | 无论多简单，coding 文档是编码前的第二道强制门禁，不可跳过 |
+| "用户让我根据文档直接改代码" | 有文档 ≠ 已完成设计文档检查，仍须先触发本 skill 确认文档合规，再走 coding.md 门禁 |
+| "用户只是让我帮忙改一下代码，不是新需求" | 任何源码 Edit/Write 操作都必须先过本 skill，由本 skill 判断是否属于合法例外 |
+| "用户已经提供了分析文档，可以直接编码" | 分析/梳理文档 ≠ 设计文档，仍须检查 `docs/design/` 下是否有对应的设计文档和 coding.md |

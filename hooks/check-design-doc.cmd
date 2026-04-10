@@ -1,4 +1,5 @@
 @echo off
+setlocal
 REM =============================================================
 REM 功能设计文档存在性检查脚本（示例）
 REM 触发时机：PreToolUse（Claude 调用 Write/Edit 工具前）
@@ -11,6 +12,8 @@ REM     1 = 阻断操作，Claude 会收到 stderr 内容作为错误提示
 REM =============================================================
 
 REM 获取当前工作目录（Claude 执行时的项目根目录）
+set "SCRIPT_DIR=%~dp0"
+for %%I in ("%SCRIPT_DIR%..") do set "PLUGIN_ROOT=%%~fI"
 set "PROJECT_DIR=%CD%"
 set "DESIGN_DOC_FOUND=0"
 
@@ -30,5 +33,6 @@ if "%DESIGN_DOC_FOUND%"=="1" (
     echo 请先在 docs/design/ 目录下创建功能设计文档（.md 格式），>&2
     echo 参考模板：skills/design-doc-required/template.md>&2
     echo 填写完毕后重新执行开发任务。>&2
+    echo Reference template: %PLUGIN_ROOT%\skills\design-doc-required\template.md>&2
     exit /b 1
 )

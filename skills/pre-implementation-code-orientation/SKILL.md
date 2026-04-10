@@ -1,6 +1,6 @@
 ---
 name: pre-implementation-code-orientation
-description: "You MUST invoke this skill after design-doc-required or bug-doc-required completes and a confirmed document exists, but BEFORE writing any implementation code. This is the mandatory bridge between documentation and coding. Trigger: user says 'start implementing', 'now write the code', 'let's begin coding', or you are about to make the first code edit for the task. Do NOT write a single line of implementation code until this skill has loaded the code coordinates from the document."
+description: "You MUST invoke this skill after design-doc-required or bug-doc-required completes and a confirmed document exists, but BEFORE writing any implementation code. This is the mandatory bridge between documentation and coding. Trigger: user says 'start implementing', 'now write the code', 'let's begin coding', 'help me modify the code', 'change the code', '帮我修改代码', '改代码', '开始写代码', '帮我改一下', or you are about to make the first code edit (Edit/Write on .java, .dart, .ts, .py, .kt, etc.) for the task. Do NOT write a single line of implementation code until this skill has loaded the code coordinates from the document."
 ---
 
 # 实施前代码定位

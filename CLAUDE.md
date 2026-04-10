@@ -11,6 +11,7 @@
 | 用户意图 | 必须第一时间调用 |
 |---------|----------------|
 | 提出任何新需求、重构计划、技术方案讨论、可行性分析 | `design-doc-required` |
+| **请求修改/编写代码（含「根据文档改代码」「帮我改一下」等）** | `design-doc-required` |
 | 报告 Bug、描述异常、请求分析问题根因 | `bug-doc-required` |
 | 即将创建或编辑 `docs/` 下任何文件 | `doc-index-required` |
 | 设计文档或 Bug 文档已确认，准备开始写第一行代码 | `pre-implementation-code-orientation` |
@@ -21,6 +22,8 @@
 | 本次会话对 team-standards 有任何变更 | `dev-log`（会话结束前） |
 
 **核心原则：** 触发时机是用户表达意图的那一刻，而不是开始动手的那一刻。收到需求就触发 `design-doc-required`，不要等到真的要写代码时才触发。
+
+**兜底规则：** 若 Claude 即将对源码文件（`.java`、`.dart`、`.ts`、`.py`、`.kt` 等）执行 Edit/Write 操作，但当前会话尚未完成 `design-doc-required` 检查，必须立即停止并先触发该 skill。不存在「任务太简单可以跳过」的例外（Bug 修复、纯重构等合法例外在 skill 内部判断）。
 
 ---
 

@@ -15,10 +15,10 @@
 | `brainstorming` | superpowers | 任何功能创建、组件构建、行为改动前 |
 | `writing-plans` | superpowers | 有 spec 或需求时，制定多步实施计划 |
 | `systematic-debugging` | superpowers | 遇到 bug、测试失败、异常行为时 |
-| `design-doc-required` | team-standards | 写任何实现代码前，或被要求提供修复方案/实施方案时（新功能和 bug 修复均适用） |
+| `design-doc-required` | team-standards | 写任何实现代码前，或被要求提供修复方案/实施方案时（新功能和 bug 修复均适用）；**任何源码 Edit/Write 请求（含「根据文档改代码」「帮我改一下」等）也必须先触发** |
 | `doc-index-required` | team-standards | **(辅助)** 写 docs/ 文档后自动更新索引，已嵌入 bug-doc / design-doc 流程，**无需单独调用** |
 | `bug-doc-required` | team-standards | 编写 bug 分析文档时；完成后必须继续调用 design-doc-required 写修复实施方案 |
-| `pre-implementation-code-orientation` | team-standards | 文档写完后、开始实施代码前 |
+| `pre-implementation-code-orientation` | team-standards | 文档写完后、开始实施代码前（含「帮我修改代码」「改代码」等直接编码请求） |
 | `java-coding-standards` | team-standards | 编写或修改任何 Java 代码时（自动应用） |
 | `test-driven-development` | superpowers | 实现功能或 bugfix 前（先写测试） |
 | `verification-before-completion` | superpowers | 声明工作完成、提交或建 PR 前 |
