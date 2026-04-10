@@ -4,26 +4,39 @@
 
 - **Java 编码规范**（阿里巴巴黄山版·强制项精简版）
 - **功能设计文档强制约束**（开发前必须有设计文档，否则引导创建）
+- **Bug 分析文档规范**（报告 Bug 时强制规范章节结构、Mermaid 图、根因表格）
 - **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息）
 - **文档索引优先约束**（编写任何文档前读取索引，分析内容边界，避免重复，写完后半自动更新索引）
+- **Markdown 编写规范**（Mermaid 图表语法、表格、代码块等）
+- **业务逻辑现状梳理**（重构/迁移前按场景维度产出流程图、知识图谱、代码索引）
+- **实施前代码定位**（从文档坐标表精准定位关键文件，禁止重新扫描）
+
+## 仓库地址
+
+| 仓库 | 地址 | 说明 |
+|------|------|------|
+| GitLab（主仓） | `https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git` | 日常维护与分发 |
+| GitHub（镜像） | `https://github.com/exception-coder/team-standards` | 仅作镜像备份 |
 
 ## 安装
 
-> Claude Code 插件通过 marketplace 机制安装，需要两步完成。
+在 Claude Code 中依次执行以下三步：
 
-**第一步：注册 marketplace**
-
-在 Claude Code 中执行：
+**第一步：注册 marketplace（指向 GitLab 仓库）**
 
 ```
-/plugin marketplace add exception-coder/team-standards
+/plugin marketplace add https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 ```
+
+> 此命令会将 GitLab 仓库克隆到本地插件缓存目录，无需手动 `git clone`。
 
 **第二步：安装插件**
 
 ```
 /plugin install team-standards@team-standards
 ```
+
+安装时选择作用域（推荐 user 级别，全局生效）。
 
 **第三步：重载生效**
 
@@ -33,29 +46,44 @@
 
 完成后可通过 `/plugin` → Installed 标签页确认插件已安装。
 
-## 升级
+### 备选：本地目录安装
 
-> Claude Code 会缓存 marketplace.json，`/plugin update` 只对比本地缓存版本，**不会自动重新拉取 GitHub**。若执行后仍显示已是最新，须用以下完整流程强制刷新缓存。
+如果已手动克隆仓库到本地，也可以用本地路径注册：
+
+```bash
+git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
+```
 
 ```
-/plugin marketplace remove exception-coder/team-standards
-/plugin marketplace add exception-coder/team-standards
+/plugin marketplace add /path/to/kpay-team-standards
+/plugin install team-standards@team-standards
+/reload-plugins
+```
+
+## 升级
+
+```
+/plugin marketplace update team-standards
 /plugin update team-standards
 /reload-plugins
 ```
+
+> 如果是本地目录安装方式，需先进入仓库目录执行 `git pull`，再执行 `/reload-plugins`。
 
 ## 包含的 Skills
 
 | Skill | 触发时机 | 作用 |
 |-------|----------|------|
+| `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；自动生成编码摘要 |
+| `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格 |
+| `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
 | `java-coding-standards` | 编写/审查任何 Java 代码时 | 强制遵守阿里黄山版编码规范 |
-| `design-doc-required` | 开始任何开发任务前 | 检查设计文档，缺失时引导创建；自动生成编码摘要 `-coding.md` |
 | `git-commit-standards` | 执行 git commit 前 | 分析 staged 变更，生成标准化中文提交信息 |
-| `doc-index-required` | 编写/创建 `docs/` 下任何文档时 | 读取总索引与子目录索引，分析内容边界，避免重复；写完后半自动更新索引 |
-| `bug-doc-required` | 编写 bug 分析文档时 | 强制规范章节结构；调用链必须用 Mermaid；根因必须用表格；内嵌调用 doc-index-required |
-| `pre-implementation-code-orientation` | 文档写完、开始实施代码前 | 从 bug/设计文档的坐标表精准 Read 关键文件，禁止重新扫描 |
-| `business-logic-orientation` | 重构/复写/迁移前需要理解现有业务逻辑时 | 按场景维度产出 3 图 + 知识图谱 + 核心代码索引 + AI 速查索引；后端附加表操作矩阵和状态扭转明细 |
-| `dev-log` | 任何 skill 或配置变更后 | 在 `docs/dev-log/YYYY-MM-DD.md` 记录变更原因和改动内容 |
+| `doc-index-required` | 编写/创建 `docs/` 下任何文档时 | 读取索引，分析内容边界，避免重复；写完后更新索引 |
+| `markdown-writing-standards` | 生成或修改含 Mermaid 图表的 Markdown 时 | Mermaid 语法规范、表格规范、代码块规范 |
+| `business-logic-orientation` | 重构/复写/迁移前需要理解现有业务逻辑时 | 按场景维度产出流程图、知识图谱、核心代码索引 |
+| `init-project-docs` | 初始化项目文档时 | 分析 controller/service/mapper 层，生成项目概要和架构分析 |
+| `dev-log` | 任何 skill 或配置变更后 | 在 `docs/dev-log/` 下记录变更原因和改动内容 |
 
 ## 设计文档模板
 
@@ -90,7 +118,7 @@ Author: 你的姓名 <你的邮箱>
 
 ## 发版规则
 
-插件缓存系统通过 `.claude-plugin/plugin.json` 中的 `version` 字段判断是否有更新。**每次发布必须递增版本号**，否则 `/plugin update` 无法检测到变更。
+通过 `.claude-plugin/plugin.json` 中的 `version` 字段判断是否有更新。**每次发布必须递增版本号**，否则升级无法检测到变更。
 
 版本号遵循语义化版本（SemVer）：
 
@@ -103,9 +131,5 @@ Author: 你的姓名 <你的邮箱>
 发版流程：
 
 1. 修改 `.claude-plugin/plugin.json` 中的 `version` 字段
-2. 提交并推送到远端
-3. 团队成员执行 `/plugin update team-standards` → `/reload-plugins`
-
-## 升级编码规范
-
-如需更新 Java 编码规范内容，直接编辑 `skills/java-coding-standards/SKILL.md`，push 后团队成员执行 `/plugin update team-standards` 即可同步。
+2. 提交并推送到 GitLab
+3. 团队成员执行 `/plugin marketplace update team-standards` → `/plugin update team-standards` → `/reload-plugins`
