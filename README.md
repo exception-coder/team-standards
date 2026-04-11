@@ -83,6 +83,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `markdown-writing-standards` | 生成或修改含 Mermaid 图表的 Markdown 时 | Mermaid 语法规范、表格规范、代码块规范 |
 | `business-logic-orientation` | 重构/复写/迁移前需要理解现有业务逻辑时 | 按场景维度产出流程图、知识图谱、核心代码索引 |
 | `init-project-docs` | 初始化项目文档时 | 分析 controller/service/mapper 层，生成项目概要和架构分析 |
+| `generate-project-profile` | 要求生成项目画像时 | 生成 AI Agent 消费的 10 维度结构化 Markdown（project-profile.md） |
 | `dev-log` | 任何 skill 或配置变更后 | 在 `docs/dev-log/` 下记录变更原因和改动内容 |
 
 ## 设计文档模板
