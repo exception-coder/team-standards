@@ -19,6 +19,8 @@
 | 编写或审查 Java 代码 | `java-coding-standards` |
 | 生成或修改包含 Mermaid 图表的 Markdown 内容 | `markdown-writing-standards` |
 | 重构/复写/迁移前需要理解现有业务逻辑 | `business-logic-orientation` |
+| **用户纠正了 AI 的编码写法（分层违规、命名错误等）** | `coding-violation-log` |
+| **开始编写代码前（若项目存在 coding-violations.md）** | `coding-violation-log`（回顾模式） |
 | 本次会话对 team-standards 有任何变更 | `dev-log`（会话结束前） |
 
 **核心原则：** 触发时机是用户表达意图的那一刻，而不是开始动手的那一刻。收到需求就触发 `design-doc-required`，不要等到真的要写代码时才触发。
