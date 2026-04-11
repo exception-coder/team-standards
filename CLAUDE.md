@@ -59,6 +59,7 @@
 | `skills/markdown-writing-standards/mermaid-syntax-ref.md` | markdown-writing-standards | Mermaid 各图类型语法速查手册 |
 | `skills/business-logic-orientation/template.md` | business-logic-orientation | 业务逻辑梳理文档模板（7+5 章节） |
 | `skills/business-logic-orientation/ai-ref-template.md` | business-logic-orientation | AI 速查索引模板（7 章节，紧凑结构） |
+| `skills/generate-project-profile/template.md` | generate-project-profile | 项目画像 10 维度 Markdown 模板 |
 
 ---
 
