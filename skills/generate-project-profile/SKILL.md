@@ -394,7 +394,9 @@ order-service                   payment-service               inventory-service
 1. 本 Skill 属于**分析类**，不进入功能开发或 bug 修复链路
 2. 生成完成后**不需要**触发 `design-doc-required`
 3. 如项目已有 `project-profile.md`，询问用户是覆盖还是跳过
-4. 多模块项目生成一份统一的 profile，不按模块拆分
-5. 前端项目跳过不适用的维度，标注「不适用」
-6. **业务流程描述用编号列表，不用 Mermaid**（流程图在 init-project-docs 中画，这里追求精简可检索）
-7. 维度 7-8 中引用的目标服务名必须与对方 profile 的服务注册名称一致，这是图谱拼接的前提
+4. **多服务/Monorepo 项目**：每个可独立部署的服务生成独立 `docs/project-profile.md`，不合并为一份。可选生成聚合索引文件（列出各服务 profile 路径和服务注册名称）
+5. **单体多模块项目**（所有模块共同部署为一个服务）：生成一份统一 profile
+6. 前端项目跳过不适用的维度，标注「不适用」
+7. **业务流程描述用编号列表，不用 Mermaid**（流程图在 init-project-docs 中画，这里追求精简可检索）
+8. 维度 8-9 中引用的目标服务名必须与对方 profile 的服务注册名称一致，这是图谱拼接的前提
+9. **推断型内容必须附证据来源**，格式：`> 证据来源：{ClassName#methodName}` 或 `> 证据来源：{file_path}`
