@@ -318,7 +318,7 @@ order-service                   payment-service               inventory-service
 
 ---
 
-## 编码约定维度（维度 9）采集指南
+## 编码约定维度（维度 10）采集指南
 
 这个维度需要从代码中**归纳**，不是简单提取。重点关注：
 
