@@ -174,7 +174,7 @@ v1 按 Service 类列方法签名。v2 改为**按业务域分组**，每个能�
 
 **维度 5 — 核心业务流程（新增）**
 
-用文字（非 Mermaid）简明描述 2-5 个核心业务流程，标注涉及的 Service、状态变迁和事件：
+用文字（非 Mermaid）简明描述 2-5 个核心业务流程，标注涉及的 Service、状态变迁和事件。**每个流程末尾必须附证据来源**：
 
 ```markdown
 ### 下单流程
@@ -183,22 +183,65 @@ v1 按 Service 类列方法签名。v2 改为**按业务域分组**，每个能�
 3. 创建 Order（状态 CREATED）→ 写入 t_order
 4. 发布事件 ORDER_CREATED → 通知 notification-service
 
-### 支付回调流程
-1. 第三方支付回调 → PaymentController#callback
-2. 验签 → 更新 Payment 状态为 SUCCESS
-3. 更新 Order 状态 CREATED → PAID
-4. 发布事件 ORDER_PAID
+> 证据来源：OrderServiceImpl#placeOrder, InventoryFeignClient#lockStock, OrderCreatedProducer#send
 ```
 
 **为什么关键**：这是连接所有维度的"胶水"。有了流程，AI 才能理解"退货退款"应该在哪个流程之后发生，涉及哪些 Service、改哪些状态、发什么事件。
 
+**证据锚点规则**：维度 3（状态机）、4（能力清单）、5（业务流程）、6（约束）中涉及推断的内容，必须在段落末尾标注 `> 证据来源：{类名#方法名}` 或 `> 证据来源：{文件路径}`。这让下游 Agent 能区分"从代码中提取的事实"和"推断的结论"。
+
+**维度 6 — 关键约束与扩展点（新增）**
+
+回答"这个需求该插在哪、最容易炸在哪、改动半径有多大"：
+
+```markdown
+### 事务边界
+| 方法 | 事务范围 | 说明 |
+|------|---------|------|
+| OrderService#placeOrder | 创建订单 + 订单明细在同一事务 | 库存锁定通过 Feign 调用，不在事务内 |
+| PaymentService#handleCallback | 更新 Payment + 更新 Order 在同一事务 | 事件发布在事务提交后 |
+
+### 幂等点
+| 接口/方法 | 幂等键 | 机制 |
+|-----------|--------|------|
+| PaymentController#callback | paymentId | 数据库唯一索引 |
+| OrderService#cancelOrder | orderId + status | 状态守卫（仅 CREATED 可取消） |
+
+### 鉴权入口
+| 接口 | 鉴权方式 | 说明 |
+|------|---------|------|
+| /api/orders/** | JWT Token | 通过 SecurityFilter 统一校验 |
+| /api/internal/** | 服务间签名 | 仅内部调用，非用户接口 |
+
+### 状态变更守卫
+| 实体 | 守卫规则 | 违反后果 |
+|------|---------|---------|
+| Order | CREATED → CANCELLED 仅允许用户主动或超时 | 抛 IllegalStateException |
+| Order | PAID 后不可直接 CANCELLED，必须走退款流程 | 抛 BusinessException |
+
+### 外部依赖失败补偿
+| 外部依赖 | 失败处理 | 说明 |
+|---------|---------|------|
+| inventory-service 锁库存 | 失败则订单创建失败，无需补偿 | 强依赖 |
+| payment-gateway | 超时则标记 PENDING，定时任务轮询查询 | 最终一致 |
+
+### 不可轻易改动的核心规则
+- 订单金额一旦创建不可修改（审计要求）
+- 支付回调必须验签（安全要求）
+- ...
+
+> 证据来源：OrderServiceImpl#placeOrder, SecurityConfig, PaymentCallbackController#callback
+```
+
+**为什么关键**：需求分析时，AI 不仅要知道"有什么能力"，还要知道"碰什么会炸"。退货需求必然涉及状态变更守卫、事务边界调整、新增幂等点，没有这个维度 AI 只能盲猜风险点。
+
 ### C 组：接口与交互 — 跨服务图谱的边
 
-**维度 6 — 对外暴露接口**
+**维度 7 — 对外暴露接口**
 
 沿用原 API 接口维度，但明确语义为"本服务对外暴露的能力"。
 
-**维度 7 — 对外调用服务（新增维度，从原"外部依赖"拆出）**
+**维度 8 — 对外调用服务（从原"外部依赖"拆出）**
 
 专门描述**本服务调用了哪些其他服务**：
 
