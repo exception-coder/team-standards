@@ -121,6 +121,13 @@ docs/
 | 10 | 编码约定 | 代码归纳 | 命名规范、异常处理、通用基类 + 代码片段 |
 | 11 | 配置概要 | application*.yml | **仅业务相关配置** |
 
+### 模板文件
+
+每个输出文件对应一个模板：
+- `template.md` → 生成 `docs/project-profile.md`（索引）
+- `business-context-template.md` → 生成 `docs/business-context.md`（业务上下文）
+- `coding-conventions-template.md` → 生成 `docs/coding-conventions.md`（编码规范）
+
 ### 与 v1（旧版 10 维度）的映射
 
 | v1 维度 | v2 去向 | 原因 |
