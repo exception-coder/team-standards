@@ -48,7 +48,7 @@ flowchart TD
     C --> D["扫描项目目录结构<br/>识别模块划分"]
     D --> E["读取 Entity/Model 层<br/>提取数据模型和状态枚举"]
     E --> F["读取 Service 层<br/>提取能力清单，按业务域分组"]
-    F --> G["读取 Controller/API 层<br/>提取对外接口和对内接口"]
+    F --> G["读取 Controller/API 层<br/>提取对外暴露接口"]
     G --> G2["扫描 Feign/HTTP Client<br/>提取对外调用的下游服务"]
     G2 --> G3["扫描消息监听/发布<br/>提取事件契约"]
     G3 --> H["读取配置文件<br/>识别服务注册名称"]
