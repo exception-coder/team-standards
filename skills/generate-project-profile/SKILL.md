@@ -57,10 +57,15 @@ flowchart TD
     I2 --> J["归纳编码约定<br/>提取典型代码范式"]
     J --> K{"docs/ 目录存在?"}
     K -->|否| L["创建 docs/ 目录"]
-    K -->|是| M["检查已有 project-profile.md"]
-    L --> N["按模板生成 project-profile.md"]
+    K -->|是| M["检查已有画像文件"]
+    L --> N["生成 3 个文件"]
     M --> N
-    N --> O(["输出文件路径，告知用户完成"])
+    N --> N1["project-profile.md<br/>索引 + 项目概述 + 技术栈"]
+    N --> N2["business-context.md<br/>数据模型/能力/流程/约束/接口/服务调用/事件"]
+    N --> N3["coding-conventions.md<br/>编码约定 + 配置概要"]
+    N1 --> O(["输出文件路径，告知用户完成"])
+    N2 --> O
+    N3 --> O
 ```
 
 ---
