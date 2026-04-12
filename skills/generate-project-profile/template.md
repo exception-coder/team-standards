@@ -5,17 +5,17 @@
 > 服务注册名称：`{service_name}`
 >
 > 本文档由 `generate-project-profile` Skill 生成，供 AI Agent 分层消费。
-> 每个 `## ` 章节可独立作为向量化分片单元。
+> 每个 `##` 章节可独立作为向量化分片单元。
 >
 > **按需加载指南**：
-> - 需求分析阶段 → 加载 A 组（维度 1-5）
-> - 方案设计阶段 → 加载 A 组 + C 组（维度 6-8）
-> - 代码生成阶段 → 加载 D 组（维度 9-10）
+> - 需求分析阶段 → 加载 A 组（维度 1-6）
+> - 方案设计阶段 → 追加 C 组（维度 7-9）
+> - 代码生成阶段 → 加载 D 组（维度 10-11）
 > - 完整画像 → 加载全部
 
 ---
 
-<!-- group: A - 业务能力层（需求分析消费） -->
+<!-- group: A - 业务认知层（需求分析消费） -->
 
 ## 1. 项目概述
 
@@ -62,15 +62,17 @@
 
 | 实体 | 状态枚举类 | 状态值 | 流转路径 | 说明 |
 |------|-----------|--------|---------|------|
-| Order | OrderStatus | CREATED → PAID → SHIPPED → COMPLETED | 正常流程 | |
-| Order | OrderStatus | PAID → REFUNDING → REFUNDED | 退款流程 | |
-| Order | OrderStatus | CREATED → CANCELLED | 超时/用户取消 | |
-| Payment | PaymentStatus | PENDING → SUCCESS | 支付成功 | |
-| Payment | PaymentStatus | PENDING → FAILED | 支付失败 | |
+| Order | OrderStatus | CREATED -> PAID -> SHIPPED -> COMPLETED | 正常流程 | |
+| Order | OrderStatus | PAID -> REFUNDING -> REFUNDED | 退款流程 | |
+| Order | OrderStatus | CREATED -> CANCELLED | 超时/用户取消 | |
+| Payment | PaymentStatus | PENDING -> SUCCESS | 支付成功 | |
+| Payment | PaymentStatus | PENDING -> FAILED | 支付失败 | |
 | ... | ... | ... | ... | ... |
 
 > 从枚举类中提取。若项目无枚举类但有状态字段，从注释或常量中推断。
 > 未检测到状态流转时标注「未检测到状态枚举」。
+
+> 证据来源：{OrderStatus.java, PaymentStatus.java}
 
 ---
 
@@ -82,8 +84,8 @@
 
 | 能力 | Service#Method | 说明 |
 |------|---------------|------|
-| 创建订单 | OrderService#placeOrder | 校验库存 → 锁库存 → 创建订单 → 发布 ORDER_CREATED |
-| 取消订单 | OrderService#cancelOrder | 仅 CREATED 状态可取消 → 释放库存 → ORDER_CANCELLED |
+| 创建订单 | OrderService#placeOrder | 校验库存 -> 锁库存 -> 创建订单 -> 发布 ORDER_CREATED |
+| 取消订单 | OrderService#cancelOrder | 仅 CREATED 状态可取消 -> 释放库存 -> ORDER_CANCELLED |
 | 查询订单 | OrderService#getOrderDetail | 按 ID / 用户 / 状态查询 |
 | ... | ... | ... |
 
@@ -91,45 +93,105 @@
 
 | 能力 | Service#Method | 说明 |
 |------|---------------|------|
-| 发起支付 | PaymentService#createPayment | 调用支付网关 → 创建 Payment 记录 → 状态 PENDING |
-| 支付回调 | PaymentService#handleCallback | 验签 → 更新 Payment 状态 → 更新 Order 为 PAID |
+| 发起支付 | PaymentService#createPayment | 调用支付网关 -> 创建 Payment 记录 -> 状态 PENDING |
+| 支付回调 | PaymentService#handleCallback | 验签 -> 更新 Payment 状态 -> 更新 Order 为 PAID |
 | ... | ... | ... |
 
-> Service 接口（I*Service）优先，无接口则读实现类。只列公开方法。
-> 业务域分组依据：按包结构（modules/xxx/）或按 Service 名前缀推断。
+> Service 接口优先，无接口则读实现类。只列公开方法。
+> 业务域分组依据：按包结构或按 Service 名前缀推断。
 
 ---
 
 ## 5. 核心业务流程
 
 > 用编号列表描述 2-5 个核心业务流程。每步标注涉及的 Service、状态变迁和事件。
-> 不画 Mermaid（追求精简可检索，流程图在 init-project-docs 中画）。
+> 每个流程末尾必须附证据来源。
 
 ### {流程1：如 下单流程}
 
-1. 用户提交订单 → `OrderController#placeOrder`
+1. 用户提交订单 -> `OrderController#placeOrder`
 2. `OrderService` 校验参数 + 校验库存
 3. 调用 `inventory-service`（Feign）锁定库存
-4. 创建 Order 记录（状态：CREATED）→ 写入 `t_order` + `t_order_item`
+4. 创建 Order 记录（状态：CREATED）-> 写入 `t_order` + `t_order_item`
 5. 发布事件 `ORDER_CREATED`（orderId, userId, amount）
 6. 返回订单详情
 
+> 证据来源：OrderServiceImpl#placeOrder, InventoryFeignClient#lockStock, OrderEventPublisher#publishCreated
+
 ### {流程2：如 支付回调流程}
 
-1. 第三方支付回调 → `PaymentController#callback`
+1. 第三方支付回调 -> `PaymentController#callback`
 2. `PaymentService` 验签 + 幂等校验（paymentId）
-3. 更新 Payment 状态 PENDING → SUCCESS
-4. 更新 Order 状态 CREATED → PAID
+3. 更新 Payment 状态 PENDING -> SUCCESS
+4. 更新 Order 状态 CREATED -> PAID
 5. 发布事件 `ORDER_PAID`（orderId, paymentId）
+
+> 证据来源：PaymentServiceImpl#handleCallback, PaymentController#callback
 
 > 如果流程涉及调用其他服务，标注目标服务名称。
 > 未检测到明确业务流程时标注「需进一步分析」。
 
 ---
 
+## 6. 关键约束与扩展点
+
+> 回答"这个需求该插在哪、最容易炸在哪、改动半径有多大"。
+> 每个子节尽量附证据来源。
+
+### 事务边界
+
+| 方法 | 事务范围 | 说明 |
+|------|---------|------|
+| OrderService#placeOrder | 创建订单 + 订单明细在同一事务 | 库存锁定通过 Feign 调用，不在事务内 |
+| PaymentService#handleCallback | 更新 Payment + 更新 Order 在同一事务 | 事件发布在事务提交后 |
+| ... | ... | ... |
+
+### 幂等点
+
+| 接口/方法 | 幂等键 | 机制 |
+|-----------|--------|------|
+| PaymentController#callback | paymentId | 数据库唯一索引 |
+| OrderService#cancelOrder | orderId + status | 状态守卫 |
+| ... | ... | ... |
+
+### 鉴权入口
+
+| 接口范围 | 鉴权方式 | 说明 |
+|---------|---------|------|
+| /api/orders/** | JWT Token | SecurityFilter 统一校验 |
+| /api/internal/** | 服务间签名 | 仅内部调用 |
+| ... | ... | ... |
+
+### 状态变更守卫
+
+| 实体 | 守卫规则 | 违反后果 |
+|------|---------|---------|
+| Order | CREATED -> CANCELLED 仅允许用户主动或超时 | 抛 IllegalStateException |
+| Order | PAID 后不可直接 CANCELLED，必须走退款流程 | 抛 BusinessException |
+| ... | ... | ... |
+
+### 外部依赖失败补偿
+
+| 外部依赖 | 失败处理 | 说明 |
+|---------|---------|------|
+| inventory-service 锁库存 | 失败则订单创建失败，无需补偿 | 强依赖 |
+| payment-gateway | 超时标记 PENDING，定时任务轮询查询 | 最终一致 |
+| ... | ... | ... |
+
+### 不可轻易改动的核心规则
+
+- {规则1：如 订单金额一旦创建不可修改（审计要求）}
+- {规则2：如 支付回调必须验签（安全要求）}
+- ...
+
+> 证据来源：{OrderServiceImpl#placeOrder, SecurityConfig, PaymentCallbackController#callback}
+> 未检测到显式约束时标注「未检测到」，不编造。
+
+---
+
 <!-- group: C - 接口与交互层（方案设计消费 + 图谱拼接） -->
 
-## 6. 对外暴露接口
+## 7. 对外暴露接口
 
 > 本服务暴露给其他服务或前端调用的接口。按业务域分组。
 
@@ -146,7 +208,7 @@
 
 ---
 
-## 7. 对外调用服务
+## 8. 对外调用服务
 
 > 本服务作为客户端，调用了哪些其他服务。这是知识图谱的「出边」。
 
@@ -163,7 +225,7 @@
 
 ---
 
-## 8. 事件与消息契约
+## 9. 事件与消息契约
 
 > 本服务发布和消费的异步事件/消息。这是知识图谱的「事件边」。
 
@@ -191,7 +253,7 @@
 
 <!-- group: D - 编码规范层（代码生成消费） -->
 
-## 9. 编码约定
+## 10. 编码约定
 
 ### 命名规范
 
@@ -229,7 +291,7 @@
 
 ---
 
-## 10. 配置概要
+## 11. 配置概要
 
 > 仅列业务相关配置（功能开关、限额、超时、重试等），跳过纯基础设施配置。
 
