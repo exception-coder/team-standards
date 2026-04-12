@@ -9,7 +9,10 @@ description: "当用户要求「生成项目画像」「生成 project profile�
 
 **代码感知是一切 AI 辅助开发的基石。** 本 Skill 将项目代码转化为结构化 Markdown 文档，作为需求分析、方案设计、方案审查等后续环节的知识上下文。
 
-核心思想：**不重复造轮子** — 让编码工具（Claude Code / Cursor / Windsurf 等）充当代码理解引擎，本 Skill 只定义输出规范。
+核心思想：
+- **不重复造轮子** — 让编码工具（Claude Code / Cursor / Windsurf 等）充当代码理解引擎，本 Skill 只定义输出规范
+- **业务能力优先** — 画像不是技术档案，而是回答"这个系统能做什么、业务怎么跑"
+- **图谱可拼接** — 每个微服务的画像是知识图谱的一个节点，通过标准化的服务交互和事件契约描述，多个画像可拼接为全局业务能力图谱
 
 ---
 
@@ -29,8 +32,8 @@ description: "当用户要求「生成项目画像」「生成 project profile�
 |------|-------------------|--------------------------|
 | **目标读者** | 人（开发者阅读理解项目） | AI Agent（程序化消费知识上下文） |
 | **输出文件** | 3 份文档（概要 + 架构 + 开发参考） | 1 份文档（project-profile.md） |
-| **侧重点** | 业务流程图、架构图、开发场景速查 | 结构化数据表格、编码约定代码片段 |
-| **使用方式** | 人工阅读 | 注入 Agent Context / 向量化分片检索 |
+| **侧重点** | 业务流程图、架构图、开发场景速查 | 结构化能力清单、服务交互契约、实体状态机 |
+| **使用方式** | 人工阅读 | 注入 Agent Context / 向量化分片检索 / 多服务画像拼接为知识图谱 |
 
 两者可以共存，不冲突。
 
@@ -40,15 +43,17 @@ description: "当用户要求「生成项目画像」「生成 project profile�
 
 ```mermaid
 flowchart TD
-    A(["收到生成项目画像指令"]) --> B["探索项目根目录\n识别构建工具和语言"]
-    B --> C["读取构建配置\npom.xml / build.gradle / package.json"]
-    C --> D["扫描项目目录结构\n识别模块划分"]
-    D --> E["读取 Entity/Model 层\n提取数据模型"]
-    E --> F["读取 Service 层\n提取能力清单"]
-    F --> G["读取 Controller/API 层\n提取接口清单"]
-    G --> H["读取配置文件\napplication.yml 等"]
-    H --> I["分析分层架构\n识别依赖方向和违规"]
-    I --> J["归纳编码约定\n提取典型代码范式"]
+    A(["收到生成项目画像指令"]) --> B["探索项目根目录<br/>识别构建工具和语言"]
+    B --> C["读取构建配置<br/>pom.xml / build.gradle / package.json"]
+    C --> D["扫描项目目录结构<br/>识别模块划分"]
+    D --> E["读取 Entity/Model 层<br/>提取数据模型和状态枚举"]
+    E --> F["读取 Service 层<br/>提取能力清单，按业务域分组"]
+    F --> G["读取 Controller/API 层<br/>提取对外接口和对内接口"]
+    G --> G2["扫描 Feign/HTTP Client<br/>提取对外调用的下游服务"]
+    G2 --> G3["扫描消息监听/发布<br/>提取事件契约"]
+    G3 --> H["读取配置文件<br/>识别服务注册名称"]
+    H --> I["归纳核心业务流程<br/>识别实体状态机"]
+    I --> J["归纳编码约定<br/>提取典型代码范式"]
     J --> K{"docs/ 目录存在?"}
     K -->|否| L["创建 docs/ 目录"]
     K -->|是| M["检查已有 project-profile.md"]
@@ -69,42 +74,206 @@ flowchart TD
 
 严格按以下模板输出，参考 `template.md`。
 
+**A 组：项目基础（快速定位）**
+
 | # | 维度 | 数据来源 | 说明 |
 |---|------|---------|------|
-| 1 | 项目概述 | 根目录 + 构建配置 | 项目名、用途、构建工具、语言版本、模块列表 |
-| 2 | 技术栈 | pom.xml / package.json 等 | 框架、中间件、版本，按分类表格 |
-| 3 | 项目结构 | 目录树扫描 | 关键目录 + 职责说明 |
-| 4 | 分层架构 | import 分析 + 包结构 | 分层模式、依赖方向、违规项 |
-| 5 | 数据模型 | Entity/Model/表结构 | 实体、核心字段、关联关系 |
-| 6 | Service 能力清单 | Service 接口/类 | 公开方法签名 + 一句话说明 |
-| 7 | API 接口 | Controller 层 | Method + URL + 入参 + 出参 |
-| 8 | 外部依赖服务 | 配置文件 + Feign/HttpClient | 服务名、协议、用途 |
-| 9 | 配置概要 | application*.yml/properties | 关键配置项，敏感值脱敏 |
-| 10 | 编码约定 | 代码归纳 | 命名规范、异常处理模式、通用基类，附典型代码片段 |
+| 1 | 项目概述 | 根目录 + 构建配置 | 项目名、用途、语言版本、模块列表、**服务注册名称** |
+| 2 | 技术栈 | pom.xml / package.json | 框架、中间件、版本，按分类表格 |
+
+**B 组：业务能力（需求分析核心消费区）**
+
+| # | 维度 | 数据来源 | 说明 |
+|---|------|---------|------|
+| 3 | 数据模型与状态机 | Entity + 枚举类 | 实体、核心字段、关联关系、**实体状态流转** |
+| 4 | 业务能力清单 | Service 接口/类 | 按业务域分组的能力列表，标注每个能力的业务语义 |
+| 5 | 核心业务流程 | 从 Service 调用链推断 | 用文字描述关键业务流程（如下单、支付、退款），标注涉及的 Service 和状态变迁 |
+
+**C 组：接口与交互（跨服务图谱拼接区）**
+
+| # | 维度 | 数据来源 | 说明 |
+|---|------|---------|------|
+| 6 | 对外暴露接口 | Controller 层 | Method + URL + 入参 + 出参，按业务域分组 |
+| 7 | 对外调用服务 | FeignClient / RestTemplate / HTTP Client | **本服务调用了谁**：服务名 + 接口 + 用途 |
+| 8 | 事件与消息契约 | MQ Listener + Publisher | **发布什么事件、消费什么事件**：topic + payload + 触发条件 |
+
+**D 组：编码规范（代码生成消费区）**
+
+| # | 维度 | 数据来源 | 说明 |
+|---|------|---------|------|
+| 9 | 编码约定 | 代码归纳 | 命名规范、异常处理模式、通用基类，附典型代码片段 |
+| 10 | 配置概要 | application*.yml | **仅列业务相关配置**（功能开关、限额、超时等），脱敏处理 |
+
+### 与 v1（旧版 10 维度）的映射
+
+| v1 维度 | v2 去向 | 原因 |
+|---------|---------|------|
+| 3. 项目结构（目录树） | **删除** | AI 可自行 `ls`/`Glob`，目录树占 token 但不帮助理解业务 |
+| 4. 分层架构 | **删除** | "DDD-lite / MVC"标签对需求分析无价值，编码约定中已含分层规则 |
+| 5. 数据模型 | **升级为 3. 数据模型与状态机** | 增加实体状态枚举和状态流转 |
+| 6. Service 能力清单 | **升级为 4. 业务能力清单** | 按业务域分组 + 业务语义标注 |
+| 7. API 接口 | **升级为 6. 对外暴露接口** | 强调"对外暴露"语义，区分于调用下游 |
+| 8. 外部依赖服务 | **拆分为 7 + 8** | 拆为"对外调用服务"（HTTP）和"事件契约"（MQ），为图谱拼接提供边 |
+| 9. 配置概要 | **精简为 10. 配置概要** | 只保留业务配置，去掉 `server.port` 等噪音 |
+| 10. 编码约定 | **保留为 9. 编码约定** | 不变 |
+| （无） | **新增 5. 核心业务流程** | 最关键的新增维度，回答"业务怎么跑" |
 
 ---
 
 ## 维度详细说明
 
-### 维度 1-4：全局认知（方案设计必读）
+### A 组：项目基础 — 快速定位本服务是什么
 
-这四个维度回答「项目是什么、用了什么技术、代码怎么组织」。是后续所有环节的前提。
+**维度 1 — 项目概述**
 
-### 维度 5-8：数据与接口（具体编码必读）
+必须包含 **服务注册名称**（如 Spring Cloud 的 `spring.application.name`），这是跨服务图谱拼接的主键。
 
-- **数据模型**：写 Entity / SQL 的依据
-- **Service 能力**：避免重复实现已有能力
-- **API 接口**：扩展接口或前后端对接的依据
-- **外部依赖**：集成外部服务时不重复造轮子
+**维度 2 — 技术栈**
 
-### 维度 9-10：配置与约定（代码风格必读）
+保持不变，用于方案设计阶段判断技术可行性。
 
-- **配置概要**：知道哪些行为可配置
-- **编码约定**：这是**最容易被忽略但最重要的维度**。没有它，Agent 生成的代码即使逻辑正确，也会和项目风格格格不入
+### B 组：业务能力 — 需求分析的核心
+
+这三个维度回答"这个系统当前能做什么业务"，是 AI 做需求影响分析的核心依据。
+
+**维度 3 — 数据模型与状态机**
+
+v1 只列字段和关联。v2 增加**实体状态枚举**和**状态流转**：
+
+```markdown
+| 实体 | 状态枚举 | 流转路径 |
+|------|---------|---------|
+| Order | CREATED → PAID → SHIPPED → COMPLETED | 正常流程 |
+| Order | PAID → REFUNDING → REFUNDED | 退款流程 |
+| Order | CREATED → CANCELLED | 取消流程 |
+```
+
+**为什么关键**：退货需求的第一个问题就是"订单有哪些状态，退货应该插入到哪个状态之后"。没有状态机，AI 只能猜。
+
+**维度 4 — 业务能力清单**
+
+v1 按 Service 类列方法签名。v2 改为**按业务域分组**，每个能力附一句话业务语义：
+
+```markdown
+### 订单域
+| 能力 | Service#Method | 说明 |
+|------|---------------|------|
+| 创建订单 | OrderService#placeOrder | 校验库存 → 锁库存 → 创建订单 → 发布 ORDER_CREATED 事件 |
+| 取消订单 | OrderService#cancelOrder | 仅 CREATED 状态可取消 → 释放库存 → 发布 ORDER_CANCELLED |
+| 查询订单 | OrderService#getOrderDetail | 支持按 ID / 用户 / 状态查询 |
+
+### 支付域
+| 能力 | Service#Method | 说明 |
+|------|---------------|------|
+| 发起支付 | PaymentService#createPayment | 调用第三方支付网关 → 更新订单状态为 PAID |
+```
+
+**为什么关键**：AI 看到"退货退款需求"时，能直接定位到订单域和支付域的现有能力，判断哪些能复用、哪些需新增。
+
+**维度 5 — 核心业务流程（新增）**
+
+用文字（非 Mermaid）简明描述 2-5 个核心业务流程，标注涉及的 Service、状态变迁和事件：
+
+```markdown
+### 下单流程
+1. 用户提交订单 → OrderController#placeOrder
+2. OrderService 校验库存 → 调用 inventory-service 锁定库存
+3. 创建 Order（状态 CREATED）→ 写入 t_order
+4. 发布事件 ORDER_CREATED → 通知 notification-service
+
+### 支付回调流程
+1. 第三方支付回调 → PaymentController#callback
+2. 验签 → 更新 Payment 状态为 SUCCESS
+3. 更新 Order 状态 CREATED → PAID
+4. 发布事件 ORDER_PAID
+```
+
+**为什么关键**：这是连接所有维度的"胶水"。有了流程，AI 才能理解"退货退款"应该在哪个流程之后发生，涉及哪些 Service、改哪些状态、发什么事件。
+
+### C 组：接口与交互 — 跨服务图谱的边
+
+**维度 6 — 对外暴露接口**
+
+沿用原 API 接口维度，但明确语义为"本服务对外暴露的能力"。
+
+**维度 7 — 对外调用服务（新增维度，从原"外部依赖"拆出）**
+
+专门描述**本服务调用了哪些其他服务**：
+
+```markdown
+| 目标服务 | 调用方式 | 接口 | 用途 |
+|---------|---------|------|------|
+| inventory-service | Feign | POST /api/inventory/lock | 下单时锁定库存 |
+| inventory-service | Feign | POST /api/inventory/release | 取消订单时释放库存 |
+| payment-gateway | HTTP | POST /api/pay/create | 发起第三方支付 |
+```
+
+**为什么关键**：这是图谱的"出边"。AI 做退货需求分析时，能立刻知道 order-service 调了 inventory-service 和 payment-gateway，退货流程大概率也需要调这两个。
+
+**维度 8 — 事件与消息契约（新增维度）**
+
+```markdown
+### 发布的事件
+| Topic/Exchange | 事件类型 | Payload 关键字段 | 触发条件 |
+|----------------|---------|-----------------|---------|
+| order-events | ORDER_CREATED | orderId, userId, amount | 订单创建成功 |
+| order-events | ORDER_PAID | orderId, paymentId | 支付回调成功 |
+| order-events | ORDER_CANCELLED | orderId, reason | 用户取消订单 |
+
+### 消费的事件
+| Topic/Exchange | 事件类型 | 来源服务 | 处理逻辑 |
+|----------------|---------|---------|---------|
+| payment-events | PAYMENT_SUCCESS | payment-service | 更新订单状态为 PAID |
+```
+
+**为什么关键**：这是图谱的"事件边"。退货需求需要发布 ORDER_REFUNDED 事件，notification-service 可能需要消费它来发退款通知。没有事件契约，AI 不知道现有的事件体系怎么设计。
+
+### D 组：编码规范 — 代码生成阶段消费
+
+维度 9（编码约定）和维度 10（配置概要）在需求分析阶段价值低，但在方案设计和代码生成阶段需要。保留但降级到最后。
+
+配置概要精简规则：**只保留业务相关配置**（功能开关、限额、重试次数、超时时间等），去掉 `server.port`、`spring.datasource.url` 等纯基础设施配置。
 
 ---
 
-## 编码约定维度（维度 10）采集指南
+## 知识图谱拼接规范
+
+### 图谱节点（每个微服务的 profile 是一个节点）
+
+每个 profile 通过以下字段成为图谱节点：
+- **节点 ID**：维度 1 中的服务注册名称（如 `order-service`）
+- **节点能力**：维度 4（业务能力清单）
+- **节点数据模型**：维度 3（数据模型与状态机）
+
+### 图谱边（服务间关系）
+
+| 边类型 | 数据来源 | 方向 |
+|--------|---------|------|
+| **同步调用** | 维度 7（对外调用服务）→ 目标服务的维度 6（对外暴露接口） | A → B |
+| **事件驱动** | 维度 8 发布侧 → 维度 8 消费侧 | A ⇢ B（虚线表示异步） |
+| **共享概念** | 维度 3 中出现相同实体名或外键引用 | A ⇔ B（双向） |
+
+### 拼接示例
+
+```text
+order-service                   payment-service               inventory-service
+┌─────────────────┐             ┌──────────────────┐          ┌──────────────────┐
+│ 维度4: 创建订单   │──Feign──→ │ 维度6: POST /pay  │          │ 维度6: POST /lock │
+│ 维度4: 取消订单   │──Feign──→ │                    │←Feign── │                    │
+│ 维度8: ORDER_PAID │⇠ 事件 ⇠  │ 维度8: PAY_SUCCESS │          │                    │
+│ 维度8: ORDER_CREATED│⇢ 事件 ⇢ │                    │          │ 维度8: ORDER_CREATED│
+│                   │──Feign──→ │                    │          │ (消费→扣减库存)     │
+└─────────────────┘             └──────────────────┘          └──────────────────┘
+```
+
+**退货需求影响分析时，AI 可以沿着这些边自动推导**：
+1. 退货需要退款 → 沿同步调用边找到 payment-service
+2. 退货需要归还库存 → 沿同步调用边找到 inventory-service
+3. 退货需要通知用户 → 沿事件边找到 notification-service（消费 ORDER_REFUNDED）
+
+---
+
+## 编码约定维度（维度 9）采集指南
 
 这个维度需要从代码中**归纳**，不是简单提取。重点关注：
 
@@ -121,11 +290,14 @@ flowchart TD
 
 ## 质量标准
 
+- **业务可理解**：非技术人员读到维度 4-5 也能理解系统做什么
 - **AI 友好**：表格优先，避免大段叙述；每个维度可独立被向量化分片
+- **图谱可拼接**：维度 1 有服务注册名、维度 7-8 有明确的服务名引用
 - **信息完整**：找不到的维度标注「未检测到」，不要编造
 - **脱敏处理**：密码、密钥、Token 等敏感配置值用 `***` 替代
 - **可验证**：每个维度的数据都能追溯到具体文件路径
 - **可增量更新**：文档头部记录生成时间，便于判断是否过期
+- **精简干练**：不输出对需求分析无价值的信息（纯目录树、纯基础设施配置等）
 
 ---
 
@@ -133,26 +305,31 @@ flowchart TD
 
 本 Skill **不限定语言和框架**。根据项目实际情况调整：
 
-| 项目类型 | 构建配置 | 数据模型来源 | Service 来源 | API 来源 |
-|---------|---------|-------------|-------------|---------|
-| Java Spring | pom.xml | @Entity / @Table | @Service 类 | @RestController |
-| Java MyBatis | pom.xml | Mapper XML / Entity | @Service 类 | @RestController |
-| Node.js | package.json | Prisma schema / Mongoose model | service/ 目录 | router/ 或 controller/ |
-| Python Django | requirements.txt | models.py | views.py / services/ | urls.py |
-| Go | go.mod | model/ 目录 | service/ 目录 | handler/ 或 router/ |
-| Vue/React | package.json | 不适用 | store/ / composables/ | api/ 目录 |
+| 项目类型 | 构建配置 | 数据模型来源 | Service 来源 | API 来源 | 服务调用来源 | 事件来源 |
+|---------|---------|-------------|-------------|---------|-------------|---------|
+| Java Spring | pom.xml | @Entity / @Table | @Service 类 | @RestController | @FeignClient / RestTemplate | @RabbitListener / @KafkaListener |
+| Java MyBatis | pom.xml | Mapper XML / Entity | @Service 类 | @RestController | @FeignClient / RestTemplate | @RabbitListener |
+| Node.js | package.json | Prisma / Mongoose | service/ 目录 | router/ / controller/ | axios / fetch 调用 | event emitter / MQ consumer |
+| Python Django | requirements.txt | models.py | views.py / services/ | urls.py | requests / httpx | celery tasks |
+| Go | go.mod | model/ 目录 | service/ 目录 | handler/ / router/ | HTTP client | goroutine / channel |
+| Vue/React | package.json | 不适用 | store/ / composables/ | api/ 目录 | 不适用 | 不适用 |
+
+**前端项目**：跳过维度 3（数据模型）、5（业务流程）、7（对外调用）、8（事件契约），标注「不适用」。
 
 ---
 
 ## 探索策略
 
 1. **先读构建配置**（pom.xml / package.json），确定语言、框架、模块结构
-2. **按模块扫描**，多模块项目逐模块分析
-3. **Service 层优先读接口**（`I*.java`），减少 token 消耗
-4. **Controller 层重点读注解和方法签名**，不需要读方法体
-5. **Entity 层完整读取**，字段信息不能遗漏
-6. **配置文件完整读取**，但敏感值脱敏
-7. **编码约定需要读 2-3 个典型实现类的完整代码**，才能归纳出模式
+2. **读配置文件**确认服务注册名称（`spring.application.name`），这是图谱节点 ID
+3. **Entity 层完整读取**，字段信息不能遗漏，**额外扫描枚举类**找状态定义
+4. **Service 层优先读接口**（`I*.java`），按业务域分组，减少 token 消耗
+5. **Controller 层重点读注解和方法签名**，不需要读方法体
+6. **扫描 Feign / RestTemplate / HTTP Client**，提取对外调用清单
+7. **扫描 MQ Listener / Publisher**，提取事件契约
+8. **从 Service 实现中推断核心业务流程**，关注状态变更和事件发布点
+9. **编码约定需要读 2-3 个典型实现类的完整代码**，才能归纳出模式
+10. **配置文件只提取业务相关项**，跳过基础设施配置
 
 ---
 
@@ -171,4 +348,6 @@ flowchart TD
 2. 生成完成后**不需要**触发 `design-doc-required`
 3. 如项目已有 `project-profile.md`，询问用户是覆盖还是跳过
 4. 多模块项目生成一份统一的 profile，不按模块拆分
-5. 前端项目跳过「数据模型」和「分层架构」维度，标注「不适用」
+5. 前端项目跳过不适用的维度，标注「不适用」
+6. **业务流程描述用编号列表，不用 Mermaid**（流程图在 init-project-docs 中画，这里追求精简可检索）
+7. 维度 7-8 中引用的目标服务名必须与对方 profile 的服务注册名称一致，这是图谱拼接的前提
