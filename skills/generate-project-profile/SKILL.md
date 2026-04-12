@@ -375,8 +375,9 @@ order-service                   payment-service               inventory-service
 6. **扫描 Feign / RestTemplate / HTTP Client**，提取对外调用清单
 7. **扫描 MQ Listener / Publisher**，提取事件契约
 8. **从 Service 实现中推断核心业务流程**，关注状态变更和事件发布点
-9. **编码约定需要读 2-3 个典型实现类的完整代码**，才能归纳出模式
-10. **配置文件只提取业务相关项**，跳过基础设施配置
+9. **扫描约束与扩展点**：`@Transactional` 找事务边界、唯一索引/幂等键、`SecurityConfig`/Filter 找鉴权入口、状态守卫（`if status != XXX throw`）、外部调用的重试/降级/补偿逻辑
+10. **编码约定需要读 2-3 个典型实现类的完整代码**，才能归纳出模式
+11. **配置文件只提取业务相关项**，跳过基础设施配置
 
 ---
 
