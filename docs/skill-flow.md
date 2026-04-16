@@ -2,10 +2,10 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-16 v6**
-> 变更摘要：新增 `project-docs-update`（知识图谱持续维护）、`arch-lint`（Flutter 架构违规检测）；`init-project-docs` 升级为 4 阶段渐进式知识图谱构建。
-> 上一版：v5.1 `design-doc-required` 新增 Mermaid 分组规范。
-> 历史版本：`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
+> **最后更新：2026-04-17 v6.1**
+> 变更摘要：`design-doc-required` 和 `bug-doc-required` 新增 Step 0（知识图谱上下文预热），AI 执行任务前按路由表按需加载文档，避免全量扫码。
+> 上一版：v6 新增 `project-docs-update`、`arch-lint`；`init-project-docs` 升级为 4 阶段。
+> 历史版本：`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
 ---
 
@@ -75,11 +75,14 @@ flowchart TD
     PDU["project-docs-update\n检测差异 同步文档"]
     ALINT["arch-lint\nFlutter 架构违规检测"]
 
+    %% 上下文预热
+    CTX["Step 0: 知识图谱预热\n读 00_project_overview\n按路由表加载必读文档"]
+
     %% 入口路径
-    E1 --> BRAIN --> PLAN --> DDR
-    E2 --> DDR
-    E3 --> DEBUG --> BDR
-    E4 --> BLO --> DDR
+    E1 --> BRAIN --> PLAN --> CTX --> DDR
+    E2 --> CTX --> DDR
+    E3 --> DEBUG --> CTX --> BDR
+    E4 --> BLO --> CTX --> DDR
     E5 --> IPD
 
     %% bug 分析文档完成后，必须写设计文档
@@ -109,7 +112,8 @@ flowchart TD
 flowchart TD
     START(["收到功能需求"]) --> BRAIN["brainstorming\n探讨意图与边界"]
     BRAIN --> PLAN["writing-plans\n制定实施计划"]
-    PLAN --> DDR["design-doc-required\n检查已有设计文档或引导新建\n内部自动更新 INDEX.md"]
+    PLAN --> CTX["Step 0: 知识图谱预热\n读 00_project_overview\n按任务类型加载必读文档"]
+    CTX --> DDR["design-doc-required\n检查已有设计文档或引导新建\n内部自动更新 INDEX.md"]
 
     DDR -- "文档存在且完整" --> ORIENT["pre-implementation-code-orientation\n读设计文档 提取代码坐标"]
     DDR -- "需求变更" --> NEWVER["新建版本文档\n{需求名}-{日期}-v{N+1}.md\n同步更新 coding.md"]
@@ -130,7 +134,8 @@ flowchart TD
 ```mermaid
 flowchart TD
     BUG(["发现 Bug"]) --> DEBUG["systematic-debugging\n系统性定位根因"]
-    DEBUG --> BUGDOC["bug-doc-required\n编写 bug 分析文档\n3 类 Mermaid 图 + 根因表格\n修复方案节只写方向摘要"]
+    DEBUG --> CTX["Step 0: 知识图谱预热\n加载约束文档 + 受影响模块文档"]
+    CTX --> BUGDOC["bug-doc-required\n编写 bug 分析文档\n3 类 Mermaid 图 + 根因表格\n修复方案节只写方向摘要"]
     BUGDOC -- "只要改代码（必须）" --> DDR["design-doc-required\n编写修复实施方案\ndocs/design/{名称}修复/\n使用 Bug 修复简化版模板"]
     DDR --> ORIENT["pre-implementation-code-orientation\n优先读设计文档提取代码坐标\n降级才读 bug 文档"]
     ORIENT --> CODE["java-coding-standards\n实施修复"]
@@ -232,3 +237,5 @@ flowchart LR
 | project-docs-update 和 init-project-docs 的区别? | init-project-docs 是**从零构建**知识图谱（首次使用），project-docs-update 是**增量维护**（代码变更后同步文档）。前者生成，后者更新。 |
 | arch-lint 和 java-coding-standards 的区别? | arch-lint 检测 **Flutter 架构分层**违规（presentation 层写 SQL 等跨层问题），java-coding-standards 检测 **Java 代码**质量（命名/格式/异常处理等）。一个管分层，一个管编码。 |
 | Phase 3-4 的自动模式和确认模式怎么选? | 自动模式：AI 尽力推断后生成，标注"需人工校验"，适合快速产出初稿。确认模式：逐份展示等用户确认，适合对准确度要求高的场景。 |
+| Step 0 知识图谱预热是什么? | 在 design-doc-required / bug-doc-required 执行前，先读 `00_project_overview.md` 获取全局索引，再按 AI 上下文路由表加载当前任务类型对应的 2-3 份文档。避免全量扫码，按需获取上下文。 |
+| 项目没有知识图谱时 Step 0 怎么办? | 自动跳过。Step 0 检测 `docs/00_project_overview.md` 不存在时直接进入后续流程，完全向后兼容。 |
