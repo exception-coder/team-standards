@@ -74,3 +74,28 @@
 | 架构红线和禁止规则 | `docs/08_constraints_and_rules.md` |
 | 当前重构进度 | `docs/09_refactor_plan.md` |
 | 最近改了什么 | `docs/10_change_log.md` |
+
+---
+
+## AI 上下文路由
+
+> **AI 执行任何任务前，先读本文件（Tier 0），再按下表按需加载对应文档。**
+> **禁止一次性全部加载，按需读取以节省 token。**
+
+### 按任务类型加载
+
+| 任务类型 | 必读文档 | 按需文档 |
+|---|---|---|
+| Bug 修复 | `08_constraints_and_rules` + `modules/{受影响模块}` | `04_data_model_map`, `06_frontend_backend_mapping` |
+| 新功能开发 | `01_architecture_overview` + `02_module_map` + `05_api_map` | `04_data_model_map`, `08_constraints_and_rules` |
+| 重构/迁移 | `08_constraints_and_rules` + `09_refactor_plan` + `skills/{tech}_skill` | `01_architecture_overview`, `02_module_map` |
+| 接口变更 | `05_api_map` + `06_frontend_backend_mapping` | `02_module_map`, `08_constraints_and_rules` |
+| 数据库变更 | `04_data_model_map` + `08_constraints_and_rules` | `02_module_map`, `06_frontend_backend_mapping` |
+| 业务流程理解 | `03_business_flow_map` + `07_glossary` | `modules/{相关模块}` |
+
+### 加载规则
+
+1. **Tier 0（每次必读）**：本文件（`00_project_overview.md`），约 3KB，提供全局索引
+2. **Tier 1（按上表必读）**：根据任务类型加载对应文档，通常 2-3 份
+3. **Tier 2（实施中按需）**：碰到不确定的术语、表结构、调用关系时再读对应文档
+4. **模块定位**：任务涉及具体模块时，读 `modules/{module}.md` 获取该模块的完整上下文（10 节结构）

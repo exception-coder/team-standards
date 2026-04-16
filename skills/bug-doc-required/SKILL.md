@@ -11,11 +11,26 @@ description: "You MUST invoke this skill the moment a user reports a bug, descri
 
 ---
 
+## Step 0：知识图谱上下文预热
+
+**在开始 Bug 分析之前，先加载项目知识图谱上下文，快速定位受影响的模块和架构约束。**
+
+1. 检查项目 `docs/00_project_overview.md` 是否存在
+2. **若存在**：
+   - 读取该文件，获取项目全局索引 + AI 上下文路由表
+   - 按路由表「Bug 修复」行加载：`08_constraints_and_rules` + `modules/{受影响模块}.md`
+   - 按需：若 Bug 涉及数据库，追加读 `04_data_model_map`；涉及接口调用，追加读 `06_frontend_backend_mapping`
+3. **若不存在**：跳过，直接进入下方流程（兼容无知识图谱的项目）
+
+> Step 0 提供的上下文用于：准确判断 Bug 涉及哪些类/层/模块、识别是否违反架构约束、加速「涉及类清单」和「关键代码路径」的填写。
+
+---
+
 ## 执行流程
 
 ```mermaid
 flowchart TD
-    A(["收到 bug 文档编写任务"]) --> B["调用 doc-index-required\n完成索引检查"]
+    A(["收到 bug 文档编写任务\n（Step 0 预热完成后）"]) --> B["调用 doc-index-required\n完成索引检查"]
     B --> C{"docs/bug/ 下已有同名文档?"}
     C -->|"是"| D["提示用户：是否补充到已有文档"]
     C -->|"否"| E["按命名规范确定文件名"]
