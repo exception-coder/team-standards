@@ -21,6 +21,8 @@
 | 重构/复写/迁移前需要理解现有业务逻辑 | `business-logic-orientation` |
 | **用户纠正了 AI 的编码写法（分层违规、命名错误等）** | `coding-violation-log` |
 | **开始编写代码前（若项目存在 coding-violations.md）** | `coding-violation-log`（回顾模式） |
+| 项目代码结构变更后需要同步文档 | `project-docs-update` |
+| Flutter 代码架构违规检查 | `arch-lint` |
 | 本次会话对 team-standards 有任何变更 | `dev-log`（会话结束前） |
 
 **核心原则：** 触发时机是用户表达意图的那一刻，而不是开始动手的那一刻。收到需求就触发 `design-doc-required`，不要等到真的要写代码时才触发。
@@ -40,9 +42,11 @@
 | `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；核心流程必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）；根因必须用表格 | bug、缺陷、问题分析、bug文档、OOM、异常 |
 | `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
 | `dev-log` | `skills/dev-log/` | 每次对 team-standards 有变更时记录开发日志；在 docs/dev-log/ 下按日期创建日志文件 | 开发日志、变更记录、skill 修改、发版记录 |
-| `init-project-docs` | `skills/init-project-docs/` | 初始化项目文档：分析 controller/service/mapper 层，生成项目概要（project-overview.md）和架构能力分析（architecture-analysis.md）两份文档到 docs/ 目录 | 初始化项目文档、分析项目能力、生成项目概要、架构分析、init project docs |
+| `init-project-docs` | `skills/init-project-docs/` | 渐进式构建项目知识图谱：Phase 1 核心文档（概要+架构+约束）→ Phase 2 映射文档（模块+数据模型+API+前后端映射+开发参考）→ Phase 3 流程与术语（业务流程+术语表+重构计划+变更记录）→ Phase 4 模块深度文档+技能卡；支持自动/确认两种模式 | 初始化项目文档、生成知识图谱、分析项目能力、生成项目概要、架构分析、init project docs、knowledge graph |
 | `generate-project-profile` | `skills/generate-project-profile/` | 生成 AI Agent 消费的项目画像（project-profile.md）：10 维度结构化 Markdown，可独立向量化分片；覆盖项目概述、技术栈、结构、架构、数据模型、Service 能力、API 接口、外部依赖、配置、编码约定 | 项目画像、project profile、代码感知、扫描项目、AI 上下文、generate profile |
 | `coding-violation-log` | `skills/coding-violation-log/` | 用户纠正编码错误时自动登记到 `docs/coding-violations.md`；编码前自动回顾已登记的违规记录，防止重犯 | 编码违规、纠正、分层违规、依赖方向、命名错误、规范错误、coding violation |
+| `project-docs-update` | `skills/project-docs-update/` | 知识图谱持续维护：检测代码结构变更（新增 Controller/Service/模块/数据表/API）与 docs/ 文档的差异，生成差异报告并执行更新；支持自动/确认模式 | 更新项目文档、同步知识图谱、文档过时、update project docs、sync knowledge graph |
+| `arch-lint` | `skills/arch-lint/` | Flutter 架构违规检测：5 条规则（presentation 层禁 SQL/HTTP、domain 层禁技术框架、金额禁 double、DAO 不可被 presentation 直接调用）；全量检查 + 轻量自动检查两种模式 | 架构检查、arch lint、检测违规、分层违规、Flutter 架构 |
 | `markdown-writing-standards` | `skills/markdown-writing-standards/` | Markdown 编写规范：Mermaid 图表语法（致命错误清单、各图类型骨架、自检清单）、表格、代码块、标题结构 | Mermaid、mermaid、图表、流程图、时序图、mindmap、状态图、markdown、表格规范 |
 | `business-logic-orientation` | `skills/business-logic-orientation/` | 重构/复写/迁移前业务逻辑现状梳理：按场景维度产出 3 图（时序图/流程图/泳道图）+ 知识图谱 + 核心代码索引 + AI 速查索引；后端附加表操作矩阵和状态扭转明细 | 现状梳理、业务逻辑、重构前分析、知识图谱、逻辑梳理、场景分析、调用链分析、AI索引 |
 
@@ -59,6 +63,21 @@
 | `skills/bug-doc-required/template.md` | bug-doc-required | bug 分析文档标准模板（6 节） |
 | `skills/init-project-docs/overview-template.md` | init-project-docs | 项目概要文档模板（7 章节） |
 | `skills/init-project-docs/architecture-template.md` | init-project-docs | 架构能力分析文档模板（7 章节） |
+| `skills/init-project-docs/templates/00_project_overview.md` | init-project-docs | 知识图谱 AI 入口模板 |
+| `skills/init-project-docs/templates/01_architecture_overview.md` | init-project-docs | 架构总览模板（多技术栈） |
+| `skills/init-project-docs/templates/02_module_map.md` | init-project-docs | 模块地图模板 |
+| `skills/init-project-docs/templates/03_business_flow_map.md` | init-project-docs | 业务流程地图模板 |
+| `skills/init-project-docs/templates/04_data_model_map.md` | init-project-docs | 数据模型总表模板 |
+| `skills/init-project-docs/templates/05_api_map.md` | init-project-docs | API 接口总表模板 |
+| `skills/init-project-docs/templates/06_frontend_backend_mapping.md` | init-project-docs | 前后端映射表模板 |
+| `skills/init-project-docs/templates/07_glossary.md` | init-project-docs | 业务术语表模板 |
+| `skills/init-project-docs/templates/08_constraints_and_rules.md` | init-project-docs | 架构约束与红线模板 |
+| `skills/init-project-docs/templates/09_refactor_plan.md` | init-project-docs | 重构路线图模板 |
+| `skills/init-project-docs/templates/10_change_log.md` | init-project-docs | 变更记录 ADR 模板 |
+| `skills/init-project-docs/templates/module_template.md` | init-project-docs | 模块深度文档模板（10 节） |
+| `skills/init-project-docs/templates/flutter_skill.md` | init-project-docs | Flutter 技能卡模板 |
+| `skills/init-project-docs/templates/vue_skill.md` | init-project-docs | Vue 技能卡模板 |
+| `skills/init-project-docs/templates/springcloud_skill.md` | init-project-docs | Spring Cloud 技能卡模板 |
 | `skills/markdown-writing-standards/mermaid-syntax-ref.md` | markdown-writing-standards | Mermaid 各图类型语法速查手册 |
 | `skills/business-logic-orientation/template.md` | business-logic-orientation | 业务逻辑梳理文档模板（7+5 章节） |
 | `skills/business-logic-orientation/ai-ref-template.md` | business-logic-orientation | AI 速查索引模板（7 章节，紧凑结构） |

@@ -82,9 +82,11 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `doc-index-required` | 编写/创建 `docs/` 下任何文档时 | 读取索引，分析内容边界，避免重复；写完后更新索引 |
 | `markdown-writing-standards` | 生成或修改含 Mermaid 图表的 Markdown 时 | Mermaid 语法规范、表格规范、代码块规范 |
 | `business-logic-orientation` | 重构/复写/迁移前需要理解现有业务逻辑时 | 按场景维度产出流程图、知识图谱、核心代码索引 |
-| `init-project-docs` | 初始化项目文档时 | 分析 controller/service/mapper 层，生成项目概要和架构分析 |
+| `init-project-docs` | 初始化项目文档 / 生成知识图谱时 | 渐进式构建 11 份知识图谱文档 + 模块深度文档 + 技能卡（4 阶段，支持自动/确认模式） |
 | `generate-project-profile` | 要求生成项目画像时 | 生成 AI Agent 消费的 10 维度结构化 Markdown（project-profile.md） |
 | `coding-violation-log` | 用户纠正 AI 编码错误时 | 自动登记违规到 `docs/coding-violations.md`，编码前回顾防重犯 |
+| `project-docs-update` | 项目代码结构变更后 | 检测代码与 docs/ 文档的差异，自动或确认式更新知识图谱 |
+| `arch-lint` | Flutter 架构检查时 | 检测 5 类架构违规（presentation 层 SQL/HTTP、domain 层框架依赖、金额 double、DAO 越层调用） |
 | `dev-log` | 任何 skill 或配置变更后 | 在 `docs/dev-log/` 下记录变更原因和改动内容 |
 
 ## 设计文档模板
