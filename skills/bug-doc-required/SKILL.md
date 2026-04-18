@@ -31,12 +31,16 @@ description: "You MUST invoke this skill the moment a user reports a bug, descri
 ```mermaid
 flowchart TD
     A(["收到 bug 文档编写任务\n（Step 0 预热完成后）"]) --> B["调用 doc-index-required\n完成索引检查"]
-    B --> C{"docs/bug/ 下已有同名文档?"}
+    B --> M{"扫描 docs/design/\n是否有对应模块?"}
+    M -->|"有"| M1["归档到\ndocs/bug/模块名/"]
+    M -->|"无"| M2["一级扁平放置\ndocs/bug/"]
+    M1 --> C{"该路径下已有同名文档?"}
+    M2 --> C
     C -->|"是"| D["提示用户：是否补充到已有文档"]
-    C -->|"否"| E["按命名规范确定文件名"]
+    C -->|"否"| E["按中文命名规范确定目录名与文件名"]
     E --> F["按标准模板生成文档结构"]
     F --> G["填充分析内容\n核心流程必须生成 3 类图：\n时序图 + 流程图 + 泳道图"]
-    G --> H["doc-index-required 第五步\n更新 INDEX.md"]
+    G --> H["doc-index-required 第五步\n更新总 INDEX 与模块 INDEX"]
     H --> I(["完成"])
     D --> F
 ```
@@ -45,30 +49,46 @@ flowchart TD
 
 ## 文档目录结构
 
-```
-docs/bug/
-  INDEX.md                              ← 顶层索引，列出所有 bug 目录
-  {bug名称}/                            ← 每个 bug 独立目录，目录名 = bug 名称
-    {bug名称}.md                        ← bug 分析文档
-    （预留：后期可在此目录下补充 module 归属、关联 PR、复现脚本等）
-```
-
-**命名规则：** 目录名和文件名统一用英文 kebab-case 描述 bug 核心现象：
+bug 文档在 `docs/bug/` 下**必须按模块分组**(对齐 `docs/design/` 的模块划分),结构为三级：
 
 ```
 docs/bug/
-  queryOrderAllDataToB-oom/
-    queryOrderAllDataToB-oom.md
-  business-day-settlement-sync/
-    business-day-settlement-sync.md
-  order-item-duplicate-on-retry/
-    order-item-duplicate-on-retry.md
+  INDEX.md                              ← 顶层索引,列出所有模块目录和未归类 bug
+  {模块名}/                              ← 模块目录,必须与 docs/design/{模块名}/ 同名
+    INDEX.md                            ← 模块级 bug 子索引,列出该模块下所有 bug
+    {bug名称}/                          ← bug 独立目录
+      {bug名称}.md                      ← bug 分析文档,文件名与目录名一致
+  {bug名称}/                            ← 若无对应 design 模块,退化为一级扁平结构
+    {bug名称}.md
+```
+
+**命名规则：** 目录名和文件名统一使用**中文**描述 bug 核心现象(与 `docs/design/` 下模块命名保持一致风格):
+
+```
+docs/bug/
+  退款退货逻辑重构/                      ← 对应 docs/design/退款退货逻辑重构/
+    INDEX.md
+    订单附加费必填字段缺失/
+      订单附加费必填字段缺失.md
+    退款算价结果缺分摊/
+      退款算价结果缺分摊.md
+  反结账/                                ← 对应 docs/design/反结账/
+    INDEX.md
+    结账回滚后金额未还原/
+      结账回滚后金额未还原.md
+  打印机启动闪退/                         ← 无对应 design 模块,一级扁平放置
+    打印机启动闪退.md
 ```
 
 **规范：**
-- 目录名不加 `bug-` 前缀，名称本身已隐含是 bug 分析
+- 模块目录名必须与 `docs/design/` 下已有模块**完全一致**(包括大小写、空格、下划线等),不允许同义替换
+- 写 bug 文档前**必须先扫描 `docs/design/`** 判断是否有对应模块：
+  - 有 → `docs/bug/{模块名}/{bug名称}/{bug名称}.md`
+  - 没有 → `docs/bug/{bug名称}/{bug名称}.md`(一级扁平,作为未归类兜底)
+- bug 目录名和文档名使用中文,简洁描述核心现象,不加 `bug-` / `bug_` 前缀
 - 目录名与文档文件名保持一致
-- 新建 bug 文档时必须新建对应目录，禁止直接放在 `docs/bug/` 根目录下
+- 禁止直接把 `.md` 文件放在 `docs/bug/` 或 `docs/bug/{模块名}/` 根目录下,必须建对应 bug 子目录
+- 历史遗留的英文 kebab-case 目录**不要求强制迁移**,新建 bug 必须按新规则
 
 ---
 
@@ -241,7 +261,10 @@ flowchart LR
 | "调用链用文字描述就够了" | 必须用 3 类 Mermaid 图（时序图、流程图、泳道图） |
 | "画一种图就够了" | 3 类图各有侧重，缺一不可：时序看交互、流程看决策、泳道看分层 |
 | "根因写一段话说明" | 必须用表格，一行一个问题 |
-| "不用更新 INDEX.md" | doc-index-required 第五步是强制要求 |
-| "直接放在 docs/bug/ 根目录" | 必须建 {bug名称}/ 子目录再放文件 |
+| "不用更新 INDEX.md" | doc-index-required 第五步是强制要求,总 INDEX 与模块 INDEX 都要更新 |
+| "直接放在 docs/bug/ 根目录" | 必须建 {模块名}/{bug名称}/ 或 {bug名称}/ 子目录再放文件 |
+| "用英文 kebab-case 命名目录就行" | 必须用**中文**命名 bug 目录与文档,与 docs/design/ 模块命名风格一致 |
+| "不用看 design 目录,直接扁平放" | 新建前必须扫描 docs/design/,有对应模块必须归到 {模块名}/ 下,不得随意扁平化 |
+| "自己新创建个和 design 不一样的模块名也行" | 模块名必须与 docs/design/{模块名}/ **完全一致**,不允许同义替换 |
 | "类名我知道，不用查" | 必须读 package 声明确认，禁止凭记忆填写 |
 | "只写短类名就够了" | 短类名无法精准定位文件，必须写完整包路径 |

@@ -2,9 +2,10 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-17 v6.1**
-> 变更摘要：`design-doc-required` 和 `bug-doc-required` 新增 Step 0（知识图谱上下文预热），AI 执行任务前按路由表按需加载文档，避免全量扫码。
-> 上一版：v6 新增 `project-docs-update`、`arch-lint`；`init-project-docs` 升级为 4 阶段。
+> **最后更新：2026-04-18 v6.2**
+> 变更摘要：`bug-doc-required` 调整目录结构为三级（`docs/bug/{模块名}/{bug名称}/`），命名由英文 kebab-case 改为中文，与 `docs/design/` 模块命名对齐；未对应任何 design 模块的 bug 退化为一级扁平结构。流程节点无变化,仅目录与命名规则细化。
+> 上一版：v6.1 `design-doc-required` 和 `bug-doc-required` 新增 Step 0（知识图谱上下文预热）。
+> 再上一版：v6 新增 `project-docs-update`、`arch-lint`；`init-project-docs` 升级为 4 阶段。
 > 历史版本：`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
 ---
@@ -27,7 +28,7 @@
 | `git-commit-standards` | team-standards | 执行 git commit 前 |
 | `finishing-a-development-branch` | superpowers | 分支实现完成、决定如何集成时 |
 | `dev-log` | team-standards | 对 team-standards 有任何变更（skill/配置/模板修改）后、本次会话结束前 |
-| `markdown-writing-standards` | team-standards | 生成或修改包含 Mermaid 图表的 Markdown 内容时（自动应用，与 java-coding-standards 同级） |
+| `markdown-writing-standards` | team-standards | 生成或修改包含 Mermaid 图表的 Markdown 内容；完成 Markdown 文件的结构性写入/重组后做目录复核（自动应用，与 java-coding-standards 同级） |
 | `business-logic-orientation` | team-standards | 重构/复写/迁移前需要理解现有业务逻辑时（产出梳理文档 + AI 速查索引） |
 | `init-project-docs` | team-standards | 要求初始化/生成知识图谱/分析项目文档时（4 阶段渐进式构建，独立分析类 skill） |
 | `generate-project-profile` | team-standards | 要求生成项目画像时（独立分析类 skill，生成 AI Agent 消费的 10 维度 Markdown） |
@@ -56,7 +57,7 @@ flowchart TD
 
     %% 文档层
     DDR["design-doc-required\n检查或创建设计文档\n（新功能 / bug 修复均适用）"]
-    MWS["markdown-writing-standards\nMermaid 语法自检"]
+    MWS["markdown-writing-standards\nMermaid 语法自检 + 目录复核"]
 
     %% 实施层
     PICO["pre-implementation-code-orientation\n从文档提取代码坐标"]

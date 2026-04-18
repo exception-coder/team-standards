@@ -75,7 +75,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | Skill | 触发时机 | 作用 |
 |-------|----------|------|
 | `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；自动生成编码摘要 |
-| `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格 |
+| `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；目录按模块分组（对齐 `docs/design/`）；中文命名 |
 | `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
 | `java-coding-standards` | 编写/审查任何 Java 代码时 | 强制遵守阿里黄山版编码规范 |
 | `git-commit-standards` | 执行 git commit 前 | 分析 staged 变更，生成标准化中文提交信息 |
