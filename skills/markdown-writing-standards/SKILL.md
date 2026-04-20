@@ -1,6 +1,6 @@
 ---
 name: markdown-writing-standards
-description: "Use when writing, reviewing, or modifying any Markdown content that contains Mermaid diagrams, complex tables, or structured documentation. You MUST follow these mandatory rules at all times. Apply automatically without being asked. TRIGGER when: generating mermaid code blocks, writing design docs, writing bug docs, creating any .md file with diagrams or structured content."
+description: "Use when writing, reviewing, or modifying any Markdown content that contains Mermaid diagrams, complex tables, or structured documentation. You MUST follow these mandatory rules at all times. Apply automatically without being asked. TRIGGER when: generating mermaid code blocks, writing design docs, writing bug docs, creating any .md file with diagrams or structured content; ALSO TRIGGER after completing any structural edit to a Markdown file (新增/删除/重命名 ## 或 ### 章节，或章节移动/合并/重组) to perform TOC review and detect duplicate/scattered/uncategorized sections before marking the file as done."
 ---
 
 # Markdown 编写规范
@@ -293,6 +293,74 @@ classDiagram
 - 一级章节（`##`）之间用 `---` 分隔线
 - 二级章节（`###`）之间用空行分隔，不加分隔线
 - 章节标题后必须有一个空行再写内容
+
+### 6.3 目录结构复核（TOC Review — 结构性改动完成后必过一遍）
+
+<HARD-GATE>
+完成 Markdown 文件的写入或较大范围修改后（首次创建、章节新增/删除、章节移动/合并/重组），必须先过一遍目录复核，再把文件视为完成。不得跳过。
+</HARD-GATE>
+
+#### 6.3.1 触发条件
+
+以下任一情况触发一次目录复核：
+
+- 新建任何结构化 Markdown 文件（非单段说明性短文）
+- 对现有 Markdown 文件新增、删除或重命名 `##` / `###` 章节
+- 对现有 Markdown 文件做章节移动、合并、拆分、重组
+
+轻微修改（段落文字调整、错别字、补充代码示例、列表项增减）**无需**触发。
+
+#### 6.3.2 复核步骤
+
+**第一步：列出当前目录快照**
+
+用 Grep 列出所有 `^## ` 与 `^### ` 行，形成当前 TOC 快照，肉眼扫一遍整体结构。
+
+**第二步：对照下表逐项排查**
+
+| 检查项 | 问题信号 | 处理方式 |
+|-------|---------|---------|
+| 分类混杂 | 平坦章节列表里混入不同性质的内容（如搭建 / 日常开发 / 报错排查 / 附录 都挤在同级 `##` 下） | 拆成 Part I/II/III 或按场景分组，顶部加读者分流导航 |
+| 内容重复 | 两个章节内容高度重叠或标题语义相近 | 合并，只保留一份，另一份用锚点链接指向 |
+| 标题重复 | 同一文件多个章节用完全相同的标题（多个"配置"/"说明"/"示例"/"错误现象"） | 加唯一前缀（"X 的配置"/"Y 的配置"），或按父子关系下沉到更深层级 |
+| 层级断层 | 出现 `##` 直接跳到 `####`，中间缺 `###` | 补全中间层级，或把深层标题降级为粗体段落 |
+| 编号错乱 | 手动编号的章节顺序/数字对不上（如"1. xxx / 3. yyy"） | 重新编号，或统一改为无编号 |
+| 命名风格不统一 | 兄弟章节有的带编号、有的不带；有的描述性、有的纯名词 | 统一为一种风格 |
+| 单章节超长 | 某个 `##` 的内容超过全文 40%，读者难以定位子部分 | 拆成多个平级章节，或下沉到子文档并在原处留链接 |
+| 交叉引用失效 | 正文提到"见第 N 节" / "详见 Y" / markdown 锚点链接，但编号已变或锚点已失效 | 全文扫描所有"第 X 节 / Section Y / 详见 Z / `#anchor`"，同步更新 |
+| 超过 4 级嵌套 | 出现 `#####` 及以上 | 降级为列表项或粗体段落，或把父章节拆出平级章节 |
+
+**第三步：判断是否需要顶部「快速导航」**
+
+出现以下信号之一时，顶部加一个快速导航块，让不同身份的读者直接跳转：
+
+- `##` 章节数 ≥ 8
+- 读者有明显分类（新人 vs 老手、开发 vs 排错、前端 vs 后端）
+- 部分章节是独立速查条目（如错误速查表、命令速查表）
+
+导航块示例：
+
+````markdown
+## 快速导航
+
+- **新人入职 / 首次搭建** → [Part I. 环境搭建](#part-i-环境搭建)
+- **日常开发** → [Part II. 开发流程](#part-ii-开发流程)
+- **报错排查** → [Part III. 报错速查](#part-iii-报错速查)
+````
+
+#### 6.3.3 复核自检清单
+
+文件写入前必须逐项确认：
+
+- [ ] 章节按语义分类组织，同类聚集（非散乱平列）
+- [ ] 无重复或近义标题（或已加唯一前缀做区分）
+- [ ] 无层级断层（`##` → `####` 之间必有 `###`）
+- [ ] 手动编号连续且顺序正确（或统一去编号）
+- [ ] 兄弟章节命名风格一致（全带编号 / 全不带；全描述句 / 全名词）
+- [ ] 所有"见第 X 节 / Section Y / 详见 Z"交叉引用指向真实存在的章节
+- [ ] 所有 markdown 锚点链接（`[文本](#anchor)`）的 anchor 与当前标题匹配
+- [ ] 章节数 ≥ 8 的文档顶部有快速导航
+- [ ] 最终层级不超过 4 级（h4），更深的已下沉为列表/段落
 
 ---
 
