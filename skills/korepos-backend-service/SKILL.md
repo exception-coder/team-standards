@@ -231,13 +231,15 @@ import '../../../../common/services/networking/remote_service/api_endpoint.dart'
 
 /// {模块} 端点枚举
 ///
-/// 对应 UI 对接手册 §{章节号} 定义的 N 个接口。
+/// 对接文档：`docs/{模块}/{模块}-UI对接手册-{YYYYMMDD}-v1.md`
 /// 路径策略：原则上与前端清单一致；若与老骨架路径冲突则加 `/v2/` 前缀避让，在此注释说明。
 enum {Module}Endpoint implements ApiEndpoint {
-  /// {接口 1 中文名 / UI 对接手册 §4.x}
+  /// {接口 1 中文名}
+  /// 文档：`docs/{模块}/{模块}-UI对接手册-*.md` §4.1
   actionOne('/xxx/one'),
 
-  /// {接口 2 中文名 / UI 对接手册 §4.x}
+  /// {接口 2 中文名}
+  /// 文档：`docs/{模块}/{模块}-UI对接手册-*.md` §4.2
   actionTwo('/xxx/two');
 
   const {Module}Endpoint(this.path);
@@ -261,9 +263,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part '{action}_request.freezed.dart';
 part '{action}_request.g.dart';
 
-/// 接口 POST {/path} 入参（UI 对接手册 §4.x）
+/// 接口 POST {/path} 入参
 ///
-/// 字段语义逐一对应 UI 对接手册的入参表。
+/// 文档：`docs/{模块}/{模块}-UI对接手册-*.md` §4.N 入参表
+///
+/// 字段语义逐一对应 UI 对接手册的入参表。任何字段增删改后，
+/// **必须同步更新文档的 §4.N 入参表 + §8 变更记录**（详见 skill 的「DTO ↔ 文档双向绑定」节）。
 @freezed
 class {Action}Request with _${Action}Request {
   const factory {Action}Request({
@@ -294,7 +299,11 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part '{action}_response.freezed.dart';
 part '{action}_response.g.dart';
 
-/// 接口 POST {/path} 出参 data（UI 对接手册 §4.x）
+/// 接口 POST {/path} 出参 data
+///
+/// 文档：`docs/{模块}/{模块}-UI对接手册-*.md` §4.N 出参表
+///
+/// 任何字段增删改后，**必须同步更新文档的 §4.N 出参表 + §8 变更记录**。
 @freezed
 class {Action}Response with _${Action}Response {
   const factory {Action}Response({
@@ -583,6 +592,81 @@ UI 对接手册           Service 方法                 Handler 方法         
 
 ---
 
+## DTO ↔ UI 对接手册双向绑定与同步
+
+**UI 对接手册是给前端团队对接用的真源文档**。前端照着 §4 的字段表写调用代码 —— 文档与 backend DTO 漂移一天，前端就写错接口一天。因此：
+
+### 绑定规则（生成代码时必须建立）
+
+**双向互指**，grep 任一侧都能定位到另一侧：
+
+1. **代码 → 文档**：每个 Endpoint 枚举值、Request DTO、Response DTO 的 dartdoc 第一行必须写
+   ```dart
+   /// 文档：`docs/{模块}/{模块}-UI对接手册-*.md` §4.N
+   ```
+   `*.md` 的通配是刻意的 —— 让 grep 对日期后缀不敏感，手册升版时不会让代码里的路径失效。
+
+2. **文档 → 代码**：UI 对接手册 §4.N 小节末尾必须加一行
+   ```markdown
+   **对应代码**：
+   - Endpoint 枚举：`lib/features/{module}/backend/endpoint/{module}_endpoint.dart#{actionName}`
+   - Request DTO：`lib/features/{module}/backend/dto/request/{action}_request.dart`
+   - Response DTO：`lib/features/{module}/backend/dto/response/{action}_response.dart`
+   ```
+
+生成代码时**两侧同步写入**，不允许只写单边。
+
+### 同步时机（后续维护，任一项触发即必须同步文档）
+
+| 触发场景 | 同步动作 |
+|---|---|
+| 新增 / 删除 / 重命名 Request DTO 字段 | 改 §4.N 入参表 + 改 §1 版本 + 追加 §8 变更记录 |
+| 新增 / 删除 / 重命名 Response DTO 字段 | 改 §4.N 出参表 + 改 §1 版本 + 追加 §8 变更记录 |
+| 字段类型 / 必填 / 默认值变化 | 改 §4.N 对应字段行 + §8 变更记录 |
+| 魔法数字枚举扩容（如 `paymentType: 1/2/3` → `1/2/3/4`） | 改 §4.N 说明列 + §8 变更记录 |
+| 新增 Endpoint 枚举值 | 改 §2 接口清单表 + 新加 §4.N 小节 + §8 变更记录 |
+| 删除 Endpoint 枚举值 | 改 §2 接口清单表 + 删 §4.N 小节（或标注「已废弃」）+ §8 变更记录 |
+| Endpoint path 变更（例如加 /v2/ 前缀） | 改 §4.N 的 Path 表格行 + §2 备注列 + §8 变更记录 |
+| 接口语义/幂等性/触发页面/异常码变化 | 改 §4.N 对应段落 + §8 变更记录 |
+
+### §1 版本号与 §8 变更记录的格式
+
+每次同步，§1 基本信息表的版本号按语义递增：
+
+| 变更类型 | 版本变化 |
+|---|---|
+| 破坏性变更（删字段 / 改字段类型 / 改必填 / 删接口） | 主版本 +1（v1 → v2） |
+| 新增字段 / 新增接口 / 新增可选参数 | 次版本 +1（v1 → v1.1） |
+| 魔法数字扩容 / 字段说明补充 / Path 不涉及破坏的调整 | 修订版本 +1（v1 → v1.0.1） |
+
+§8 追加一行（与历史同格式）：
+
+```markdown
+| v1.1 | 2026-04-21 | 张凯 | `ActionOneRequest` 新增可选字段 `reasonText`；`ActionOneResponse` 的 `status` 魔法数字扩至 1/2/3/4（新增 4=已取消） |
+```
+
+### 代码编辑时的工作流
+
+每当 Claude 在当前 skill 下动 `backend/dto/**/*.dart` 或 `backend/endpoint/*_endpoint.dart`：
+
+1. **先读文档**：从 DTO 的 dartdoc 取路径，Read 打开 UI 对接手册 §4.N
+2. **对字段**：Diff 当前手册 §4.N 表 vs DTO 字段，列出差异
+3. **同步写入**：改代码的同时改文档（Edit markdown 表、改版本号、加变更记录）
+4. **回报用户**：「代码改了 X，文档 §4.N 同步改了 Y，版本 v1 → v1.1」
+
+**严禁只改代码不改文档**。前端团队下一次拉文档时看到的就是旧契约，线上会出问题。
+
+### 前端归属提醒（生成首个接口时必须输出）
+
+**每当本 skill 首次为某模块生成 backend 代码时**，最后回复必须带上这段话：
+
+> ⚠️ 同步提醒
+> 本次生成的 DTO / Endpoint 已经绑定了 `docs/{模块}/{模块}-UI对接手册-*.md`。该文档**后续会交给前端团队对接使用**，前端按 §4 字段表写调用代码。
+> 从此刻起，任何对 Request / Response / Endpoint 的改动（增删字段、改类型、改枚举值、改 path）都**必须同步回改该文档的 §4.N + §1 版本号 + §8 变更记录**，两侧严禁漂移。
+> 若未来改动未通过本 skill（人手直接编辑 DTO），请自行走同步流程；建议后续补一个 Dart 契约测试作为硬闸。
+
+---
+
 ## 完成后自检清单
 
 执行完 Step 8 后，对新生成的代码逐项自检：
@@ -597,7 +681,10 @@ UI 对接手册           Service 方法                 Handler 方法         
 | 路由注册 | `api_intranet_handler.dart` backend 路由块新增一行 `register{Module}BackendRoutes(router, _ref)` |
 | 代码生成 | 所有含 `part '*.freezed.dart'` / `part '*.g.dart'` 的文件，提醒用户跑 `dart run build_runner build --delete-conflicting-outputs` |
 | 注释完备 | 每个类 / public 方法有 dartdoc；对齐云端注释标注了 Java 类全路径；魔法数字有枚举说明 |
-| 对接手册一致性 | 新增接口的 Path、入参字段、出参字段与 UI 对接手册逐项对齐 |
+| 代码 → 文档引用 | 每个 Endpoint 枚举值 / Request DTO / Response DTO 的 dartdoc 第一行含 ``文档：`docs/{模块}/{模块}-UI对接手册-*.md` §4.N`` |
+| 文档 → 代码引用 | UI 对接手册每个 §4.N 小节末尾写有「对应代码」段，列出 Endpoint 枚举值 / Request DTO / Response DTO 的相对路径 |
+| 对接手册一致性 | 新增接口的 Path、入参字段、出参字段与 UI 对接手册逐项对齐；若本次有字段/接口变更，已改 §1 版本号并追加 §8 变更记录 |
+| 同步提醒输出 | 若本次是**首次**为该模块生成 backend 代码，回复末尾带上「⚠️ 同步提醒」段落（内容见「DTO ↔ UI 对接手册双向绑定与同步」节） |
 
 若任一项不通过，**必须在回复用户前修正**，而不是先落盘再等用户发现。
 
@@ -632,5 +719,6 @@ git-commit-standards（提交）
 | 复用 `features/{module}/domain/` 的 freezed 模型作为 backend DTO | 两侧耦合；未来模型演化会互相牵制 |
 | 在 handler 里手写 `try-catch` / `jsonDecode` | 偏离 IntranetHandlerBase 模板，日志/错误映射会不一致 |
 | 跳过 UI 对接手册自行推断接口形状 | 字段漂移 —— 前端最终拿不到预期字段 |
+| 改了 DTO 字段 / Endpoint 但不同步 UI 对接手册 §4.N / §1 版本 / §8 变更记录 | 文档会发给前端团队对接使用，漂移即线上字段错位 |
 | 同一次 PR 同时改 backend 和 `features/{module}/presentation/` | 违反「backend 与 UI 彻底分开开发」；UI 切换由 UI 团队做 |
 | 在设计/编码文档里把「UI 怎么调新接口」作为 checkbox 任务 | 越界；backend 只声明契约，不规划 UI diff |

@@ -74,6 +74,12 @@
 - 异常场景：原订单不存在 → `ApiIntranetException(MessageKey.notFound)`
 - 对齐云端：`com.kpaygroup.pos.order.modules.service.v1.impl.XxxServiceImpl#actionName`
 
+**对应代码**（backend 侧，供排错定位；本段 backend 同学维护，前端略过）：
+
+- Endpoint 枚举：`lib/features/{module}/backend/endpoint/{module}_endpoint.dart#actionName`
+- Request DTO：`lib/features/{module}/backend/dto/request/{action}_request.dart`
+- Response DTO：`lib/features/{module}/backend/dto/response/{action}_response.dart`
+
 <!-- ============ 单接口模板 止 ============ -->
 
 ### 4.N+1 `{actionName2}` — {下一个接口}
