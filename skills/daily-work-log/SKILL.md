@@ -30,10 +30,44 @@ description: "每次对业务项目的源码（.dart/.java/.kt/.ts/.py 等）执
 
 - **路径**：业务项目根目录下 `docs/work-log/{YYYY-MM-DD}.md`（每日一份，无时区依赖，按本地日期切分）
 - **时间戳**：条目里的 `HH:MM` 用 24 小时制本地时间
-- **目录不存在**：自动创建 `docs/work-log/`
+- **目录不存在**：自动创建 `docs/work-log/`，**同时检查并追加 `.gitignore`**（见下节）
 - **当日文件不存在**：按下方「文件骨架」初始化
 
 若业务项目不允许在 `docs/` 下直接写（用户手工配置了别的路径），询问用户一次并记住。默认走 `docs/work-log/`。
+
+### ⚠️ 首次创建 work-log 目录时必须配置 .gitignore（硬规则）
+
+**每日工作日志记录的是个人工时与改动流水，属个人工作记录而非项目资产，绝不入仓。**
+
+首次在项目里生成 `docs/work-log/` 目录时，AI **必须**：
+
+1. Read 项目根目录 `.gitignore`
+2. 检查是否已含 `docs/work-log/` 或等价规则（如 `work-log/` 未锚定、或 `docs/**/work-log/`）
+3. **未含** → Edit `.gitignore`，追加一段：
+
+   ```gitignore
+   # 每日工作日志（daily-work-log skill 产出，个人工时与修改流水，不入仓）
+   docs/work-log/
+   ```
+
+4. 若本次会话**已经把 `docs/work-log/*.md` 纳入了 git 追踪**（比如上次 commit 没加 gitignore），AI 必须主动执行一次清理：
+   - `git rm --cached docs/work-log/*.md`（从 index 移除，保留本地文件）
+   - 把 `.gitignore` + 清理一起打一个 `chore(gitignore)` 的小 commit
+
+5. 回报用户：「已配置 .gitignore 忽略 docs/work-log/，本地文件保留」
+
+**这条规则无例外。** 即使用户没说，第一次生成日志文件时就必须同步配置。跳过这一步 = 把个人工时数据污染进 git 历史，后续清理成本高。
+
+### .gitignore 已存在但格式不同的场景
+
+| 已有规则 | 处理 |
+|---|---|
+| `docs/work-log/`（完全匹配） | 跳过 |
+| `work-log/`（未锚定，也能匹配） | 跳过，不重复追加 |
+| `docs/**/work-log/` | 跳过 |
+| 无任何匹配 | 追加上方新段 |
+
+不追加注释行的变种或多个正则等价规则，**保持规则干净**。
 
 ---
 
@@ -309,12 +343,15 @@ dev-log（仅 team-standards 项目：会话结束前）
 | 为每次 Edit 新建条目（即使是同一 bug） | 违反"同 bug 合并" |
 | 在 team-standards 仓库里写 `docs/work-log/`（而不是业务项目） | 错位；team-standards 走 dev-log |
 | 把 skill/文档修改记到 daily-work-log | 错位；应走 dev-log |
+| **首次创建 `docs/work-log/` 未配置 `.gitignore`** | 个人工时数据会被提交进 git 历史，清理成本高；规则：生成目录即同步 ignore |
+| **把 work-log 文件纳入业务 commit** | 上条规则的结果，同样禁止 |
 
 ---
 
 ## 自检清单（每次写入后）
 
 - [ ] 文件路径是业务项目的 `docs/work-log/{YYYY-MM-DD}.md`，不是别的仓库
+- [ ] **首次创建 `docs/work-log/` 时，已同步检查并追加 `.gitignore`；若已误 track 过则 `git rm --cached` 清理**
 - [ ] 写入前 Read 了当天文件
 - [ ] 同 bug / 同功能已合并到已有条目，没新建重复条目
 - [ ] 修改明细一行一条、带时间戳、≤ 50 字
