@@ -667,6 +667,140 @@ UI 对接手册           Service 方法                 Handler 方法         
 
 ---
 
+## ACL（Anti-Corruption Layer）：内部 DTO 与 wire DTO 的边界
+
+**接口上线对接后，HTTP 响应 JSON 即契约；内部调试加的字段绝不可无意泄漏到 wire。** 本节规定三档 ACL 策略与已对接接口的保护规则。
+
+### 背景与原则
+
+- **场景一**：service 编排层常需把中间状态字段（如 `originalPayChannelCode`、`debugTrace`、内部派生标志位）从 DAO 传到 service 做过滤/路由；但这些字段不供前端消费
+- **场景二**：若内部 DTO 直接复用为 HTTP Response（典型如 `typedef WriteRefundResponse = RefundResult`），在其上加字段会让 HTTP JSON 多出字段。**UI 的 freezed fromJson 默认忽略未知字段不会挂**，但仍是合约污染 —— 未来 UI 升级做严格校验、CI diff 接口快照、或字段名撞名都可能翻车
+- **场景三**：云端（Java）字段增减不可直接透传到终端 wire；需要 mapper 映射
+- **原则**：**业务可自由演进内部字段，wire 层只能加不能减、能不动尽量不动**。每次新增字段显式决策它是 wire 还是 internal —— **默认 internal-first**，跳过 JSON
+
+### 三档 ACL 策略（按侵入度从轻到重）
+
+| 档位 | 做法 | 何时用 |
+|---|---|---|
+| **L1 轻量 — 注解豁免** | freezed 字段加 `@JsonKey(includeToJson: false, includeFromJson: false)`，JSON 序列化时跳过 | 内部字段 1-2 个；仅 service / dao 层过滤或派生用 |
+| **L2 中量 — 双枚举 / 双 DTO 物理分离** | 拆成 `{Name}`（internal）+ `{Name}Wire`（wire），或 internal 枚举 + wire 枚举两套 | 已有先例：`PaymentType`（internal，业务分类）vs `RefundMethodType`（wire，UI 合约字面），通过 `code` 值隐式对应 |
+| **L3 重量 — Mapper 层** | 在模块 `backend/mapper/` 下建 mapper 类：`toWire(internal) → wire` / `fromWire(wire) → internal`，两边 DTO 分到不同包 | 模块接口 ≥ 5 且每个都有内外差异；或字段名本身 snake vs camel 跨侧不同 |
+
+> 大多数场景 **L1 够用**。加内部字段时**默认 L1**，只有拆分压力出现（字段数多、语义分歧大）时升 L2；L3 一般新模块初始设计时就要决定，中途难切。
+
+### 判断「字段是 wire 还是 internal」的三问
+
+加新字段前问自己：
+
+1. **前端会消费吗？** UI 对接手册 §4.N 里是否列了这个字段？
+2. **是 service/dao 派生给自己判断用的？**（比如过滤条件、中间状态、调试 trace）
+3. **是 DB 列原始值，service 为了做决策读出来的？**（比如 `originalPayChannelCode` 供 service 过滤）
+
+**三问任一答 internal → 走 L1**；只有明确是"给 UI 消费"才加进 wire。
+
+### L1 样例（最常用）
+
+```dart
+@freezed
+class RefundTransactionResult with _$RefundTransactionResult {
+  const factory RefundTransactionResult({
+    /// Wire 字段 — 文档 §4.3 出参表列出，供前端消费
+    required int transactionId,
+    required double refundAmount,
+
+    /// Internal 字段 — service 过滤用，不进 HTTP 响应
+    ///
+    /// 取值对齐云端 `TransactionV1ServiceImpl.java:652` 过滤字段；
+    /// 当值 ∈ {KPOS_CARD, KPOS_QR} 时 `_buildSuccessResponse` 才把该流水放进 kposList
+    @JsonKey(includeToJson: false, includeFromJson: false)
+    @Default('') String originalPayChannelCode,
+  }) = _RefundTransactionResult;
+
+  factory RefundTransactionResult.fromJson(Map<String, dynamic> json) =>
+      _$RefundTransactionResultFromJson(json);
+}
+```
+
+效果：
+- Dart 对象内部随意读写 `originalPayChannelCode`
+- `toJson()` 输出的 JSON **不含**该字段 → HTTP 响应干净
+- `fromJson({"originalPayChannelCode": "..."})` 输入也被**忽略** → 避免外部注入
+
+### L2 样例（枚举级物理分离，已在项目内应用）
+
+refund backendv2 里 `PaymentType`（internal 业务枚举）和 `RefundMethodType`（wire 枚举）就是 L2 的典型：
+
+```dart
+// dto/payment_type.dart — 内部业务枚举，对齐云端 PaymentTypeEnum
+enum PaymentType {
+  kpay(1), cash(2), custom(3), bankCard(4), qrCode(5);
+  final int code;
+  const PaymentType(this.code);
+}
+
+// dto/refund_method_type.dart — wire format 枚举，JSON 字面量
+enum RefundMethodType {
+  kpay(1), cash(2), custom(3), kpayOffline(4);
+  final int code;
+  const RefundMethodType(this.code);
+  static RefundMethodType fromCode(int code) { /* ... */ }
+}
+```
+
+两套枚举通过 `code` 值隐式对应，物理隔离；**内部枚举改（删 `kpayOffline`、加 `bankCard`/`qrCode`）wire 枚举完全不动 → HTTP JSON 零破坏**。
+
+### 已开启对接接口的额外保护
+
+**DTO 一旦被 UI 按 §4.N 对接，其 wire 部分视为契约冻结**。后续改动分类：
+
+| 操作 | 允许 | 附加约束 |
+|---|---|---|
+| 加 wire 字段（带 `@Default` 或可选） | ✅ | §1 版本 +minor（v1 → v1.1），§8 变更记录 |
+| 加 internal 字段（L1 注解或 L2 独立类） | ✅ | JSON 字节级不变，无版本变更 |
+| 删 wire 字段 | ❌ | 必走新接口 / `/v2/` 路径 |
+| 改 wire 字段类型（int ↔ string 等） | ❌ | 同上 |
+| 必填 → 可选 | ⚠️ | §8 记录；前端可能仍按必填传，无破坏 |
+| 可选 → 必填 | ❌ | 破坏老版本 UI |
+| 魔法数字扩容（`1/2/3` → `1/2/3/4`） | ✅ | dartdoc 枚举更新，§4.N 说明列更新，§8 记录 |
+| 魔法数字取值语义变更（`4=A` → `4=B`） | ❌ | 必走新接口；旧 UI 会按旧语义解读 |
+
+**硬约束**：每次改 DTO 字段**前**，先 grep `features/{module}/presentation/`、`features/{module}/frontend/` 里是否已有 UI 调用对应接口；有 = 已对接 = 启动上表规则。
+
+### 判断流（AI 编辑 DTO 时自检）
+
+```mermaid
+flowchart TD
+    START(["准备加/改 DTO 字段"]) --> Q1{"字段是 wire\n还是 internal?"}
+    Q1 -->|"wire"| Q2{"接口已对接?"}
+    Q1 -->|"internal"| L1["加 L1 注解\nincludeToJson/FromJson: false\n或升级 L2 分离类"]
+    Q2 -->|"否"| ADD["直接加 wire 字段\n同步改文档 §4.N"]
+    Q2 -->|"是"| Q3{"加字段\n还是改/删?"}
+    Q3 -->|"加 optional/带 Default"| ADDMIN["加字段\n§1 +minor\n§8 变更记录\n同步改 §4.N"]
+    Q3 -->|"改类型/删/必填改动"| STOP["停止\n必走新接口 /v2"]
+    L1 --> CK["自检: internal 字段\n不应出现在 §4.N 手册"]
+    ADD --> CK
+    ADDMIN --> CK
+    STOP --> END(["与用户确认走新接口"])
+```
+
+### 已对接接口 grep 识别方法
+
+对 refund 模块：
+
+```bash
+# 1. 列出当前模块已暴露的接口 path
+grep -E "\('/v[12]?/refund/" lib/features/refund/backendv2/endpoint/*.dart
+
+# 2. 对每个 path，grep UI 是否调过
+grep -rn "/v2/refund/confirm" lib/features/refund/{presentation,frontend,application}/
+
+# 3. 有命中 = 已对接，启动保护规则
+```
+
+Skill 在 Edit DTO 前**必须跑**这一步识别，把结果和字段改动影响一起 report 给用户再决策。
+
+---
+
 ## 完成后自检清单
 
 执行完 Step 8 后，对新生成的代码逐项自检：
@@ -684,6 +818,8 @@ UI 对接手册           Service 方法                 Handler 方法         
 | 代码 → 文档引用 | 每个 Endpoint 枚举值 / Request DTO / Response DTO 的 dartdoc 第一行含 ``文档：`docs/{模块}/{模块}-UI对接手册-*.md` §4.N`` |
 | 文档 → 代码引用 | UI 对接手册每个 §4.N 小节末尾写有「对应代码」段，列出 Endpoint 枚举值 / Request DTO / Response DTO 的相对路径 |
 | 对接手册一致性 | 新增接口的 Path、入参字段、出参字段与 UI 对接手册逐项对齐；若本次有字段/接口变更，已改 §1 版本号并追加 §8 变更记录 |
+| **ACL 分级标注** | 每个新增 DTO 字段已明确是 wire 还是 internal；internal 字段已加 `@JsonKey(includeToJson: false, includeFromJson: false)`（L1）或独立到内部类/枚举（L2） |
+| **已对接接口保护** | 对本次涉及的接口，已 grep `presentation/` / `frontend/` 确认是否已被 UI 调用；若已对接，本次改动未违反「允许/禁止」矩阵（未删 wire 字段、未改字段类型、未变魔法数字语义） |
 | 同步提醒输出 | 若本次是**首次**为该模块生成 backend 代码，回复末尾带上「⚠️ 同步提醒」段落（内容见「DTO ↔ UI 对接手册双向绑定与同步」节） |
 
 若任一项不通过，**必须在回复用户前修正**，而不是先落盘再等用户发现。
@@ -722,3 +858,5 @@ git-commit-standards（提交）
 | 改了 DTO 字段 / Endpoint 但不同步 UI 对接手册 §4.N / §1 版本 / §8 变更记录 | 文档会发给前端团队对接使用，漂移即线上字段错位 |
 | 同一次 PR 同时改 backend 和 `features/{module}/presentation/` | 违反「backend 与 UI 彻底分开开发」；UI 切换由 UI 团队做 |
 | 在设计/编码文档里把「UI 怎么调新接口」作为 checkbox 任务 | 越界；backend 只声明契约，不规划 UI diff |
+| 给已对接接口的 freezed DTO 加字段不加 `@JsonKey(includeToJson/FromJson: false)` 注解，直接让内部字段进 wire | 污染已冻结契约；必须按 ACL L1/L2 策略处理 |
+| 对已对接接口的 wire 字段做破坏性改动（删字段、改类型、可选→必填、魔法数字语义变） | 违反已开启对接接口保护矩阵；必须走新接口或 `/v2/` 路径 |

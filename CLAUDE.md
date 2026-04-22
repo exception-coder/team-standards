@@ -23,7 +23,11 @@
 | **开始编写代码前（若项目存在 coding-violations.md）** | `coding-violation-log`（回顾模式） |
 | 项目代码结构变更后需要同步文档 | `project-docs-update` |
 | Flutter 代码架构违规检查 | `arch-lint` |
+| **跨项目定位 / 排查 / 调用链追踪（涉及 ≥2 个 kpay POS 生态工程）** | `cross-project-locator`（查询模式） |
+| **即将写同时提到 ≥2 个 kpay POS 工程名的 markdown（对照 / 流程 / 数据流）** | `cross-project-locator`（登记模式） |
 | 本次会话对 team-standards 有任何变更 | `dev-log`（会话结束前） |
+| **业务项目源码有 Edit/Write 改动，或用户说「记一下工作日志」「记录一下」** | `daily-work-log` |
+| **会话结束前若本会话有业务项目源码改动未登记** | `daily-work-log`（强制回补） |
 
 **核心原则：** 触发时机是用户表达意图的那一刻，而不是开始动手的那一刻。收到需求就触发 `design-doc-required`，不要等到真的要写代码时才触发。
 
@@ -49,6 +53,8 @@
 | `arch-lint` | `skills/arch-lint/` | Flutter 架构违规检测：5 条规则（presentation 层禁 SQL/HTTP、domain 层禁技术框架、金额禁 double、DAO 不可被 presentation 直接调用）；全量检查 + 轻量自动检查两种模式 | 架构检查、arch lint、检测违规、分层违规、Flutter 架构 |
 | `markdown-writing-standards` | `skills/markdown-writing-standards/` | Markdown 编写规范：Mermaid 图表语法（致命错误清单、各图类型骨架、自检清单）、表格、代码块、标题结构、目录结构复核（TOC Review — 分类混杂/重复/层级断层/交叉引用失效/快速导航判断） | Mermaid、mermaid、图表、流程图、时序图、mindmap、状态图、markdown、表格规范、目录结构、TOC、章节重构、目录复核 |
 | `business-logic-orientation` | `skills/business-logic-orientation/` | 重构/复写/迁移前业务逻辑现状梳理：按场景维度产出 3 图（时序图/流程图/泳道图）+ 知识图谱 + 核心代码索引 + AI 速查索引；后端附加表操作矩阵和状态扭转明细 | 现状梳理、业务逻辑、重构前分析、知识图谱、逻辑梳理、场景分析、调用链分析、AI索引 |
+| `cross-project-locator` | `skills/cross-project-locator/` | kpay POS 生态跨项目业务拓扑定位与登记：查询模式（按业务域/工程名路由到 `kpay-pos-topology/` 下 mapping 或 flows）+ 登记模式（拦截跨项目 markdown 的错误落盘位置，强制写入 `kpay-pos-topology/`）；路由入口是 `kpay-pos-topology/CLAUDE.md` § 查找索引表 | 跨项目、调用链、链路、定位、追踪、end-to-end、前后端追踪、korepos、bff、order-manage、接口对照、映射 |
+| `daily-work-log` | `skills/daily-work-log/` | 业务项目每日工作日志：每次 Edit/Write 业务源码后写入 `docs/work-log/{YYYY-MM-DD}.md`，按 🐛 Bug 修复 / ✨ 功能开发 分两区；同 bug 多次修复合并同条目、同功能多轮迭代合并同条目；一行一条修改明细、带时间戳、动词开头；预估工时累计叠加（基础估值表 + 叠加项）；写入前必须 Read 当天日志合并现有条目；会话结束前若有未登记改动强制回补；与 dev-log 分工：dev-log 作用于 team-standards 仓库、daily-work-log 作用于业务项目 | 工作日志、每日日志、工时、记录、work-log、daily-log、日报、登记 |
 
 ---
 
