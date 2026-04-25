@@ -7,7 +7,7 @@ description: "Use when writing, adding, or modifying korepos (and korepos-refund
 
 ## 核心原则
 
-**korepos 业务模块的后端接口必须按 `features/{module}/backend/` 模板编写，作为未来独立服务的蓝本。backend 与 UI 彻底分离，跨模块访问只能通过 `common/backend_infra` 门面。**
+**korepos 业务模块的后端接口必须按 `features/{module}/backend/` 模板编写，作为未来独立服务的蓝本。backend 与 UI 彻底分离：其它模块的 `presentation / application / data / domain` 层访问**只能**通过 `common/backend_infra` 门面；**其它模块的 `backend/` 层可以直接互相 import**（同属后台团队代码区，独立服务化时会一起搬走）。**
 
 **默认目标目录：`lib/features/{module}/backend/`**（不是 `backendv2/`）。
 
@@ -161,10 +161,16 @@ lib/features/{module}/backend/
 
 `backend/` 将整体拷贝到未来的独立服务中，import 边界就是服务边界。
 
+**核心心智模型**：
+
+- **backend 阵营互通**：所有 `features/{x}/backend/` 同属"后台团队介入开发的代码区"，互相 import 不受限；未来独立服务化时这些目录会一起搬走
+- **非 backend 层是禁区**：UI 团队维护的 `presentation/` / `application/` / `data/` / `domain/` 不得被 backend 引用（破坏分离），跨此类依赖必须走 `BackendInfra` 门面
+
 ### ✅ 允许引用（视为基础能力，会一起拷走）
 
 - `lib/common/**` — 数据库 / 日志 / 网络 / 存储 / 通用工具
-- `lib/common/backend_infra/**` — 门面层（**必经之路**，详见下一节）
+- `lib/common/backend_infra/**` — 门面层（**非 backend 层**依赖的必经之路，详见下一节）
+- **`lib/features/{other}/backend/**`** — 其它模块的 backend 层（同属后台团队代码区，可直接 import；含 `service / dao / dto / endpoint / registry` 任一子目录）
 - `lib/features/auth/application/auth_service.dart` — **只通过 `infra.auth`**，禁止直接 import
 - `lib/features/order/data/order_local_repository.dart` — **只通过 `infra.createOrderRepo()`**
 - `lib/features/store/application/store_service.dart` — **只通过 `infra.store`**
@@ -173,18 +179,21 @@ lib/features/{module}/backend/
 
 - `lib/features/{module}/domain/**` — 前端 UI 领域模型；backend 须自持副本到 `backend/dto/`
 - `lib/features/{module}/data/**`、`application/**`、`presentation/**` — UI 侧（同模块内 UI 文件同样禁引）
-- `lib/features/payment/**`、`cart/**`、`bill/**` 等其他业务 feature — 一律经 BackendInfra 暴露或拒绝引用
+- `lib/features/{other}/{data,application,presentation,domain}/**` — 其它 feature 的**非 backend 层** — 一律经 BackendInfra 暴露或拒绝引用
 - 任何 `*_notifier.dart` / `*_view_model.dart` / `*_controller.dart`（UI 层 Riverpod 控制器）
 - `package:flutter/widgets.dart`、`package:flutter/material.dart`（仅 `debugPrint` 场景豁免，用 `package:flutter/foundation.dart`）
 - 同模块老 `backend/application/`、`backend/data/`（如果共存期）—— 新代码不反向依赖老骨架，老代码下线时直接删
 
-**发现越界 import 时立刻停下**，与调用方确认是走 BackendInfra 扩展，还是该项不属于 backend 职责。
+**发现越界 import 时立刻停下**，与调用方确认：
+
+- 如果是其它模块的 **backend 层** → 直接 import 即可，不必走门面（本 skill v1.10 起放开）
+- 如果是其它模块的 **非 backend 层**（application / data / domain / presentation）→ 走 BackendInfra 扩展，或该项不属于 backend 职责
 
 ---
 
 ## BackendInfra 门面规则
 
-所有跨模块/跨层依赖 **只能** 通过 `BackendInfra` 接口（`lib/common/backend_infra/backend_infra.dart`）访问。
+**跨到非 backend 层的依赖**（其它 feature 的 `application / data / domain / presentation`）**只能** 通过 `BackendInfra` 接口（`lib/common/backend_infra/backend_infra.dart`）访问。其它 feature 的 **backend 层**不受此约束，可直接 import。
 
 ### Service / DAO 的标准依赖注入形态
 
@@ -206,15 +215,25 @@ class XxxService {
 
 Service / DAO 内部 **不允许** 再出现 `ref.read(...)`。想拿什么从 `_infra` 取：`_infra.db` / `_infra.auth` / `_infra.store` / `_infra.kvStorage` / `_infra.dataSync` / `_infra.lang` / `_infra.createOrderRepo()` / `_infra.settlement`。
 
-### 新增跨模块依赖的流程（必须走扩展 BackendInfra）
+### 新增跨模块依赖的流程
 
-若业务逻辑确实需要一个现在 `BackendInfra` 还没暴露的能力（比如某模块的 repository），**禁止直接 import**，改走以下三步：
+先判断依赖落在哪一层，再决定路径：
+
+#### 情况 A — 依赖的是其它模块的 **backend 层**（service / dao / dto / endpoint）
+
+**直接 import** 即可，不需要走门面扩展。
+
+典型场景：`features/refund/backend/` 的 service 需要调 `features/payment/backend/service/KPayOnlineRefundService`。两者同属后台团队代码区，独立服务化时会一起搬走，无需做 ACL 隔离。
+
+#### 情况 B — 依赖的是其它模块的 **非 backend 层**（application / data / domain / presentation）
+
+**禁止直接 import**，走 BackendInfra 扩展的以下三步：
 
 1. 在 `backend_infra.dart` 接口上新增一个方法/getter，**写清楚独立服务化剥离路径注释**（参考 `createOrderRepo()` 和 `settlement` 的注释样式）
 2. 在 `backend_infra_riverpod.dart` 的 `_RiverpodBackendInfra` 实现里用 `_ref.read(...)` 把 Provider 桥接上
 3. Service / DAO 通过 `_infra.xxx` 调用，**对业务层透明**
 
-这是唯一合法的跨模块扩展路径。
+这是跨到非 backend 层的唯一合法扩展路径。
 
 ---
 
@@ -851,7 +870,7 @@ git-commit-standards（提交）
 | 新模块命名为 `backendv2/` | `backendv2` 是 refund 的一次性历史名，新模块一律用 `backend/` |
 | 在 `backend/` 下新建 `application/` 或 `data/` 或 `domain/` 目录（新代码） | 这是 v1 老结构；新代码走 `endpoint/registry/dto/service/dao/` |
 | 在 Service / DAO 里写 `ref.read(xxxProvider)` | 绕过 BackendInfra 门面，独立服务化时会大范围返工 |
-| 直接 import `features/{other}/presentation/**`、`*_notifier.dart`、widget | backend 侵入 UI 层，违反前后端彻底分离 |
+| 直接 import 其它 feature 的**非 backend 层**（`presentation/**`、`application/**`、`data/**`、`domain/**`）、`*_notifier.dart`、widget | backend 侵入 UI 层，违反前后端彻底分离。其它 feature 的 `backend/` 层不受此限 |
 | 复用 `features/{module}/domain/` 的 freezed 模型作为 backend DTO | 两侧耦合；未来模型演化会互相牵制 |
 | 在 handler 里手写 `try-catch` / `jsonDecode` | 偏离 IntranetHandlerBase 模板，日志/错误映射会不一致 |
 | 跳过 UI 对接手册自行推断接口形状 | 字段漂移 —— 前端最终拿不到预期字段 |

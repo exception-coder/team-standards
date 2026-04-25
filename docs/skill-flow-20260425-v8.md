@@ -2,11 +2,11 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-25 v8**
-> 变更摘要：① `design-doc-required` 新增「第四·五步：轻量修订流水」分支 —— 设计文档已存在的修正/对齐/删冗余类小修，在原 v 文档末尾追加调整流水行即可，不新建 vN+1 / coding.md；准入用 8 项硬清单兜底滥用。② 新增 `bugfix-coding-style` skill —— 联调期 bug 修复禁止直接删原代码，必须先 `//` 注释保留（带 `[DEPRECATED YYYY-MM-DD]` 标记），追加新代码后等用户确认再清理；与轻量修订流水分支配套使用。
-> 上一版：v7（2026-04-22）。
-> 再上一版：v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
-> 历史版本：`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
+> **最后更新：2026-04-18 v6.2**
+> 变更摘要：`bug-doc-required` 调整目录结构为三级（`docs/bug/{模块名}/{bug名称}/`），命名由英文 kebab-case 改为中文，与 `docs/design/` 模块命名对齐；未对应任何 design 模块的 bug 退化为一级扁平结构。流程节点无变化,仅目录与命名规则细化。
+> 上一版：v6.1 `design-doc-required` 和 `bug-doc-required` 新增 Step 0（知识图谱上下文预热）。
+> 再上一版：v6 新增 `project-docs-update`、`arch-lint`；`init-project-docs` 升级为 4 阶段。
+> 历史版本：`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
 ---
 
@@ -35,7 +35,6 @@
 | `coding-violation-log` | team-standards | 用户纠正 AI 编码错误时登记违规；编码前回顾已登记记录防重犯（嵌入编码链路，java-coding-standards 之前） |
 | `project-docs-update` | team-standards | 项目代码结构变更后同步知识图谱文档（检测差异 + 自动/确认更新） |
 | `arch-lint` | team-standards | Flutter 架构违规检测（5 条分层规则，全量/轻量两种模式） |
-| `bugfix-coding-style` | team-standards | 联调期 bug 修复编码风格：注释保留旧代码 + 追加新代码（带 `[DEPRECATED]` 标记），配合 design-doc-required 第四·五步轻量修订流水使用 |
 
 ---
 
@@ -139,10 +138,8 @@ flowchart TD
     DEBUG --> CTX["Step 0: 知识图谱预热\n加载约束文档 + 受影响模块文档"]
     CTX --> BUGDOC["bug-doc-required\n编写 bug 分析文档\n3 类 Mermaid 图 + 根因表格\n修复方案节只写方向摘要"]
     BUGDOC -- "只要改代码（必须）" --> DDR["design-doc-required\n编写修复实施方案\ndocs/design/{名称}修复/\n使用 Bug 修复简化版模板"]
-    DDR -- "已有文档 + 改动通过\n第四·五步硬清单" --> LIGHT["在原 v 文档末尾\n追加调整流水行\n不新建 vN+1"]
-    DDR -- "改动不通过硬清单" --> ORIENT["pre-implementation-code-orientation\n优先读设计文档提取代码坐标\n降级才读 bug 文档"]
-    LIGHT --> ORIENT
-    ORIENT --> CODE["java-coding-standards\n实施修复\n+ bugfix-coding-style\n（注释保留旧代码 + 追加新代码）"]
+    DDR --> ORIENT["pre-implementation-code-orientation\n优先读设计文档提取代码坐标\n降级才读 bug 文档"]
+    ORIENT --> CODE["java-coding-standards\n实施修复"]
     CODE --> VERIFY["verification-before-completion\n验证修复有效"]
     VERIFY --> COMMIT["git-commit-standards\n type: fix  提交"]
     COMMIT --> MORE{"还有关联 Bug?"}
@@ -242,7 +239,4 @@ flowchart LR
 | arch-lint 和 java-coding-standards 的区别? | arch-lint 检测 **Flutter 架构分层**违规（presentation 层写 SQL 等跨层问题），java-coding-standards 检测 **Java 代码**质量（命名/格式/异常处理等）。一个管分层，一个管编码。 |
 | Phase 3-4 的自动模式和确认模式怎么选? | 自动模式：AI 尽力推断后生成，标注"需人工校验"，适合快速产出初稿。确认模式：逐份展示等用户确认，适合对准确度要求高的场景。 |
 | Step 0 知识图谱预热是什么? | 在 design-doc-required / bug-doc-required 执行前，先读 `00_project_overview.md` 获取全局索引，再按 AI 上下文路由表加载当前任务类型对应的 2-3 份文档。避免全量扫码，按需获取上下文。 |
-| 什么时候走「轻量修订流水」而不是新建 vN+1? | 设计文档已存在 + 改动通过 design-doc-required 第四·五步硬清单（不新增接口/字段/类、不改方法签名、单文件 ≤30 行净变更、性质属修正/对齐/删冗余/修 bug）。任一项 ❌ 退回新建版本。 |
-| 轻量修订流水期间代码怎么写? | 必须遵循 `bugfix-coding-style`：禁止直接删原代码，先用 `//` 注释保留（带 `[DEPRECATED YYYY-MM-DD]` 标记 + 引用文档），紧接着追加新代码。等用户明确指令再清理注释。 |
-| `bugfix-coding-style` 和 `coding-violation-log` 有什么区别? | bugfix-coding-style 是**主动规则**（写代码时必须遵循的注释保留风格），coding-violation-log 是**反应式登记**（用户纠错后记录到违规表防重犯）。前者管"怎么写"，后者管"错过的别再错"。 |
 | 项目没有知识图谱时 Step 0 怎么办? | 自动跳过。Step 0 检测 `docs/00_project_overview.md` 不存在时直接进入后续流程，完全向后兼容。 |
