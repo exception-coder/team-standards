@@ -4,11 +4,12 @@
 
 - **Java 编码规范**（阿里巴巴黄山版·强制项精简版）
 - **功能设计文档强制约束**（开发前必须有设计文档，否则引导创建）
+- **方案审视与更优建议**（用户提出具体方案时先判断目标、风险和更优做法，再实施）
 - **DDD-lite 全栈架构约束**（编码前默认判断分层、Feature 模块与原子能力）
 - **Bug 分析文档规范**（报告 Bug 时强制规范章节结构、Mermaid 图、根因表格）
 - **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息）
 - **文档索引优先约束**（编写任何文档前读取索引，分析内容边界，避免重复，写完后半自动更新索引）
-- **文档输出路径判定**（团队共享文档进 `docs/`，个人/临时 AI 输出进本地忽略的 `.ai-docs/`）
+- **文档输出路径判定**（团队共享文档进 `docs/`，个人/临时 AI 输出进用户 Documents 下的 `ai-docs/{project}/`）
 - **Markdown 编写规范**（Mermaid 图表语法、表格、代码块等）
 - **业务逻辑现状梳理**（重构/迁移前按场景维度产出流程图、知识图谱、代码索引）
 - **实施前代码定位**（从文档坐标表精准定位关键文件，禁止重新扫描）
@@ -79,13 +80,14 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 
 | Skill | 触发时机 | 作用 |
 |-------|----------|------|
+| `solution-review-required` | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径直接改时 | 先分离真实目标与候选方案，识别风险、缺口和替代方案，给出更优建议后再进入设计或实施 |
 | `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；自动生成编码摘要 |
 | `architecture-ddd-lite-fullstack` | 开始编写或审查 Java / React / Vue / Flutter 业务代码前 | 强制 DDD-lite 分层、Feature 模块化、单向依赖与原子能力沉淀，禁止 UI / Controller 直接承载业务逻辑 |
 | `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；目录按模块分组（对齐 `docs/design/`）；中文命名 |
 | `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
 | `java-coding-standards` | 编写/审查任何 Java 代码时 | 强制遵守阿里黄山版编码规范 |
 | `git-commit-standards` | 执行 git commit 前 | 分析 staged 变更，生成标准化中文提交信息 |
-| `doc-index-required` | 编写/创建任何 Markdown 文档，或编辑 `docs/` 下文档时 | 先判定团队共享 vs 个人临时输出路径；团队共享文档读取索引并更新索引，个人临时输出写入 `.ai-docs/` 且不更新索引 |
+| `doc-index-required` | 编写/创建任何 Markdown 文档，或编辑 `docs/` 下文档时 | 先判定团队共享 vs 个人临时输出路径；团队共享文档读取索引并更新索引，个人临时输出默认写入用户 Documents 下的 `ai-docs/{project}/` 且不更新索引 |
 | `markdown-writing-standards` | 生成或修改含 Mermaid 图表的 Markdown 时 | Mermaid 语法规范、表格规范、代码块规范 |
 | `business-logic-orientation` | 重构/复写/迁移前需要理解现有业务逻辑时 | 按场景维度产出流程图、知识图谱、核心代码索引 |
 | `init-project-docs` | 初始化项目文档 / 生成知识图谱时 | 渐进式构建 11 份知识图谱文档 + 模块深度文档 + 技能卡（4 阶段，支持自动/确认模式） |

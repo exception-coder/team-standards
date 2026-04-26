@@ -104,7 +104,7 @@ flowchart TD
 
 正式实施设计文档统一存放在项目 `docs/design/` 目录下，支持**扁平目录**和**层级嵌套**两种组织方式。
 
-> **输出路径边界：** `docs/design/` 只放团队共享、已确认要作为编码依据的正式设计文档。AI 在确认前生成的方案草稿、代码扫描笔记、对照分析、个人备忘默认写入 `.ai-docs/{agent}/{YYYY-MM-DD}/`，并按 `doc-index-required` 的“文档输出路径判定”规则处理，禁止直接塞进 `docs/design/` 影响团队成员。
+> **输出路径边界：** `docs/design/` 只放团队共享、已确认要作为编码依据的正式设计文档。AI 在确认前生成的方案草稿、代码扫描笔记、对照分析、个人备忘默认写入 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，并按 `doc-index-required` 的“文档输出路径判定”规则处理，禁止直接塞进 `docs/design/` 影响团队成员。
 
 ```
 docs/design/
@@ -263,7 +263,7 @@ docs/design/
 2. 询问是否有已有文档需要手动指定路径
 3. 若无文档，先执行 `doc-index-required` 的**文档输出路径判定**：
    - 正式实施设计文档 → 进入 `docs/design/` 并执行 Phase-A
-   - 个人草稿/临时分析 → 写入 `.ai-docs/{agent}/{YYYY-MM-DD}/`，不更新 docs 索引，且不得作为最终编码门禁依据
+   - 个人草稿/临时分析 → 写入 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，不更新 docs 索引，且不得作为最终编码门禁依据
 4. 正式文档分支下，**立即调用 `doc-index-required` Phase-A**（前置阶段），完成以下两项：
    - 读取 `docs/INDEX.md` 与 `docs/design/INDEX.md`，确认内容边界（是否已有重叠文档）
    - 分析结果告知用户后，进入文档创建引导
@@ -623,7 +623,7 @@ docs/design/
 | "我已经理解需求了" | 理解 ≠ 文档存在，仍须检查 |
 | "只改一个方法" | 判断是否属于例外情况，否则仍须检查 |
 | "直接建文件，不用查索引" | 必须先调用 doc-index-required Phase-A，禁止跳过 |
-| "先把草稿也放到 docs/design 里" | 未确认要团队共享的草稿必须放 `.ai-docs/`，正式文档才进入 `docs/design/` |
+| "先把草稿也放到 docs/design 里" | 未确认要团队共享的草稿必须放用户目录个人/临时 AI 输出路径，正式文档才进入 `docs/design/` |
 | "doc-index-required 会自动触发" | 不会。必须在本流程中显式调用 Phase-A 和 Phase-B，不依赖自动识别 |
 | "子功能文件放父目录就行" | 子模块必须创建独立子目录，禁止将文件直接放在父需求目录下 |
 | "设计文档确认了，直接写代码" | 还差一步：必须确认 `-coding.md` 存在后才能编码 |
