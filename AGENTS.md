@@ -29,7 +29,7 @@
 | **跨项目定位 / 排查 / 调用链追踪（涉及 ≥2 个 kpay POS 生态工程）** | `cross-project-locator`（查询模式） |
 | **即将写同时提到 ≥2 个 kpay POS 工程名的 markdown（对照 / 流程 / 数据流）** | `cross-project-locator`（登记模式） |
 | 本次会话对 team-standards 有任何变更 | `dev-log`（会话结束前） |
-| **team-standards 变更完成后工作区存在未提交变更** | `git-commit-standards`（自动 stage / commit / push） |
+| **当前 git 仓库就是 team-standards 插件源码仓库，且插件自身变更完成后工作区存在未提交变更** | `git-commit-standards`（自动 stage / commit / push） |
 | **业务项目源码有 Edit/Write 改动，或用户说「记一下工作日志」「记录一下」** | `daily-work-log` |
 | **会话结束前若本会话有业务项目源码改动未登记** | `daily-work-log`（强制回补） |
 
@@ -37,7 +37,7 @@
 
 **兜底规则：** 若 Codex 即将对源码文件（`.java`、`.dart`、`.ts`、`.py`、`.kt` 等）执行 Edit/Write 操作，但当前会话尚未完成 `design-doc-required` 检查，必须立即停止并先触发该 skill。不存在「任务太简单可以跳过」的例外（Bug 修复、纯重构等合法例外在 skill 内部判断）。
 
-**team-standards 收尾规则：** 本仓库有任何变更完成后，必须立即自动执行 `git status` 检查；若存在未提交变更，按 `git-commit-standards` 自动 stage、commit，并 push 当前分支。除非用户明确说“不要提交 / 不要 push / 只改不提交”，否则不得把变更留到后续会话累计。
+**team-standards 收尾规则（仅限本插件源码仓库）：** 只有当当前 git 仓库就是 `team-standards` / `kpay-team-standards` 插件源码仓库，且变更对象是 `skills/`、`hooks/`、`.claude-plugin/`、`.codex-plugin/`、`AGENTS.md`、`CLAUDE.md`、`README.md`、`docs/skill-flow*`、`docs/dev-log/` 等插件自身文件时，才允许自动执行 `git status`、`git add -A`、`git commit`、`git push` 和插件版本号递增。业务项目即使安装了本 plugin，也绝不触发该自动收尾；业务项目提交仍按普通 `git-commit-standards` 流程等待用户确认。
 
 ---
 
