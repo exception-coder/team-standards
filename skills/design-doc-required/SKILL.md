@@ -592,7 +592,8 @@ docs/design/
 | Skill | 何时调用 |
 |-------|---------|
 | `markdown-writing-standards` | 生成或修改设计文档中的 Mermaid 图表时，必须先调用进行语法自检 |
-| `doc-index-required` | **Phase-A**：文档不存在时，创建文档**前**必须调用（读索引 + 边界分析）；**Phase-B**：文档写完**后**再次调用（更新索引）。前后两次缺一不可 |
+| `doc-index-required` | 创建设计文档草稿前必须先执行输出路径规则；默认写用户目录。只有用户明确指定 `docs/...` 终版路径时，才执行 Phase-A / Phase-B 更新索引 |
+| `backend-knowledge-graph-required` | Java 后端单服务需求分析前，若项目存在 `docs/knowledge-graph/backend/`，必须先读取后端知识图谱中的能力、流程、表、枚举、API 与外部依赖 |
 | `pre-implementation-code-orientation` | 设计文档确认完毕、开始写第一行实现代码前调用 |
 | `dev-log` | 本次会话中对设计文档有实质性变更时，会话结束前调用 |
 
