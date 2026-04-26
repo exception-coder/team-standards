@@ -2,11 +2,11 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-25 v8**
-> 变更摘要：① `design-doc-required` 新增「第四·五步：轻量修订流水」分支 —— 设计文档已存在的修正/对齐/删冗余类小修，在原 v 文档末尾追加调整流水行即可，不新建 vN+1 / coding.md；准入用 8 项硬清单兜底滥用。② 新增 `bugfix-coding-style` skill —— 联调期 bug 修复禁止直接删原代码，必须先 `//` 注释保留（带 `[DEPRECATED YYYY-MM-DD]` 标记），追加新代码后等用户确认再清理；与轻量修订流水分支配套使用。
-> 上一版：v7（2026-04-22）。
-> 再上一版：v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
-> 历史版本：`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
+> **最后更新：2026-04-26 v9**
+> 变更摘要：`design-doc-required` 新增「第一·七步：模版分级选择」—— 把现有「完整模版（template.md，18 节）+ coding 摘要」拆成两档：① 轻量分支用 `lightweight-template.md`（7 节，时序图为主轴），适用于已有架构内单接口新增/调整、库表读写流程描述等；不需要配套 `-coding.md`，节省大量 token。② 完整分支保持原流程不变，适用于跨服务/新增表/复杂事务/对外契约新增等场景。准入用 9 项硬清单兜底（命中任一升级条件 ❌ 立即升级到完整模版），决策必须显式告知用户。同步更新执行流程图（新增 WEIGHT/POST_WEIGHT 节点）、Mermaid 强制要求章节按模版分级、检查清单分两套、红色警告新增 4 条。
+> 上一版：v8（2026-04-25）。
+> 再上一版：v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
+> 历史版本：`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
 ---
 
@@ -117,8 +117,13 @@ flowchart TD
     PLAN --> CTX["Step 0: 知识图谱预热\n读 00_project_overview\n按任务类型加载必读文档"]
     CTX --> DDR["design-doc-required\n检查已有设计文档或引导新建\n内部自动更新 INDEX.md"]
 
-    DDR -- "文档存在且完整" --> ORIENT["pre-implementation-code-orientation\n读设计文档 提取代码坐标"]
-    DDR -- "需求变更" --> NEWVER["新建版本文档\n{需求名}-{日期}-v{N+1}.md\n同步更新 coding.md"]
+    DDR --> WEIGHT{"第一·七步\n模版分级选择"}
+    WEIGHT -- "命中升级触发条件\n（新增表/跨服务/复杂事务等）" --> HEAVY["完整模版分支\ntemplate.md + coding.md"]
+    WEIGHT -- "通过轻量准入清单\n（已有架构内单接口）" --> LIGHT["轻量模版分支\nlightweight-template.md\n仅时序图 + 规则表\n不生成 coding.md"]
+    HEAVY --> ORIENT["pre-implementation-code-orientation\n读设计文档 提取代码坐标"]
+    LIGHT --> ORIENT
+
+    DDR -- "需求变更" --> NEWVER["新建版本文档\n{需求名}-{日期}-v{N+1}.md\n同步更新 coding.md（仅完整模版）"]
     NEWVER --> ORIENT
 
     ORIENT --> TDD["test-driven-development\n先写失败测试"]
@@ -246,3 +251,7 @@ flowchart LR
 | 轻量修订流水期间代码怎么写? | 必须遵循 `bugfix-coding-style`：禁止直接删原代码，先用 `//` 注释保留（带 `[DEPRECATED YYYY-MM-DD]` 标记 + 引用文档），紧接着追加新代码。等用户明确指令再清理注释。 |
 | `bugfix-coding-style` 和 `coding-violation-log` 有什么区别? | bugfix-coding-style 是**主动规则**（写代码时必须遵循的注释保留风格），coding-violation-log 是**反应式登记**（用户纠错后记录到违规表防重犯）。前者管"怎么写"，后者管"错过的别再错"。 |
 | 项目没有知识图谱时 Step 0 怎么办? | 自动跳过。Step 0 检测 `docs/00_project_overview.md` 不存在时直接进入后续流程，完全向后兼容。 |
+| 什么时候走「轻量模版」? | 命中第一·七步全部 9 项硬清单（不新增表/字段/对外契约/类 ≥3、不跨服务、不引入新中间件、不重设状态机、改动可由「时序图 + 规则表 + 失败行为表」描述）。任一 ❌ 升级到完整模版。已有架构内的单接口新增/调整、库表读写流程描述就是典型轻量场景。 |
+| 轻量模版需要 coding.md 吗? | **不需要**。时序图 + 规则表 + 失败行为表已经覆盖编码所需的最小信息。第四步（生成 coding.md）和第六步（同步 coding.md）只对完整模版生效，轻量分支跳过。 |
+| 轻量文档实施完后还要做什么? | 回填代码入口的真实行号（编码前可以写「待实现」，实施完成后填实际 Service / DAO 文件:line），让文档同时承担「设计意图」与「库表行为索引」两个角色。 |
+| 轻量改到一半发现要新增表怎么办? | 立即升级到完整模版（按 lightweight-template 第 6 节「升级到完整模版的触发条件」处理）。以轻量文档为草稿，按 template.md 章节逐节展开，并新建 vN+1 + coding.md。 |

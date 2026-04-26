@@ -95,12 +95,33 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 
 ## 设计文档模板
 
-模板位于 `skills/design-doc-required/template.md`，包含 18 个章节：
+模版分两档，根据改动规模选择，由 `design-doc-required` 第一·七步硬清单兜底判定。
+
+### 完整模版（`skills/design-doc-required/template.md`）
+
+适用：跨服务/跨模块协作、新增数据库表、新增对外契约入口、复杂事务/分布式锁、状态机重设计。
+
+包含 18 个章节：
 
 - 基本信息、背景与目标、功能范围
 - 业务流程、接口设计、类设计、数据库设计
 - 事务并发、缓存、消息异步、安全、日志监控、异常处理
 - 测试要点、上线回滚方案、风险点
+
+完整模版必须配套 `-coding.md`（基于 `coding-template.md`）作为编码摘要。
+
+### 轻量模版（`skills/design-doc-required/lightweight-template.md`）
+
+适用：在已有架构内新增/调整单接口、单接口的库表读写流程描述、入参出参微调、同模块内业务规则修正。
+
+包含 7 个章节，以「库表读写时序图」为主轴：
+
+- 代码入口、接口契约
+- 时序图（库表读写顺序，必填 sequenceDiagram）
+- 关键过滤/写入规则、失败行为
+- 升级到完整模版的触发条件、修订记录
+
+轻量模版**不需要**配套 `-coding.md`，时序图 + 规则表已涵盖编码所需信息。
 
 建议在项目 `docs/design/` 目录下按功能创建对应文档。
 

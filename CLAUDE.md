@@ -40,7 +40,7 @@
 
 | Skill 名称 | 目录 | 覆盖范围 | 关键词 |
 |-----------|------|---------|--------|
-| `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档（新功能和 bug 修复均适用）；bug 修复简化版模板；文档存储结构；coding-summary 自动生成 | 设计文档、需求、方案、实现前、新功能、修复方案、实施方案、bug修复 |
+| `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档（新功能和 bug 修复均适用）；**模版分级**（轻量 `lightweight-template.md` 用于单接口/库表读写流程；完整 `template.md` 用于跨服务/新增表/复杂事务等）；硬清单兜底滥用；bug 修复简化版模板；文档存储结构；完整模版自动生成 coding-summary，轻量模版无需 coding.md | 设计文档、需求、方案、实现前、新功能、修复方案、实施方案、bug修复、轻量模版、接口级 |
 | `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名 | 提交、commit、git、分支 |
 | `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
 | `doc-index-required` | `skills/doc-index-required/` | 写文档前读取总索引与子目录索引；分析内容边界；半自动更新索引 | 文档、docs、写文档、索引、重复内容 |
@@ -64,8 +64,9 @@
 
 | 文件 | 所属 Skill | 用途 |
 |------|-----------|------|
-| `skills/design-doc-required/template.md` | design-doc-required | 18 节完整设计文档模板 |
-| `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板 |
+| `skills/design-doc-required/template.md` | design-doc-required | 18 节完整设计文档模板（跨服务/新增表/复杂事务场景） |
+| `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板（仅完整模版需要） |
+| `skills/design-doc-required/lightweight-template.md` | design-doc-required | 7 节接口级轻量模版（单接口库表读写流程；无需配套 coding.md） |
 | `hooks/check-design-doc.cmd` | 可选 Hook | 设计文档校验脚本 — Windows（默认禁用） |
 | `hooks/check-design-doc.sh` | 可选 Hook | 设计文档校验脚本 — macOS/Linux（默认禁用） |
 | `skills/bug-doc-required/template.md` | bug-doc-required | bug 分析文档标准模板（6 节） |
