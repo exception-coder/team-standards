@@ -9,7 +9,7 @@
 - **Bug 分析文档规范**（报告 Bug 时强制规范章节结构、Mermaid 图、根因表格）
 - **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息）
 - **文档索引优先约束**（编写任何文档前读取索引，分析内容边界，避免重复，写完后半自动更新索引）
-- **文档输出路径判定**（团队共享文档进 `docs/`，个人/临时 AI 输出进用户 Documents 下的 `ai-docs/{project}/`）
+- **文档输出路径规则**（AI 生成 Markdown 默认进用户 Documents 下的 `ai-docs/{project}/`，终版由用户自行上传）
 - **Markdown 编写规范**（Mermaid 图表语法、表格、代码块等）
 - **业务逻辑现状梳理**（重构/迁移前按场景维度产出流程图、知识图谱、代码索引）
 - **实施前代码定位**（从文档坐标表精准定位关键文件，禁止重新扫描）
@@ -87,7 +87,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
 | `java-coding-standards` | 编写/审查任何 Java 代码时 | 强制遵守阿里黄山版编码规范 |
 | `git-commit-standards` | 执行 git commit 前 | 分析 staged 变更，生成标准化中文提交信息 |
-| `doc-index-required` | 编写/创建任何 Markdown 文档，或编辑 `docs/` 下文档时 | 先判定团队共享 vs 个人临时输出路径；团队共享文档读取索引并更新索引，个人临时输出默认写入用户 Documents 下的 `ai-docs/{project}/` 且不更新索引 |
+| `doc-index-required` | 编写/创建任何 Markdown 文档，或编辑 `docs/` 下文档时 | AI 生成 Markdown 默认写入用户 Documents 下的 `ai-docs/{project}/`；只有用户明确指定 `docs/` 路径时才读取并更新索引 |
 | `markdown-writing-standards` | 生成或修改含 Mermaid 图表的 Markdown 时 | Mermaid 语法规范、表格规范、代码块规范 |
 | `business-logic-orientation` | 重构/复写/迁移前需要理解现有业务逻辑时 | 按场景维度产出流程图、知识图谱、核心代码索引 |
 | `init-project-docs` | 初始化项目文档 / 生成知识图谱时 | 渐进式构建 11 份知识图谱文档 + 模块深度文档 + 技能卡（4 阶段，支持自动/确认模式） |
@@ -156,6 +156,8 @@ Author: 你的姓名 <你的邮箱>
 通过 `.claude-plugin/plugin.json` 中的 `version` 字段判断是否有更新。**每次发布必须递增版本号**，否则升级无法检测到变更。
 
 仅在维护 team-standards / kpay-team-standards 插件源码仓库时，仓库自身变更完成后默认自动执行 `git add -A`、规范 commit 和 `git push`，以小步提交方式及时分发规则调整。业务项目即使安装本 plugin，也不会因此自动提交、推送或修改版本号。若某次插件仓库维护只想保留本地变更，需要明确说明“不要提交”或“不要 push”。
+
+是否每次 `git push` 都弹授权由 Codex / Claude / IDE 宿主的命令审批策略决定；本插件只能规定“需要自动 push”，不能绕过宿主授权。若宿主支持保存 `git push` 授权，保存后后续才可免重复确认。
 
 版本号遵循语义化版本（SemVer）：
 

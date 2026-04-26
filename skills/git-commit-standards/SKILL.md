@@ -27,6 +27,8 @@ If you think any step is unnecessary, that thought is a Red Flag. Stop and re-re
 
 业务项目即使安装了 team-standards plugin，也**绝不**触发自动 stage、自动 commit、自动 push 或自动版本号递增。业务项目提交必须走普通确认流程。
 
+**授权边界：** 自动 push 是本 skill 的行为规则，不等于可以绕过 Codex / Claude / IDE 宿主的命令审批。若宿主环境对 `git push` 启用了每次确认，仍会弹授权；只有宿主支持并保存了对应命令授权时，后续才可能免确认。
+
 ---
 
 ## 提交信息格式

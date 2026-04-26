@@ -80,20 +80,14 @@ flowchart TD
     C -->|"否"| F["询问用户设计文档路径或名称"]
     F --> G{"用户能提供文档?"}
     G -->|"是"| D
-    G -->|"否"| IDX_A["调用 doc-index-required Phase-A\n读取索引 + 分析内容边界"]
-    IDX_A --> BELONG["目录归属分析\n扫描已有设计目录\n判断是否属于某个父架构的子模块"]
-    BELONG --> BELONG_Q{"属于某个已有架构的子模块?"}
-    BELONG_Q -->|"是"| NEST["确定父目录\n强制创建子目录: docs/design/父需求/子模块/\n文件必须放入子目录，禁止放在父目录"]
-    BELONG_Q -->|"否"| FLAT["创建顶层目录\n路径: docs/design/需求名称/"]
-    NEST --> WEIGHT{"第一·七步\n模版分级选择"}
-    FLAT --> WEIGHT
-    WEIGHT -->|"轻量\n通过准入清单"| H_LIGHT["引导用户创建轻量文档\n输出 lightweight-template.md"]
-    WEIGHT -->|"完整\n任一升级触发条件命中"| H_HEAVY["引导用户创建完整文档\n输出 template.md"]
+    G -->|"否"| USER_DOC["调用 doc-index-required\n生成用户目录草稿\n不写项目 docs"]
+    USER_DOC --> WEIGHT{"第一·七步\n模版分级选择"}
+    WEIGHT -->|"轻量\n通过准入清单"| H_LIGHT["生成轻量文档草稿\n输出 lightweight-template.md"]
+    WEIGHT -->|"完整\n任一升级触发条件命中"| H_HEAVY["生成完整文档草稿\n输出 template.md"]
     H_LIGHT --> J_LIGHT["等待用户确认文档已填写"]
     H_HEAVY --> J_HEAVY["等待用户确认文档已填写"]
-    J_LIGHT --> IDX_B["调用 doc-index-required Phase-B\n更新 docs/design/INDEX.md"]
-    J_HEAVY --> IDX_B
-    IDX_B --> POST_WEIGHT{"刚创建的是\n轻量模版?"}
+    J_LIGHT --> POST_WEIGHT{"刚创建的是\n轻量模版?"}
+    J_HEAVY --> POST_WEIGHT
     POST_WEIGHT -->|"是"| Z
     POST_WEIGHT -->|"否"| CODING
 ```
@@ -102,9 +96,9 @@ flowchart TD
 
 ## 文档目录结构规范
 
-正式实施设计文档统一存放在项目 `docs/design/` 目录下，支持**扁平目录**和**层级嵌套**两种组织方式。
+AI 生成的设计文档默认存放在用户文档目录，不直接写入项目 `docs/design/`。用户确认终版后，可自行上传到项目 `docs/design/` 或明确指定项目内路径让 AI 写入。
 
-> **输出路径边界：** `docs/design/` 只放团队共享、已确认要作为编码依据的正式设计文档。AI 在确认前生成的方案草稿、代码扫描笔记、对照分析、个人备忘默认写入 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，并按 `doc-index-required` 的“文档输出路径判定”规则处理，禁止直接塞进 `docs/design/` 影响团队成员。
+> **输出路径边界：** AI 生成的方案草稿、设计文档、代码扫描笔记、对照分析、个人备忘默认写入 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`。项目 `docs/design/` 只接收用户明确指定路径或用户自行上传的终版文档。
 
 ```
 docs/design/
@@ -261,14 +255,10 @@ docs/design/
 
 1. 告知用户未找到对应需求的设计文档
 2. 询问是否有已有文档需要手动指定路径
-3. 若无文档，先执行 `doc-index-required` 的**文档输出路径判定**：
-   - 正式实施设计文档 → 进入 `docs/design/` 并执行 Phase-A
-   - 个人草稿/临时分析 → 写入 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，不更新 docs 索引，且不得作为最终编码门禁依据
-4. 正式文档分支下，**立即调用 `doc-index-required` Phase-A**（前置阶段），完成以下两项：
-   - 读取 `docs/INDEX.md` 与 `docs/design/INDEX.md`，确认内容边界（是否已有重叠文档）
-   - 分析结果告知用户后，进入文档创建引导
-5. **执行第一·五步目录归属分析 + 第一·七步模版分级选择**
-6. 按对应模版引导用户创建：
+3. 若无文档，先执行 `doc-index-required` 的**文档输出路径规则**，默认写入 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`
+4. 仅当用户明确指定 `docs/...` 终版路径时，才调用 `doc-index-required Phase-A / Phase-B` 更新项目索引
+5. **执行第一·七步模版分级选择**
+6. 按对应模版生成用户目录草稿：
 
 ---
 
@@ -277,9 +267,7 @@ docs/design/
 > **本次改动判定为【轻量级】，按接口级模版处理。**
 >
 > 请按以下步骤操作：
-> 1. 创建目录（根据第一·五步归属分析结果）：
->    - **独立需求** → `docs/design/{需求名称}/`
->    - **子模块** → `docs/design/{父需求}/{子模块名}/`
+> 1. 默认创建到用户目录：`{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`
 > 2. 创建文件：`{需求名称}-{今日日期}-v1.md`
 > 3. 参考 `lightweight-template.md`，至少完成以下章节：
 >    - 第 1 节：代码入口（先写"待实现"也可以）
@@ -287,7 +275,7 @@ docs/design/
 >    - 第 3 节：时序图（库表读写顺序，必填 Mermaid sequenceDiagram）
 >    - 第 4 节：关键过滤/写入规则
 >    - 第 5 节：失败行为
-> 4. 填写完毕后告知我文件路径，我将读取后开始实现
+> 4. 草稿确认后告知我文件路径，我将读取后开始实现；终版是否上传到项目 `docs/` 由用户自行决定
 > 5. **本分支无需生成 `-coding.md`**
 
 模板文件位于：`skills/design-doc-required/lightweight-template.md`
@@ -299,22 +287,20 @@ docs/design/
 > **本次改动判定为【完整级】，按完整模版处理。**
 >
 > 请按以下步骤操作：
-> 1. 创建目录（根据第一·五步归属分析结果）：
->    - **独立需求** → `docs/design/{需求名称}/`
->    - **子模块** → `docs/design/{父需求}/{子模块名}/`（**禁止**将子模块文件直接放在父目录下）
+> 1. 默认创建到用户目录：`{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`
 > 2. 创建文件：`{需求名称}-{今日日期}-v1.md`
 > 3. 参考模板填写内容（至少完成以下章节）：
 >    - 第 2 节：背景与目标
 >    - 第 4 节：业务流程设计
 >    - 第 5 节：接口设计（如涉及接口变更）
 >    - 第 8 节：核心业务规则
-> 4. 填写完毕后告知我文件路径，我将读取后开始实现
+> 4. 草稿确认后告知我文件路径，我将读取后开始实现；终版是否上传到项目 `docs/` 由用户自行决定
 
 模板文件位于：`skills/design-doc-required/template.md`（安装后路径由 `$CLAUDE_PLUGIN_ROOT` 指定）
 
 ### 第三·五步：文档写完后更新索引
 
-用户确认设计文档填写完毕后，**调用 `doc-index-required` Phase-B**（后置阶段），将新文档登记到 `docs/design/INDEX.md`（含摘要和大纲）。若 `docs/INDEX.md` 中尚无 `design/` 条目，一并追加。
+用户目录草稿确认后，不自动调用 `doc-index-required Phase-B`，也不更新 `docs/design/INDEX.md`。只有用户明确指定项目 `docs/...` 终版路径时，才执行 Phase-B 并登记索引。
 
 ---
 
@@ -622,15 +608,16 @@ docs/design/
 | "用户让我快点做" | 先确认文档，再快速实现 |
 | "我已经理解需求了" | 理解 ≠ 文档存在，仍须检查 |
 | "只改一个方法" | 判断是否属于例外情况，否则仍须检查 |
-| "直接建文件，不用查索引" | 必须先调用 doc-index-required Phase-A，禁止跳过 |
-| "先把草稿也放到 docs/design 里" | 未确认要团队共享的草稿必须放用户目录个人/临时 AI 输出路径，正式文档才进入 `docs/design/` |
-| "doc-index-required 会自动触发" | 不会。必须在本流程中显式调用 Phase-A 和 Phase-B，不依赖自动识别 |
+| "直接建文件，不用查索引" | 必须先执行 doc-index-required 的输出路径规则；只有用户指定 `docs/...` 时才进入 Phase-A |
+| "先把草稿也放到 docs/design 里" | AI 生成文档默认放用户目录；终版由用户自行上传，或用户明确指定 `docs/...` 路径后再写项目目录 |
+| "直接建文件，不用确认输出路径" | 仍需先执行 doc-index-required 的输出路径规则；默认用户目录，用户指定 `docs/...` 时才进入项目索引流程 |
+| "doc-index-required 会自动触发" | 不会。必须在本流程中显式执行输出路径规则；只有用户指定 `docs/...` 时才显式调用 Phase-A 和 Phase-B |
 | "子功能文件放父目录就行" | 子模块必须创建独立子目录，禁止将文件直接放在父需求目录下 |
 | "设计文档确认了，直接写代码" | 还差一步：必须确认 `-coding.md` 存在后才能编码 |
 | "coding 文档内容简单，不用生成" | 无论多简单，coding 文档是编码前的第二道强制门禁，不可跳过 |
 | "用户让我根据文档直接改代码" | 有文档 ≠ 已完成设计文档检查，仍须先触发本 skill 确认文档合规，再走 coding.md 门禁 |
 | "用户只是让我帮忙改一下代码，不是新需求" | 任何源码 Edit/Write 操作都必须先过本 skill，由本 skill 判断是否属于合法例外 |
-| "用户已经提供了分析文档，可以直接编码" | 分析/梳理文档 ≠ 设计文档，仍须检查 `docs/design/` 下是否有对应的设计文档和 coding.md |
+| "用户已经提供了分析文档，可以直接编码" | 分析/梳理文档 ≠ 设计文档，仍须检查用户提供的设计文档路径或生成用户目录设计草稿，并确认 coding.md 门禁 |
 | "看着不大就走轻量模版吧" | 必须按第一·七步硬清单逐项判定，不允许凭感觉。命中任一升级触发条件立即升级到完整模版 |
 | "轻量模版可以省略时序图" | 时序图是轻量模版的核心载体，省略后等于没有设计文档。缺图直接退回让用户补全 |
 | "轻量分支没 coding.md，顺手生成一个吧" | 轻量分支显式不需要 coding.md，多生成一份只会让 token 浪费 + 后续维护双份。绝对不要主动生成 |
