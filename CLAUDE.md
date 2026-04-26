@@ -13,7 +13,7 @@
 | 提出任何新需求、重构计划、技术方案讨论、可行性分析 | `design-doc-required` |
 | **请求修改/编写代码（含「根据文档改代码」「帮我改一下」等）** | `design-doc-required` |
 | 报告 Bug、描述异常、请求分析问题根因 | `bug-doc-required` |
-| 即将创建或编辑 `docs/` 下任何文件 | `doc-index-required` |
+| 即将创建任何 Markdown 文档；或编辑 `docs/` 下任何文件 | `doc-index-required`（先判定团队共享/个人临时输出路径） |
 | 设计文档或 Bug 文档已确认，准备开始写第一行代码 | `pre-implementation-code-orientation` |
 | **开始编写任何业务代码前（Java / React / Vue / Flutter）** | `architecture-ddd-lite-fullstack`（默认分层规则） |
 | 执行 git commit 或生成提交信息 | `git-commit-standards` |
@@ -49,7 +49,7 @@
 | `architecture-ddd-lite-fullstack` | `skills/architecture-ddd-lite-fullstack/` | 编码前默认架构规则：DDD-lite 分层、Feature 模块化、单向依赖、原子能力沉淀；适配 Java Spring、React、Vue、Flutter；禁止 UI / Controller 直接写业务逻辑或访问 DB / HTTP | DDD-lite、分层架构、Feature、原子能力、UseCase、Application、Domain、Repository、Infrastructure、前端、Flutter、Spring |
 | `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名 | 提交、commit、git、分支 |
 | `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
-| `doc-index-required` | `skills/doc-index-required/` | 写文档前读取总索引与子目录索引；分析内容边界；半自动更新索引 | 文档、docs、写文档、索引、重复内容 |
+| `doc-index-required` | `skills/doc-index-required/` | 写文档前先判定输出路径（团队共享 `docs/` vs 个人临时 `.ai-docs/`）；团队共享文档读取总索引与子目录索引、分析内容边界、半自动更新索引；个人临时输出写入本地忽略目录且不更新索引 | 文档、docs、写文档、索引、重复内容、输出路径、个人文档、临时文档、ai-docs |
 | `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；核心流程必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）；根因必须用表格；**目录按模块分组**（对齐 `docs/design/{模块名}/`，三级结构 `docs/bug/{模块名}/{bug名称}/{bug名称}.md`）；目录与文件名使用**中文**命名 | bug、缺陷、问题分析、bug文档、OOM、异常、模块分组、中文命名 |
 | `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
 | `dev-log` | `skills/dev-log/` | 每次对 team-standards 有变更时记录开发日志；在 docs/dev-log/ 下按日期创建日志文件 | 开发日志、变更记录、skill 修改、发版记录 |

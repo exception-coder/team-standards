@@ -1,9 +1,53 @@
 ---
 name: doc-index-required
-description: "You MUST invoke this skill BOTH BEFORE and AFTER creating, writing, or editing ANY file under docs/ (at any nesting depth). This skill has TWO phases: Phase-A (pre-write: read index + analyze boundaries) and Phase-B (post-write: update index). TRIGGER Phase-A when: (1) about to call Write or Edit on any .md file whose absolute path contains /docs/ (including deeply nested paths like docs/design/xxx/yyy/file.md), (2) about to move, rename, or reorganize files under docs/, (3) user says '新建文档', '写文档', '整理文档', '移动文档', '重构文档目录', 'create doc', 'add doc', 'move doc', (4) another skill (design-doc-required, bug-doc-required, etc.) is about to produce a docs/ file — invoke Phase-A FIRST. TRIGGER Phase-B when: docs/ file writing is complete, to update INDEX.md. Do NOT touch any docs/ file until Phase-A is complete. Only exception: updates to index files themselves (docs/INDEX.md, docs/*/INDEX.md). IMPORTANT: This applies to ALL working directories, not just the primary project."
+description: "You MUST invoke this skill before choosing an output path for any generated Markdown document, and BOTH BEFORE and AFTER creating, writing, or editing ANY file under docs/ (at any nesting depth). First decide whether the document is team-shared or personal/temporary AI output. Team-shared docs use docs/ and require Phase-A/Phase-B indexing. Personal/temporary AI output defaults to a local ignored path and MUST NOT update docs/ indexes. TRIGGER Phase-A when: (1) about to call Write or Edit on any .md file whose absolute path contains /docs/ (including deeply nested paths like docs/design/xxx/yyy/file.md), (2) about to move, rename, or reorganize files under docs/, (3) user says '新建文档', '写文档', '整理文档', '移动文档', '重构文档目录', 'create doc', 'add doc', 'move doc', (4) another skill (design-doc-required, bug-doc-required, etc.) is about to produce a docs/ file — invoke Phase-A FIRST. TRIGGER Phase-B when: docs/ file writing is complete, to update INDEX.md. Do NOT touch any docs/ file until Phase-A is complete. Only exception: updates to index files themselves (docs/INDEX.md, docs/*/INDEX.md). IMPORTANT: This applies to ALL working directories, not just the primary project."
 ---
 
 # 文档索引优先原则
+
+## 文档输出路径判定
+
+在创建任何 Markdown 文档目录或文件前，必须先判定输出路径，禁止默认把所有 AI 生成内容写入项目 `docs/`。
+
+### 三类输出路径
+
+| 类型 | 适用内容 | 默认路径 | 是否更新索引 |
+|------|----------|----------|--------------|
+| 团队共享文档 | 已确认要作为团队知识沉淀的设计文档、Bug 分析文档、API 文档、知识图谱、项目规范 | `docs/{subdir}/...` | 是，必须执行 Phase-A + Phase-B |
+| 个人/临时 AI 输出 | 个人分析草稿、扫描记录、临时对照表、一次性排查笔记、未确认要团队共享的方案草稿 | `.ai-docs/{agent}/{YYYY-MM-DD}/{topic}.md` | 否，禁止更新 `docs/INDEX.md` |
+| 用户指定路径 | 用户明确给出文件路径或要求写入某个目录 | 按用户路径处理 | 若路径在 `docs/` 下则更新索引，否则不更新 |
+
+### 默认判定规则
+
+1. 用户明确说“团队文档 / 写到 docs / 设计文档 / bug 文档 / API 文档 / 更新知识图谱” → 判定为团队共享文档。
+2. 用户明确说“我自己的 / 临时 / 草稿 / 分析一下并留档 / 不想影响团队 / 不要提交” → 判定为个人/临时 AI 输出。
+3. 用户未说明共享意图，且内容不是编码门禁必须引用的正式设计/bug 文档 → 默认判定为个人/临时 AI 输出。
+4. `design-doc-required` 的已确认正式实施文档、`bug-doc-required` 的正式 Bug 分析文档仍属于团队共享文档；但在确认前生成的草稿、扫描笔记、候选方案必须先落个人/临时路径。
+
+### 个人/临时路径保护
+
+个人/临时 AI 输出默认写入：
+
+```text
+.ai-docs/{agent}/{YYYY-MM-DD}/{主题名}.md
+```
+
+写入前必须确保 `.ai-docs/` 不进入团队提交：
+
+1. 优先检查 `.git/info/exclude` 是否已包含 `.ai-docs/`
+2. 若没有，追加 `.ai-docs/` 到 `.git/info/exclude`
+3. 不主动修改团队共享的 `.gitignore`，除非用户明确要求
+4. 不对 `.ai-docs/` 下的文件执行 `doc-index-required Phase-B`
+
+### 输出判定回显
+
+写文档前必须向用户回显一行：
+
+```text
+文档输出路径判定：{团队共享 / 个人临时 / 用户指定} -> {目标路径}，原因：{一句话}
+```
+
+---
 
 本 skill 分为 **两个阶段**，在文档编写的**前后**各执行一次：
 
@@ -21,6 +65,7 @@ description: "You MUST invoke this skill BOTH BEFORE and AFTER creating, writing
 以下情况**不触发**本 skill：
 - 修改非 `docs/` 目录下的文件（代码、配置等）
 - 对索引文件本身的更新（`docs/INDEX.md`、`docs/*/INDEX.md`）
+- 写入 `.ai-docs/` 个人/临时 AI 输出目录（但写入前仍必须完成“文档输出路径判定”）
 
 ---
 

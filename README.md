@@ -8,6 +8,7 @@
 - **Bug 分析文档规范**（报告 Bug 时强制规范章节结构、Mermaid 图、根因表格）
 - **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息）
 - **文档索引优先约束**（编写任何文档前读取索引，分析内容边界，避免重复，写完后半自动更新索引）
+- **文档输出路径判定**（团队共享文档进 `docs/`，个人/临时 AI 输出进本地忽略的 `.ai-docs/`）
 - **Markdown 编写规范**（Mermaid 图表语法、表格、代码块等）
 - **业务逻辑现状梳理**（重构/迁移前按场景维度产出流程图、知识图谱、代码索引）
 - **实施前代码定位**（从文档坐标表精准定位关键文件，禁止重新扫描）
@@ -84,7 +85,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
 | `java-coding-standards` | 编写/审查任何 Java 代码时 | 强制遵守阿里黄山版编码规范 |
 | `git-commit-standards` | 执行 git commit 前 | 分析 staged 变更，生成标准化中文提交信息 |
-| `doc-index-required` | 编写/创建 `docs/` 下任何文档时 | 读取索引，分析内容边界，避免重复；写完后更新索引 |
+| `doc-index-required` | 编写/创建任何 Markdown 文档，或编辑 `docs/` 下文档时 | 先判定团队共享 vs 个人临时输出路径；团队共享文档读取索引并更新索引，个人临时输出写入 `.ai-docs/` 且不更新索引 |
 | `markdown-writing-standards` | 生成或修改含 Mermaid 图表的 Markdown 时 | Mermaid 语法规范、表格规范、代码块规范 |
 | `business-logic-orientation` | 重构/复写/迁移前需要理解现有业务逻辑时 | 按场景维度产出流程图、知识图谱、核心代码索引 |
 | `init-project-docs` | 初始化项目文档 / 生成知识图谱时 | 渐进式构建 11 份知识图谱文档 + 模块深度文档 + 技能卡（4 阶段，支持自动/确认模式） |
