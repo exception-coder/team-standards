@@ -21,7 +21,7 @@
 | 编写或审查 Java 代码 | `java-coding-standards` |
 | 生成或修改包含 Mermaid 图表的 Markdown 内容；或完成 Markdown 文件的结构性写入/重组（新增/删除/重命名 ##、### 章节，或章节移动/合并） | `markdown-writing-standards` |
 | 重构/复写/迁移前需要理解现有业务逻辑 | `business-logic-orientation` |
-| Java 后端单服务需求分析前存在 `docs/knowledge-graph/backend/`，或要求生成/更新后端知识图谱，或会话中确认了后端业务事实需要归档 | `backend-knowledge-graph-required` |
+| Java 后端单服务需求分析前存在 `docs/knowledge-graph/backend/`，或要求生成/更新后端知识图谱，或会话中反复提及后端业务事实需要候选沉淀 | `backend-knowledge-graph-required` |
 | **用户纠正了 AI 的编码写法（分层违规、命名错误等）** | `coding-violation-log` |
 | **开始编写代码前（若项目存在 coding-violations.md）** | `coding-violation-log`（回顾模式） |
 | **联调期 bug 修复 / 对齐云端 / 删冗余** 类源码改动 | `bugfix-coding-style`（注释保留旧逻辑） |
@@ -53,7 +53,7 @@
 | `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名；team-standards 自动 push 仍受宿主命令授权策略约束 | 提交、commit、git、分支、push、授权 |
 | `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
 | `doc-index-required` | `skills/doc-index-required/` | AI 生成 Markdown 默认写入用户 Documents 下的 `ai-docs/{project}/`；终版由用户自行上传，或用户明确指定 `docs/` 路径后才读取/更新索引 | 文档、docs、写文档、索引、输出路径、用户目录、Documents、终版文档 |
-| `backend-knowledge-graph-required` | `skills/backend-knowledge-graph-required/` | Java 后端单服务知识图谱：按项目沉淀领域能力、原子能力、流程、表、枚举、API、外部依赖与代码坐标；需求分析前优先读取图谱；会话中反复提及内容只作为候选沉淀，确认或代码验证后才更新正式图谱 | Java后端、知识图谱、单服务、领域能力、原子能力、表、枚举、状态流转、ER图、API、Service |
+| `backend-knowledge-graph-required` | `skills/backend-knowledge-graph-required/` | Java 后端单服务知识图谱：按项目沉淀领域能力、原子能力、流程、表、枚举、API、外部依赖与代码坐标；需求分析前优先读取图谱；会话中反复提及的后端业务事实自动进入用户目录候选池，确认或代码验证后才更新正式图谱 | Java后端、知识图谱、单服务、候选沉淀、领域能力、原子能力、表、枚举、状态流转、ER图、API、Service |
 | `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；核心流程必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）；根因必须用表格；**目录按模块分组**（对齐 `docs/design/{模块名}/`，三级结构 `docs/bug/{模块名}/{bug名称}/{bug名称}.md`）；目录与文件名使用**中文**命名 | bug、缺陷、问题分析、bug文档、OOM、异常、模块分组、中文命名 |
 | `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
 | `dev-log` | `skills/dev-log/` | 每次对 team-standards 有变更时记录开发日志；在 docs/dev-log/ 下按日期创建日志文件 | 开发日志、变更记录、skill 修改、发版记录 |

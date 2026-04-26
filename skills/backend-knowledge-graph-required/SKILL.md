@@ -1,6 +1,6 @@
 ---
 name: backend-knowledge-graph-required
-description: "Use for Java backend single-service business knowledge graphs. Trigger when the user asks to initialize, generate, organize, read, or update a backend service knowledge graph; when analyzing a Java backend requirement and the project has docs/knowledge-graph/backend/; when backend code changes affect APIs, services, domain capabilities, database tables, enums, state transitions, transactions, MQ/events, or external dependencies; or when the user says to record a confirmed backend business fact into the knowledge graph. Scope is Java backend single service only, not frontend, Flutter, or cross-project topology."
+description: "Use for Java backend single-service business knowledge graphs. Trigger when the user asks to initialize, generate, organize, read, or update a backend service knowledge graph; when analyzing a Java backend requirement and the project has docs/knowledge-graph/backend/; when backend code changes affect APIs, services, domain capabilities, database tables, enums, state transitions, transactions, MQ/events, or external dependencies; or when a session repeatedly mentions backend business facts that should be captured as candidate knowledge. Scope is Java backend single service only, not frontend, Flutter, or cross-project topology."
 ---
 
 # Java 后端单服务知识图谱
@@ -36,6 +36,25 @@ docs/knowledge-graph/backend/
 ```
 
 写入项目 `docs/` 前必须遵循 `doc-index-required`：默认先生成用户目录草稿；只有用户明确要求更新项目知识图谱时，才写入 `docs/knowledge-graph/backend/` 并更新索引。
+
+## 候选沉淀池
+
+为避免会话中的业务事实遗漏，后端知识图谱采用“两段式沉淀”：
+
+```text
+会话提及 / 代码分析发现
+  → 自动记录到候选沉淀池
+  → 用户确认或证据校验
+  → 整理进入正式知识图谱
+```
+
+候选沉淀池默认写入用户目录，不写项目 `docs/`：
+
+```text
+{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/backend-kg-candidates.md
+```
+
+候选池用于防遗漏，正式图谱用于可信引用。二者职责必须分开。
 
 ## 分析前读取顺序
 
@@ -136,17 +155,37 @@ docs/knowledge-graph/backend/
 
 ## 会话沉淀规则
 
-用户在会话中经常提到的内容**不会无条件自动写入正式知识图谱**。按以下规则处理：
+用户在会话中经常提到的内容**必须自动记录到候选沉淀池**，但**不能无条件自动写入正式知识图谱**。按以下规则处理：
 
 | 场景 | 处理 |
 |------|------|
-| 用户明确说“记入知识图谱 / 更新知识图谱 / 归档到后端图谱” | 可更新正式图谱 |
+| 用户明确说“记入知识图谱 / 更新知识图谱 / 归档到后端图谱” | 先检索候选池 + 现有正式图谱，再整理更新正式图谱 |
 | 本次后端代码变更新增/修改 API、Service、表、枚举、状态流转、MQ、外部依赖 | 必须提示并更新相关图谱卡片 |
-| 会话中反复出现同一业务事实，但尚未代码验证 | 记录为“候选沉淀”，默认写用户目录草稿，不进正式图谱 |
-| 事实来自代码、DDL、枚举类、接口契约、已确认设计文档 | 可作为正式图谱依据 |
-| 只是猜测、临时讨论、未确认方案 | 禁止写入正式图谱 |
+| 会话中反复出现同一后端业务事实，但尚未代码验证 | 自动追加到候选沉淀池，默认写用户目录，不进正式图谱 |
+| 事实来自代码、DDL、枚举类、接口契约、已确认设计文档 | 可作为正式图谱依据；更新前仍需合并候选池同主题内容 |
+| 只是猜测、临时讨论、未确认方案 | 可记录为“待确认假设”，禁止写入正式图谱 |
 
 正式图谱条目必须能追溯到至少一个来源：代码坐标、表结构、枚举类、接口契约、设计文档或用户明确确认。
+
+候选沉淀池每条记录至少包含：
+
+```text
+- 记录时间
+- 服务/模块
+- 会话事实
+- 关联能力/流程/表/枚举
+- 可信度：待确认 / 已确认 / 已代码验证
+- 来源：用户描述 / 代码坐标 / DDL / 枚举类 / API 契约
+- 后续动作：待用户确认 / 待代码核验 / 可整理入正式图谱
+```
+
+当用户后续要求“整理知识图谱 / 更新正式图谱 / 归档”时，必须先读取：
+
+1. 用户目录中的 `backend-kg-candidates.md`
+2. 项目内 `docs/knowledge-graph/backend/` 现有正式图谱
+3. 命中主题的代码、DDL、枚举或 API 契约
+
+然后去重、合并、补证据，再写正式图谱。
 
 ## 更新触发
 
@@ -161,6 +200,18 @@ docs/knowledge-graph/backend/
 - 修改事务、锁、幂等、补偿逻辑
 
 若用户没有要求写项目 `docs/`，先在用户目录生成“知识图谱更新建议”；用户确认后再写正式图谱。
+
+## 多项目边界
+
+多项目知识图谱不做单服务内部能力的重复整理，主要记录服务间关系：
+
+- 调用方向：A 服务调用 B 服务
+- 入口契约：HTTP/RPC/MQ/任务调度
+- 关键业务对象：订单、退款、支付、库存等
+- 数据归属：哪个服务负责哪类主数据
+- 失败传播：超时、重试、补偿、幂等边界
+
+跨项目链路交给 `cross-project-locator`。本 skill 只在单服务图谱中保留“外部依赖”视角，不把多个项目的内部表、枚举、原子能力混到一起。
 
 ## 输出要求
 
@@ -180,7 +231,8 @@ docs/knowledge-graph/backend/
 
 | 错误想法 | 正确处理 |
 |----------|----------|
-| “用户提到了就写入图谱” | 先判断是否为已确认事实，未确认只进候选沉淀 |
+| “用户提到了就写入正式图谱” | 先自动进候选沉淀池，确认或代码验证后再整理入正式图谱 |
+| “不自动记录，等用户以后想起来再说” | 错。会话中的后端业务事实应自动候选记录，防止遗漏 |
 | “一个 plugin 把所有端都做了” | 本 skill 只管 Java 后端单服务 |
 | “先全量扫代码再说” | 有图谱先读图谱，再按代码坐标读文件 |
 | “表字段照抄一遍就算图谱” | 必须写字段业务含义、读写能力和一致性约束 |
