@@ -2,20 +2,11 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-27 v11**
-> 变更摘要：team-standards 维护链路新增自动 commit/push 收尾：本仓库完成 skill、模板、配置、README、AGENTS/CLAUDE、skill-flow 或 dev-log 变更后，必须自动检查工作区、stage、按 `git-commit-standards` 基于 staged diff 生成提交并 push 当前分支；除非用户明确要求“不要提交 / 不要 push / 只改不提交”，否则不得让变更跨会话累计。
-> 上一版：v10（2026-04-27）。
-> 再上一版：v9（2026-04-26）；v8（2026-04-25）；v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
-> 历史版本：`docs/skill-flow-20260427-v10.md`（v10）、`docs/skill-flow-20260427-v9.md`（v9）、`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
-
----
-
-## 快速导航
-
-- **看触发时机** → [Skill 总览](#skill-总览)
-- **看完整链路** → [Skill 调用关系图](#skill-调用关系图) / [功能开发完整链路](#功能开发完整链路) / [Bug 修复完整链路](#bug-修复完整链路)
-- **看维护规则** → [team-standards 维护链路](#team-standards-维护链路) / [文档-索引-coding 子循环详解](#文档-索引-coding-子循环详解)
-- **查常见问题** → [常见困惑速查](#常见困惑速查)
+> **最后更新：2026-04-26 v9**
+> 变更摘要：`design-doc-required` 新增「第一·七步：模版分级选择」—— 把现有「完整模版（template.md，18 节）+ coding 摘要」拆成两档：① 轻量分支用 `lightweight-template.md`（7 节，时序图为主轴），适用于已有架构内单接口新增/调整、库表读写流程描述等；不需要配套 `-coding.md`，节省大量 token。② 完整分支保持原流程不变，适用于跨服务/新增表/复杂事务/对外契约新增等场景。准入用 9 项硬清单兜底（命中任一升级条件 ❌ 立即升级到完整模版），决策必须显式告知用户。同步更新执行流程图（新增 WEIGHT/POST_WEIGHT 节点）、Mermaid 强制要求章节按模版分级、检查清单分两套、红色警告新增 4 条。
+> 上一版：v8（2026-04-25）。
+> 再上一版：v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
+> 历史版本：`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
 ---
 
@@ -30,12 +21,11 @@
 | `doc-index-required` | team-standards | **(辅助)** 写 docs/ 文档后自动更新索引，已嵌入 bug-doc / design-doc 流程，**无需单独调用** |
 | `bug-doc-required` | team-standards | 编写 bug 分析文档时；完成后必须继续调用 design-doc-required 写修复实施方案 |
 | `pre-implementation-code-orientation` | team-standards | 文档写完后、开始实施代码前（含「帮我修改代码」「改代码」等直接编码请求） |
-| `architecture-ddd-lite-fullstack` | team-standards | 编写或审查 Java / React / Vue / Flutter 业务代码前；在实施前代码定位后，先判断 Feature、分层、单向依赖与原子能力 |
 | `java-coding-standards` | team-standards | 编写或修改任何 Java 代码时（自动应用） |
 | `test-driven-development` | superpowers | 实现功能或 bugfix 前（先写测试） |
 | `verification-before-completion` | superpowers | 声明工作完成、提交或建 PR 前 |
 | `requesting-code-review` | superpowers | 完成实现后请求代码审查 |
-| `git-commit-standards` | team-standards | 执行 git commit / push 前；team-standards 自身变更完成后自动 stage、commit、push |
+| `git-commit-standards` | team-standards | 执行 git commit 前 |
 | `finishing-a-development-branch` | superpowers | 分支实现完成、决定如何集成时 |
 | `dev-log` | team-standards | 对 team-standards 有任何变更（skill/配置/模板修改）后、本次会话结束前 |
 | `markdown-writing-standards` | team-standards | 生成或修改包含 Mermaid 图表的 Markdown 内容；完成 Markdown 文件的结构性写入/重组后做目录复核（自动应用，与 java-coding-standards 同级） |
@@ -72,7 +62,6 @@ flowchart TD
 
     %% 实施层
     PICO["pre-implementation-code-orientation\n从文档提取代码坐标"]
-    ARCH["architecture-ddd-lite-fullstack\n编码前默认架构规则\nDDD-lite + Feature + 原子能力"]
     JCS["java-coding-standards\n编写代码"]
 
     %% 收尾层
@@ -114,7 +103,7 @@ flowchart TD
 
     %% 汇入实施层
     DDR -- "文档就绪后" --> PICO
-    PICO --> ARCH --> JCS --> GCS
+    PICO --> JCS --> GCS
 ```
 
 ---
@@ -137,8 +126,7 @@ flowchart TD
     DDR -- "需求变更" --> NEWVER["新建版本文档\n{需求名}-{日期}-v{N+1}.md\n同步更新 coding.md（仅完整模版）"]
     NEWVER --> ORIENT
 
-    ORIENT --> ARCH["architecture-ddd-lite-fullstack\n编码前判断 Feature / 分层 / 原子能力"]
-    ARCH --> TDD["test-driven-development\n先写失败测试"]
+    ORIENT --> TDD["test-driven-development\n先写失败测试"]
     TDD --> CODE["java-coding-standards\n按规范实现代码"]
     CODE --> VERIFY["verification-before-completion\n运行验证 确认全部通过"]
     VERIFY --> REVIEW["requesting-code-review\n请求代码审查"]
@@ -159,8 +147,7 @@ flowchart TD
     DDR -- "已有文档 + 改动通过\n第四·五步硬清单" --> LIGHT["在原 v 文档末尾\n追加调整流水行\n不新建 vN+1"]
     DDR -- "改动不通过硬清单" --> ORIENT["pre-implementation-code-orientation\n优先读设计文档提取代码坐标\n降级才读 bug 文档"]
     LIGHT --> ORIENT
-    ORIENT --> ARCH["architecture-ddd-lite-fullstack\n先判断修复应落在哪一层\n禁止直接塞进 UI / Controller"]
-    ARCH --> CODE["java-coding-standards\n实施修复\n+ bugfix-coding-style\n（注释保留旧代码 + 追加新代码）"]
+    ORIENT --> CODE["java-coding-standards\n实施修复\n+ bugfix-coding-style\n（注释保留旧代码 + 追加新代码）"]
     CODE --> VERIFY["verification-before-completion\n验证修复有效"]
     VERIFY --> COMMIT["git-commit-standards\n type: fix  提交"]
     COMMIT --> MORE{"还有关联 Bug?"}
@@ -181,17 +168,11 @@ flowchart TD
     M1(["对 team-standards 做了任何变更\nskill / 模板 / 配置 / 规则"]) --> M2["dev-log\n在 docs/dev-log/YYYY-MM-DD.md\n追加本次变更内容与原因"]
     M2 --> M3{"本次会话需要发版?"}
     M3 -- "是" --> M4["更新 plugin.json version\n同步更新 marketplace.json version\n更新 CLAUDE.md 索引表\n更新 README.md Skills 表\n更新 skill-flow.md"]
-    M3 -- "否" --> M5["git status\n检查未提交变更"]
+    M3 -- "否" --> M5(["会话结束"])
     M4 --> M5
-    M5 --> M6{"工作区存在变更?"}
-    M6 -- "否" --> M8(["会话结束"])
-    M6 -- "是" --> M7["git-commit-standards\n自动 stage + commit + push"]
-    M7 --> M8
 ```
 
 > **触发判断：** 只要在本次会话中创建、修改、删除了 `skills/` 下任意文件，或调整了 `CLAUDE.md` 规则，即必须在会话结束前调用 `dev-log`。
->
-> **自动提交判断：** 只要 team-standards 变更完成且 `git status --short` 非空，必须立即按 `git-commit-standards` 自动提交并 push，避免多轮变更累计到一个大提交。用户明确要求暂不提交或暂不 push 时除外。
 
 ---
 
@@ -256,7 +237,6 @@ flowchart LR
 | bug 文档的修复方案节写什么? | 仅写方向摘要（每级一句话），加设计文档路径指引。详细实施细节写进设计文档。 |
 | dev-log 什么时候调? | 在对 team-standards 做了任何变更（skill/模板/配置）的会话结束前必须调用，记录改了什么、为什么改。 |
 | dev-log 和 git-commit-standards 有什么区别? | git-commit-standards 生成 commit 提交信息（面向 git 历史）；dev-log 记录变更背景与决策原因（面向人工追溯），两者均需执行。 |
-| team-standards 改完后会自动 commit 和 push 吗? | 会。只要本仓库变更完成且工作区非空，就自动 stage、基于 staged diff 生成规范提交、commit 并 push 当前分支；除非用户明确说不要提交或不要 push。 |
 | init-project-docs 什么时候调? | 仅在明确要求"初始化项目文档"或"分析项目能力"时调用，是独立的分析类 skill，不属于功能开发或 bug 修复链路。 |
 | markdown-writing-standards 和 design-doc-required 的 Mermaid 章节什么关系? | design-doc-required 规定「必须画哪些图」（功能模块图、能力分解图等），markdown-writing-standards 规定「图怎么画不出错」（语法规则、自检清单）。前者定义 what，后者定义 how。 |
 | 写 Mermaid 时需要显式调用 markdown-writing-standards 吗? | 自动应用，与 java-coding-standards 同级。只要检测到要写 Mermaid 代码块，规则自动生效。 |
@@ -264,8 +244,6 @@ flowchart LR
 | AI 速查索引和 coding.md 有什么区别? | AI 速查索引是对**现有代码**的紧凑索引（文件/方法/调用链/表操作），coding.md 是对**设计方案**的编码摘要（接口契约/类清单/业务规则）。前者面向理解，后者面向实施。 |
 | init-project-docs 的 4 个 Phase 必须全部执行吗? | 不必须。Phase 1-2 是核心（全自动），Phase 3-4 可选。可以只运行 Phase 1-2 快速建立基础知识图谱，后续按需补充。 |
 | project-docs-update 和 init-project-docs 的区别? | init-project-docs 是**从零构建**知识图谱（首次使用），project-docs-update 是**增量维护**（代码变更后同步文档）。前者生成，后者更新。 |
-| architecture-ddd-lite-fullstack 什么时候调? | 设计文档和代码定位完成后、第一行业务源码改动前。它是默认架构门禁：先判断 Feature、Presentation/Application/Domain/Repository/Infrastructure 分层、调用方向和原子能力，再写代码。 |
-| architecture-ddd-lite-fullstack 和 java-coding-standards 的区别? | architecture-ddd-lite-fullstack 管**代码放哪一层、依赖方向、业务能力怎么复用**；java-coding-standards 管 **Java 代码质量**（命名、格式、异常、集合、日志等）。先分层，再写具体语言代码。 |
 | arch-lint 和 java-coding-standards 的区别? | arch-lint 检测 **Flutter 架构分层**违规（presentation 层写 SQL 等跨层问题），java-coding-standards 检测 **Java 代码**质量（命名/格式/异常处理等）。一个管分层，一个管编码。 |
 | Phase 3-4 的自动模式和确认模式怎么选? | 自动模式：AI 尽力推断后生成，标注"需人工校验"，适合快速产出初稿。确认模式：逐份展示等用户确认，适合对准确度要求高的场景。 |
 | Step 0 知识图谱预热是什么? | 在 design-doc-required / bug-doc-required 执行前，先读 `00_project_overview.md` 获取全局索引，再按 AI 上下文路由表加载当前任务类型对应的 2-3 份文档。避免全量扫码，按需获取上下文。 |

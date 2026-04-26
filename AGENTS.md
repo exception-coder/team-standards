@@ -6,7 +6,7 @@
 
 ## Skill 主动触发规范
 
-**Skill 必须主动触发，不等用户显式调用。** Claude 在以下场景必须自动识别并第一时间调用对应 Skill：
+**Skill 必须主动触发，不等用户显式调用。** Codex 在以下场景必须自动识别并第一时间调用对应 Skill：
 
 | 用户意图 | 必须第一时间调用 |
 |---------|----------------|
@@ -35,7 +35,7 @@
 
 **核心原则：** 触发时机是用户表达意图的那一刻，而不是开始动手的那一刻。收到需求就触发 `design-doc-required`，不要等到真的要写代码时才触发。
 
-**兜底规则：** 若 Claude 即将对源码文件（`.java`、`.dart`、`.ts`、`.py`、`.kt` 等）执行 Edit/Write 操作，但当前会话尚未完成 `design-doc-required` 检查，必须立即停止并先触发该 skill。不存在「任务太简单可以跳过」的例外（Bug 修复、纯重构等合法例外在 skill 内部判断）。
+**兜底规则：** 若 Codex 即将对源码文件（`.java`、`.dart`、`.ts`、`.py`、`.kt` 等）执行 Edit/Write 操作，但当前会话尚未完成 `design-doc-required` 检查，必须立即停止并先触发该 skill。不存在「任务太简单可以跳过」的例外（Bug 修复、纯重构等合法例外在 skill 内部判断）。
 
 **team-standards 收尾规则：** 本仓库有任何变更完成后，必须立即自动执行 `git status` 检查；若存在未提交变更，按 `git-commit-standards` 自动 stage、commit，并 push 当前分支。除非用户明确说“不要提交 / 不要 push / 只改不提交”，否则不得把变更留到后续会话累计。
 
@@ -61,7 +61,7 @@
 | `arch-lint` | `skills/arch-lint/` | Flutter 架构违规检测：5 条规则（presentation 层禁 SQL/HTTP、domain 层禁技术框架、金额禁 double、DAO 不可被 presentation 直接调用）；全量检查 + 轻量自动检查两种模式 | 架构检查、arch lint、检测违规、分层违规、Flutter 架构 |
 | `markdown-writing-standards` | `skills/markdown-writing-standards/` | Markdown 编写规范：Mermaid 图表语法（致命错误清单、各图类型骨架、自检清单）、表格、代码块、标题结构、目录结构复核（TOC Review — 分类混杂/重复/层级断层/交叉引用失效/快速导航判断） | Mermaid、mermaid、图表、流程图、时序图、mindmap、状态图、markdown、表格规范、目录结构、TOC、章节重构、目录复核 |
 | `business-logic-orientation` | `skills/business-logic-orientation/` | 重构/复写/迁移前业务逻辑现状梳理：按场景维度产出 3 图（时序图/流程图/泳道图）+ 知识图谱 + 核心代码索引 + AI 速查索引；后端附加表操作矩阵和状态扭转明细 | 现状梳理、业务逻辑、重构前分析、知识图谱、逻辑梳理、场景分析、调用链分析、AI索引 |
-| `cross-project-locator` | `skills/cross-project-locator/` | kpay POS 生态跨项目业务拓扑定位与登记：查询模式（按业务域/工程名路由到 `kpay-pos-topology/` 下 mapping 或 flows）+ 登记模式（拦截跨项目 markdown 的错误落盘位置，强制写入 `kpay-pos-topology/`）；路由入口是 `kpay-pos-topology/CLAUDE.md` § 查找索引表 | 跨项目、调用链、链路、定位、追踪、end-to-end、前后端追踪、korepos、bff、order-manage、接口对照、映射 |
+| `cross-project-locator` | `skills/cross-project-locator/` | kpay POS 生态跨项目业务拓扑定位与登记：查询模式（按业务域/工程名路由到 `kpay-pos-topology/` 下 mapping 或 flows）+ 登记模式（拦截跨项目 markdown 的错误落盘位置，强制写入 `kpay-pos-topology/`）；路由入口是 `kpay-pos-topology/AGENTS.md` § 查找索引表 | 跨项目、调用链、链路、定位、追踪、end-to-end、前后端追踪、korepos、bff、order-manage、接口对照、映射 |
 | `daily-work-log` | `skills/daily-work-log/` | 业务项目每日工作日志：每次 Edit/Write 业务源码后写入 `docs/work-log/{YYYY-MM-DD}.md`，按 🐛 Bug 修复 / ✨ 功能开发 分两区；同 bug 多次修复合并同条目、同功能多轮迭代合并同条目；一行一条修改明细、带时间戳、动词开头；预估工时累计叠加（基础估值表 + 叠加项）；写入前必须 Read 当天日志合并现有条目；会话结束前若有未登记改动强制回补；与 dev-log 分工：dev-log 作用于 team-standards 仓库、daily-work-log 作用于业务项目 | 工作日志、每日日志、工时、记录、work-log、daily-log、日报、登记 |
 | `korepos-backend-service` | `skills/korepos-backend-service/` | korepos / korepos-refund 后端接口编写规范：目录结构（`endpoint / registry / dto / service / dao`，禁止新代码用 `application/data/domain` 老骨架）+ BackendInfra 门面边界（Service / DAO 内禁 `ref.read`，依赖通过构造器注入）+ UI 层泄漏拦截（不得 import 同 feature 的 `presentation / application / data / domain` 或其它 feature 非 backend 层）+ DTO 自闭环（freezed 副本，不复用 domain 模型）+ **一接口一 service 粒度规则**（每个 service 文件对应 1 个 endpoint，类内单一 public 方法 = handler 转发方法名，跨接口复用沉到 `service/{purpose}_orchestrator.dart`，service 之间禁止互相 import；命名 `{module}_{action}_service.dart`，存量 1:N 文件保持不动）+ 8 步编写顺序 + 自检清单 + 常见红线 | 后端接口、backend、shelf、endpoint、handler、service、dao、加接口、写 backend 服务、实现服务端、UI 对接手册、一接口一 service、orchestrator、粒度、ACL 防腐蚀 |
 
@@ -169,7 +169,7 @@ description: 触发时机描述   # 明确说明何时 MUST 调用
 
 ## 发版规则（push 前必须执行）
 
-**每次 push 前，必须先更新 `.claude-plugin/plugin.json` 中的 `version` 字段，否则团队成员执行 `/plugin update` 无法检测到变更。**
+**每次 push 前，必须先更新 `.Codex-plugin/plugin.json` 中的 `version` 字段，否则团队成员执行 `/plugin update` 无法检测到变更。**
 
 版本号遵循语义化版本（SemVer），按变更类型递增：
 
@@ -180,8 +180,8 @@ description: 触发时机描述   # 明确说明何时 MUST 调用
 | 不兼容的结构变更（目录重组、Skill 重命名） | Major（首位） | `1.2.0` → `2.0.0` |
 
 **发版检查清单（每次 push 前逐项确认）：**
-1. `.claude-plugin/plugin.json` 的 `version` 已按上表递增
-2. `.claude-plugin/marketplace.json` 中对应插件的 `version` 已同步递增（两处必须一致，插件系统以 marketplace.json 为基准判断是否有更新）
+1. `.Codex-plugin/plugin.json` 的 `version` 已按上表递增
+2. `.Codex-plugin/marketplace.json` 中对应插件的 `version` 已同步递增（两处必须一致，插件系统以 marketplace.json 为基准判断是否有更新）
 3. 本文件 Skill 索引表已同步（新增/修改/删除）
 4. `docs/skill-flow.md` 已同步（链路结构变化时同时创建版本快照）
 5. README.md 的「包含的 Skills」表已同步（如有新增 Skill）

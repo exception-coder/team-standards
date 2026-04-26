@@ -4,6 +4,7 @@
 
 - **Java 编码规范**（阿里巴巴黄山版·强制项精简版）
 - **功能设计文档强制约束**（开发前必须有设计文档，否则引导创建）
+- **DDD-lite 全栈架构约束**（编码前默认判断分层、Feature 模块与原子能力）
 - **Bug 分析文档规范**（报告 Bug 时强制规范章节结构、Mermaid 图、根因表格）
 - **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息）
 - **文档索引优先约束**（编写任何文档前读取索引，分析内容边界，避免重复，写完后半自动更新索引）
@@ -12,6 +13,7 @@
 - **实施前代码定位**（从文档坐标表精准定位关键文件，禁止重新扫描）
 - **跨项目拓扑定位与登记**（kpay POS 生态跨项目调用链、接口对照、业务全链路的唯一查询/写入入口）
 - **每日工作日志**（业务项目源码改动后按 bug / 功能 分类沉淀到 `docs/work-log/{YYYY-MM-DD}.md`，同主题合并、工时累计叠加）
+- **team-standards 自动提交推送**（本仓库规则变更完成后自动小步 commit + push，避免累计大包变更）
 
 ## 仓库地址
 
@@ -77,6 +79,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | Skill | 触发时机 | 作用 |
 |-------|----------|------|
 | `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；自动生成编码摘要 |
+| `architecture-ddd-lite-fullstack` | 开始编写或审查 Java / React / Vue / Flutter 业务代码前 | 强制 DDD-lite 分层、Feature 模块化、单向依赖与原子能力沉淀，禁止 UI / Controller 直接承载业务逻辑 |
 | `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；目录按模块分组（对齐 `docs/design/`）；中文命名 |
 | `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
 | `java-coding-standards` | 编写/审查任何 Java 代码时 | 强制遵守阿里黄山版编码规范 |
@@ -148,6 +151,8 @@ Author: 你的姓名 <你的邮箱>
 ## 发版规则
 
 通过 `.claude-plugin/plugin.json` 中的 `version` 字段判断是否有更新。**每次发布必须递增版本号**，否则升级无法检测到变更。
+
+team-standards 仓库自身变更完成后，默认自动执行 `git add -A`、规范 commit 和 `git push`，以小步提交方式及时分发规则调整。若某次只想保留本地变更，需要明确说明“不要提交”或“不要 push”。
 
 版本号遵循语义化版本（SemVer）：
 
