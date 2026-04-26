@@ -142,7 +142,7 @@ lib/features/{module}/backend/
 │   └── response/
 │       └── {action}_response.dart        # freezed + json_serializable 出参（data 部分）
 ├── service/
-│   └── {module}_{feature}_service.dart   # 业务编排（依赖 BackendInfra + DAO），@riverpod Provider
+│   └── {module}_{action}_service.dart   # 一接口一 service：每个文件对应 1 个 HTTP endpoint，类内单一 public 方法 = handler 转发的方法名（详见「Service 粒度规则」节）
 └── dao/
     └── {module}_{table}_dao.dart         # 纯 DB SQL/事务，@riverpod Provider
 ```
@@ -234,6 +234,64 @@ Service / DAO 内部 **不允许** 再出现 `ref.read(...)`。想拿什么从 `
 3. Service / DAO 通过 `_infra.xxx` 调用，**对业务层透明**
 
 这是跨到非 backend 层的唯一合法扩展路径。
+
+---
+
+## Service 粒度规则：一接口一 service（debug 友好原则）
+
+### 心智模型先校准
+
+`backend/service/` 在 Flutter 端虽然叫 service，但语义角色 = **云端 Spring 的 Controller**（HTTP 入口的薄编排层），**不是云端的 ServiceImpl**。
+
+| 视角 | 云端 Java | 本端 Flutter backend |
+|---|---|---|
+| `endpoint/{module}_handler.dart` | DispatcherServlet 路由分发（基础设施） | shelf 路由 + parse/encode 模板 |
+| `service/{module}_{action}_service.dart` | `XxxController.actionOne(req)` | 一接口一 service，承接对应 endpoint |
+| `service/{purpose}_orchestrator.dart` | `XxxServiceImpl` 跨方法的复用编排 | 多 service 共享的写入/校验链路 |
+| `dao/` | `Mapper / Repository` | 纯 DB SQL/事务 |
+
+云端 ServiceImpl 把多个业务方法塞一个类里有合理性（DI 便宜、跨方法事务、Spring AOP 织入）；本端 backend 不具备这些约束,debug 时**栈干净、日志定位、版本控制 diff 收敛**的友好度更重要 → **一接口一 service**。
+
+### 强制规则
+
+1. **粒度**:`backend/service/` 下每个 `.dart` 文件**只对应 1 个 HTTP endpoint**(即 Registry 里 1 行 `router.post(...)`)
+2. **类内单一 public 方法**:方法名与 handler 转发方法名一致(例:`RefundV2Handler.confirm()` → `RefundConfirmService.confirm()`);私有 `_xxx()` 数量不限,前置校验 / 参数组装 / 响应组装继续抽 `_private`
+3. **文件命名**:`{module}_{action}_service.dart`,`{action}` = handler 方法名 snake_case,与 Endpoint 枚举值同名(camel→snake)
+4. **跨接口复用**:多个 service 共用的写入/校验/编排链路(典型如取消订单的「db.transaction + KPay 退款 + 数据同步」三段式)必须沉到独立文件 `service/{purpose}_orchestrator.dart`,以「编排器」名字承载(参考现存 `whole_order_cancel_orchestrator.dart`)
+5. **service 之间禁止互相 import**:复用一律走 orchestrator / 共享 helper / DAO;service A 想调 service B 的能力 = 把 B 的能力下沉为 orchestrator,两个 service 各自调 orchestrator
+6. **DTO 自闭环不变**:每个 service 自己声明依赖的 Request / Response,Step 2/3 流程不变
+
+### 反例 → 正例
+
+❌ **反例**:同一 service 暴露多个 public 方法
+
+```dart
+// service/refund_query_service.dart  ← 1 个文件 expose 3 个 endpoint,debug 时栈与日志混在一起
+class RefundV2QueryService {
+  Future<GetMaxRefundableAmountResponse> getMaxAmount(...) {...}
+  Future<GetRefundAllocationsResponse> getAllocations(...) {...}
+  Future<GetRefundProductsResponse> getProducts(...) {...}
+}
+```
+
+✅ **正例**:拆成 3 个文件,Handler/Service/Endpoint/Registry 四层 1:1:1:1 对齐
+
+```
+service/get_max_refundable_amount_service.dart   → class GetMaxRefundableAmountService { Future<...> getMaxAmount(req); }
+service/get_refund_allocations_service.dart      → class GetRefundAllocationsService    { Future<...> getAllocations(req); }
+service/get_refund_products_service.dart         → class GetRefundProductsService       { Future<...> getProducts(req); }
+```
+
+### 命名一致性收敛
+
+历史代码里两种命名风格并存,新代码**只允许动作型**:
+
+| 风格 | 例 | 是否允许新增 |
+|---|---|---|
+| 动作型 `{action}_{resource}_service.dart` | `cancel_refund_order_service.dart` | ✅ 允许 |
+| 域型 `{module}_{domain}_service.dart` | `refund_write_service.dart` | ❌ 不允许新增,文件名必须包含动作 |
+
+> **存量 1:N 文件不改**:`refund_query_service.dart` 等历史文件由专项 PR 拆分,本规则**自本条目落入 SKILL.md 之日起仅对新增 service 文件强制生效**,改动现有文件时若机会成熟可顺手拆,但不要为了拆而开 PR。
 
 ---
 
@@ -468,8 +526,9 @@ class {Module}{Feature}Service {
 ```
 
 规则：
-- **public 方法 = 对外接口**：类级 / 方法级 dartdoc **必须**写「对齐云端：{Java 类全路径}#方法」
-- **参数组装、校验、辅助查询必须抽 `_private` 方法**，不得内联在主流程里（参考记忆：健壮性代码不内联）
+- **一接口一 service**:每个 service 文件只对应 1 个 endpoint,类内只暴露 1 个 public 方法(详见上方「Service 粒度规则」节);跨接口复用的链路下沉到 `service/{purpose}_orchestrator.dart`,**严禁** service A 直接 import service B
+- **public 方法 = 对外接口**:类级 / 方法级 dartdoc **必须**写「对齐云端:{Java 类全路径}#方法」
+- **参数组装、校验、辅助查询必须抽 `_private` 方法**,不得内联在主流程里(参考记忆:健壮性代码不内联)
 - **只 import `BackendInfra` + DAO + DTO + common**，禁止 `ref.read(xxxProvider)` 方式直接拉其他模块
 - **业务异常用 `ApiIntranetException(MessageKey.xxx)`**，由 handler 层统一本地化
 - 失败场景：受控异常 rethrow；未预期异常 catch 后返回 `success: false` 的响应，不让 HTTP 500 冒泡
@@ -827,6 +886,7 @@ Skill 在 Edit DTO 前**必须跑**这一步识别，把结果和字段改动影
 | 检查项 | 通过条件 |
 |---|---|
 | 目录结构 | 严格符合 `backend/{endpoint,registry,dto/{request,response},service,dao}/`；新代码不新增 `application/data/domain` 目录（存量老骨架可并存） |
+| **service 粒度** | 每个 service 文件只对应 1 个 endpoint，类内只暴露 1 个 public 方法（方法名 = handler 转发方法名）；跨接口复用沉入 `service/{purpose}_orchestrator.dart`；service 之间无互相 import |
 | import 边界 | grep 整个新增 backend 代码：无 `features/{module}/{data,application,presentation,domain}/` 引用；无 `features/payment/**`、`features/cart/**` 等其他 feature 引用；无 `*_notifier.dart` / widget 引用 |
 | BackendInfra 使用 | Service / DAO 构造器接受 `BackendInfra`，方法体内 **不出现** `ref.read(` |
 | DTO 自闭环 | request/response DTO **不 import** `features/{module}/domain/**`，均为 freezed 自持副本 |
@@ -870,6 +930,8 @@ git-commit-standards（提交）
 | 新模块命名为 `backendv2/` | `backendv2` 是 refund 的一次性历史名，新模块一律用 `backend/` |
 | 在 `backend/` 下新建 `application/` 或 `data/` 或 `domain/` 目录（新代码） | 这是 v1 老结构；新代码走 `endpoint/registry/dto/service/dao/` |
 | 在 Service / DAO 里写 `ref.read(xxxProvider)` | 绕过 BackendInfra 门面，独立服务化时会大范围返工 |
+| 一个 service 文件 expose 多个 public 业务方法 / 一个 service 服务多个 endpoint | 违反「一接口一 service」debug 友好原则；本端 service ≈ 云端 Controller，不要按 ServiceImpl 的合并方式写 |
+| service A 直接 import service B 复用业务能力 | 跨接口复用必须沉到 orchestrator；service 之间维持平级独立，否则未来独立服务化时调用图爆炸 |
 | 直接 import 其它 feature 的**非 backend 层**（`presentation/**`、`application/**`、`data/**`、`domain/**`）、`*_notifier.dart`、widget | backend 侵入 UI 层，违反前后端彻底分离。其它 feature 的 `backend/` 层不受此限 |
 | 复用 `features/{module}/domain/` 的 freezed 模型作为 backend DTO | 两侧耦合；未来模型演化会互相牵制 |
 | 在 handler 里手写 `try-catch` / `jsonDecode` | 偏离 IntranetHandlerBase 模板，日志/错误映射会不一致 |
