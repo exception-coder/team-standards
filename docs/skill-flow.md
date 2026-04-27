@@ -2,9 +2,9 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-27 v16.1**
-> 变更摘要：补充 `backend-knowledge-graph-required` 的会话候选沉淀机制：会话中反复提及的后端业务事实自动进入用户目录候选池，用户确认或代码验证后再整理进正式图谱；跨项目图谱只记录调用关系与数据归属等服务间关系。
-> 上一版：v16（2026-04-27，轻微规则补充未单独创建快照）。
+> **最后更新：2026-04-27 v16.2**
+> 变更摘要：`korepos-backend-service` 新增「BackendInfra 门面新旧分离」原则（情况 C）：从 0 写的 backend 内部基础设施（云端 HTTP / WS / 设备协议等）必须建立独立子门面 + 平级 provider，禁止挂到 BackendInfra 上，避免新代码伪装成"将要清空的过渡通道"。
+> 上一版：v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
 > 再上一版：v15（2026-04-27）；v14（2026-04-27）；v13（2026-04-27）；v12（2026-04-27）；v11（2026-04-27）；v10（2026-04-27）；v9（2026-04-26）；v8（2026-04-25）；v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
 > 历史版本：`docs/skill-flow-20260427-v15.md`（v15）、`docs/skill-flow-20260427-v14.md`（v14）、`docs/skill-flow-20260427-v13.md`（v13）、`docs/skill-flow-20260427-v12.md`（v12）、`docs/skill-flow-20260427-v11.md`（v11）、`docs/skill-flow-20260427-v10.md`（v10）、`docs/skill-flow-20260427-v9.md`（v9）、`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
