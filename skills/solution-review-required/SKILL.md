@@ -1,6 +1,6 @@
 ---
 name: solution-review-required
-description: "Use this skill the moment a user proposes a concrete idea, implementation approach, architecture direction, refactor plan, or asks Codex to implement a specific solution. MUST run before design-doc-required planning or code changes when the user's wording contains an assumed solution. Forces Codex to separate the user's real goal from the proposed implementation, evaluate risks and alternatives, then recommend the best path instead of blindly doing exactly what was requested."
+description: "Use this skill the moment a user proposes a concrete idea, implementation approach, architecture direction, refactor plan, asks Codex to implement a specific solution, or implies that existing code should be copied as the reference pattern. MUST run before design-doc-required planning or code changes when the user's wording contains an assumed solution. Forces Codex to separate the user's real goal from the proposed implementation, evaluate existing-code quality, risks and alternatives, then recommend the best path instead of blindly following the user or copying weak legacy code."
 ---
 
 # 方案审视与更优建议
@@ -11,6 +11,10 @@ description: "Use this skill the moment a user proposes a concrete idea, impleme
 
 在进入设计文档、计划或编码前，必须先判断：用户真正想解决什么问题、当前方案是否合适、有没有更简单/更安全/更可维护的做法。
 
+现有代码是**事实材料**，不是天然正确的设计范式。AI 不得因为项目里已经这样写，就默认继续扩散同样的结构、分层、命名、状态处理或数据一致性问题。
+
+AI 的默认姿态不是“服从型代码补全器”，而是“有工程判断的协作者”：当用户方案、现有代码惯性或短期补丁会带来长期风险时，必须主动指出问题并给出更优建议。
+
 ## 触发时机
 
 以下情况必须立即触发：
@@ -19,6 +23,8 @@ description: "Use this skill the moment a user proposes a concrete idea, impleme
 - 用户给出具体技术路径、目录方案、架构调整、自动化策略后要求实施
 - 用户要求“照这个回复/方案更新到项目”
 - 用户让 AI 根据一个尚未验证的假设直接改代码或改规范
+- 用户要求“参考现有代码 / 照这个文件 / 抄云端逻辑 / 按原结构补一个类似的”
+- 用户给出的方案明显只是局部补丁，可能绕过状态机、数据一致性、分层边界、幂等或测试验证
 
 ## 执行流程
 
@@ -30,19 +36,27 @@ description: "Use this skill the moment a user proposes a concrete idea, impleme
    - 优先读现有规范、README、索引、相关代码或配置
    - 不在不了解现状时直接评价或实施
 
-3. **识别风险与缺口**
+3. **评估现有代码是否值得参考**
+   - 现有代码是否符合当前架构、分层、命名、异常处理、状态机和数据一致性约束
+   - 现有代码是在表达业务模型，还是把历史补丁、临时兼容、重复分支堆在一起
+   - 如果必须兼容旧结构，要明确“兼容边界”，禁止把坏结构扩散到新代码
+   - 若现有代码质量差，只能提取事实和业务规则，不能把它当作实现模板
+
+4. **识别风险与缺口**
    - 是否影响团队成员
    - 是否过度设计或引入额外维护成本
    - 是否破坏已有流程、版本、目录或分层约束
    - 是否有数据、权限、安全、兼容性、发布成本风险
+   - 是否只是迎合用户表述或现有代码惯性，而没有从业务模型、边界和长期维护成本审视
 
-4. **给出更优建议**
+5. **给出更优建议**
    - 保留用户方案：当前方案最合适时明确说明
    - 微调方案：保留方向但收窄范围或改默认值
    - 替代方案：给出更简单、更稳、更符合现状的做法
    - 暂缓方案：风险高或信息不足时先确认再动手
+   - 反惯性建议：当现有代码质量差时，提出“先抽模型/规则，再落代码”的路径
 
-5. **形成执行决策**
+6. **形成执行决策**
    - 低风险且更优路径明确：直接按推荐方案实施
    - 多方案权衡明显：先简短说明推荐理由，再实施推荐方案
    - 高风险或会影响团队约定：先向用户确认
@@ -56,6 +70,7 @@ description: "Use this skill the moment a user proposes a concrete idea, impleme
 - 真实目标：...
 - 用户方案：...
 - 风险/缺口：...
+- 现有代码参考价值：...
 - 更优建议：...
 - 执行决策：...
 ```
@@ -77,6 +92,9 @@ description: "Use this skill the moment a user proposes a concrete idea, impleme
 | 错误想法 | 正确处理 |
 |----------|----------|
 | “用户都这么说了，直接做” | 先分离目标和方案，判断是否有更优解 |
+| “项目里都这么写，照着抄最安全” | 先判断现有代码是否值得参考；差代码只能提取事实，不能扩散结构 |
+| “用户没问更优方案，就别多嘴” | 风险明显时必须主动给出更优建议，这是本 skill 的职责 |
+| “先按旧代码补一个，后面再重构” | 必须明确兼容边界和后续代价；禁止把坏结构变成新范式 |
 | “先改完再说风险” | 风险必须在实施前识别 |
 | “这个只是规则调整，不用看现状” | 规则调整更要看现有触发链路和团队影响 |
 | “给用户很多方案让他自己选” | 默认给出明确推荐；只有高风险或信息不足才停下来确认 |

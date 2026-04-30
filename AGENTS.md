@@ -10,7 +10,7 @@
 
 | 用户意图 | 必须第一时间调用 |
 |---------|----------------|
-| 用户提出具体想法/方案并要求实施，或要求按某个方案、回复、目录策略、架构路径直接改 | `solution-review-required` |
+| 用户提出具体想法/方案并要求实施，或要求按某个方案、回复、目录策略、架构路径、现有代码直接改 | `solution-review-required` |
 | 提出任何新需求、重构计划、技术方案讨论、可行性分析 | `design-doc-required` |
 | **请求修改/编写代码（含「根据文档改代码」「帮我改一下」等）** | `design-doc-required` |
 | 报告 Bug、描述异常、请求分析问题根因 | `bug-doc-required` |
@@ -47,7 +47,7 @@
 
 | Skill 名称 | 目录 | 覆盖范围 | 关键词 |
 |-----------|------|---------|--------|
-| `solution-review-required` | `skills/solution-review-required/` | 用户提出具体方案或要求照某个想法实施时，先分离真实目标与候选方案，识别风险、替代方案和更优建议，再决定是否实施；防止 AI 盲目照做 | 方案审视、更优建议、想法、实施方案、不要盲从、风险评估、替代方案 |
+| `solution-review-required` | `skills/solution-review-required/` | 用户提出具体方案或要求照某个想法、回复、目录策略、架构路径、现有代码实施时，先分离真实目标与候选方案，评估现有代码是否值得参考，识别风险、替代方案和更优建议，再决定是否实施；防止 AI 盲目照做、迎合用户或扩散低质量旧结构 | 方案审视、更优建议、想法、实施方案、不要盲从、反迎合、现有代码质量、代码惯性、风险评估、替代方案 |
 | `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档（新功能和 bug 修复均适用）；**模版分级**（轻量 `lightweight-template.md` 用于单接口/库表读写流程；完整 `template.md` 用于跨服务/新增表/复杂事务等）；硬清单兜底滥用；bug 修复简化版模板；文档存储结构；完整模版自动生成 coding-summary，轻量模版无需 coding.md | 设计文档、需求、方案、实现前、新功能、修复方案、实施方案、bug修复、轻量模版、接口级 |
 | `architecture-ddd-lite-fullstack` | `skills/architecture-ddd-lite-fullstack/` | 编码前默认架构规则：DDD-lite 分层、Feature 模块化、单向依赖、原子能力沉淀；适配 Java Spring、React、Vue、Flutter；禁止 UI / Controller 直接写业务逻辑或访问 DB / HTTP | DDD-lite、分层架构、Feature、原子能力、UseCase、Application、Domain、Repository、Infrastructure、前端、Flutter、Spring |
 | `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名；team-standards 自动 push 仍受宿主命令授权策略约束 | 提交、commit、git、分支、push、授权 |
@@ -75,7 +75,7 @@
 
 | 文件 | 所属 Skill | 用途 |
 |------|-----------|------|
-| `skills/solution-review-required/SKILL.md` | solution-review-required | 用户提出具体方案并要求实施前的目标/方案分离、风险识别与更优建议规则 |
+| `skills/solution-review-required/SKILL.md` | solution-review-required | 用户提出具体方案并要求实施前的目标/方案分离、现有代码质量评估、风险识别与更优建议规则 |
 | `skills/backend-knowledge-graph-required/SKILL.md` | backend-knowledge-graph-required | Java 后端单服务知识图谱的生成、读取、更新与会话沉淀规则 |
 | `skills/design-doc-required/template.md` | design-doc-required | 18 节完整设计文档模板（跨服务/新增表/复杂事务场景） |
 | `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板（仅完整模版需要） |

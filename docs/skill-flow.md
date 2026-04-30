@@ -2,12 +2,13 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-30 v16.6**
+> **最后更新：2026-05-01 v16.7**
+> 变更摘要 v16.7：`solution-review-required` 增强反迎合与现有代码质量审视规则 —— 当用户要求按现有代码、云端逻辑、类似文件或具体方案直接实现时，AI 必须先分离目标与候选方案，评估现有代码是否值得参考；低质量旧结构只能作为事实材料提取业务规则，不能作为新实现模板扩散；风险明显时必须主动给出更优建议。该变更只补强节点文字与 FAQ，链路节点结构未变，按"轻微"处理未单独创建快照。
 > 变更摘要 v16.6：`bugfix-coding-style` 方向反转 —— 之前的 A 类（`[DEPRECATED YYYY-MM-DD]` + 注释保留旧代码）/ B 类（`[ADDED YYYY-MM-DD]` 头注释）规则全部废止；改为禁止把变更历史写进源码（`[BUGFIX]` / 日期标记 / PR 引用 / 注释保留旧代码全部禁止），变更原因归 git log / commit message / bug 文档，源码内只保留对当下读者有价值的 WHY 注释且优先上提到方法 / 类 doc comment；适用范围扩展到所有源码改动（不限联调期）；遇到旧 `[DEPRECATED]` / `[ADDED]` 标记可在改同段代码时顺手清理。FAQ 中的相关问答同步调整（规则方向反转，但流程节点结构未变，按"轻微"处理未单独创建快照）。
 > 变更摘要 v16.5：`korepos-backend-service` 新增「外部调用前的边界兜底校验」健壮性硬规则 —— service 调云端 HTTP / 跨子门面 / POS 硬件协议前，凡传给对方的金额/数量/配额等业务数值，若本地 DB 有可查的上限/边界，必须用 DB 实读值兜底校验，不信任入参或前序内存对象；校验抽 `_assertXxxWithinBound` 私有方法；金额比较加 ±0.005 浮点容差。Step 5 强制规则、自检清单、禁区表均同步追加（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.4：`daily-work-log` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`，与 `bug-doc-required` / `design-doc-required` / `doc-index-required` 完全对齐；项目内 `docs/work-log/` 与 `.gitignore` 兜底节降级为"用户明确指定路径"分支（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.3：`bug-doc-required` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，与 `design-doc-required` / `doc-index-required` 一致；项目内 `docs/bug/` 降级为"用户明确指定路径或上传终版"分支；流程图分叉、红色警告与"各文档类型与用途"表同步调整（轻微规则补充，未单独创建快照）。
-> 上一版：v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
+> 上一版：v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
 > 再上一版：v15（2026-04-27）；v14（2026-04-27）；v13（2026-04-27）；v12（2026-04-27）；v11（2026-04-27）；v10（2026-04-27）；v9（2026-04-26）；v8（2026-04-25）；v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
 > 历史版本：`docs/skill-flow-20260427-v15.md`（v15）、`docs/skill-flow-20260427-v14.md`（v14）、`docs/skill-flow-20260427-v13.md`（v13）、`docs/skill-flow-20260427-v12.md`（v12）、`docs/skill-flow-20260427-v11.md`（v11）、`docs/skill-flow-20260427-v10.md`（v10）、`docs/skill-flow-20260427-v9.md`（v9）、`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
@@ -29,7 +30,7 @@
 | `brainstorming` | superpowers | 任何功能创建、组件构建、行为改动前 |
 | `writing-plans` | superpowers | 有 spec 或需求时，制定多步实施计划 |
 | `systematic-debugging` | superpowers | 遇到 bug、测试失败、异常行为时 |
-| `solution-review-required` | team-standards | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径直接改时，先审视目标、风险和更优方案 |
+| `solution-review-required` | team-standards | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时，先审视目标、现有代码质量、风险和更优方案 |
 | `design-doc-required` | team-standards | 写任何实现代码前，或被要求提供修复方案/实施方案时（新功能和 bug 修复均适用）；**任何源码 Edit/Write 请求（含「根据文档改代码」「帮我改一下」等）也必须先触发** |
 | `doc-index-required` | team-standards | **(辅助)** 创建任何 Markdown 文档前先确定输出路径；AI 生成 Markdown 默认写用户 Documents 下的 `ai-docs/{project}/`，仅用户指定 `docs/` 路径时更新索引 |
 | `backend-knowledge-graph-required` | team-standards | Java 后端单服务需求分析前读取 `docs/knowledge-graph/backend/`；生成/更新后端图谱；会话事实自动候选沉淀，确认或代码验证后整理进正式图谱 |
@@ -262,7 +263,9 @@ flowchart LR
 
 | 困惑 | 答案 |
 |---|---|
-| 什么时候要先调用 solution-review-required? | 用户已经给出具体方案、目录策略、架构路径或要求“按这个回复实施”时先调用。它先判断真实目标、风险和更优做法，再进入设计文档或编码流程。 |
+| 什么时候要先调用 solution-review-required? | 用户已经给出具体方案、目录策略、架构路径、现有代码参考或要求“按这个回复实施”时先调用。它先判断真实目标、现有代码质量、风险和更优做法，再进入设计文档或编码流程。 |
+| 用户要求“参考现有代码照着写”时可以直接抄吗? | 不可以默认抄。现有代码只能作为事实材料，必须先判断它是否符合当前架构、分层、状态机、数据一致性和测试约束。质量差的旧代码只能提取业务规则，不能作为新实现模板继续扩散。 |
+| 用户没问更优方案时，AI 要主动提吗? | 要。`solution-review-required` 的核心职责就是反迎合：当用户方案或现有代码惯性存在明显风险时，必须主动指出问题，并给出更简单、更安全或更可维护的建议。 |
 | 后端知识图谱会因为会话里反复提到就自动更新吗? | 会自动记录到用户目录候选池，避免遗漏；但不会无条件写入正式图谱。只有用户明确要求归档、代码/DDL/枚举/接口契约验证过，或本次后端代码变更影响了 API、Service、表、枚举、状态流转等，才整理进正式图谱。 |
 | backend-knowledge-graph-required 管哪些范围? | 只管 Java 后端单服务。沉淀领域能力、原子能力、流程、表、枚举、API、外部依赖和代码坐标；前端、Flutter、跨项目拓扑不放进这个 skill。 |
 | 多项目知识图谱还要整理什么? | 不做各服务内部能力的重复沉淀，主要记录服务间调用关系、入口契约、关键业务对象、数据归属、失败传播和幂等补偿边界；具体跨项目链路由 `cross-project-locator` 负责。 |
