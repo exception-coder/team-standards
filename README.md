@@ -25,6 +25,64 @@
 | GitLab（主仓） | `https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git` | 日常维护与分发 |
 | GitHub（镜像） | `https://github.com/exception-coder/team-standards` | 仅作镜像备份 |
 
+## 项目结构
+
+```text
+team-standards/
+  .claude-plugin/       Claude Code 插件元数据与 marketplace 配置
+  .codex-plugin/        Codex 插件元数据
+  skills/               各个 Skill 的规则、模板和辅助资料
+  hooks/                可选 Hook 脚本，用于更强的写入前校验
+  docs/                 插件维护文档、skill-flow 链路图、历史快照和决策日志
+  AGENTS.md             Codex 入口规范，定义主动触发规则和 Skill 索引
+  CLAUDE.md             Claude 入口规范，定义主动触发规则和 Skill 索引
+  README.md             对外安装、使用、维护说明
+```
+
+### 顶层目录
+
+| 路径 | 作用 | 维护要点 |
+|------|------|----------|
+| `.claude-plugin/` | Claude Code 插件声明目录，包含插件版本、展示信息和 marketplace 条目 | 发布前必须同步递增 `plugin.json` 与 `marketplace.json` 的 `version` |
+| `.codex-plugin/` | Codex 插件声明目录，包含 Codex 侧插件元数据 | 维护 Codex 分发时同步递增 `plugin.json` 的 `version` |
+| `skills/` | 插件核心目录，每个子目录是一个独立 Skill，至少包含 `SKILL.md` | 新增或修改 Skill 后，同步更新 `AGENTS.md`、`CLAUDE.md`、README 的 Skills 表和 `docs/skill-flow.md` |
+| `hooks/` | 可选强制拦截脚本目录，目前用于设计文档门禁检查 | 默认禁用；需要脚本级拦截时再启用 `hooks.json` 中对应平台配置 |
+| `docs/` | 维护文档目录，记录 Skill 链路、历史版本、配置机制和决策型变更背景 | 链路结构变化时更新 `skill-flow.md` 并创建版本快照 |
+
+### 关键文件
+
+| 文件 | 作用 | 什么时候改 |
+|------|------|------------|
+| `AGENTS.md` | Codex 读取的插件开发规范入口，包含 Skill 主动触发表、Skill 索引、维护规则 | Skill 覆盖范围、触发条件、辅助资源或维护规则变化时 |
+| `CLAUDE.md` | Claude Code 读取的插件开发规范入口，内容与 `AGENTS.md` 保持同类同步 | 与 `AGENTS.md` 同步维护，避免两个入口规则不一致 |
+| `README.md` | 面向使用者和维护者的安装、升级、结构和能力说明 | 对外说明、安装方式、Skills 总览、发版规则变化时 |
+| `docs/skill-flow.md` | Skill 调用链路全景图，解释什么时候调哪个 Skill、顺序是什么 | Skill 新增/删除、触发顺序、维护链路或 FAQ 变化时 |
+| `docs/skill-flow-*.md` | `skill-flow.md` 的历史快照 | 链路节点或连线发生结构性变化时创建 |
+| `docs/dev-log/YYYY-MM-DD.md` | 决策型变更日志，只记录长期背景 | 新增/删除 Skill、规则方向反转、触发链路变化、重大团队原则沉淀时 |
+| `hooks/hooks.json` | Hook 注册配置，控制是否启用写入前脚本校验 | 需要启用或调整 Hook 时 |
+| `hooks/check-design-doc.cmd` | Windows 设计文档检查脚本 | 调整 Windows 下的强制门禁逻辑时 |
+| `hooks/check-design-doc.sh` | macOS/Linux 设计文档检查脚本 | 调整 Unix 系统下的强制门禁逻辑时 |
+| `.claude-plugin/plugin.json` | Claude 插件基础元数据 | 每次发布前递增版本 |
+| `.claude-plugin/marketplace.json` | Claude marketplace 入口 | 每次发布前与 `.claude-plugin/plugin.json` 保持版本一致 |
+| `.codex-plugin/plugin.json` | Codex 插件基础元数据 | 每次发布前递增版本 |
+
+### Skill 目录约定
+
+每个 Skill 使用独立目录：
+
+```text
+skills/
+  {skill-name}/
+    SKILL.md              必须存在，定义触发时机、执行流程、红线
+    *.md                  可选模板、参考资料或辅助说明
+```
+
+维护 Skill 时遵循三条原则：
+
+1. `SKILL.md` 的 frontmatter `name` 必须与目录名一致。
+2. 新增或修改 Skill 覆盖范围后，必须同步 `AGENTS.md`、`CLAUDE.md` 的 Skill 索引。
+3. 若影响触发链路或调用顺序，必须同步 `docs/skill-flow.md`；链路结构变化时创建 `docs/skill-flow-{YYYYMMDD}-v{N}.md` 快照。
+
 ## 安装
 
 在 Claude Code 中依次执行以下三步：
@@ -148,8 +206,8 @@ Hook 脚本：Windows 使用 `hooks/check-design-doc.cmd`，macOS/Linux 使用 `
 
 `git-commit-standards` Skill 会自动读取署名配置。在你的全局 `~/.claude/CLAUDE.md` 中添加：
 
-```markdown
-## Git 提交署名
+```text
+Git 提交署名
 Author: 你的姓名 <你的邮箱>
 ```
 
