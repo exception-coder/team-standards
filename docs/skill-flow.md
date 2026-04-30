@@ -2,7 +2,8 @@
 
 > 本文档梳理 team-standards 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-05-01 v18**
+> **最后更新：2026-05-01 v18.1**
+> 变更摘要 v18.1：`architecture-ddd-lite-fullstack` 补充结构质量门禁 —— 编码前不仅判断分层、Feature、原子能力，也必须判断代码结构是否清晰、易维护、低耦合、高内聚；新增实现不得为了快速完成而复制低质量旧结构或制造职责混杂、难测、难替换的代码。该变更只补强节点文字与 Skill 规则，链路节点结构未变，按"轻微"处理未单独创建快照。
 > 变更摘要 v18：移除 `superpowers` 外部 Skill 引用 —— `brainstorming`、`writing-plans`、`systematic-debugging`、`test-driven-development`、`verification-before-completion`、`requesting-code-review`、`finishing-a-development-branch` 不属于当前 team-standards 插件工程，已从 Skill 总览和主链路 Mermaid 图中删除，避免维护者误以为本插件依赖外部插件。链路结构发生变化，创建 v18 快照。
 > 变更摘要 v17：`dev-log` 触发范围收窄为“决策型变更” —— git commit body 作为默认变更日志，普通小改、措辞同步、版本号递增不再写 `docs/dev-log/`；仅新增/删除 Skill、触发时机或核心行为变化、规则方向反转、跨 Skill 链路变化、重大团队原则沉淀等需要长期追溯背景的变更才写 dev-log。team-standards 维护链路新增 dev-log 判定分支，属于链路节点结构变化，创建 v17 快照。
 > 变更摘要 v16.7：`solution-review-required` 增强反迎合与现有代码质量审视规则 —— 当用户要求按现有代码、云端逻辑、类似文件或具体方案直接实现时，AI 必须先分离目标与候选方案，评估现有代码是否值得参考；低质量旧结构只能作为事实材料提取业务规则，不能作为新实现模板扩散；风险明显时必须主动给出更优建议。该变更只补强节点文字与 FAQ，链路节点结构未变，按"轻微"处理未单独创建快照。
@@ -10,7 +11,7 @@
 > 变更摘要 v16.5：`korepos-backend-service` 新增「外部调用前的边界兜底校验」健壮性硬规则 —— service 调云端 HTTP / 跨子门面 / POS 硬件协议前，凡传给对方的金额/数量/配额等业务数值，若本地 DB 有可查的上限/边界，必须用 DB 实读值兜底校验，不信任入参或前序内存对象；校验抽 `_assertXxxWithinBound` 私有方法；金额比较加 ±0.005 浮点容差。Step 5 强制规则、自检清单、禁区表均同步追加（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.4：`daily-work-log` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`，与 `bug-doc-required` / `design-doc-required` / `doc-index-required` 完全对齐；项目内 `docs/work-log/` 与 `.gitignore` 兜底节降级为"用户明确指定路径"分支（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.3：`bug-doc-required` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，与 `design-doc-required` / `doc-index-required` 一致；项目内 `docs/bug/` 降级为"用户明确指定路径或上传终版"分支；流程图分叉、红色警告与"各文档类型与用途"表同步调整（轻微规则补充，未单独创建快照）。
-> 上一版：v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
+> 上一版：v18（2026-05-01）；v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
 > 再上一版：v15（2026-04-27）；v14（2026-04-27）；v13（2026-04-27）；v12（2026-04-27）；v11（2026-04-27）；v10（2026-04-27）；v9（2026-04-26）；v8（2026-04-25）；v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
 > 历史版本：`docs/skill-flow-20260501-v18.md`（v18）、`docs/skill-flow-20260501-v17.md`（v17）、`docs/skill-flow-20260427-v15.md`（v15）、`docs/skill-flow-20260427-v14.md`（v14）、`docs/skill-flow-20260427-v13.md`（v13）、`docs/skill-flow-20260427-v12.md`（v12）、`docs/skill-flow-20260427-v11.md`（v11）、`docs/skill-flow-20260427-v10.md`（v10）、`docs/skill-flow-20260427-v9.md`（v9）、`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
@@ -35,7 +36,7 @@
 | `backend-knowledge-graph-required` | team-standards | Java 后端单服务需求分析前读取 `docs/knowledge-graph/backend/`；生成/更新后端图谱；会话事实自动候选沉淀，确认或代码验证后整理进正式图谱 |
 | `bug-doc-required` | team-standards | 编写 bug 分析文档时；完成后必须继续调用 design-doc-required 写修复实施方案 |
 | `pre-implementation-code-orientation` | team-standards | 文档写完后、开始实施代码前（含「帮我修改代码」「改代码」等直接编码请求） |
-| `architecture-ddd-lite-fullstack` | team-standards | 编写或审查 Java / React / Vue / Flutter 业务代码前；在实施前代码定位后，先判断 Feature、分层、单向依赖与原子能力 |
+| `architecture-ddd-lite-fullstack` | team-standards | 编写或审查 Java / React / Vue / Flutter 业务代码前；在实施前代码定位后，先判断 Feature、分层、单向依赖、原子能力与结构质量（清晰、易维护、低耦合、高内聚） |
 | `java-coding-standards` | team-standards | 编写或修改任何 Java 代码时（自动应用） |
 | `git-commit-standards` | team-standards | 执行 git commit / push 前；仅在当前仓库就是 team-standards 插件源码仓库且插件自身变更完成后自动 stage、commit、push |
 | `dev-log` | team-standards | 对 team-standards 做决策型变更后：新增/删除 Skill、触发时机或核心行为变化、规则方向反转、跨 Skill 链路变化、重大团队原则沉淀；普通小改只写 commit body |
@@ -73,7 +74,7 @@ flowchart TD
 
     %% 实施层
     PICO["pre-implementation-code-orientation\n从文档提取代码坐标"]
-    ARCH["architecture-ddd-lite-fullstack\n编码前默认架构规则\nDDD-lite + Feature + 原子能力"]
+    ARCH["architecture-ddd-lite-fullstack\n编码前默认架构规则\nDDD-lite + Feature + 原子能力 + 结构质量"]
     JCS["java-coding-standards\n编写代码"]
 
     %% 收尾层
@@ -139,7 +140,7 @@ flowchart TD
     DDR -- "需求变更" --> NEWVER["新建版本文档\n{需求名}-{日期}-v{N+1}.md\n同步更新 coding.md（仅完整模版）"]
     NEWVER --> ORIENT
 
-    ORIENT --> ARCH["architecture-ddd-lite-fullstack\n编码前判断 Feature / 分层 / 原子能力"]
+    ORIENT --> ARCH["architecture-ddd-lite-fullstack\n编码前判断 Feature / 分层 / 原子能力 / 结构质量"]
     ARCH --> CODE["java-coding-standards\n按规范实现代码"]
     CODE --> COMMIT["git-commit-standards\n分析 diff 生成规范提交信息"]
 ```
@@ -276,8 +277,8 @@ flowchart LR
 | AI 速查索引和 coding.md 有什么区别? | AI 速查索引是对**现有代码**的紧凑索引（文件/方法/调用链/表操作），coding.md 是对**设计方案**的编码摘要（接口契约/类清单/业务规则）。前者面向理解，后者面向实施。 |
 | init-project-docs 的 4 个 Phase 必须全部执行吗? | 不必须。Phase 1-2 是核心（全自动），Phase 3-4 可选。可以只运行 Phase 1-2 快速建立基础知识图谱，后续按需补充。 |
 | project-docs-update 和 init-project-docs 的区别? | init-project-docs 是**从零构建**知识图谱（首次使用），project-docs-update 是**增量维护**（代码变更后同步文档）。前者生成，后者更新。 |
-| architecture-ddd-lite-fullstack 什么时候调? | 设计文档和代码定位完成后、第一行业务源码改动前。它是默认架构门禁：先判断 Feature、Presentation/Application/Domain/Repository/Infrastructure 分层、调用方向和原子能力，再写代码。 |
-| architecture-ddd-lite-fullstack 和 java-coding-standards 的区别? | architecture-ddd-lite-fullstack 管**代码放哪一层、依赖方向、业务能力怎么复用**；java-coding-standards 管 **Java 代码质量**（命名、格式、异常、集合、日志等）。先分层，再写具体语言代码。 |
+| architecture-ddd-lite-fullstack 什么时候调? | 设计文档和代码定位完成后、第一行业务源码改动前。它是默认架构门禁：先判断 Feature、Presentation/Application/Domain/Repository/Infrastructure 分层、调用方向、原子能力和结构质量（清晰、易维护、低耦合、高内聚），再写代码。 |
+| architecture-ddd-lite-fullstack 和 java-coding-standards 的区别? | architecture-ddd-lite-fullstack 管**代码放哪一层、依赖方向、业务能力怎么复用、结构是否清晰易维护且低耦合高内聚**；java-coding-standards 管 **Java 代码质量**（命名、格式、异常、集合、日志等）。先分层和结构设计，再写具体语言代码。 |
 | arch-lint 和 java-coding-standards 的区别? | arch-lint 检测 **Flutter 架构分层**违规（presentation 层写 SQL 等跨层问题），java-coding-standards 检测 **Java 代码**质量（命名/格式/异常处理等）。一个管分层，一个管编码。 |
 | Phase 3-4 的自动模式和确认模式怎么选? | 自动模式：AI 尽力推断后生成，标注"需人工校验"，适合快速产出初稿。确认模式：逐份展示等用户确认，适合对准确度要求高的场景。 |
 | Step 0 知识图谱预热是什么? | 在 design-doc-required / bug-doc-required 执行前，先读 `00_project_overview.md` 获取全局索引，再按 AI 上下文路由表加载当前任务类型对应的 2-3 份文档。避免全量扫码，按需获取上下文。 |

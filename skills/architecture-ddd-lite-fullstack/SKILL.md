@@ -1,15 +1,17 @@
 ---
 name: architecture-ddd-lite-fullstack
-description: "Use before writing or reviewing any business code in Java Spring Boot/Spring Cloud, React, Vue, or Flutter. MUST be invoked after design/pre-implementation orientation and before the first source-code edit to decide the target layer, feature module, and reusable atomic capability. Enforces DDD-lite layering, feature-based structure, one-way dependencies, and prevents business logic from being written directly in Controller/UI/Page."
+description: "Use before writing or reviewing any business code in Java Spring Boot/Spring Cloud, React, Vue, or Flutter. MUST be invoked after design/pre-implementation orientation and before the first source-code edit to decide the target layer, feature module, reusable atomic capability, and maintainability boundaries. Enforces DDD-lite layering, feature-based structure, one-way dependencies, clear code structure, low coupling, high cohesion, and prevents business logic from being written directly in Controller/UI/Page."
 ---
 
 # DDD-lite 全栈架构编码规范
 
 ## 核心哲学
 
-该项目采用 DDD-lite + Feature 模块化架构，目标是：高内聚、低耦合、可复用、可扩展、适合 AI 协作开发。
+该项目采用 DDD-lite + Feature 模块化架构，目标是：代码结构清晰、易于维护、低耦合、高内聚、可复用、可扩展、适合 AI 协作开发。
 
 任何业务代码，必须先判断属于哪一层，再实现；不允许直接写在 Controller / UI / Page 中。
+
+清晰结构不是“代码写完后再优化”的附加项，而是第一行代码前的门禁。AI 不得为了快速完成而新增难读、难测、难替换、职责混杂的实现。
 
 ---
 
@@ -17,7 +19,7 @@ description: "Use before writing or reviewing any business code in Java Spring B
 
 - **触发与门禁** → [触发时机](#触发时机) / [编码前检查清单](#编码前检查清单) / [输出要求](#输出要求)
 - **架构分层** → [标准分层模型](#标准分层模型) / [各层职责](#各层职责)
-- **项目组织** → [Feature 模块化结构](#feature-模块化结构) / [原子能力沉淀](#原子能力沉淀)
+- **项目组织** → [Feature 模块化结构](#feature-模块化结构) / [原子能力沉淀](#原子能力沉淀) / [结构质量门禁](#结构质量门禁)
 - **技术栈约束** → [前端约束](#前端约束) / [Flutter 约束](#flutter-约束) / [Java 后端约束](#java-后端约束)
 
 ---
@@ -33,6 +35,7 @@ description: "Use before writing or reviewing any business code in Java Spring B
 | 新增接口、页面、UseCase、Service、Repository、DAO、HTTP Client | 明确职责边界和调用链 |
 | 重构现有业务逻辑 | 先识别现有逻辑应沉到 Application / Domain / Infrastructure 的哪一层 |
 | 代码审查发现跨层调用、巨型 Service、重复业务逻辑 | 用本规范判定违规类型 |
+| 代码实现可能继续沿用低质量旧结构 | 先判断是否会增加耦合、职责混杂或维护成本 |
 
 ---
 
@@ -189,6 +192,50 @@ RefundService
 
 ---
 
+## 结构质量门禁
+
+所有业务代码在实现前必须满足以下结构质量要求。若无法满足，必须先调整设计或拆分实现，不能带着明显结构债继续编码。
+
+### 代码结构清晰
+
+- 文件、类、方法命名必须能表达业务意图，而不是技术动作堆叠。
+- 一个文件只承载一个清晰职责；超过一个职责时拆分到 UseCase、Domain Rule、Repository 或 Adapter。
+- 方法应围绕一个步骤或一个业务判断，复杂流程拆成有语义的私有方法或原子能力。
+- 新增代码必须能从目录位置看出所属 feature、层级和责任边界。
+
+### 易于维护
+
+- 新逻辑必须有明确变更点，避免把多个不相关规则揉在同一个 if/else 或 switch 中。
+- 未来新增同类规则时，应能通过新增策略、规则、原子能力或配置扩展，而不是修改多个分散位置。
+- 对外契约、领域规则、技术适配必须分开，避免一个改动牵动 UI、DB、HTTP 和业务规则多处联动。
+- 不为了一次性需求复制旧代码；若复用旧逻辑，应先判断是否需要提取公共能力。
+
+### 低耦合
+
+- 上层依赖抽象和业务语义，不依赖下层实现细节。
+- 跨 feature 调用必须通过公开能力、Application Service、Repository 抽象或明确的端口，不直接 import 对方内部实现。
+- DTO、Entity、ViewModel、DB Model 不得无边界混用；跨层传递时必须做转换或隔离。
+- 外部系统、设备、DB、缓存、文件、HTTP Client 必须隔离在 Infrastructure / Adapter，不得渗透到 Domain / UI。
+
+### 高内聚
+
+- 同一业务能力的状态判断、金额计算、幂等规则、表操作约束应集中在同一能力边界内。
+- 一个 Service / UseCase 围绕一个业务流程或能力，不把多个业务场景塞进同一个类。
+- 通用原子能力集中沉淀，禁止多个页面、接口、UseCase 各自维护一份类似规则。
+- 状态机、动作规范、表操作矩阵等核心业务模型优先集中表达，禁止散落在 UI 判断或临时 SQL 条件里。
+
+### 禁止行为
+
+| 禁止行为 | 正确处理 |
+|----------|----------|
+| 为了快，直接复制一个相似文件再改几行 | 先识别可复用能力，必要时抽象公共能力或拆分职责 |
+| 一个方法同时处理参数适配、业务判断、SQL、HTTP、日志流水 | 按 Presentation / Application / Domain / Infrastructure 拆分 |
+| 为了少建文件，把多个业务场景塞进一个 Service | 按 UseCase 或原子能力拆分，保持单一职责 |
+| 上层直接依赖 DAO / HTTP Client / 其它 feature 内部类 | 通过 Repository、Application Service 或能力端口隔离 |
+| 继续沿用低质量旧结构，只因为项目里已有类似写法 | 先评估现有代码质量；差结构只能提取业务事实，不能扩散 |
+
+---
+
 ## 前端约束
 
 适用于 React / Vue。
@@ -297,6 +344,10 @@ Infrastructure Mapper / Client / MQ Adapter
 - [ ] 可复用业务能力是否已沉淀为原子能力。
 - [ ] 是否复用了已有原子能力，而不是重复实现。
 - [ ] 是否避免新增巨型 Service。
+- [ ] 代码结构是否清晰，文件/类/方法职责是否单一。
+- [ ] 新增实现是否易于维护，未来规则扩展是否有稳定落点。
+- [ ] 是否保持低耦合，避免跨层、跨 feature 直接依赖内部实现。
+- [ ] 是否保持高内聚，同一业务能力的规则和状态处理是否集中表达。
 - [ ] 生成代码时能说明每个类/文件属于哪一层。
 
 ---
@@ -314,6 +365,7 @@ Infrastructure Mapper / Client / MQ Adapter
 - Repository：{是否涉及，文件/类}
 - Infrastructure：{是否涉及，文件/类}
 - 原子能力复用/新增：{说明}
+- 结构质量：{清晰性 / 可维护性 / 低耦合 / 高内聚判断}
 ```
 
 如果无法判断层级，必须先读取项目结构或设计文档；仍无法判断时，向用户确认，不得直接把逻辑写进 UI / Controller。
@@ -330,3 +382,5 @@ Infrastructure Mapper / Client / MQ Adapter
 | "多个 UseCase 复制一段计算逻辑" | 抽成原子能力并补测试 |
 | "Domain 里注入 HTTP Client / Mapper" | Domain 保持纯业务，技术依赖放 Infrastructure |
 | "一个 Service 什么都管" | 按 UseCase / 原子能力拆分，职责单一 |
+| "先能跑，结构以后再说" | 结构质量是编码前门禁，先拆职责和依赖边界再写 |
+| "复制旧实现最快" | 先判断旧实现是否值得参考；低质量旧结构不能扩散 |
