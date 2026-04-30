@@ -99,7 +99,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `arch-lint` | Flutter 架构检查时 | 检测 5 类架构违规（presentation 层 SQL/HTTP、domain 层框架依赖、金额 double、DAO 越层调用） |
 | `cross-project-locator` | 跨项目（≥2 个 kpay POS 工程）定位 / 排查 / 登记拓扑知识时 | 路由到 `kpay-pos-topology/` 仓库：查询模式按业务域/工程名读 mapping 或 flows；登记模式拦截错误落盘位置，强制写入拓扑仓库 |
 | `daily-work-log` | 业务项目源码 Edit/Write 后 / 用户说「记一下工作日志」 / 会话结束前 | 按 🐛 Bug 修复 vs ✨ 功能开发 写入 `docs/work-log/{YYYY-MM-DD}.md`；同主题合并；一行一条明细；累计预估工时；与 `dev-log`（team-standards 内部）分工互补 |
-| `dev-log` | 任何 skill 或配置变更后 | 在 `docs/dev-log/` 下记录变更原因和改动内容 |
+| `dev-log` | team-standards 决策型变更后 | 仅记录新增/删除 Skill、触发链路变化、规则方向反转、重大团队原则等长期背景；普通小改和版本号递增写清楚 git commit body 即可 |
 
 ## 设计文档模板
 

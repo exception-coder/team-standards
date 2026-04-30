@@ -30,7 +30,7 @@
 | Flutter 代码架构违规检查 | `arch-lint` |
 | **跨项目定位 / 排查 / 调用链追踪（涉及 ≥2 个 kpay POS 生态工程）** | `cross-project-locator`（查询模式） |
 | **即将写同时提到 ≥2 个 kpay POS 工程名的 markdown（对照 / 流程 / 数据流）** | `cross-project-locator`（登记模式） |
-| 本次会话对 team-standards 有任何变更 | `dev-log`（会话结束前） |
+| 本次会话对 team-standards 做了决策型变更（新增/删除 Skill、触发时机或核心行为变化、规则方向反转、跨 Skill 链路变化、重大团队原则沉淀） | `dev-log`（会话结束前；普通小改只写 commit body） |
 | **当前 git 仓库就是 team-standards 插件源码仓库，且插件自身变更完成后工作区存在未提交变更** | `git-commit-standards`（自动 stage / commit / push） |
 | **业务项目源码有 Edit/Write 改动，或用户说「记一下工作日志」「记录一下」** | `daily-work-log` |
 | **会话结束前若本会话有业务项目源码改动未登记** | `daily-work-log`（强制回补） |
@@ -56,7 +56,7 @@
 | `backend-knowledge-graph-required` | `skills/backend-knowledge-graph-required/` | Java 后端单服务知识图谱：按项目沉淀领域能力、原子能力、流程、表、枚举、API、外部依赖与代码坐标；需求分析前优先读取图谱；会话中反复提及的后端业务事实自动进入用户目录候选池，确认或代码验证后才更新正式图谱 | Java后端、知识图谱、单服务、候选沉淀、领域能力、原子能力、表、枚举、状态流转、ER图、API、Service |
 | `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；核心流程必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）；根因必须用表格；**默认输出路径走用户文档目录** `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，与 `design-doc-required` / `doc-index-required` 对齐，不直接写项目 `docs/bug/`；仅当用户明确指定项目内路径或要求"上传终版"时才进入 `docs/bug/` 并按模块分组（对齐 `docs/design/{模块名}/`，三级结构 `docs/bug/{模块名}/{bug名称}/{bug名称}.md`）；目录与文件名使用**中文**命名 | bug、缺陷、问题分析、bug文档、OOM、异常、模块分组、中文命名、用户目录、Documents、终版文档 |
 | `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
-| `dev-log` | `skills/dev-log/` | 每次对 team-standards 有变更时记录开发日志；在 docs/dev-log/ 下按日期创建日志文件 | 开发日志、变更记录、skill 修改、发版记录 |
+| `dev-log` | `skills/dev-log/` | team-standards 决策型变更日志：仅记录新增/删除 Skill、触发时机或核心行为变化、规则方向反转、跨 Skill 链路变化、重大团队原则沉淀；普通小改、措辞同步、版本号递增默认由 git commit body 记录，不再写 dev-log | 开发日志、决策记录、重大规则、触发链路、规则方向反转、skill 修改、发版记录 |
 | `init-project-docs` | `skills/init-project-docs/` | 渐进式构建项目知识图谱：Phase 1 核心文档（概要+架构+约束）→ Phase 2 映射文档（模块+数据模型+API+前后端映射+开发参考）→ Phase 3 流程与术语（业务流程+术语表+重构计划+变更记录）→ Phase 4 模块深度文档+技能卡；支持自动/确认两种模式 | 初始化项目文档、生成知识图谱、分析项目能力、生成项目概要、架构分析、init project docs、knowledge graph |
 | `generate-project-profile` | `skills/generate-project-profile/` | 生成 AI Agent 消费的项目画像（project-profile.md）：10 维度结构化 Markdown，可独立向量化分片；覆盖项目概述、技术栈、结构、架构、数据模型、Service 能力、API 接口、外部依赖、配置、编码约定 | 项目画像、project profile、代码感知、扫描项目、AI 上下文、generate profile |
 | `coding-violation-log` | `skills/coding-violation-log/` | 用户纠正编码错误时自动登记到 `docs/coding-violations.md`；编码前自动回顾已登记的违规记录，防止重犯 | 编码违规、纠正、分层违规、依赖方向、命名错误、规范错误、coding violation |

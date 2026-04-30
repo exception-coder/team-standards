@@ -1,15 +1,45 @@
 ---
 name: dev-log
-description: Use when any skill, configuration, or team-standards file is added, modified, or deleted in this session. Must invoke before ending a session that contains changes, to record what changed and why.
+description: Use only for decision-level team-standards changes: adding/removing a Skill, changing a Skill's trigger timing or core behavior, reversing a rule direction, introducing a new template/workflow, changing cross-skill flow structure, or recording a multi-step design decision whose rationale may not be obvious from git history. Do NOT use for ordinary wording tweaks, README/index synchronization, version bumps, typo fixes, or small iterative rule clarifications when the git commit body can carry the rationale.
 ---
 
 # 开发日志记录规范
 
 ## 核心原则
 
-**每次对 team-standards 的变更（新增 Skill、修改规则、调整配置、发版）必须在当天的开发日志中留下记录。**
+**`git commit` 是默认变更日志；`dev-log` 只记录决策型变更。**
 
-日志是变更的溯源依据，记录"为什么改"比记录"改了什么"更重要。
+普通的小变更、迭代、措辞调整、索引同步、版本号递增，必须写清楚 commit body，但不需要再写 `docs/dev-log/`，避免同一件事记录两遍。
+
+`dev-log` 的价值是补充 git diff 和 commit body 不容易完整表达的背景：为什么引入这条规则、为什么推翻旧方向、为什么选择这个链路或 Skill 边界。
+
+---
+
+## 触发边界
+
+### 必须写 dev-log
+
+- 新增、删除或重命名 Skill
+- 修改 Skill 的触发时机、核心行为、硬门禁或红线
+- 推翻旧规则或发生方向反转
+- 新增模板、文档链路、跨 Skill 调用关系或维护流程
+- 多轮讨论沉淀出的团队原则、架构原则、协作规则
+- 影响团队成员日常使用方式的规则变化
+
+### 不需要写 dev-log
+
+- README / AGENTS / CLAUDE / skill-flow 的同步措辞调整
+- typo、格式、表格文案、示例补充
+- 插件版本号递增本身
+- 小范围规则澄清，commit body 已经能说明背景
+- 单纯把已存在的规则同步到另一个入口文件
+
+### 判断口诀
+
+```text
+commit body 记录“这次为什么改”。
+dev-log 只记录“这个规则为什么存在”。
+```
 
 ---
 
@@ -31,7 +61,9 @@ docs/dev-log/
 
 ```mermaid
 flowchart TD
-    A(["收到变更记录任务\n或会话即将结束"]) --> B["确认今天日期\nYYYY-MM-DD"]
+    A(["完成 team-standards 变更"]) --> GATE{"是否决策型变更?"}
+    GATE -->|"否"| SKIP["只写清楚 commit body\n不写 dev-log"]
+    GATE -->|"是"| B["确认今天日期\nYYYY-MM-DD"]
     B --> C{"docs/dev-log/YYYY-MM-DD.md\n是否存在?"}
     C -->|"否"| D["新建文件\n写入文件头"]
     C -->|"是"| E["读取文件末尾\n确认追加位置"]
@@ -73,9 +105,10 @@ flowchart TD
 | `新增 Skill` | 在 skills/ 下新建了 SKILL.md |
 | `修改 Skill` | 修改了已有 SKILL.md 的内容 |
 | `新增模板` | 在 skill 目录下新增了辅助模板文件 |
-| `修改配置` | 修改了 CLAUDE.md、plugin.json、marketplace.json |
-| `发版` | 升级了 version 字段并 push |
+| `修改配置` | 修改了会影响插件行为或分发策略的配置 |
+| `发版` | 重大版本发布说明；普通 patch 版本号递增不单独记录 |
 | `修复规则` | 补充了某个 Skill 中的漏洞或错误描述 |
+| `调整流程` | 修改了跨 Skill 调用链路、触发顺序或维护流程 |
 
 ---
 
@@ -117,7 +150,8 @@ flowchart TD
 
 | 想法 | 正确处理 |
 |------|----------|
-| "改动很小，不用记" | 所有变更都要记，小改动日后更难追溯 |
-| "代码提交里有 commit message 了" | commit message 记录了改什么，日志记录了为什么改，两者互补 |
-| "下次再补" | 当场记录，细节最准确，延后记录信息失真 |
+| "所有变更都写 dev-log 更保险" | 错。普通小变更写好 commit body 即可，dev-log 只记录决策型背景 |
+| "代码提交里有 commit message 了，所以重大规则也不用 dev-log" | 重大规则仍要写 dev-log，记录规则存在的长期背景 |
+| "这次只是版本号递增，也写一条日志" | 版本号递增本身不写；只有伴随重大规则变化才写 |
+| "下次再补重大决策日志" | 决策型变更当场记录，延后记录信息失真 |
 | "时间不知道填什么" | 用当前时间估算即可，精确到分钟 |
