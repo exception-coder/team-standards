@@ -1,169 +1,136 @@
 ---
 name: bugfix-coding-style
-description: "Use when applying any bug fix, alignment correction, redundant-code removal, OR adding missing logic to align with upstream/cloud during integration/联调 phase. Trigger when: (1) design-doc-required has routed the change to 「第四·五步：轻量修订流水」 branch, (2) user describes the change as 'fix bug', 'align with cloud/upstream', 'add missing piece', '修 bug', '对齐云端', '删冗余', '修正实现', '改回正确逻辑', '补上漏掉的逻辑', '补缺漏', or (3) about to Edit/Write source code with intent of replacing existing erroneous logic OR adding alignment code that was missed in previous iterations. Two distinct sub-rules: (A) modifying/replacing existing code → comment-out-then-append; (B) adding pure new code that was missing → tag with `[ADDED YYYY-MM-DD]` header comment."
+description: "Use when applying any bug fix, alignment correction, redundant-code removal, OR adding missing logic to align with upstream/cloud during integration/联调 phase. Trigger when: (1) design-doc-required has routed the change to 「第四·五步：轻量修订流水」 branch, (2) user describes the change as 'fix bug', 'align with cloud/upstream', 'add missing piece', '修 bug', '对齐云端', '删冗余', '修正实现', '改回正确逻辑', '补上漏掉的逻辑', '补缺漏', or (3) about to Edit/Write source code with intent of replacing existing erroneous logic OR adding alignment code that was missed in previous iterations. Forbids in-source change-log comments and commented-out legacy code; requires WHY-only inline comments and pushes structural explanations into method/class doc comments."
 ---
 
-# 联调期 Bug 修复编码风格
+# Bug 修复 / 联调期编码风格
+
+> **本 skill 自 v1.17.0 起方向反转：禁止把变更历史写进代码内部，禁止保留注释式旧代码。** 之前版本要求的 `[DEPRECATED YYYY-MM-DD]` / `[ADDED YYYY-MM-DD]` / 注释保留旧代码段全部废止。变更历史归 git log / commit message / bug 文档 / 设计文档管，不入源码。
 
 ## 核心原则
 
-**联调期代码改动必须留下「为什么改」「原代码长什么样 / 为什么以前没有」的对照证据，禁止直接删除或无声新增。** 改动按性质分两类，分别有强制注释规范：
+**代码内只保留对当下读者有意义的"WHY 注释"，禁止任何形式的变更历史叙事。** 修改/替换/删除已有代码时直接覆盖，不留旧代码副本；新增对齐补丁时直接添加，不打补丁标记。
 
-| 改动性质 | 处理方式 | 注释标记 |
-|---------|---------|---------|
-| **A. 修改/替换/删除**已有错误代码 | 先 `//` 注释保留旧代码，紧接着追加新代码 | `[DEPRECATED YYYY-MM-DD]` |
-| **B. 新增**之前缺漏的对齐/补丁代码（无原代码可注释） | 直接添加新代码，但**必须**在新增代码块上方加头注释 | `[ADDED YYYY-MM-DD]` |
+| 类型 | 处理方式 |
+|------|---------|
+| 修改/替换/删除已有代码 | 直接改写。不要 `//` 注释保留旧实现，不要写 `[DEPRECATED]`/`[BUGFIX]`/`[FIXED YYYY-MM-DD]` 等标记。 |
+| 新增之前缺漏的对齐代码 | 直接添加。不要写 `[ADDED YYYY-MM-DD]`、不要写"对齐云端 XX 第 N 行"作为头注释，不要引用调整流水编号。 |
+| 必要的 WHY 注释 | **优先上提到方法 / 类的 doc comment**；只有当某行本身的逻辑非显然且无法在方法 doc 里讲清时，才在该行加单行注释。 |
 
-理由：联调期代码尚未稳定，留对照证据可作为：
+## 为什么反向
 
-- 快速回滚锚点（A 类注释一行恢复 / B 类删一段恢复）
-- code review 时的对照参照（reviewer 一眼看出"改了什么、为什么"或"为什么这里要新加一段"）
-- 跨端联调时的对话凭据（前后端讨论行为差异时直接指原代码或对齐依据）
+| 旧规则的初衷 | 实际产生的问题 |
+|-------------|---------------|
+| 留对照证据方便快速回滚 | git 本身就是回滚锚点，注释段反而和实际代码脱节、容易腐烂 |
+| code review 看"改了什么、为什么" | review 看 PR diff 即可；commit message + bug 文档讲"为什么"更准确 |
+| 跨端联调时直接指原代码作凭据 | 联调结论应沉淀到 bug 文档 / 设计文档，不应靠源码注释当临时白板 |
+| 让代码"留下故事" | 故事归 git history。源码每多一行噪声注释，下个读者多一份认知负担 |
 
-直接删除/无声新增会让上述三件事都困难，要么靠 git blame 跨多个 commit 翻历史，要么靠记忆复原，都不可靠。
+## 红线（任何情况下都不得出现在源码中）
 
----
+| 反例 | 原因 |
+|------|------|
+| `// [BUGFIX 2026-04-30] 旧实现用 transaction_no 反查...` | 变更日期/原因属于 git log，不属于代码 |
+| `// [DEPRECATED 2026-04-25] 这段以前是 X，现在改成 Y` | 完全属于 commit message |
+| `// [ADDED 2026-04-25] 对齐云端 RefundServiceImpl#handleX（L1063-1070）` | 对齐依据应放方法 doc comment 的"对齐云端"段（不带日期），或写进设计/bug 文档 |
+| 大段被 `//` 注释的旧代码 | 增加噪声、容易腐烂、git 已经留底 |
+| `// 详见 v6 调整流水 2026-04-25 条目` | 引用易失效；让读者跳到外部文档才能理解的代码不合格 |
+| `// PR #1234 / Issue #56 / Linear ticket KP-789` | 同上 |
+| `// TODO(zhangkai 2026-04): 这里以后再优化` | 带个人/日期的 TODO 也是噪声；要 TODO 就匿名写"待优化原因"，但更应该开任务 |
 
-## 适用范围
+## 推荐写法（WHY 注释只放有当下价值的）
 
-| 场景 | 是否适用 | 改动类型 | 处理方式 |
-|------|---------|---------|---------|
-| **联调期 bug 修复**（与云端/规范/上游不一致的修正） | ✅ 适用 | A | 注释保留 + 追加新代码 |
-| **删除明确无效的 if/else 分支** | ✅ 适用 | A | 注释保留整段 |
-| **方法体内逻辑修正**（不改签名） | ✅ 适用 | A | 注释保留原行 |
-| **补上原本缺漏的对齐代码**（如云端有、本地没搬过来） | ✅ 适用 | **B** | 加 `[ADDED]` 头注释 + 直接添加 |
-| **修复时同时做 A+B**（既删旧错误又补新缺漏） | ✅ 适用 | A+B | 两套规范分别应用，互不混淆 |
-| **新功能开发**（design-doc-required 走 vN+1） | ❌ 不适用 | — | 按新版本完整实现，不保留旧逻辑注释 |
-| **纯重命名 / IDE refactor**（变量名、import 排序） | ❌ 不适用 | — | 直接改 |
-| **测试代码 / 配置文件** | ❌ 不适用 | — | 直接改 |
-| **commit 已合并主干、确认稳定后的清理** | ❌ 不适用 | — | 由用户在 review 时主动要求 AI 清理 |
+允许且鼓励的注释形式：
 
----
+| 类型 | 例子 | 摆放位置 |
+|------|------|---------|
+| 方法/类承担的隐藏不变式 | "字段映射约定：POS 回调 outTradeNO 对应本地 out_trade_no 而非 transaction_no" | 方法/类 doc comment |
+| 与外部系统的字段语义对齐 | "对齐云端 PayV1ServiceImpl#refundOrderNotifyForKpayOffline" | 类 doc comment（不带日期/版本） |
+| 单行非显然的业务约束 | `// 加 ±0.005 浮点容差是为了让前端 toFixed(2) 与 Rust BigDecimal 的尾差不报错` | 该行上方 |
+| 对易误解参数的语义说明 | `/// [businessDate] 营业日（不一定等于 createTime 的日期）` | 参数 doc tag |
 
-## 注释格式规范
+判断准绳：**删掉这条注释，下一个改这段代码的人会不会犯错？** 会则保留，不会则删。
 
-### A 类：注释保留旧代码（修改/替换/删除）
+## A vs B 不再区分
 
-每段注释保留的旧代码，必须配套一段头注释，包含三要素：
-
-1. **`[DEPRECATED YYYY-MM-DD]`** 标记 + 改动日期
-2. **替代逻辑摘要**（一句话说明新逻辑做了什么）
-3. **变更原因 + 引用文档**（指向调整流水 / bug 文档 / 设计文档某条目）
-
-#### A 类标准模板
-
-```dart
-// [DEPRECATED 2026-04-25] selectedServices 直接采用前端传值，不再覆盖
-// 原逻辑（保留待联调验证后由确认人移除）：与云端 RefundServiceImpl#calculateRefundPrice 不一致，
-// 会强制塞入 DB 全量服务费 ID，导致前端"勾选/取消勾选服务费"算价结果完全相同。
-// 详见 v6 调整流水 2026-04-25 条目。
-// if (serviceFeeData.isNotEmpty) {
-//   selectedOption['selectedServices'] = serviceFeeData
-//       .map((f) => f['serviceFeeManagementId'] as int)
-//       .toList();
-// }
-```
-
-### B 类：纯新增缺漏代码（无原代码可注释）
-
-新增代码块上方必须加头注释，包含三要素：
-
-1. **`[ADDED YYYY-MM-DD]`** 标记 + 改动日期
-2. **新增逻辑摘要**（一句话说明这段代码做了什么）
-3. **缺漏原因 + 对齐依据**（为什么之前没有 / 对齐哪个上游接口 / 引用文档）
-
-#### B 类标准模板
-
-```dart
-// [ADDED 2026-04-25] 算价后按 selectedTip 修正 refundAmount，对齐云端
-// RefundServiceImpl#handleCalculateAfterRefundResponse（L1063-1070）。
-// Rust 算价时 tipAmount 不参与分摊，返回的 posOrder.payAmount 不含小费；
-// 必须在外层按 selectedTip 决定是否把 tipAmount 加到 refundAmount 里，否则
-// 前端"勾选/取消勾选小费"算价结果完全相同。详见 v6 调整流水 2026-04-25 第二条。
-final data = resultJson['data'] as Map<String, dynamic>?;
-if (data != null) {
-  final selectedTipFinal = selectedOption['selectedTip'] == true;
-  final outPosOrder = data['posOrder'] as Map<String, dynamic>?;
-  final payAmount = (outPosOrder?['payAmount'] as num?)?.toDouble() ?? 0;
-  final outTipAmount = (outPosOrder?['tipAmount'] as num?)?.toDouble() ?? 0;
-  data['refundAmount'] = selectedTipFinal ? payAmount + outTipAmount : payAmount;
-  data['tipAmount'] = outTipAmount;
-}
-```
-
-### A vs B 判定速查
-
-| 问题 | A 类 | B 类 |
-|------|------|------|
-| 原文件这段位置有无错误代码可指？ | 有 | 无（纯空白/缺漏） |
-| diff 看到的是什么？ | 删除 + 新增 / 全是注释行 | 纯新增 |
-| reviewer 第一眼疑问 | "为什么这样改？" | "为什么这里要加？以前没有合理吗？" |
-| 头注释要回答的核心问题 | "新逻辑替代了什么、为什么替代" | "之前为什么没有、现在为什么必须加" |
-
-### 各语言对应注释符
-
-| 语言 | 行注释 | 块注释（多行旧代码可用） |
-|------|--------|----------------------|
-| Dart / Java / Kotlin / TS / JS | `//` | `/* ... */` |
-| Python | `#` | `""" ... """` 或多行 `#` |
-| SQL | `--` | `/* ... */` |
-| YAML / Bash | `#` | 仅多行 `#` |
-
-**优先用行注释**（每行一个 `//`），不用块注释 —— 行注释每行独立，IDE 折叠/搜索更友好。
-
----
+旧规则的 A 类（DEPRECATED）/ B 类（ADDED）已废止。不论是修改还是新增，写法都一样：直接改、不留痕迹。需要解释 WHY 时，按上节"推荐写法"上提到 doc comment。
 
 ## 摆放位置
 
-新代码与注释保留的旧代码的相对位置：
-
 ```dart
-// 新逻辑放在前面（执行路径上）
-final selectedOption = _initCalculateSelectedOption(rawSelectedOption);
-
-// [DEPRECATED 2026-04-25] ...（注释保留旧代码紧跟在新代码后）
-// if (serviceFeeData.isNotEmpty) { ... }
+/// 按 POS 回调的 outTradeNO 反查退款流水。
+///
+/// 字段映射约定：POS 回调字段 outTradeNO 对应本地 `order_transaction.out_trade_no`，
+/// **不是** `transaction_no`（那是本地系统流水号 RTX/T...）。退款场景下两者必然不同。
+///
+/// 命中行须满足 `refund_flag=1`，确保只匹配退款流水而非原支付流水。
+Future<RefundCallbackLookupResult?> lookupByOutTradeNo(String outTradeNo) async {
+  // Step 1: 退款流水
+  final transaction = await (db.select(db.orderTransaction)
+        ..where((t) =>
+            t.outTradeNo.equals(outTradeNo) &
+            t.refundFlag.equals(1) &
+            t.deleted.equals(0))
+        ..limit(1))
+      .getSingleOrNull();
+  // ...
+}
 ```
 
-**禁止把注释保留的旧代码放在新逻辑前**（视觉上让 reviewer 误以为旧逻辑还会执行）。
+对照反例：
 
----
+```dart
+// ❌ 禁止：变更日志、deprecated 旧代码、引用文档
+//
+// [BUGFIX 2026-04-30] 旧实现用 transaction_no 反查，原支付场景因 transaction_no
+// 与 out_trade_no 同值（均为 T...）而凑巧命中；退款场景导致全部反查未命中。
+// 详见 v6 调整流水 2026-04-30 条目。
+// final transaction = await (db.select(db.orderTransaction)
+//       ..where((t) => t.transactionNo.equals(outTradeNo) & t.deleted.equals(0))
+//       ..limit(1))
+//     .getSingleOrNull();
+final transaction = await ...; // 新代码
+```
 
-## 移除时机
+## 适用范围
 
-**AI 永远不主动删除带标记的注释/头注释。** 必须由用户明确指令才能清理。A 类（DEPRECATED）和 B 类（ADDED）的清理范围不同：
+| 场景 | 是否适用 | 处理方式 |
+|------|---------|---------|
+| 联调期 bug 修复 | ✅ | 直接改写，逻辑说明上提方法 doc |
+| 删除明确无效的 if/else 分支 | ✅ | 直接删，不留注释 |
+| 方法体内逻辑修正（不改签名） | ✅ | 直接改 |
+| 补上原本缺漏的对齐代码 | ✅ | 直接加，无需 ADDED 标记 |
+| 新功能开发 | ✅ | 同样适用本规范 |
+| 纯重命名 / IDE refactor | ✅ | 直接改 |
+| 测试代码 / 配置文件 | ✅ | 直接改 |
 
-| 触发指令 | A 类（DEPRECATED） | B 类（ADDED） |
-|---------|-------------------|--------------|
-| "可以删了"、"清理一下" | 删除注释段（旧代码连同头注释一起删） | **保留代码本身**，仅删除头注释 |
-| "移除 DEPRECATED" | 仅清理 A 类 | 不动 |
-| "移除 ADDED" / "去掉新增标记" | 不动 | 仅清理 B 类头注释 |
-| "全部清理" | 两类都清理 | 两类都清理 |
-| "这次 commit 把注释也删了" | commit 前先清理，再提交 | 同左 |
-| 无明确指令 | 保留 | 保留 |
+本 skill 现在适用于**所有源码改动**，不再局限于轻量修订流水。
 
-**红线：** 即使 AI 在后续编辑同一段代码时，也不能"顺手"删除带 `[DEPRECATED]` / `[ADDED]` 的注释 —— 哪怕注释看起来"已经过时很久"。
+## 遇到旧的 [DEPRECATED] / [ADDED] 注释怎么办
 
----
+旧版本（v1.16 及以前）按规范留下的标记注释，**编辑同一段代码时可顺手清理**：
+
+- A 类（`[DEPRECATED]` + 注释保留的旧代码）：删除整段（头注释 + 旧代码）
+- B 类（`[ADDED]` 头注释 + 实际代码）：删除头注释，**保留代码本身**
+
+这与旧版"AI 永不主动删除带标记注释"规则相反 —— 因为新规范本身就要求源码内不留这类注释。但仅限于"刚好在改这段代码"时顺手做，不必专开 PR 全仓清理。
 
 ## 与其他 Skill 的协作
 
 | Skill | 关系 |
 |-------|------|
-| `design-doc-required` 第四·五步 | 走轻量修订流水分支时，代码改动必须遵循本 skill |
-| `coding-violation-log` | 用户若纠正本 skill 的执行（如忘记保留注释），由 coding-violation-log 登记 |
-| `git-commit-standards` | commit message 不必专门描述"保留了注释代码"，diff 自身可见 |
-
----
+| `design-doc-required` 第四·五步 | 走轻量修订流水分支时，代码改动遵循本 skill（直接改，不留变更日志） |
+| `coding-violation-log` | 用户若纠正本 skill 的执行（如又写了 BUGFIX 标记），由 coding-violation-log 登记 |
+| `git-commit-standards` | 变更原因写进 commit message body（中文 body），不入源码 |
+| `bug-doc-required` | bug 文档保留完整根因/修复历史；源码不重复这些信息 |
 
 ## 红色警告
 
 | 想法 | 正确处理 |
 |------|----------|
-| "改动很小，删了更干净" | 联调期就是要"不干净"地保留对照，干净留给主干 |
-| "git diff 能看到旧代码" | diff 看的是改了什么，注释看的是"为什么改"和"原代码长啥样"，两者互补 |
-| "纯新增不需要注释" | ❌ 错。B 类必须加 `[ADDED]` 头注释，否则 reviewer 无法判断"这段以前为什么没有、现在为什么必须加"，commit 信息也讲不清 |
-| "用户没说要保留注释" | 默认就是保留，用户说删才删 |
-| "重新编辑这段代码时顺手清理" | 禁止。带 `[DEPRECATED]` / `[ADDED]` 标记的注释只能由用户明确指令删除 |
-| "新功能开发也用这套" | 新功能走 vN+1 完整实现，不保留旧逻辑注释、也不加 `[ADDED]` 标记 |
-| "B 类清理时把代码也删了" | ❌ 错。B 类清理只删头注释，代码本身是新增的对齐补丁，必须保留 |
+| "删了改不回去" | git revert 一条命令的事；源码里堆 deprecated 注释才是不可靠的回滚机制 |
+| "Reviewer 看不懂为什么改" | 写在 commit message body / PR description / bug 文档里 |
+| "我加了 [ADDED 日期] 显得有交代" | 是噪声不是交代；把对齐依据上提到方法 doc 的"对齐云端"段（不带日期） |
+| "这段代码以前 bug 过，警示后人" | 加测试用例覆盖、写进 bug 文档；不在源码注释里复述故事 |
+| "TODO 想标个日期方便回头查" | 别。开 issue / 任务卡，源码里只留"为什么这里需要 TODO"的内容（且更应避免） |
+| "用户没说要清理，那就保留旧 DEPRECATED" | 错。本 skill v1.17 起规则反转，遇到就可以顺手清（限改同一段代码时） |

@@ -2,9 +2,12 @@
 
 > 本文档梳理 team-standards 与 superpowers 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-04-27 v16.2**
-> 变更摘要：`korepos-backend-service` 新增「BackendInfra 门面新旧分离」原则（情况 C）：从 0 写的 backend 内部基础设施（云端 HTTP / WS / 设备协议等）必须建立独立子门面 + 平级 provider，禁止挂到 BackendInfra 上，避免新代码伪装成"将要清空的过渡通道"。
-> 上一版：v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
+> **最后更新：2026-04-30 v16.6**
+> 变更摘要 v16.6：`bugfix-coding-style` 方向反转 —— 之前的 A 类（`[DEPRECATED YYYY-MM-DD]` + 注释保留旧代码）/ B 类（`[ADDED YYYY-MM-DD]` 头注释）规则全部废止；改为禁止把变更历史写进源码（`[BUGFIX]` / 日期标记 / PR 引用 / 注释保留旧代码全部禁止），变更原因归 git log / commit message / bug 文档，源码内只保留对当下读者有价值的 WHY 注释且优先上提到方法 / 类 doc comment；适用范围扩展到所有源码改动（不限联调期）；遇到旧 `[DEPRECATED]` / `[ADDED]` 标记可在改同段代码时顺手清理。FAQ 中的相关问答同步调整（规则方向反转，但流程节点结构未变，按"轻微"处理未单独创建快照）。
+> 变更摘要 v16.5：`korepos-backend-service` 新增「外部调用前的边界兜底校验」健壮性硬规则 —— service 调云端 HTTP / 跨子门面 / POS 硬件协议前，凡传给对方的金额/数量/配额等业务数值，若本地 DB 有可查的上限/边界，必须用 DB 实读值兜底校验，不信任入参或前序内存对象；校验抽 `_assertXxxWithinBound` 私有方法；金额比较加 ±0.005 浮点容差。Step 5 强制规则、自检清单、禁区表均同步追加（轻微规则补充，未单独创建快照）。
+> 变更摘要 v16.4：`daily-work-log` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`，与 `bug-doc-required` / `design-doc-required` / `doc-index-required` 完全对齐；项目内 `docs/work-log/` 与 `.gitignore` 兜底节降级为"用户明确指定路径"分支（轻微规则补充，未单独创建快照）。
+> 变更摘要 v16.3：`bug-doc-required` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，与 `design-doc-required` / `doc-index-required` 一致；项目内 `docs/bug/` 降级为"用户明确指定路径或上传终版"分支；流程图分叉、红色警告与"各文档类型与用途"表同步调整（轻微规则补充，未单独创建快照）。
+> 上一版：v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
 > 再上一版：v15（2026-04-27）；v14（2026-04-27）；v13（2026-04-27）；v12（2026-04-27）；v11（2026-04-27）；v10（2026-04-27）；v9（2026-04-26）；v8（2026-04-25）；v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
 > 历史版本：`docs/skill-flow-20260427-v15.md`（v15）、`docs/skill-flow-20260427-v14.md`（v14）、`docs/skill-flow-20260427-v13.md`（v13）、`docs/skill-flow-20260427-v12.md`（v12）、`docs/skill-flow-20260427-v11.md`（v11）、`docs/skill-flow-20260427-v10.md`（v10）、`docs/skill-flow-20260427-v9.md`（v9）、`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
@@ -47,7 +50,7 @@
 | `coding-violation-log` | team-standards | 用户纠正 AI 编码错误时登记违规；编码前回顾已登记记录防重犯（嵌入编码链路，java-coding-standards 之前） |
 | `project-docs-update` | team-standards | 项目代码结构变更后同步知识图谱文档（检测差异 + 自动/确认更新） |
 | `arch-lint` | team-standards | Flutter 架构违规检测（5 条分层规则，全量/轻量两种模式） |
-| `bugfix-coding-style` | team-standards | 联调期 bug 修复编码风格：注释保留旧代码 + 追加新代码（带 `[DEPRECATED]` 标记），配合 design-doc-required 第四·五步轻量修订流水使用 |
+| `bugfix-coding-style` | team-standards | bug 修复 / 任何源码改动的注释规范（v1.17 起方向反转）：禁止变更历史/日期标记/PR 引用/注释保留旧代码进入源码；变更原因归 git log + bug 文档；源码内只保留 WHY 注释且优先上提到方法 doc comment |
 
 ---
 
@@ -168,7 +171,7 @@ flowchart TD
     DDR -- "改动不通过硬清单" --> ORIENT["pre-implementation-code-orientation\n优先读设计文档提取代码坐标\n降级才读 bug 文档"]
     LIGHT --> ORIENT
     ORIENT --> ARCH["architecture-ddd-lite-fullstack\n先判断修复应落在哪一层\n禁止直接塞进 UI / Controller"]
-    ARCH --> CODE["java-coding-standards\n实施修复\n+ bugfix-coding-style\n（注释保留旧代码 + 追加新代码）"]
+    ARCH --> CODE["java-coding-standards\n实施修复\n+ bugfix-coding-style\n（直接改写；禁变更日志注释；逻辑说明上提方法 doc）"]
     CODE --> VERIFY["verification-before-completion\n验证修复有效"]
     VERIFY --> COMMIT["git-commit-standards\n type: fix  提交"]
     COMMIT --> MORE{"还有关联 Bug?"}
@@ -247,7 +250,8 @@ flowchart LR
 | `{需求}-{日期}-v{N}.md` | 需求确定时 | 人 | 禁止，变更须新建版本 |
 | `{需求}-{日期}-v{N}-coding.md` | 读完设计文档后自动生成 | AI（节省 token） | 随设计文档版本同步 |
 | `{需求}-current.md` | 代码上线稳定后 | AI 优先读取 | 随代码演进直接覆盖 |
-| `docs/bug/{名称}/{名称}.md` | 确认 bug 根因后 | 人 + AI 分析阶段 | 可补充，修复方案节只写方向摘要 |
+| `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/{bug 名称}-bug分析-{YYYYMMDD}-v{N}.md` | 确认 bug 根因后（**默认**） | 人 + AI 分析阶段 | 可补充，修复方案节只写方向摘要；终版由用户上传 |
+| `docs/bug/{名称}/{名称}.md` | 用户明确要求"上传终版 / 写到 docs/" 时 | 人 + AI 分析阶段 | 可补充；写入项目时按模块分组 + 触发 doc-index-required |
 | `docs/design/{名称}修复/{名称}修复-vN.md` | bug 分析完成后 | AI 实施阶段 | 禁止修改已有版本，变更须新建 |
 | `docs/{subdir}/INDEX.md` | 首个文档创建时 | doc-index-required 读取 | 随文档新增自动追加 |
 | `docs/dev-log/YYYY-MM-DD.md` | team-standards 有变更时 | 人（追溯变更历史） | 当天可追加，禁止修改历史日期文件 |
@@ -288,8 +292,8 @@ flowchart LR
 | Phase 3-4 的自动模式和确认模式怎么选? | 自动模式：AI 尽力推断后生成，标注"需人工校验"，适合快速产出初稿。确认模式：逐份展示等用户确认，适合对准确度要求高的场景。 |
 | Step 0 知识图谱预热是什么? | 在 design-doc-required / bug-doc-required 执行前，先读 `00_project_overview.md` 获取全局索引，再按 AI 上下文路由表加载当前任务类型对应的 2-3 份文档。避免全量扫码，按需获取上下文。 |
 | 什么时候走「轻量修订流水」而不是新建 vN+1? | 设计文档已存在 + 改动通过 design-doc-required 第四·五步硬清单（不新增接口/字段/类、不改方法签名、单文件 ≤30 行净变更、性质属修正/对齐/删冗余/修 bug）。任一项 ❌ 退回新建版本。 |
-| 轻量修订流水期间代码怎么写? | 必须遵循 `bugfix-coding-style`：禁止直接删原代码，先用 `//` 注释保留（带 `[DEPRECATED YYYY-MM-DD]` 标记 + 引用文档），紧接着追加新代码。等用户明确指令再清理注释。 |
-| `bugfix-coding-style` 和 `coding-violation-log` 有什么区别? | bugfix-coding-style 是**主动规则**（写代码时必须遵循的注释保留风格），coding-violation-log 是**反应式登记**（用户纠错后记录到违规表防重犯）。前者管"怎么写"，后者管"错过的别再错"。 |
+| 轻量修订流水期间代码怎么写? | 必须遵循 `bugfix-coding-style`（v1.17 起反转）：直接改写或新增，**禁止**在源码中保留 `[DEPRECATED]` / `[ADDED]` / `[BUGFIX 日期]` 等变更日志标记，**禁止**注释保留旧代码段。变更原因写进 commit message body / bug 文档；源码内只保留对当下读者有价值的 WHY 注释，且优先上提到方法 / 类 doc comment。 |
+| `bugfix-coding-style` 和 `coding-violation-log` 有什么区别? | bugfix-coding-style 是**主动规则**（写代码时必须遵循的注释规范，v1.17 起核心规则是"禁变更日志、WHY 注释上提方法 doc"），coding-violation-log 是**反应式登记**（用户纠错后记录到违规表防重犯）。前者管"怎么写"，后者管"错过的别再错"。 |
 | 项目没有知识图谱时 Step 0 怎么办? | 自动跳过。Step 0 检测 `docs/00_project_overview.md` 不存在时直接进入后续流程，完全向后兼容。 |
 | 什么时候走「轻量模版」? | 命中第一·七步全部 9 项硬清单（不新增表/字段/对外契约/类 ≥3、不跨服务、不引入新中间件、不重设状态机、改动可由「时序图 + 规则表 + 失败行为表」描述）。任一 ❌ 升级到完整模版。已有架构内的单接口新增/调整、库表读写流程描述就是典型轻量场景。 |
 | 轻量模版需要 coding.md 吗? | **不需要**。时序图 + 规则表 + 失败行为表已经覆盖编码所需的最小信息。第四步（生成 coding.md）和第六步（同步 coding.md）只对完整模版生效，轻量分支跳过。 |

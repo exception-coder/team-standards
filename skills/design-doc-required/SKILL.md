@@ -384,7 +384,7 @@ docs/design/
 
 3. **不**新建 `vN+1.md`、**不**新建/更新 `-coding.md`
 4. **跳过** `doc-index-required` Phase-B（INDEX 摘要无需更新）
-5. 进入代码改动时**必须遵循 `bugfix-coding-style`**：先注释原错误代码（带 `[DEPRECATED YYYY-MM-DD]` 标记），再追加新代码，待用户确认后清理
+5. 进入代码改动时**必须遵循 `bugfix-coding-style`**（v1.17 起方向反转）：直接改写或新增；**禁止**在源码中保留 `[DEPRECATED]` / `[ADDED]` / `[BUGFIX 日期]` 等变更日志标记，**禁止**注释保留旧代码段；变更原因写进 commit message body 与本文档调整流水，源码内只保留 WHY 注释且优先上提到方法 / 类 doc comment
 6. commit 信息按 `git-commit-standards` 规范，并在 body 引用调整流水所在文档路径
 
 #### 红线
