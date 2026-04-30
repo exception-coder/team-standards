@@ -140,7 +140,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | Skill | 触发时机 | 作用 |
 |-------|----------|------|
 | `solution-review-required` | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时 | 先分离真实目标与候选方案，评估现有代码是否值得参考，识别风险、缺口和替代方案，给出更优建议后再进入设计或实施 |
-| `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；自动生成编码摘要 |
+| `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；Git 管理下默认维护稳定/current 文档，历史写入 commit body；完整模版自动生成编码摘要 |
 | `architecture-ddd-lite-fullstack` | 开始编写或审查 Java / React / Vue / Flutter 业务代码前 | 强制 DDD-lite 分层、Feature 模块化、单向依赖与原子能力沉淀；要求代码结构清晰、易维护、低耦合、高内聚，禁止 UI / Controller 直接承载业务逻辑 |
 | `backend-knowledge-graph-required` | Java 后端单服务需求分析前存在 `docs/knowledge-graph/backend/`，或要求生成/更新后端知识图谱时 | 按项目沉淀领域能力、原子能力、业务流程、表、枚举、API、外部依赖与代码坐标；会话中反复提及的后端业务事实自动进入用户目录候选池，确认或代码验证后才更新正式图谱 |
 | `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；目录按模块分组（对齐 `docs/design/`）；中文命名 |
@@ -189,7 +189,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 
 轻量模版**不需要**配套 `-coding.md`，时序图 + 规则表已涵盖编码所需信息。
 
-建议在项目 `docs/design/` 目录下按功能创建对应文档。
+项目内正式设计文档进入 Git 后，默认维护稳定文档（如 `{需求}-current.md` / `{需求}-coding.md`），普通迭代直接更新原文件，历史和变更原因写入 git commit body。只有重大架构基线、发布快照、非 Git 管理文档或用户明确要求时，才创建 `YYYYMMDD-vN` 快照文件。
 
 ## 可选：脚本级强制拦截
 
