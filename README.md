@@ -143,7 +143,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；Git 管理下默认维护稳定/current 文档，历史写入 commit body；完整模版自动生成编码摘要 |
 | `architecture-ddd-lite-fullstack` | 开始编写或审查 Java / React / Vue / Flutter 业务代码前 | 强制 DDD-lite 分层、Feature 模块化、单向依赖与原子能力沉淀；要求代码结构清晰、易维护、低耦合、高内聚，禁止 UI / Controller 直接承载业务逻辑 |
 | `backend-knowledge-graph-required` | Java 后端单服务需求分析前存在 `docs/knowledge-graph/backend/`，或要求生成/更新后端知识图谱时 | 按项目沉淀领域能力、原子能力、业务流程、表、枚举、API、外部依赖与代码坐标；会话中反复提及的后端业务事实自动进入用户目录候选池，确认或代码验证后才更新正式图谱 |
-| `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；目录按模块分组（对齐 `docs/design/`）；中文命名 |
+| `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；**默认走用户文档目录**（`{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`），仅用户明确要求时才进项目 `docs/bug/`；写入项目时按模块分组（对齐 `docs/design/`），中文命名 |
 | `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
 | `java-coding-standards` | 编写/审查任何 Java 代码时 | 强制遵守阿里黄山版编码规范 |
 | `git-commit-standards` | 执行 git commit 前 | 分析 staged 变更，生成标准化中文提交信息 |

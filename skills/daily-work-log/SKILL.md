@@ -1,13 +1,15 @@
 ---
 name: daily-work-log
-description: "每次对业务项目的源码（.dart/.java/.kt/.ts/.py 等）执行 Edit/Write 后、或用户说『记一下工作日志』『记录一下』『写个日志』『更新工作日志』等时，必须触发本 skill 把本次改动按 [Bug 修复] vs [功能开发] 写入项目的 `docs/work-log/{YYYY-MM-DD}.md`。核心规则：一行一条修改明细、同一 bug 多次修复合并到同一条目、同一功能多轮迭代合并到同一条目、每条目带预估工时（累计）。写入前必须先读当天日志合并现有条目，严禁为同一主题创建多条。每个会话结束前若有未登记的改动，强制回补一次。"
+description: "每次对业务项目的源码（.dart/.java/.kt/.ts/.py 等）执行 Edit/Write 后、或用户说『记一下工作日志』『记录一下』『写个日志』『更新工作日志』等时，必须触发本 skill 把本次改动按 [Bug 修复] vs [功能开发] 写入用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`（个人工作记录，不入项目仓库）。核心规则：一行一条修改明细、同一 bug 多次修复合并到同一条目、同一功能多轮迭代合并到同一条目、每条目带预估工时（累计）。写入前必须先读当天日志合并现有条目，严禁为同一主题创建多条。每个会话结束前若有未登记的改动，强制回补一次。"
 ---
 
 # 每日工作日志记录规范
 
 ## 核心原则
 
-**每次对业务项目源码有实质改动（Edit/Write），就在业务项目的 `docs/work-log/{YYYY-MM-DD}.md` 追加或合并一条记录。**
+**每次对业务项目源码有实质改动（Edit/Write），就在用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md` 追加或合并一条记录。**
+
+工作日志记录的是个人工时与改动流水，属于**个人工作记录**，与 `bug-doc-required` / `design-doc-required` 等 AI 起草文档一样默认写入用户文档目录，**不写入项目仓库**，与项目代码、设计文档、bug 文档物理隔离。
 
 不是记录 AI 对话内容；不是记录流水账；是**把"今天做了什么可以上交日报的工作"按 bug / 功能 分类沉淀**。
 
@@ -28,46 +30,30 @@ description: "每次对业务项目的源码（.dart/.java/.kt/.ts/.py 等）执
 
 ## 文件路径与命名
 
-- **路径**：业务项目根目录下 `docs/work-log/{YYYY-MM-DD}.md`（每日一份，无时区依赖，按本地日期切分）
+- **默认路径**：`{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`
+  - Windows：`%USERPROFILE%\Documents\ai-docs\{project}\work-log\{YYYY-MM-DD}.md`
+  - macOS / Linux：`~/Documents/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`
+  - 若系统无 Documents 目录，兜底 `~/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`
+  - `{project}` 取当前业务项目目录名（避免多个项目工作日志混在一起）
 - **时间戳**：条目里的 `HH:MM` 用 24 小时制本地时间
-- **目录不存在**：自动创建 `docs/work-log/`，**同时检查并追加 `.gitignore`**（见下节）
+- **目录不存在**：自动创建 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/`
 - **当日文件不存在**：按下方「文件骨架」初始化
 
-若业务项目不允许在 `docs/` 下直接写（用户手工配置了别的路径），询问用户一次并记住。默认走 `docs/work-log/`。
+### 写入前必须回显输出路径
 
-### ⚠️ 首次创建 work-log 目录时必须配置 .gitignore（硬规则）
+与 `doc-index-required` 一致，写日志文件前向用户回显一行：
 
-**每日工作日志记录的是个人工时与改动流水，属个人工作记录而非项目资产，绝不入仓。**
+```text
+工作日志输出路径：{用户目录默认 / 用户指定路径} -> {目标路径}
+```
 
-首次在项目里生成 `docs/work-log/` 目录时，AI **必须**：
+### 不再写入项目 docs/
 
-1. Read 项目根目录 `.gitignore`
-2. 检查是否已含 `docs/work-log/` 或等价规则（如 `work-log/` 未锚定、或 `docs/**/work-log/`）
-3. **未含** → Edit `.gitignore`，追加一段：
+工作日志属个人工作记录，**绝不写入业务项目 `docs/`，不入仓**。原 `docs/work-log/` 历史目录由用户决定如何处理（保留本地、迁移到用户目录、或删除），本 skill 不做自动迁移。
 
-   ```gitignore
-   # 每日工作日志（daily-work-log skill 产出，个人工时与修改流水，不入仓）
-   docs/work-log/
-   ```
+### 用户显式指定项目内路径的例外
 
-4. 若本次会话**已经把 `docs/work-log/*.md` 纳入了 git 追踪**（比如上次 commit 没加 gitignore），AI 必须主动执行一次清理：
-   - `git rm --cached docs/work-log/*.md`（从 index 移除，保留本地文件）
-   - 把 `.gitignore` + 清理一起打一个 `chore(gitignore)` 的小 commit
-
-5. 回报用户：「已配置 .gitignore 忽略 docs/work-log/，本地文件保留」
-
-**这条规则无例外。** 即使用户没说，第一次生成日志文件时就必须同步配置。跳过这一步 = 把个人工时数据污染进 git 历史，后续清理成本高。
-
-### .gitignore 已存在但格式不同的场景
-
-| 已有规则 | 处理 |
-|---|---|
-| `docs/work-log/`（完全匹配） | 跳过 |
-| `work-log/`（未锚定，也能匹配） | 跳过，不重复追加 |
-| `docs/**/work-log/` | 跳过 |
-| 无任何匹配 | 追加上方新段 |
-
-不追加注释行的变种或多个正则等价规则，**保持规则干净**。
+仅当用户明确说「写到项目 docs/work-log/」/「上传到仓库」时，才允许落项目目录，且此时必须主动检查 `.gitignore` 是否已忽略 `docs/work-log/`，未忽略则按"用户指定项目路径"流程交由 `doc-index-required` 走 Phase-A/B（这是非默认路径）。
 
 ---
 
@@ -140,7 +126,7 @@ description: "每次对业务项目的源码（.dart/.java/.kt/.ts/.py 等）执
 
 ```mermaid
 flowchart TD
-    START(["本次改动待登记"]) --> R["Read docs/work-log/今日.md\n提取所有条目标题"]
+    START(["本次改动待登记"]) --> R["Read 今日 work-log\n提取所有条目标题"]
     R --> Q1{"本次会话是否\n触发过 bug-doc-required?"}
     Q1 -->|"是"| B1["用 bug 文档的标题\n查已有 Bx 条目"]
     Q1 -->|"否"| Q2{"本次会话是否\n触发过 design-doc-required?"}
@@ -270,7 +256,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     T(["触发时机命中"]) --> S1["Step 1\n确定今日日期 YYYY-MM-DD"]
-    S1 --> S2["Step 2\nRead docs/work-log/YYYY-MM-DD.md\n不存在则初始化骨架"]
+    S1 --> S2["Step 2\nRead 用户目录今日 work-log\n不存在则初始化骨架"]
     S2 --> S3["Step 3\n判断 bug vs 功能"]
     S3 --> S4["Step 4\n合并判定：命中已有条目 or 新建"]
     S4 --> S5["Step 5\n本轮工时估算"]
@@ -341,17 +327,16 @@ dev-log（仅 team-standards 项目：会话结束前）
 | 预估工时超过 8h / 单条目 | 说明主题太大，应拆子条目 |
 | 修改明细跨行 / 段落叙述 | 违反"一行一条" |
 | 为每次 Edit 新建条目（即使是同一 bug） | 违反"同 bug 合并" |
-| 在 team-standards 仓库里写 `docs/work-log/`（而不是业务项目） | 错位；team-standards 走 dev-log |
+| 把工作日志写到业务项目 `docs/` 下（除非用户明确要求） | 与 bug/design 文档默认路径一致：AI 起草个人记录走用户文档目录，不入仓 |
 | 把 skill/文档修改记到 daily-work-log | 错位；应走 dev-log |
-| **首次创建 `docs/work-log/` 未配置 `.gitignore`** | 个人工时数据会被提交进 git 历史，清理成本高；规则：生成目录即同步 ignore |
-| **把 work-log 文件纳入业务 commit** | 上条规则的结果，同样禁止 |
+| **未经用户明确指定却把日志落到项目内** | 个人工时记录不属于项目资产；必须默认走 `{USER_DOCUMENTS}/ai-docs/` |
 
 ---
 
 ## 自检清单（每次写入后）
 
-- [ ] 文件路径是业务项目的 `docs/work-log/{YYYY-MM-DD}.md`，不是别的仓库
-- [ ] **首次创建 `docs/work-log/` 时，已同步检查并追加 `.gitignore`；若已误 track 过则 `git rm --cached` 清理**
+- [ ] 文件路径是 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`（用户文档目录、个人记录），不是项目仓库
+- [ ] 写入前已向用户回显输出路径
 - [ ] 写入前 Read 了当天文件
 - [ ] 同 bug / 同功能已合并到已有条目，没新建重复条目
 - [ ] 修改明细一行一条、带时间戳、≤ 50 字

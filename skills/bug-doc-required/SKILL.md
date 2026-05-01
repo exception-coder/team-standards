@@ -30,7 +30,14 @@ description: "You MUST invoke this skill the moment a user reports a bug, descri
 
 ```mermaid
 flowchart TD
-    A(["收到 bug 文档编写任务\n（Step 0 预热完成后）"]) --> B["调用 doc-index-required\n完成索引检查"]
+    A(["收到 bug 文档编写任务\n（Step 0 预热完成后）"]) --> P{"用户是否明确给出\n项目 docs/ 路径或要求上传终版?"}
+    P -->|"否（默认）"| USER_DOC["走用户文档目录\n{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/"]
+    USER_DOC --> NAME["按中文命名规范确定文件名\n{bug 中文名称}-bug分析-{YYYYMMDD}-v{N}.md"]
+    NAME --> F["按标准模板生成文档结构"]
+    F --> G["填充分析内容\n核心流程必须生成 3 类图：\n时序图 + 流程图 + 泳道图"]
+    G --> Z(["完成（不更新项目 INDEX）"])
+
+    P -->|"是（明确写入项目 docs/）"| B["调用 doc-index-required Phase-A\n完成索引检查"]
     B --> M{"扫描 docs/design/\n是否有对应模块?"}
     M -->|"有"| M1["归档到\ndocs/bug/模块名/"]
     M -->|"无"| M2["一级扁平放置\ndocs/bug/"]
@@ -38,16 +45,50 @@ flowchart TD
     M2 --> C
     C -->|"是"| D["提示用户：是否补充到已有文档"]
     C -->|"否"| E["按中文命名规范确定目录名与文件名"]
-    E --> F["按标准模板生成文档结构"]
-    F --> G["填充分析内容\n核心流程必须生成 3 类图：\n时序图 + 流程图 + 泳道图"]
-    G --> H["doc-index-required 第五步\n更新总 INDEX 与模块 INDEX"]
-    H --> I(["完成"])
-    D --> F
+    E --> F2["按标准模板生成文档结构"]
+    F2 --> G2["填充分析内容\n核心流程必须生成 3 类图：\n时序图 + 流程图 + 泳道图"]
+    G2 --> H["doc-index-required Phase-B\n更新总 INDEX 与模块 INDEX"]
+    H --> Z
+    D --> F2
 ```
 
 ---
 
-## 文档目录结构
+## 输出路径边界
+
+> **核心规则**：AI 生成的 bug 分析文档**默认写入用户文档目录**，不直接写入项目 `docs/bug/`。与 `design-doc-required` 保持一致，最终由用户确认终版后自行上传到项目，或在用户明确指定路径时由 AI 写入。
+
+### 默认输出路径（用户未指定项目内路径时）
+
+```text
+{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/{bug 中文名称}-bug分析-{YYYYMMDD}-v{N}.md
+```
+
+路径解析规则与 `doc-index-required` 完全一致：
+
+1. Windows：`%USERPROFILE%\Documents\ai-docs\{project}\{agent}\{YYYY-MM-DD}\{文件名}`
+2. macOS / Linux：`~/Documents/ai-docs/{project}/{agent}/{YYYY-MM-DD}/{文件名}`
+3. 若系统没有 Documents 目录，兜底写入 `~/ai-docs/{project}/{agent}/{YYYY-MM-DD}/{文件名}`
+4. `{project}` 取当前项目目录名；`{agent}` 取当前 AI agent 名称（`claude` / `codex` 等）
+
+**默认路径下的文档：**
+- 不调用 `doc-index-required` Phase-A / Phase-B，不更新任何 INDEX
+- 写入前必须按 `doc-index-required` 的"输出路径回显"要求向用户展示一行目标路径
+- 若同主题已有当日草稿，版本号 `v{N}` 自增追加，不覆盖旧版本
+
+### 项目 docs/bug/ 例外（仅当用户明确要求时）
+
+只有以下三种情况，AI 才允许把 bug 文档直接写入项目 `docs/bug/` 并触发 `doc-index-required` 全流程：
+
+1. 用户明确给出 `docs/bug/...` 路径
+2. 用户明确说"上传终版文档 / 写到项目 docs / 更新项目 bug 文档"
+3. 当前操作是编辑、移动、整理已有 `docs/bug/` 下的文件
+
+满足上述条件时，按下方"项目 docs/bug/ 归档结构"组织目录。
+
+---
+
+## 项目 docs/bug/ 归档结构（仅终版/用户指定路径时使用）
 
 bug 文档在 `docs/bug/` 下**必须按模块分组**(对齐 `docs/design/` 的模块划分),结构为三级：
 
@@ -82,7 +123,7 @@ docs/bug/
 
 **规范：**
 - 模块目录名必须与 `docs/design/` 下已有模块**完全一致**(包括大小写、空格、下划线等),不允许同义替换
-- 写 bug 文档前**必须先扫描 `docs/design/`** 判断是否有对应模块：
+- 写入项目 `docs/bug/` 前必须先扫描 `docs/design/` 判断是否有对应模块：
   - 有 → `docs/bug/{模块名}/{bug名称}/{bug名称}.md`
   - 没有 → `docs/bug/{bug名称}/{bug名称}.md`(一级扁平,作为未归类兜底)
 - bug 目录名和文档名使用中文,简洁描述核心现象,不加 `bug-` / `bug_` 前缀
@@ -249,7 +290,7 @@ flowchart LR
 
 | Skill | 何时调用 |
 |---|---|
-| `doc-index-required` | 本 skill 执行流程第一步，必须先调用，完成索引读取和更新 |
+| `doc-index-required` | **默认走用户目录时不调用**（不更新项目 INDEX）；仅当用户明确要求写入项目 `docs/bug/` 时，按"前置 Phase-A → 文档写作 → 后置 Phase-B"流程调用 |
 | `design-doc-required` | 若 bug 修复需要引入新功能或接口变更，修复方案实施前须调用 |
 
 ---
@@ -258,13 +299,14 @@ flowchart LR
 
 | 想法 | 正确处理 |
 |---|---|
+| "默认就写到项目 docs/bug/" | **错**。AI 生成的 bug 文档默认走 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，仅当用户明确指定项目内路径或要求上传终版时才写入 `docs/bug/` |
 | "调用链用文字描述就够了" | 必须用 3 类 Mermaid 图（时序图、流程图、泳道图） |
 | "画一种图就够了" | 3 类图各有侧重，缺一不可：时序看交互、流程看决策、泳道看分层 |
 | "根因写一段话说明" | 必须用表格，一行一个问题 |
-| "不用更新 INDEX.md" | doc-index-required 第五步是强制要求,总 INDEX 与模块 INDEX 都要更新 |
-| "直接放在 docs/bug/ 根目录" | 必须建 {模块名}/{bug名称}/ 或 {bug名称}/ 子目录再放文件 |
-| "用英文 kebab-case 命名目录就行" | 必须用**中文**命名 bug 目录与文档,与 docs/design/ 模块命名风格一致 |
-| "不用看 design 目录,直接扁平放" | 新建前必须扫描 docs/design/,有对应模块必须归到 {模块名}/ 下,不得随意扁平化 |
-| "自己新创建个和 design 不一样的模块名也行" | 模块名必须与 docs/design/{模块名}/ **完全一致**,不允许同义替换 |
+| "不用更新 INDEX.md" | 仅当文档写入项目 `docs/bug/` 时强制要求；用户目录草稿不更新任何 INDEX |
+| "直接放在 docs/bug/ 根目录" | 写入项目时必须建 {模块名}/{bug名称}/ 或 {bug名称}/ 子目录再放文件（仅适用项目内路径） |
+| "用英文 kebab-case 命名目录就行" | 写入项目 `docs/bug/` 时必须用**中文**命名 bug 目录与文档；用户目录草稿同样以中文主题命名文件 |
+| "不用看 design 目录,直接扁平放" | 写入项目 `docs/bug/` 前必须扫描 `docs/design/`,有对应模块必须归到 {模块名}/ 下,不得随意扁平化 |
+| "自己新创建个和 design 不一样的模块名也行" | 写入项目时模块名必须与 `docs/design/{模块名}/` **完全一致**,不允许同义替换 |
 | "类名我知道，不用查" | 必须读 package 声明确认，禁止凭记忆填写 |
 | "只写短类名就够了" | 短类名无法精准定位文件，必须写完整包路径 |

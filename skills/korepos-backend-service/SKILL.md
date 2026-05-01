@@ -20,6 +20,20 @@ description: "Use when writing, adding, or modifying korepos (and korepos-refund
 - **主范本**：`features/refund/backendv2/`（代码结构与门面用法作为范本，**但 `backendv2/` 命名本身是历史遗留，不要模仿**）
 - **目录命名范本**：`features/payment/backend/`（新模块命名对标这个）
 
+#### 最佳实践活范本：`/confirm/refund/transaction` 链路
+
+写新接口时，先打开下方 5 个文件通读一遍，作为 endpoint / request / response / service / dao 编排的"活范本"。该接口完整覆盖了"事务编排 + 多 DAO 协作 + 子 service 注入 + 边界兜底校验 + 容错调用"的典型形态。
+
+| 角色 | 文件路径 | 关键看点 |
+|---|---|---|
+| Endpoint 枚举 | `lib/features/refund/backendv2/endpoint/refund_v2_endpoint.dart#L10`（`confirmRefund('/confirm/refund/transaction')`） | 一行一个 endpoint，路径与方法名 camel→snake 对齐 |
+| Request DTO | `lib/features/refund/backendv2/dto/request/confirm_refund_request.dart` | 字段级 dartdoc 写明业务含义 / 取值来源 / 默认值语义；新增字段附 [ADDED YYYY-MM-DD vN] 来源标注（详见 §1 版本号节）；**目录例外**：confirm_refund 走的是 backendv2 历史 dto 路径，**新接口的 request 必须放 `features/{module}/common/models/request/`**（详见 Step 2） |
+| Response DTO | `lib/features/refund/backendv2/dto/response/confirm_refund_response.dart` | 主响应类 + 嵌套 freezed 类（`KposRefundTransactionInfo` / `KposCancelTransactionInfo` / `KPayOnlineRefundResultInfo`）的拆分粒度；列表字段写明"无则 null/空"语义；同样**目录例外**——新接口走 `common/models/response/` |
+| Service | `lib/features/refund/backendv2/service/refund_confirm_service.dart` | 构造器注入 `BackendInfra` + 多个原子 DAO（`PendingOnlineRefundDao` / `RefundEligibilityDao`）+ 子 service（`RefundValidationService` / `RefundPersistenceService` / `RefundV2PriceService`）；service 内只调 DAO 方法、不接触任何 SQL（详见 Step 5「Service 内禁止任何 SQL」红线） |
+| DAO 注入与调用 | 同上 service 文件的 `@riverpod` 工厂 + 构造器 | DAO 通过 `ref.read(xxxDaoProvider)` 在工厂层注入，service 类持 `final XxxDao _dao`；服务体内**只**通过 `_dao.findXxx(...)` / `_dao.updateXxx(...)` 访问数据 |
+
+> **写新接口时的"参照拷贝"清单**：从该链路拷贝的 5 类形态 = ① endpoint 枚举一行 ② Request 字段+dartdoc 模式 ③ Response（含嵌套）模式 ④ service `@riverpod` 工厂 + 构造器注入 ⑤ DAO 调用替换成本接口的原子方法。**不要拷贝的**：`backendv2/` 这个名字本身、`backendv2/dto/` 这个 DTO 目录位置（两者都是历史遗留，详见下节）。
+
 ### 关于 `refund/backendv2/` 的历史说明
 
 refund 模块走了 `backendv2/` 是因为 `features/refund/backend/` 早已被另一批正在搬运中的老骨架占用（内含 `application/data/domain`），为避免两批代码在同一目录下互相踩脚，当时开了个 `backendv2/` 做隔离。这是**一次性的历史决定**，不是通用命名约定。
@@ -156,9 +170,13 @@ lib/features/{module}/
     ├── service/
     │   ├── internal/                        # ★ 原子能力层(多 service 复用单元,不挂 endpoint)
     │   │   └── {capability}_service.dart    # 详见「Service/internal 原子能力层」节
+    │   ├── models/                          # ★ service 装配中转 DTO(Rust FFI 入参对象/跨方法传递结构等)
+    │   │   └── {xxx}.dart                   #   不是 wire DTO 也不是 DAO Row,详见「Service 装配中转 DTO」节
     │   ├── {action}_service.dart            # 一接口一 service,编排 DAO + 事务 + BackendInfra
-    │   └── {purpose}_orchestrator.dart      # 跨 service 共享的写入/校验链路（粗粒度编排）
+    │   └── {purpose}_orchestrator.dart     # 跨 service 共享的写入/校验链路（粗粒度编排）
     └── dao/
+        ├── models/                          # ★ 本模块 DAO 私有 Row 实体(JOIN/聚合的强类型返回)
+        │   └── {xxx}_row.dart               #   随 backend/ 整包独立服务化,不进 common
         └── {table}_dao.dart                 # ★ 原子 SQL 一方法一语句,禁止业务编排,事务由 service 包(详见 Step 4)
 ```
 
@@ -516,6 +534,99 @@ class RefundCallbackPersistenceService {
 
 ---
 
+## Service 装配中转 DTO（`service/models/`）
+
+### 概念与定位
+
+`service/{action}_service.dart` 在主流程里经常需要把一组字段当一个对象传递 —— 例如：
+
+- 调 Rust FFI 前组装的算价入参对象（`OrderAdditionalFee` / `PosOrder` / `MainItem`...）
+- 跨多个私有方法传递的结构化中间结果
+- 拼装响应前的 internal 装配对象（与 wire DTO 形状不一定一致）
+
+这些**不是 wire DTO**（不进 common，因为不出现在前端契约中），**也不是 DAO Row**（不由 DAO 返回，是 service 自己拼出来的）。它们的归宿是 `lib/features/{module}/backend/service/models/`，与 `dao/models/` 形成对称：
+
+| 层 | 私有 DTO 位置 | 用途 | 命名 |
+|---|---|---|---|
+| DAO | `backend/dao/models/{xxx}_row.dart` | DB 查询结果（聚合/JOIN/子集） | `*Row` / `*SummaryRow` / `*ProjectionRow` |
+| service | `backend/service/models/{xxx}.dart` | service 装配中转（FFI 入参/跨方法传递/装配中间产物） | 语义命名（如 `RustServiceFeeData` / `RefundConfirmContext`） |
+| service 文件内 `_` 私有 record | service 文件底部 | **小** 上下文 record（1-3 字段） | `_Ctx` / `_Inner` / `_AllocateInfo` |
+
+### 抽出阈值（何时建 `service/models/`，何时留 `_` 私有 record）
+
+满足**任一**条件时抽到 `service/models/`：
+
+| 信号 | 例 |
+|---|---|
+| 字段数 **≥ 5** | `RustServiceFeeData` 12 字段 — 塞 service 文件底部会挤占可读空间 |
+| 在多个 public/private 方法间传递（**≥ 2 处** use site） | 一个 DTO 同时被装配方法、`_buildResponse` 私有方法、`_buildXxxBranch` 用 |
+| 有 `toJson` / `fromJson` / 转换方法 | 行数会膨胀，与 service 主流程混在一起视觉割裂 |
+| 类级 dartdoc 超过 3 行（需写明 wire 形态/对齐云端类/特殊语义） | 注释占据 service 文件，读者注意力被分散 |
+
+**否则**保留为 service 文件底部 `_` 私有 record / class（**字段 ≤ 3** 且**单一方法内传递**）—— 这是事务上下文场景（`_Ctx { now, operatorId, tenantId }`）。
+
+### `service/models/` 的写法约定
+
+```dart
+// lib/features/{module}/backend/service/models/rust_service_fee_data.dart
+
+/// Rust FFI 入参：单条服务费配置（对齐 rust additional_fee.rs OrderAdditionalFee）
+///
+/// service 装配阶段的中转 DTO —— 不是 wire DTO（前端响应仍透传 Rust 出参,与本类无关），
+/// 也不是 DAO Row。仅 backend 内部 service 与 Rust FFI 桥接用。
+///
+/// [toJson] 输出形态与历史 Map 字节级一致：method=1 输出 serviceChargeRate,
+/// 其它输出 serviceFixedCharge（互斥）；其余字段无条件输出。
+class RustServiceFeeData {
+  final int serviceFeeManagementId;
+  final String serviceFeeName;
+  // ... 其余字段
+  final double? serviceChargeRate;
+  final double? serviceFixedCharge;
+
+  const RustServiceFeeData({
+    required this.serviceFeeManagementId,
+    required this.serviceFeeName,
+    // ...
+    this.serviceChargeRate,
+    this.serviceFixedCharge,
+  });
+
+  /// 输出 Map 给 Rust FFI / 出参分支共用；保留互斥字段语义
+  Map<String, dynamic> toJson() => {
+        'serviceFeeManagementId': serviceFeeManagementId,
+        'serviceFeeName': serviceFeeName,
+        if (serviceChargeMethod == 1) 'serviceChargeRate': serviceChargeRate ?? 0,
+        if (serviceChargeMethod != 1) 'serviceFixedCharge': serviceFixedCharge ?? 0,
+        // ...
+      };
+}
+```
+
+#### 强制规则
+
+| 项 | 规则 |
+|---|---|
+| **物理位置** | `lib/features/{module}/backend/service/models/{xxx}.dart` —— 与 `dao/models/` 对称，单文件单 class（与现有 wire DTO 一致风格） |
+| **命名** | 语义命名 **不带 `_` 前缀**（dart 没有 package-private，靠目录约定隔离）；动词/语境前缀让用途自明，如 `Rust*Data` / `*Context` / `*Input` |
+| **类型** | 普通 `class`，`final` 字段，`const` 构造器 + `required`；按需加 `toJson()` / `fromJson()` / 工厂方法 |
+| **dartdoc 必含 3 项** | (1)用途定位（"装配中转 DTO，不进 wire"）(2)对齐云端/Rust 的 source（如 `rust additional_fee.rs OrderAdditionalFee`）(3)`toJson` 输出形态与历史 Map 是否字节级一致 |
+| **不进 wire** | 类不能被任何 handler / Response DTO 直接引用；只允许 service 文件 import |
+| **跨模块复用** | 默认本模块独享。其它模块需要相同形状 → 各自在自己模块的 `service/models/` 下复制一份（DAO Row 同规则）—— **DTO 重复 OK，硬绑两个模块不 OK** |
+| **build_runner** | 通常无需（本类无 `*.g.dart`）；如确有 freezed/json_serializable 才加 part |
+
+### 写代码时何时主动抽到 `service/models/`
+
+写 service 时按以下流程主动审视：
+
+1. 写完装配段或主流程后，反向看私有 record / `Map<String, dynamic>` 拼装：是否符合**抽出阈值**任一条件？
+2. **是** → 主动建议用户：「这个 `Map<String, dynamic>` 拼装有 12 字段且 toJson 形态固定，建议抽到 `backend/service/models/{xxx}.dart`，IDE 能补全字段、编译期检查拼写错误。我抽吗？」
+3. **否** → 保留为 service 文件底部 `_` 私有 record；**不擅自外移**
+
+> 此规则建议性，但**抽出后必须遵循 dartdoc 三项规范**（用途/source/toJson 形态），保证读者无须翻 service 文件就能理解这个中转 DTO 的语义。
+
+---
+
 ## 八步编写顺序（必须按顺序落盘）
 
 每一步都要在落盘前把**这一步文件的完整内容**展示给用户确认，不得批量生成整包。
@@ -675,6 +786,8 @@ dart run build_runner build --delete-conflicting-outputs
 
 **路径**：`backend/dao/{table}_dao.dart`（命名以**表名**为主，一个表一个 DAO 文件）
 
+> **DAO 是 SQL 的唯一容器**。整个 backend 内（含 service / orchestrator / handler / registry / internal 原子能力）**只有 DAO 文件**允许出现 `customSelect` / `select(table)` / `update(table)` / `delete(table)` / `into(table).insert(...)` / `_db.batch(...)` 这类 drift 调用；其它任何文件出现 SQL 都视为违规（详见 Step 5「Service 内禁止任何 SQL」红线 + 「禁区」节）。
+
 #### 核心规则：DAO 只是 SQL 的容器，不是事务编排者
 
 | 维度 | DAO 应该做 | DAO **不应该**做 |
@@ -818,7 +931,7 @@ class RefundConfirmService {
 | 档位 | 用法 | 范本 | 何时用 |
 |---|---|---|---|
 | **A. Drift 自动 Row 类** | `select(orders).where(...).getSingleOrNull()` 直接返回 drift 生成的 `Order` / `Bill` row | `OrderDao.findById` 返回 `Future<Order?>` | 单表查询，字段集 = 表字段集 |
-| **B. 自定义 `*Row` 实体类** | `customSelect(...).get()` 后 `.map((r) => XxxRow(...))` 包装；实体类放 `lib/common/services/database/models/` | `BillDao.findPayableBills` 返回 `Future<List<PayableBillRow>>` | JOIN / 计算列 / 子集字段 / 字段需重命名 |
+| **B. 自定义 `*Row` 实体类** | `customSelect(...).get()` 后 `.map((r) => XxxRow(...))` 包装；实体类**默认**放本模块 `backend/dao/models/`（跨模块复用时才上提到 `lib/common/services/database/models/`，详见「实体类落地约定」） | `OrderServiceFeeSnapshotDao.findByOrderId` 返回 `Future<List<OrderServiceFeeSnapshotRow>>` | JOIN / 计算列 / 子集字段 / 字段需重命名 |
 | **C. 自定义 `*SummaryRow` 实体类** | 同 B，但承载 SUM/COUNT/AVG 等聚合结果，字段语义是"汇总值" | `OrderDao.sumAmountsByOrderIds` 应改返 `Future<OrderAmountsSummaryRow?>`（当前是 `Map<String, double>?`，是反例） | 聚合查询，字段全部是数值汇总 |
 
 > 这三档都是 **JPA 风格**：调方拿到的是 dart 强类型对象，IDE 自动补全字段名、字段拼写错编译期就报。**Map / QueryRow 是 JDBC 风格**——拼错字段名运行时才崩，且查询语义靠 doc 描述而不是类型。
@@ -853,10 +966,10 @@ final id = rows.first.read<int>('order_item_id'); // ← 同样的字符串问�
 
 ##### ✅ 正例（用自定义实体类承载结果集）
 
-**Step 1：在 `lib/common/services/database/models/` 下建实体文件**
+**Step 1：在本模块 `backend/dao/models/` 下建实体文件**（默认就近落地，跨模块复用时才上提到全局；上提条件见「实体类落地约定」）
 
 ```dart
-// lib/common/services/database/models/order_amounts_summary_row.dart
+// lib/features/{module}/backend/dao/models/order_amounts_summary_row.dart
 
 /// 订单金额汇总行(DAO 层 DTO)
 ///
@@ -894,10 +1007,10 @@ class OrderAmountsSummaryRow {
 **Step 2：DAO 方法返回该实体**
 
 ```dart
-// daos/order_dao.dart
-import '../models/order_amounts_summary_row.dart';
+// backend/dao/order_dao.dart
+import 'models/order_amounts_summary_row.dart';
 
-export '../models/order_amounts_summary_row.dart'; // 调方 import dao 即可拿到实体
+export 'models/order_amounts_summary_row.dart'; // 调方 import dao 即可拿到实体
 
 class OrderDao extends DatabaseAccessor<AppDatabase> with _$OrderDaoMixin {
   /// 联台订单金额汇总。返回 null 表示 orderIds 为空或无匹配。
@@ -939,12 +1052,14 @@ final pay = summary.payAmount;          // ← 字段拼错编译期就报错
 
 | 项 | 规则 |
 |---|---|
-| **物理位置** | `lib/common/services/database/models/{purpose}_row.dart` —— 与 `daos/` 平级，便于跨模块复用 |
+| **物理位置（默认）** | `lib/features/{module}/backend/dao/models/{purpose}_row.dart` —— 与本模块 `dao/` 同包，独立服务化时随 `backend/` 整包搬走，不污染全局 common |
+| **物理位置（例外，跨模块复用）** | `lib/common/services/database/models/{purpose}_row.dart` —— 仅当**已实际有 ≥2 个不同模块的 DAO 同时返回该 Row**（不是"假设可能复用"）时才上提到全局；首次出现复用需求时机会主义迁移，不预先上提 |
 | **命名后缀** | `*Row`（普通查询）/ `*SummaryRow`（聚合查询）/ `*ProjectionRow`（子集投影） |
 | **类型** | 普通 `class`，`final` 字段，`const` 构造器 + `required`；**不写** `fromJson` / `toJson`（DAO 内部 DTO，不进 wire，详见 ACL 节） |
 | **字段类型** | 严格强类型：`int / double / String / DateTime / int? / double?...`；**禁用** `dynamic` / `Object` |
 | **可空语义** | 字段可空（`int?`）= "DB 列允许 NULL 或 SUM/MIN 在空集时返回 NULL"；不可空（`int`）= "DAO 内部已用 `?? 默认值` 兜底" |
-| **export** | DAO 文件顶部 `export '../models/{xxx}_row.dart';` —— 调方 `import 'order_dao.dart'` 就能拿到实体，无需双 import |
+| **export** | DAO 文件顶部 `export 'models/{xxx}_row.dart';`（默认本模块就近）或 `export '../../../../common/services/database/models/{xxx}_row.dart';`（已上提到全局时）—— 调方 `import '{module}_dao.dart'` 就能拿到实体，无需双 import |
+| **跨模块引用方式** | A 模块 DAO 想用 B 模块的 Row：先确认是否真的复用同一形状；是 → 把 Row 上提到 `common/services/database/models/`；否 → A 模块自己在 `backend/dao/models/` 下建一份（DAO 层 DTO 允许重复，避免硬绑两个模块） |
 
 ##### 何时不必新建 `*Row`：drift 自动 Row 已经够用
 
@@ -1102,9 +1217,11 @@ class _Inner {
 #### 强制规则
 
 - **一接口一 service**：每个 service 文件只对应 1 个 endpoint，类内只暴露 1 个 public 方法（详见上方「Service 粒度规则」节）；跨接口复用的链路下沉到 `service/{purpose}_orchestrator.dart` 或 `service/internal/{capability}_service.dart`，**严禁** service A 直接 import service B
+- **Service 内禁止任何 SQL（核心红线）**：service 文件里**不允许**出现 `_db.customSelect(...)` / `_db.select(table)` / `_db.update(table)` / `_db.delete(table)` / `into(table).insert(...)` / `_infra.db.batch(...)` 等任何 drift 直接读写形式；所有数据访问必须经 DAO 方法调用。`db.transaction(() async { ... })` 是**唯一例外**（事务编排归 service），但事务体内每一步只能是 `await _xxxDao.method(...)` 调用，不得直接拼 SQL。**理由**：① service 直接出现 SQL 字符串会让"业务编排"与"数据访问"耦合在同一栈，单元测试要 mock 整个 db；② 同一条 SQL 会被多个 service 复制粘贴，schema 变更时改散无主；③ 字段名靠 `row.read('xxx_col')` 字符串取值，IDE 无补全、拼写错误运行时才暴露；④ 独立服务化时 SQL 与业务逻辑无法分包搬走。**违规处置**：发现 service 文件里出现任何 SQL 字符串或 drift typed query → 立刻在 `backend/dao/` 或 `common/backend_infra/daos/` 下加一个原子 DAO 方法（`findXxx` / `updateXxx` / `insertXxx`），把 SQL 移走，service 改调 DAO；同步把违规登记到 `docs/coding-violations.md`（详见 `coding-violation-log` skill）
 - **事务编排归 service**：`db.transaction()` 必须出现在 service，不在 DAO；service 内部按"读上下文 → 事务内组合 DAO → 事务外容错调用"三段式
 - **public 方法 = 对外接口**：类级 / 方法级 dartdoc **必须**写「对齐云端：{Java 类全路径}#方法」
 - **参数组装 / 校验 / 辅助查询 / 上下文打包 必须抽 `_private` 方法**，不得内联在主流程里
+- **对外调用前必须用 DB 实读数据兜底校验业务数值**：service 调云端 HTTP / 跨子门面 / POS 硬件协议前，凡传给对方的"业务数值"（金额、数量、配额、剩余次数等）若在本地 DB 中存在可查到的上限/边界（原流水金额、剩余可退、可用库存等），**必须**用 DB 实读值做边界校验，不得直接信任上游入参或前序内存对象；校验逻辑抽 `_private` 方法（详见下方「外部调用前的边界兜底校验」节）
 - **DTO 来自 common**：`import '../../common/models/{request,response}/...';` —— 不再 import `../dto/`
 - **只 import `BackendInfra` + DAO + 本模块 common + 原子能力 + lib/common`**，禁止 `ref.read(xxxProvider)` 方式直接拉其他模块（其它模块依赖走 BackendInfra 门面或其它模块 backend 直接 import）
 - **业务异常用 `ApiIntranetException(MessageKey.xxx)`**，由 handler 层统一本地化
@@ -1115,6 +1232,90 @@ class _Inner {
   - 魔法数字（状态码、枚举值）→ 枚举所有可能值及语义
   - 字段取值来源 → 注明 DB 列 / 入参字段 / 云端对齐路径
   - 容错降级（比如分摊失败仅记日志不回滚）→ 注明"为何不回滚"
+
+#### 外部调用前的边界兜底校验（健壮性硬规则）
+
+**任何要传给云端 HTTP、跨子门面 / capability port、POS 硬件协议的"业务数值"（金额、数量、配额等），如果它在本地 DB 中存在可查到的上限/边界，service 层在发起调用前必须用 DB 实读值兜底校验，不得直接信任上游入参或前序内存对象。**
+
+##### 为什么必须做
+
+| 风险 | 影响 |
+|---|---|
+| 云端/硬件回错信息泛化（如"退款金额大于交易流水金额"） | 定位成本高，要翻三层日志才知道是本地传错 |
+| 上游计算可能 bug 或入参变形（UI 算价、Rust FFI、allocator、外部模块入参） | 一旦失真没本地兜底就直接打到云端 |
+| 即便本次代码无 bug，DB 状态可能因并发/幂等竞争出现偏差 | 边界校验是最后一道防线 |
+| 错误金额一旦云端入账，回滚链路远比拦截一次复杂 | 风险不对称，必须前移 |
+
+##### 强制做法
+
+1. **校验时机**：service 内调外部前。事务内 DAO 读完上下文 → 立即校验 → 校验通过才进事务写入或外部调用
+2. **校验对象**：每一笔即将发出的"可向云端发起业务变更的数值"（refundAmount / quantity / amount / 等）
+3. **校验依据**：DB 实读的边界值（原流水 `pay_amount`、累计已退 `SUM(...)` 等），**不是入参回显**，**不是上游内存对象**
+4. **校验方法必须抽 `_private` 方法**（与「健壮性/参数校验代码须抽私有方法」规则呼应），不得内联到主流程
+5. **失败抛业务异常**：`ApiIntranetException(MessageKey.invalidParam)` 或更具体的 `MessageKey`
+6. **金额比较加 ±0.005 浮点容差**：避免 double 精度误差导致 "9.0 > 9.0000001" 的误报
+
+##### ❌ 反例
+
+```dart
+// 直接信任 DAO 读出的 pay_amount，无兜底就送云端
+final onlineRefundInfo = RefundOnlineCallInfo(
+  outTradeNo: refundOutTradeNo,
+  oriOrderNo: alloc.originalChannelTradeNo,
+  refundAmount: _formatOnlineRefundAmount(alloc.payAmount),
+);
+
+// 信任 allocator 的 currentRefundAmount，没核"原流水可退余额"
+refundAmount: _formatOnlineRefundAmount(alloc.currentRefundAmount),
+```
+
+风险：上游 allocator 一旦把 currentRefundAmount 算大（哪怕 0.01 元），云端立刻回 result=3 reason=发起退款失败；本地无线索可查（业务日志里 refundAmount 看着没问题，但和 DB 不一致）。
+
+##### ✅ 正例
+
+```dart
+// 1. service 在调云端前用 DB 实读做兜底
+final originalTx = await _orderTransactionDao.findById(alloc.originalTransactionId);
+final alreadyRefunded = await _orderTransactionDao.sumSuccessRefundsOf(alloc.originalTransactionId);
+_assertRefundAmountWithinBound(
+  proposed: alloc.currentRefundAmount,
+  originalPayAmount: originalTx.payAmount,
+  alreadyRefunded: alreadyRefunded,
+);
+// 校验通过才组装外发参数 + 调云端
+final outcome = await _infra.refundKpayOnline(/* ... */);
+
+// 2. 校验抽私有方法
+void _assertRefundAmountWithinBound({
+  required double proposed,
+  required double originalPayAmount,
+  required double alreadyRefunded,
+}) {
+  if (proposed <= 0) {
+    throw ApiIntranetException(MessageKey.invalidParam); // 金额必须 > 0
+  }
+  final available = originalPayAmount - alreadyRefunded;
+  if (proposed > available + 0.005) {  // 浮点容差
+    throw ApiIntranetException(MessageKey.invalidParam); // 超过可退余额
+  }
+}
+```
+
+##### 适用范围
+
+| 场景 | 是否强制 |
+|---|---|
+| service 调云端 HTTP 接口（如 kpayOnlineRefund / kpayOfflineRefund） | ✅ 必须 |
+| service 调跨子门面 / capability port（独立服务化后变 RPC） | ✅ 必须 |
+| service 调 POS 硬件协议（线下刷卡撤销/退款） | ✅ 必须 |
+| service 内部纯本地 DB 写入（无外部调用） | 推荐做（前置校验防写入异常态） |
+| 单纯查询接口（无 mutation） | 不强制（查询不会引发不一致） |
+
+##### 已知反例（待补救）
+
+- `lib/features/refund/backendv2/dao/cancel_order_refund_dao.dart` cancel/reject 路径
+- `lib/features/refund/backendv2/dao/refund_transaction_dao.dart` 部分退路径
+- 都直接信任原流水 `pay_amount` / allocator `currentRefundAmount` 后送云端，未做"原流水可退余额"实读核对；后续在对应 service 加私有 `_assertRefundAmountWithinBound` 补齐
 
 #### 复用提醒（重要）
 
@@ -1640,13 +1841,15 @@ Skill 在 Edit DTO 前**必须跑**这一步识别，把结果和字段改动影
 
 | 检查项 | 通过条件 |
 |---|---|
-| **目录结构** | 严格符合 `common/{enums/{endpoints,business},models/{request,response}}` + `backend/{endpoint(handler),registry,service/{,internal},dao}`；新代码不新增 `backend/dto/`、`backend/endpoint/{module}_endpoint.dart`、`application/data/domain/` 等已废弃路径 |
+| **目录结构** | 严格符合 `common/{enums/{endpoints,business},models/{request,response}}` + `backend/{endpoint(handler),registry,service/{,internal,models},dao/{,models}}`；新代码不新增 `backend/dto/`、`backend/endpoint/{module}_endpoint.dart`、`application/data/domain/` 等已废弃路径 |
 | **service 粒度** | 每个 service 文件只对应 1 个 endpoint，类内只暴露 1 个 public 方法（方法名 = handler 转发方法名）；跨接口复用沉入 `service/{purpose}_orchestrator.dart` 或 `service/internal/`；service 之间无互相 import |
 | **DAO 原子化** | 每个 DAO public 方法 = 一条原子 SQL；DAO 内部**不出现** `db.transaction(`；DAO 不读 `_infra.auth` / `_infra.store` 等上下文（除 `_infra.db`）；事务编排在 service |
-| **DAO 返回强类型实体（JPA 风格）** | DAO 方法返回类型必须是 drift 自动 Row（单表）或自定义 `*Row` 实体类（JOIN/聚合）；**禁止** `Future<Map<String, dynamic>>` / `Future<List<QueryRow>>` / `Future<dynamic>`；自定义 Row 类放 `lib/common/services/database/models/`，DAO 顶部 `export` |
+| **DAO 返回强类型实体（JPA 风格）** | DAO 方法返回类型必须是 drift 自动 Row（单表）或自定义 `*Row` 实体类（JOIN/聚合）；**禁止** `Future<Map<String, dynamic>>` / `Future<List<QueryRow>>` / `Future<dynamic>`；自定义 Row 类**默认放本模块** `backend/dao/models/`（仅当 ≥2 模块实际复用时才上提到 `lib/common/services/database/models/`），DAO 顶部 `export` |
 | **service/internal 复用提醒** | 写主 service 时已 grep 模块内同类片段；发现 ≥2 处重复 → 已主动建议下沉到 `service/internal/{capability}_service.dart`（用户确认前不擅自抽） |
+| **service 装配中转 DTO** | service 装配段 `Map<String, dynamic>` / 私有 record 满足任一阈值（字段 ≥5 / 跨方法 ≥2 处用 / 有 toJson / dartdoc >3 行）时已主动建议抽到 `backend/service/models/`；用户确认前不擅自抽。小 record（字段 ≤3 + 单方法内传递）保留 service 文件底部 `_` 前缀私有 |
 | import 边界 | grep 新增代码：无 `features/{module}/{data,application,presentation,domain}/` 引用；其它 feature 的非 common/非 backend 层引用走 BackendInfra；无 `*_notifier.dart` / widget 引用 |
 | BackendInfra 使用 | Service / DAO 构造器接受 `BackendInfra`，方法体内 **不出现** `ref.read(` |
+| **外部调用前的边界兜底校验** | 凡 service 调云端 HTTP / 跨子门面 / POS 硬件协议的"业务数值"（金额、数量、配额等），若本地 DB 有可查的上限/边界，已用 DB 实读值做边界校验（不信任入参/前序内存对象）；校验逻辑抽 `_assertXxxWithinBound` 私有方法；金额比较加 ±0.005 浮点容差；失败抛 `ApiIntranetException`。详见「外部调用前的边界兜底校验」节 |
 | **DTO 在 common 且 wire 干净** | request/response DTO 在 `features/{module}/common/models/{request,response}/`；用 `@JsonSerializable()`（不写 freezed）；**不出现** `@JsonKey(includeToJson: false, includeFromJson: false)` 标注的 internal 字段 — internal 字段一律拆到 backend 私有 record / `_` 前缀类 |
 | **路由枚举在 common** | `{Module}Endpoint` 在 `features/{module}/common/enums/endpoints/`，handler 通过 import 引用；backend/endpoint/ 下不存在 `{module}_endpoint.dart` |
 | Handler 薄壳 | 每个 handler 方法 ≤ 8 行，只含 `_base.handle/handleRaw` 调用 |
@@ -1696,6 +1899,7 @@ git-commit-standards（提交）
 | **DAO 内部包 `db.transaction(...)` 做多步 SQL 编排** | 违反 DAO 原子化原则（Step 4）；事务由 service 包，DAO 一方法一 SQL |
 | **DAO 内部读 `_infra.auth` / `_infra.store` / `_infra.kvStorage`** | 上下文耦合，DAO 无法独立测试；service 整理 tenantId/operatorId/storeId 后作为入参传入 |
 | **DAO 方法返回 `Map<String, dynamic>` / `List<QueryRow>` / `dynamic`** | 弱类型 JDBC 风格，调方靠字符串 key 取字段，IDE 不补全、拼错运行时才崩；必须用 drift 自动 Row 或自定义 `*Row` 实体类（JPA 风格） |
+| **Service 内出现任何 SQL（`_db.customSelect` / `_db.select(table)` / `_db.update(table)` / `_db.delete(table)` / `into(table).insert` / `_infra.db.batch(...)` 等）** | 业务编排与数据访问耦合，schema 变更时 SQL 散落多处无主、单测要 mock 整个 db、字符串字段名靠 `row.read('xxx')` 拼写错运行时才崩、独立服务化时无法分包搬走；service 仅允许 `db.transaction(...)` 包事务，体内每一步必须是 `await _xxxDao.method(...)` 调用，SQL 一律下沉到 DAO（详见 Step 5「Service 内禁止任何 SQL」核心红线）|
 | 在 Service / DAO 里写 `ref.read(xxxProvider)` | 绕过 BackendInfra 门面，独立服务化时会大范围返工 |
 | 一个 service 文件 expose 多个 public 业务方法 / 一个 service 服务多个 endpoint | 违反「一接口一 service」debug 友好原则；本端 service ≈ 云端 Controller，不要按 ServiceImpl 的合并方式写 |
 | service A 直接 import service B 复用业务能力 | 跨接口复用必须沉到 `service/internal/{capability}_service.dart` 或 `service/{purpose}_orchestrator.dart`；service 之间维持平级独立 |
@@ -1707,3 +1911,5 @@ git-commit-standards（提交）
 | 同一次 PR 同时改 backend 和 `features/{module}/presentation/` | 违反「backend 与 UI 彻底分开开发」；UI 切换由 UI 团队做（注：本次允许同 PR 改 `common/` —— 它是 UI 与 backend 共享契约真源） |
 | 在设计/编码文档里把「UI 怎么调新接口」作为 checkbox 任务 | 越界；backend 只声明契约，不规划 UI diff |
 | 对已对接接口的 wire 字段做破坏性改动（删字段、改类型、可选→必填、魔法数字语义变） | 违反已开启对接接口保护矩阵；必须走新接口或 `/v2/` 路径 |
+| **service 调云端/硬件前不做 DB 实读兜底校验，直接信任入参或前序内存对象** | 一旦上游计算偏差或 DB 状态异常，错误金额/数量直接打到云端，回错信息泛化（"金额大于流水"），定位成本高且回滚链路远比拦截一次复杂；必须用 DB 实读边界（原流水 pay_amount、累计已退 sum 等）兜底，校验抽 `_private` 方法 |
+| **在已有的巨型方法 / 老骨架文件里就地追加新逻辑（新增 N 行内联在旧 service / 旧 repository / 旧 endpoint 段里）** | 新逻辑放到新 service / 新子门面 / 新原子能力暴露 public 方法（一开始就符合 SKILL 目标态：DAO 唯一容器 SQL / 私有方法粒度 / 强类型 / 一接口一 service），旧文件只 +1 行调用；典型应用：扩展数据同步链路漏处理的字段、给老 repository 补字段映射、给老 endpoint 接受新 payload 段时，全部走"新结构暴露 + 旧代码引用"。详见 `architecture-ddd-lite-fullstack` skill 的「新代码落点决策」节 |
