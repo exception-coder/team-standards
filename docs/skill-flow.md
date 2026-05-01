@@ -2,7 +2,8 @@
 
 > 本文档梳理 team-standards 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-05-02 v19**
+> **最后更新：2026-05-02 v19.1**
+> 变更摘要 v19.1：`git-commit-standards` hook 从"一刀切强制"调整为"按 staged diff 大小放行" —— `hooks/check-git-commit-skill.js` 在拦截 `git commit` 时先跑 `git diff --staged --shortstat` + `--name-status`，若 ≤2 文件 ∧ insertions+deletions ≤30 ∧ 全部为 `M` 修改则直接放行（让模型自行写一句 clear commit message），其它情况才强制 skill；阈值通过 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 环境变量可调；同时移除 `git push` 拦截（commit 已落地、push 无需再门禁）。SKILL.md description、CLAUDE.md/AGENTS.md 主动触发表 + Skill 索引、README.md 能力条目同步更新。该变更只调整触发条件粒度，链路节点结构未变，按"轻微"处理未单独创建快照。
 > 变更摘要 v19：`git-commit-standards` 由"模型自觉调用"升级为"hook 强制调用" —— 新增 `hooks/check-git-commit-skill.js`（跨平台 Node 脚本），通过 `hooks/hooks.json` 默认启用 PreToolUse Bash matcher，在每次 `git commit` / `git push` 前 grep 当前会话 transcript 是否含 `team-standards:git-commit-standards` skill 调用记录，未命中直接 exit 2 阻断。同步更新 SKILL.md description、CLAUDE.md/AGENTS.md 主动触发表 + Skill 索引 + 辅助资源表、README.md 能力表 + 顶层目录表，新增 `git commit/push 前 skill 触发拦截` 链路节点。该变更属于触发机制语义变化（建议 → 强制），创建 v19 快照。
 > 变更摘要 v18.2：`design-doc-required` 调整文档版本策略 —— 项目内正式文档进入 Git 后，默认维护稳定/current 文档，普通迭代直接修改原文档并由 git commit body 记录历史；`YYYYMMDD-vN` 快照仅用于重大基线、非 Git 管理文档或用户明确要求。`bugfix-coding-style` 同步强调源码只描述当前正确逻辑，过气逻辑和变更说明归 Git 历史。该变更只补强节点文字与 FAQ，链路节点结构未变，按"轻微"处理未单独创建快照。
 > 变更摘要 v18.1：`architecture-ddd-lite-fullstack` 补充结构质量门禁 —— 编码前不仅判断分层、Feature、原子能力，也必须判断代码结构是否清晰、易维护、低耦合、高内聚；新增实现不得为了快速完成而复制低质量旧结构或制造职责混杂、难测、难替换的代码。该变更只补强节点文字与 Skill 规则，链路节点结构未变，按"轻微"处理未单独创建快照。
@@ -40,7 +41,7 @@
 | `pre-implementation-code-orientation` | team-standards | 文档写完后、开始实施代码前（含「帮我修改代码」「改代码」等直接编码请求） |
 | `architecture-ddd-lite-fullstack` | team-standards | 编写或审查 Java / React / Vue / Flutter 业务代码前；在实施前代码定位后，先判断 Feature、分层、单向依赖、原子能力与结构质量（清晰、易维护、低耦合、高内聚） |
 | `java-coding-standards` | team-standards | 编写或修改任何 Java 代码时（自动应用） |
-| `git-commit-standards` | team-standards | 执行 git commit / push 前；**v1.18 起 hook 强制**：`hooks/check-git-commit-skill.js` 在 PreToolUse Bash matcher 拦截，会话内未调用本 skill 时 git commit / push 直接 exit 2 阻断；仅在当前仓库就是 team-standards 插件源码仓库且插件自身变更完成后自动 stage、commit、push |
+| `git-commit-standards` | team-standards | 大改 git commit 之前（>2 文件 / >30 行 / 含新增/重命名/删除文件）；**v1.18.1 起 hook 按改动大小放行**：`hooks/check-git-commit-skill.js` 看 staged diff，≤2 文件 ∧ ≤30 行 ∧ 仅 `M` 修改时直接放行（让模型自行写 commit message），其它情况未调用本 skill 时直接 exit 2 阻断；阈值可用 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 调整；git push 不门禁；仅在当前仓库就是 team-standards 插件源码仓库且插件自身变更完成后自动 stage、commit、push |
 | `dev-log` | team-standards | 对 team-standards 做决策型变更后：新增/删除 Skill、触发时机或核心行为变化、规则方向反转、跨 Skill 链路变化、重大团队原则沉淀；普通小改只写 commit body |
 | `markdown-writing-standards` | team-standards | 生成或修改包含 Mermaid 图表的 Markdown 内容；完成 Markdown 文件的结构性写入/重组后做目录复核（自动应用，与 java-coding-standards 同级） |
 | `business-logic-orientation` | team-standards | 重构/复写/迁移前需要理解现有业务逻辑时（产出梳理文档 + AI 速查索引） |

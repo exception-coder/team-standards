@@ -8,7 +8,7 @@
 - **DDD-lite 全栈架构约束**（编码前默认判断分层、Feature 模块、原子能力和结构质量）
 - **Java 后端单服务知识图谱**（按项目沉淀能力、流程、表、枚举、API、外部依赖与代码坐标）
 - **Bug 分析文档规范**（报告 Bug 时强制规范章节结构、Mermaid 图、根因表格）
-- **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息；**v1.18 起 hook 强制**：`hooks/check-git-commit-skill.js` 默认启用，未调用 skill 时 `git commit` / `git push` 直接被拦截）
+- **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息；**v1.18.1 起 hook 按改动大小放行**：`hooks/check-git-commit-skill.js` 看 staged diff，小改 ≤2 文件 ∧ ≤30 行 ∧ 仅 `M` 修改时直接放行让模型写 commit message，大改才强制走 skill 五步；git push 不门禁）
 - **文档索引优先约束**（编写任何文档前读取索引，分析内容边界，避免重复，写完后半自动更新索引）
 - **文档输出路径规则**（AI 生成 Markdown 默认进用户 Documents 下的 `ai-docs/{project}/`，终版由用户自行上传）
 - **Markdown 编写规范**（Mermaid 图表语法、表格、代码块等）

@@ -1,6 +1,6 @@
 ---
 name: git-commit-standards
-description: Use BEFORE running any git command (status / diff / log / commit / push) when the user asks to commit code, push, or generate a commit message. Triggering is now hook-enforced — `hooks/check-git-commit-skill.js` blocks `git commit` / `git push` Bash calls until this skill has been invoked in the current session, so do NOT fall back to the harness default git workflow. MUST analyze actual code changes before composing the message. Automatic stage/commit/push applies ONLY to the team-standards plugin source repository, never to business projects that merely install this plugin.
+description: Use when the user asks to commit code or generate a commit message AND the staged diff is non-trivial (>2 files, >30 net lines, or contains new/renamed/deleted files). For trivial commits (≤2 files, ≤30 lines, only modifications to existing files) skip this skill and write a clear `git commit` message directly — `hooks/check-git-commit-skill.js` enforces the same threshold at the Bash layer (only blocks `git commit` when staged diff exceeds it). MUST analyze actual code changes before composing the message. Automatic stage/commit/push applies ONLY to the team-standards plugin source repository, never to business projects that merely install this plugin.
 ---
 
 <EXTREMELY-IMPORTANT>
@@ -19,7 +19,12 @@ If you think any step is unnecessary, that thought is a Red Flag. Stop and re-re
 
 每次提交前先执行 `git diff --staged`，读取变更内容后再撰写提交信息。
 
-> **Hook 强制说明：** `hooks/check-git-commit-skill.js` 会在每次 `git commit` / `git push` 的 Bash 调用前拦截，并通过 transcript 检查本会话是否真正调用过本 skill。未调用直接 exit 2 阻断。这意味着：用户一说 commit 就必须**第一时间**通过 Skill 工具调用 `team-standards:git-commit-standards`，否则 git 命令会被 hook 拦下来，且无法绕过。
+> **Hook 强制说明（v1.18.1 起按改动大小放行）：** `hooks/check-git-commit-skill.js` 在每次 `git commit` 的 Bash 调用前先看 staged diff：
+> - **小改放行**：≤ 2 文件 ∧ insertions+deletions ≤ 30 ∧ 全部为 `M`（仅修改现有文件，无 `A`/`R`/`D`）→ 直接放行，让模型用一句清晰的 commit message 提交，不必启动本 skill 五步清单。阈值可用环境变量 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 调整。
+> - **大改强制**：以上任一不满足时，hook 会 grep 当前 transcript 是否含 `"skill":"team-standards:git-commit-standards"` 调用记录，未调用直接 exit 2 阻断。
+> - **git push 不再拦截**：commit 已落地，push 不门禁。
+>
+> 模型侧的判定流程：收到 commit 请求 → Bash 跑 `git diff --staged --shortstat` + `--name-status` 看大小 → 小改直接 commit，大改先 Skill 调用本 skill。
 
 **team-standards 特例（只作用于插件源码仓库）：** 仅当以下三项同时满足时，才自动完成 `git add` → `git diff --staged` → `git commit` → `git push`：
 
