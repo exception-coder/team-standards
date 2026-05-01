@@ -8,7 +8,7 @@
 - **DDD-lite 全栈架构约束**（编码前默认判断分层、Feature 模块、原子能力和结构质量）
 - **Java 后端单服务知识图谱**（按项目沉淀能力、流程、表、枚举、API、外部依赖与代码坐标）
 - **Bug 分析文档规范**（报告 Bug 时强制规范章节结构、Mermaid 图、根因表格）
-- **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息）
+- **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息；**v1.18 起 hook 强制**：`hooks/check-git-commit-skill.js` 默认启用，未调用 skill 时 `git commit` / `git push` 直接被拦截）
 - **文档索引优先约束**（编写任何文档前读取索引，分析内容边界，避免重复，写完后半自动更新索引）
 - **文档输出路径规则**（AI 生成 Markdown 默认进用户 Documents 下的 `ai-docs/{project}/`，终版由用户自行上传）
 - **Markdown 编写规范**（Mermaid 图表语法、表格、代码块等）
@@ -46,7 +46,7 @@ team-standards/
 | `.claude-plugin/` | Claude Code 插件声明目录，包含插件版本、展示信息和 marketplace 条目 | 发布前必须同步递增 `plugin.json` 与 `marketplace.json` 的 `version` |
 | `.codex-plugin/` | Codex 插件声明目录，包含 Codex 侧插件元数据 | 维护 Codex 分发时同步递增 `plugin.json` 的 `version` |
 | `skills/` | 插件核心目录，每个子目录是一个独立 Skill，至少包含 `SKILL.md` | 新增或修改 Skill 后，同步更新 `AGENTS.md`、`CLAUDE.md`、README 的 Skills 表和 `docs/skill-flow.md` |
-| `hooks/` | 可选强制拦截脚本目录，目前用于设计文档门禁检查 | 默认禁用；需要脚本级拦截时再启用 `hooks.json` 中对应平台配置 |
+| `hooks/` | 强制拦截脚本目录：`check-git-commit-skill.js` 默认启用（拦截未调用 git-commit-standards skill 的 git commit / push）；`check-design-doc.{cmd,sh}` 默认禁用模板 | 新增 hook 时同步更新 `hooks.json`、CLAUDE.md/AGENTS.md 辅助资源表 |
 | `docs/` | 维护文档目录，记录 Skill 链路、历史版本、配置机制和决策型变更背景 | 链路结构变化时更新 `skill-flow.md` 并创建版本快照 |
 
 ### 关键文件

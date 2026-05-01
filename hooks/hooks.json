@@ -1,6 +1,19 @@
 {
-  "_comment": "Hook 配置，默认未启用。如需启用，将下方 _disabled_PreToolUse 改为 PreToolUse。Windows 使用 .cmd，macOS/Linux 使用 .sh。",
-  "hooks": {},
+  "_comment": "默认启用 git commit/push 前的 skill 校验 hook（跨平台 Node 脚本，无需用户区分平台）。其它 hook（如 design-doc 检查）仍按 _disabled_* 模板手动启用。Windows 使用 .cmd，macOS/Linux 使用 .sh。",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/check-git-commit-skill.js\"",
+            "async": false
+          }
+        ]
+      }
+    ]
+  },
   "_disabled_PreToolUse_windows": [
     {
       "matcher": "Write|Edit|MultiEdit",

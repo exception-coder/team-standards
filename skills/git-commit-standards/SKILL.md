@@ -1,6 +1,6 @@
 ---
 name: git-commit-standards
-description: Use when about to run git commit, git push, when asked to commit code, when generating a commit message, OR when the current git repository is the team-standards plugin source repository and plugin-source changes are complete with a dirty worktree. MUST analyze actual code changes before composing the message. Automatic stage/commit/push applies ONLY to the team-standards plugin source repository, never to business projects that merely install this plugin.
+description: Use BEFORE running any git command (status / diff / log / commit / push) when the user asks to commit code, push, or generate a commit message. Triggering is now hook-enforced — `hooks/check-git-commit-skill.js` blocks `git commit` / `git push` Bash calls until this skill has been invoked in the current session, so do NOT fall back to the harness default git workflow. MUST analyze actual code changes before composing the message. Automatic stage/commit/push applies ONLY to the team-standards plugin source repository, never to business projects that merely install this plugin.
 ---
 
 <EXTREMELY-IMPORTANT>
@@ -18,6 +18,8 @@ If you think any step is unnecessary, that thought is a Red Flag. Stop and re-re
 **提交信息必须基于实际代码变更分析生成，禁止凭记忆或猜测填写。**
 
 每次提交前先执行 `git diff --staged`，读取变更内容后再撰写提交信息。
+
+> **Hook 强制说明：** `hooks/check-git-commit-skill.js` 会在每次 `git commit` / `git push` 的 Bash 调用前拦截，并通过 transcript 检查本会话是否真正调用过本 skill。未调用直接 exit 2 阻断。这意味着：用户一说 commit 就必须**第一时间**通过 Skill 工具调用 `team-standards:git-commit-standards`，否则 git 命令会被 hook 拦下来，且无法绕过。
 
 **team-standards 特例（只作用于插件源码仓库）：** 仅当以下三项同时满足时，才自动完成 `git add` → `git diff --staged` → `git commit` → `git push`：
 

@@ -17,7 +17,7 @@
 | 即将创建任何 Markdown 文档；或编辑 `docs/` 下任何文件 | `doc-index-required`（默认用户目录输出；仅用户指定 `docs/` 时更新索引） |
 | 设计文档或 Bug 文档已确认，准备开始写第一行代码 | `pre-implementation-code-orientation` |
 | **开始编写任何业务代码前（Java / React / Vue / Flutter）** | `architecture-ddd-lite-fullstack`（默认分层规则） |
-| 执行 git commit 或生成提交信息 | `git-commit-standards` |
+| **任何 git commit / git push 之前**（hook 强制：`hooks/check-git-commit-skill.js` 拦截未调用 skill 的 Bash 提交命令） | `git-commit-standards` |
 | 编写或审查 Java 代码 | `java-coding-standards` |
 | 生成或修改包含 Mermaid 图表的 Markdown 内容；或完成 Markdown 文件的结构性写入/重组（新增/删除/重命名 ##、### 章节，或章节移动/合并） | `markdown-writing-standards` |
 | 重构/复写/迁移前需要理解现有业务逻辑 | `business-logic-orientation` |
@@ -50,7 +50,7 @@
 | `solution-review-required` | `skills/solution-review-required/` | 用户提出具体方案或要求照某个想法、回复、目录策略、架构路径、现有代码实施时，先分离真实目标与候选方案，评估现有代码是否值得参考，识别风险、替代方案和更优建议，再决定是否实施；防止 AI 盲目照做、迎合用户或扩散低质量旧结构 | 方案审视、更优建议、想法、实施方案、不要盲从、反迎合、现有代码质量、代码惯性、风险评估、替代方案 |
 | `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档（新功能和 bug 修复均适用）；**模版分级**（轻量 `lightweight-template.md` 用于单接口/库表读写流程；完整 `template.md` 用于跨服务/新增表/复杂事务等）；Git 管理下项目正式文档默认维护稳定/current 文档，历史由 commit body 承担，版本快照仅用于重大基线、非 Git 文档或用户明确要求；完整模版自动生成 coding-summary，轻量模版无需 coding.md | 设计文档、需求、方案、实现前、新功能、修复方案、实施方案、bug修复、轻量模版、接口级、current文档、Git历史 |
 | `architecture-ddd-lite-fullstack` | `skills/architecture-ddd-lite-fullstack/` | 编码前默认架构规则：DDD-lite 分层、Feature 模块化、单向依赖、原子能力沉淀；适配 Java Spring、React、Vue、Flutter；强制代码结构清晰、易维护、低耦合、高内聚，禁止 UI / Controller 直接写业务逻辑或访问 DB / HTTP；**新代码落点决策**（扩展现有功能时新代码必须放到新结构暴露 public 方法，旧文件只 +1 行调用，禁止在巨型方法 / 旧骨架文件里就地追加 N 行新逻辑） | DDD-lite、分层架构、Feature、原子能力、UseCase、Application、Domain、Repository、Infrastructure、结构清晰、易维护、低耦合、高内聚、前端、Flutter、Spring、新代码落点、strangler pattern、旧代码堆叠禁令 |
-| `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名；team-standards 自动 push 仍受宿主命令授权策略约束 | 提交、commit、git、分支、push、授权 |
+| `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名；team-standards 自动 push 仍受宿主命令授权策略约束；**v1.18 起由 `hooks/check-git-commit-skill.js` PreToolUse hook 强制拦截**：会话内未调用本 skill 时 `git commit` / `git push` 直接 exit 2 阻断 | 提交、commit、git、分支、push、授权、hook、强制拦截 |
 | `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
 | `doc-index-required` | `skills/doc-index-required/` | AI 生成 Markdown 默认写入用户 Documents 下的 `ai-docs/{project}/`；终版由用户自行上传，或用户明确指定 `docs/` 路径后才读取/更新索引 | 文档、docs、写文档、索引、输出路径、用户目录、Documents、终版文档 |
 | `backend-knowledge-graph-required` | `skills/backend-knowledge-graph-required/` | Java 后端单服务知识图谱：按项目沉淀领域能力、原子能力、流程、表、枚举、API、外部依赖与代码坐标；需求分析前优先读取图谱；会话中反复提及的后端业务事实自动进入用户目录候选池，确认或代码验证后才更新正式图谱 | Java后端、知识图谱、单服务、候选沉淀、领域能力、原子能力、表、枚举、状态流转、ER图、API、Service |
@@ -82,6 +82,7 @@
 | `skills/design-doc-required/lightweight-template.md` | design-doc-required | 7 节接口级轻量模版（单接口库表读写流程；无需配套 coding.md） |
 | `hooks/check-design-doc.cmd` | 可选 Hook | 设计文档校验脚本 — Windows（默认禁用） |
 | `hooks/check-design-doc.sh` | 可选 Hook | 设计文档校验脚本 — macOS/Linux（默认禁用） |
+| `hooks/check-git-commit-skill.js` | git-commit-standards | git commit/push 前强制 skill 已调用的拦截脚本 — Node 跨平台（**默认启用**） |
 | `skills/bug-doc-required/template.md` | bug-doc-required | bug 分析文档标准模板（6 节） |
 | `skills/init-project-docs/overview-template.md` | init-project-docs | 项目概要文档模板（7 章节） |
 | `skills/init-project-docs/architecture-template.md` | init-project-docs | 架构能力分析文档模板（7 章节） |
