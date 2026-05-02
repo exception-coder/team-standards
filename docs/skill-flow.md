@@ -2,7 +2,9 @@
 
 > 本文档梳理 team-standards 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-05-02 v19.3**
+> **最后更新：2026-05-02 v19.5**
+> 变更摘要 v19.5：`backend-knowledge-graph-required` 强化后端接口开发的表逻辑闭环 —— 新增 `07_table_logic_index.md`、`08_atomic_capability_index.md`、`table-logic/`、`atomic-capabilities/` 目录规范；后端接口编码前必须回顾表逻辑索引和原子能力索引，编码中优先复用已有 DAO/原子能力，编码后将 DAO/SQL、订单/退款/支付状态判定、金额聚合、表状态变化同步到正式图谱或用户目录候选池。该变更调整后端图谱核心行为但不改变主链路节点结构，按"轻微"处理未单独创建快照。
+> 变更摘要 v19.4：`korepos-backend-service` 新增「跨 feature 业务原子能力层」规则 —— 在已有的「模块内 `service/internal/`」与「全局基础设施门面 `backend_infra/{capability}/`」之间补充中间层 `lib/common/backend_infra/services/`，沉淀 ≥2 feature 模块共享的业务原子能力（与 `daos/` 对偶，但允许跨表组合 + 业务规则计算）；强制维护 `INDEX.md` 索引（按文件登记 + 按业务关键词反查）；写新 service 主流程前必查索引，已有则注入复用、禁止复制粘贴；补充 internal/ → backend_infra/services/ 升级流程。SKILL.md 在 §Service/internal 章节后新增完整子章节，README.md 同步更新 backend_infra 目录结构 + 新增依赖落点表格行（轻微规则补充，未单独创建快照）。
 > 变更摘要 v19.3：`design-doc-required` 将完整模版从 18 节功能设计压缩为 8 节方案/接口设计，明确设计文档是“某个方案/接口开发的简明编码依据”，重点确认核心逻辑、关键规则、编码落点和风险点；功能模块总览、能力分解、类调用图、数据结构、下游依赖、缓存/消息/事务等只写本次变化，不复写项目全集资料。该变更调整模版核心行为但不改变 Skill 链路节点，按"轻微"处理未单独创建快照。
 > 变更摘要 v19.2：`design-doc-required` 调整 Mermaid 图表策略 —— 从“完整模版固定多图必备”改为“最小图原则 + 场景选图”；单个后端接口/单业务动作默认只要求 1 张接口自身核心流程图或库表读写时序图，模块图、能力图、状态图、依赖图仅在对应场景命中时触发。该变更只补强节点文字与 FAQ，链路节点结构未变，按"轻微"处理未单独创建快照。
 > 变更摘要 v19.1：`git-commit-standards` hook 从"一刀切强制"调整为"按 staged diff 大小放行" —— `hooks/check-git-commit-skill.js` 在拦截 `git commit` 时先跑 `git diff --staged --shortstat` + `--name-status`，若 ≤2 文件 ∧ insertions+deletions ≤30 ∧ 全部为 `M` 修改则直接放行（让模型自行写一句 clear commit message），其它情况才强制 skill；阈值通过 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 环境变量可调；同时移除 `git push` 拦截（commit 已落地、push 无需再门禁）。SKILL.md description、CLAUDE.md/AGENTS.md 主动触发表 + Skill 索引、README.md 能力条目同步更新。该变更只调整触发条件粒度，链路节点结构未变，按"轻微"处理未单独创建快照。
@@ -16,7 +18,7 @@
 > 变更摘要 v16.5：`korepos-backend-service` 新增「外部调用前的边界兜底校验」健壮性硬规则 —— service 调云端 HTTP / 跨子门面 / POS 硬件协议前，凡传给对方的金额/数量/配额等业务数值，若本地 DB 有可查的上限/边界，必须用 DB 实读值兜底校验，不信任入参或前序内存对象；校验抽 `_assertXxxWithinBound` 私有方法；金额比较加 ±0.005 浮点容差。Step 5 强制规则、自检清单、禁区表均同步追加（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.4：`daily-work-log` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`，与 `bug-doc-required` / `design-doc-required` / `doc-index-required` 完全对齐；项目内 `docs/work-log/` 与 `.gitignore` 兜底节降级为"用户明确指定路径"分支（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.3：`bug-doc-required` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，与 `design-doc-required` / `doc-index-required` 一致；项目内 `docs/bug/` 降级为"用户明确指定路径或上传终版"分支；流程图分叉、红色警告与"各文档类型与用途"表同步调整（轻微规则补充，未单独创建快照）。
-> 上一版：v19.2（2026-05-02，轻微规则补充未单独创建快照）；v19.1（2026-05-02，轻微规则补充未单独创建快照）；v19（2026-05-02）；v18.2（2026-05-01，轻微规则补充未单独创建快照）；v18.1（2026-05-01，轻微规则补充未单独创建快照）；v18（2026-05-01）；v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
+> 上一版：v19.4（2026-05-02，轻微规则补充未单独创建快照）；v19.3（2026-05-02，轻微规则补充未单独创建快照）；v19.2（2026-05-02，轻微规则补充未单独创建快照）；v19.1（2026-05-02，轻微规则补充未单独创建快照）；v19（2026-05-02）；v18.2（2026-05-01，轻微规则补充未单独创建快照）；v18.1（2026-05-01，轻微规则补充未单独创建快照）；v18（2026-05-01）；v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
 > 再上一版：v15（2026-04-27）；v14（2026-04-27）；v13（2026-04-27）；v12（2026-04-27）；v11（2026-04-27）；v10（2026-04-27）；v9（2026-04-26）；v8（2026-04-25）；v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
 > 历史版本：`docs/skill-flow-20260502-v19.md`（v19）、`docs/skill-flow-20260501-v18.md`（v18）、`docs/skill-flow-20260501-v17.md`（v17）、`docs/skill-flow-20260427-v15.md`（v15）、`docs/skill-flow-20260427-v14.md`（v14）、`docs/skill-flow-20260427-v13.md`（v13）、`docs/skill-flow-20260427-v12.md`（v12）、`docs/skill-flow-20260427-v11.md`（v11）、`docs/skill-flow-20260427-v10.md`（v10）、`docs/skill-flow-20260427-v9.md`（v9）、`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
@@ -38,7 +40,7 @@
 | `solution-review-required` | team-standards | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时，先审视目标、现有代码质量、风险和更优方案 |
 | `design-doc-required` | team-standards | 写任何实现代码前，或被要求提供修复方案/实施方案时（新功能和 bug 修复均适用）；**任何源码 Edit/Write 请求（含「根据文档改代码」「帮我改一下」等）也必须先触发**；文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、编码落点和风险点；图表遵循最小图原则；Git 管理下默认维护稳定/current 文档，历史由 commit body 承担 |
 | `doc-index-required` | team-standards | **(辅助)** 创建任何 Markdown 文档前先确定输出路径；AI 生成 Markdown 默认写用户 Documents 下的 `ai-docs/{project}/`，仅用户指定 `docs/` 路径时更新索引 |
-| `backend-knowledge-graph-required` | team-standards | Java 后端单服务需求分析前读取 `docs/knowledge-graph/backend/`；生成/更新后端图谱；会话事实自动候选沉淀，确认或代码验证后整理进正式图谱 |
+| `backend-knowledge-graph-required` | team-standards | 后端接口/服务开发前读取 `docs/knowledge-graph/backend/`，重点回顾表逻辑索引和原子能力索引；生成/更新后端图谱；编码后同步 DAO/SQL、表关系、订单/退款/支付状态判定、金额聚合、原子能力复用；会话事实自动候选沉淀，确认或代码验证后整理进正式图谱 |
 | `bug-doc-required` | team-standards | 编写 bug 分析文档时；完成后必须继续调用 design-doc-required 写修复实施方案 |
 | `pre-implementation-code-orientation` | team-standards | 文档写完后、开始实施代码前（含「帮我修改代码」「改代码」等直接编码请求） |
 | `architecture-ddd-lite-fullstack` | team-standards | 编写或审查 Java / React / Vue / Flutter 业务代码前；在实施前代码定位后，先判断 Feature、分层、单向依赖、原子能力与结构质量（清晰、易维护、低耦合、高内聚） |
@@ -73,7 +75,7 @@ flowchart TD
 
     %% 文档层
     DOP["doc-index-required\n文档输出路径规则\n默认用户目录 ai-docs"]
-    BKG["backend-knowledge-graph-required\nJava 后端单服务图谱\n能力/流程/表/枚举"]
+    BKG["backend-knowledge-graph-required\n后端单服务图谱\n表逻辑/原子能力/流程/枚举"]
     DDR["design-doc-required\n检查或创建设计文档\n（新功能 / bug 修复均适用）"]
     MWS["markdown-writing-standards\nMermaid 语法自检 + 目录复核"]
 
@@ -132,7 +134,7 @@ flowchart TD
 flowchart TD
     START(["收到功能需求\n或用户给出具体方案"]) --> SRR["solution-review-required\n分离目标与方案\n识别风险和更优建议"]
     SRR --> CTX["Step 0: 知识图谱预热\n读 00_project_overview\n按任务类型加载必读文档"]
-    CTX --> BKG["backend-knowledge-graph-required\nJava 后端命中时读取\n能力/流程/表/枚举图谱"]
+    CTX --> BKG["backend-knowledge-graph-required\n后端命中时读取\n表逻辑/原子能力/流程/枚举图谱"]
     BKG --> DOP["doc-index-required\n先确定输出路径\n默认用户目录 ai-docs"]
     DOP --> DDR["design-doc-required\n检查已有设计文档或生成用户目录草稿\n用户指定 docs 时才更新 INDEX.md"]
 
@@ -259,8 +261,10 @@ flowchart LR
 | 什么时候要先调用 solution-review-required? | 用户已经给出具体方案、目录策略、架构路径、现有代码参考或要求“按这个回复实施”时先调用。它先判断真实目标、现有代码质量、风险和更优做法，再进入设计文档或编码流程。 |
 | 用户要求“参考现有代码照着写”时可以直接抄吗? | 不可以默认抄。现有代码只能作为事实材料，必须先判断它是否符合当前架构、分层、状态机、数据一致性和测试约束。质量差的旧代码只能提取业务规则，不能作为新实现模板继续扩散。 |
 | 用户没问更优方案时，AI 要主动提吗? | 要。`solution-review-required` 的核心职责就是反迎合：当用户方案或现有代码惯性存在明显风险时，必须主动指出问题，并给出更简单、更安全或更可维护的建议。 |
-| 后端知识图谱会因为会话里反复提到就自动更新吗? | 会自动记录到用户目录候选池，避免遗漏；但不会无条件写入正式图谱。只有用户明确要求归档、代码/DDL/枚举/接口契约验证过，或本次后端代码变更影响了 API、Service、表、枚举、状态流转等，才整理进正式图谱。 |
-| backend-knowledge-graph-required 管哪些范围? | 只管 Java 后端单服务。沉淀领域能力、原子能力、流程、表、枚举、API、外部依赖和代码坐标；前端、Flutter、跨项目拓扑不放进这个 skill。 |
+| 后端知识图谱会因为会话里反复提到就自动更新吗? | 会自动记录到用户目录候选池，避免遗漏；但不会把未验证猜测直接写入正式图谱。代码/DDL/枚举/API 契约验证过，或本次后端代码变更影响 DAO/SQL、表关系、状态判定、金额聚合、原子能力时，必须同步正式图谱或候选池。 |
+| backend-knowledge-graph-required 管哪些范围? | 管后端单服务。沉淀领域能力、原子能力、流程、表逻辑、表关系、枚举、状态判定、API、外部依赖和代码坐标；前端 UI、跨项目拓扑不放进这个 skill。 |
+| 后端接口开发前要看哪些图谱? | 先看 `07_table_logic_index.md` 和 `08_atomic_capability_index.md`，再看命中的 `table-logic/{scenario}.md`、`atomic-capabilities/{capability}.md`、表卡、流程卡、枚举卡，最后才读 DAO/Service 代码。 |
+| 订单部分退、订单状态判定这类反复问题怎么处理? | 必须沉淀到 `table-logic/` 和原子能力索引。卡片要写清涉及表、状态/金额字段、判定矩阵、状态变化矩阵、可复用 DAO/Service 方法和代码坐标，后续新增接口先按图谱判断是否支持。 |
 | 多项目知识图谱还要整理什么? | 不做各服务内部能力的重复沉淀，主要记录服务间调用关系、入口契约、关键业务对象、数据归属、失败传播和幂等补偿边界；具体跨项目链路由 `cross-project-locator` 负责。 |
 | 需要单独调用 doc-index-required 吗? | 创建任何 Markdown 文档前都要先应用它的“输出路径规则”。默认写入用户目录，不更新 INDEX；只有用户明确指定 `docs/` 路径或编辑已有 `docs/` 文件时，才执行 Phase-A/Phase-B。 |
 | AI 生成文档默认写到哪里? | 默认写到用户 Documents 下的 `ai-docs/{project}/{agent}/{YYYY-MM-DD}/`；Windows 为 `%USERPROFILE%\Documents\ai-docs\...`，macOS/Linux 为 `~/Documents/ai-docs/...`，无 Documents 时兜底 `~/ai-docs/...`。 |

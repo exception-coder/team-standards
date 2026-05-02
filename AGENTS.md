@@ -21,7 +21,7 @@
 | 编写或审查 Java 代码 | `java-coding-standards` |
 | 生成或修改包含 Mermaid 图表的 Markdown 内容；或完成 Markdown 文件的结构性写入/重组（新增/删除/重命名 ##、### 章节，或章节移动/合并） | `markdown-writing-standards` |
 | 重构/复写/迁移前需要理解现有业务逻辑 | `business-logic-orientation` |
-| Java 后端单服务需求分析前存在 `docs/knowledge-graph/backend/`，或要求生成/更新后端知识图谱，或会话中反复提及后端业务事实需要候选沉淀 | `backend-knowledge-graph-required` |
+| 后端接口/服务开发前涉及表读写、状态判定、订单/退款/支付等业务逻辑；存在 `docs/knowledge-graph/backend/`；要求生成/更新后端知识图谱；或会话中反复提及后端业务事实需要候选沉淀 | `backend-knowledge-graph-required` |
 | **用户纠正了 AI 的编码写法（分层违规、命名错误等）** | `coding-violation-log` |
 | **开始编写代码前（若项目存在 coding-violations.md）** | `coding-violation-log`（回顾模式） |
 | **bug 修复 / 对齐云端 / 删冗余 / 任何源码改动** | `bugfix-coding-style`（源码只描述当前逻辑；禁变更日志注释；逻辑说明上提方法 doc） |
@@ -53,7 +53,7 @@
 | `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名；team-standards 自动 push 仍受宿主命令授权策略约束；**v1.18.1 起 hook 按改动大小判定**：`hooks/check-git-commit-skill.js` 看 staged diff，≤2 文件 ∧ ≤30 行 ∧ 仅 `M` 修改时放行（让模型自行写一句 commit message），其它情况未调用本 skill 时直接 exit 2 阻断；阈值可用 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 调整；git push 不门禁 | 提交、commit、git、分支、push、授权、hook、按改动大小放行 |
 | `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
 | `doc-index-required` | `skills/doc-index-required/` | AI 生成 Markdown 默认写入用户 Documents 下的 `ai-docs/{project}/`；终版由用户自行上传，或用户明确指定 `docs/` 路径后才读取/更新索引 | 文档、docs、写文档、索引、输出路径、用户目录、Documents、终版文档 |
-| `backend-knowledge-graph-required` | `skills/backend-knowledge-graph-required/` | Java 后端单服务知识图谱：按项目沉淀领域能力、原子能力、流程、表、枚举、API、外部依赖与代码坐标；需求分析前优先读取图谱；会话中反复提及的后端业务事实自动进入用户目录候选池，确认或代码验证后才更新正式图谱 | Java后端、知识图谱、单服务、候选沉淀、领域能力、原子能力、表、枚举、状态流转、ER图、API、Service |
+| `backend-knowledge-graph-required` | `skills/backend-knowledge-graph-required/` | 后端单服务知识图谱：按项目沉淀领域能力、原子能力、流程、表、表关系、枚举、状态判定、API、外部依赖与代码坐标；后端接口开发前强制回顾 `07_table_logic_index.md` / `08_atomic_capability_index.md`，优先复用已有表逻辑和原子能力；编码后将 DAO/SQL、订单/退款/支付状态判定、金额聚合、表状态变更同步到正式图谱或用户目录候选池 | 后端、接口开发、知识图谱、单服务、表逻辑、表关系、订单状态、部分退、退款判定、原子能力、DAO、SQL、枚举、状态流转、候选沉淀、API、Service |
 | `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；核心流程必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）；根因必须用表格；**目录按模块分组**（对齐 `docs/design/{模块名}/`，三级结构 `docs/bug/{模块名}/{bug名称}/{bug名称}.md`）；目录与文件名使用**中文**命名 | bug、缺陷、问题分析、bug文档、OOM、异常、模块分组、中文命名 |
 | `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
 | `dev-log` | `skills/dev-log/` | team-standards 决策型变更日志：仅记录新增/删除 Skill、触发时机或核心行为变化、规则方向反转、跨 Skill 链路变化、重大团队原则沉淀；普通小改、措辞同步、版本号递增默认由 git commit body 记录，不再写 dev-log | 开发日志、决策记录、重大规则、触发链路、规则方向反转、skill 修改、发版记录 |
@@ -76,7 +76,7 @@
 | 文件 | 所属 Skill | 用途 |
 |------|-----------|------|
 | `skills/solution-review-required/SKILL.md` | solution-review-required | 用户提出具体方案并要求实施前的目标/方案分离、现有代码质量评估、风险识别与更优建议规则 |
-| `skills/backend-knowledge-graph-required/SKILL.md` | backend-knowledge-graph-required | Java 后端单服务知识图谱的生成、读取、更新与会话沉淀规则 |
+| `skills/backend-knowledge-graph-required/SKILL.md` | backend-knowledge-graph-required | 后端单服务知识图谱的生成、读取、表逻辑回顾、原子能力复用、更新与会话沉淀规则 |
 | `skills/design-doc-required/template.md` | design-doc-required | 8 节方案/接口设计文档模板（核心逻辑、编码落点、风险点，超出轻量范围时使用） |
 | `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板（仅完整模版需要） |
 | `skills/design-doc-required/lightweight-template.md` | design-doc-required | 7 节接口级轻量模版（单接口自身流程 / 库表读写流程；无需配套 coding.md） |

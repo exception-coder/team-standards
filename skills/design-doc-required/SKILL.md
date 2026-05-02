@@ -627,7 +627,7 @@ Git 管理下的项目正式文档以稳定/current 文档为主。版本快照�
 |-------|---------|
 | `markdown-writing-standards` | 生成或修改设计文档中的 Mermaid 图表时，必须先调用进行语法自检 |
 | `doc-index-required` | 创建设计文档草稿前必须先执行输出路径规则；默认写用户目录。只有用户明确指定 `docs/...` 终版路径时，才执行 Phase-A / Phase-B 更新索引 |
-| `backend-knowledge-graph-required` | Java 后端单服务需求分析前，若项目存在 `docs/knowledge-graph/backend/`，必须先读取后端知识图谱中的能力、流程、表、枚举、API 与外部依赖 |
+| `backend-knowledge-graph-required` | 后端接口/服务需求分析与编码前，若项目存在 `docs/knowledge-graph/backend/`，必须先读取后端知识图谱中的能力、流程、表逻辑、原子能力、枚举、API 与外部依赖；编码后同步表读写、状态判定和原子能力变化 |
 | `pre-implementation-code-orientation` | 设计文档确认完毕、开始写第一行实现代码前调用 |
 | `dev-log` | 仅 team-standards 自身发生决策型规则变更时调用；业务项目设计文档的普通演进由 git commit body 记录 |
 

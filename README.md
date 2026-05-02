@@ -6,7 +6,7 @@
 - **功能设计文档强制约束**（开发前必须有设计文档，否则引导创建）
 - **方案审视与更优建议**（用户提出具体方案或要求参考现有代码时，先判断目标、代码质量、风险和更优做法，再实施）
 - **DDD-lite 全栈架构约束**（编码前默认判断分层、Feature 模块、原子能力和结构质量）
-- **Java 后端单服务知识图谱**（按项目沉淀能力、流程、表、枚举、API、外部依赖与代码坐标）
+- **后端单服务知识图谱**（沉淀表逻辑、状态判定、订单/退款/支付规则、原子能力、API 与代码坐标）
 - **Bug 分析文档规范**（报告 Bug 时强制规范章节结构、Mermaid 图、根因表格）
 - **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息；**v1.18.1 起 hook 按改动大小放行**：`hooks/check-git-commit-skill.js` 看 staged diff，小改 ≤2 文件 ∧ ≤30 行 ∧ 仅 `M` 修改时直接放行让模型写 commit message，大改才强制走 skill 五步；git push 不门禁）
 - **文档索引优先约束**（编写任何文档前读取索引，分析内容边界，避免重复，写完后半自动更新索引）
@@ -142,7 +142,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `solution-review-required` | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时 | 先分离真实目标与候选方案，评估现有代码是否值得参考，识别风险、缺口和替代方案，给出更优建议后再进入设计或实施 |
 | `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；设计文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、关键规则和风险点；图表遵循最小图原则；Git 管理下默认维护稳定/current 文档，历史写入 commit body；完整模版自动生成编码摘要 |
 | `architecture-ddd-lite-fullstack` | 开始编写或审查 Java / React / Vue / Flutter 业务代码前 | 强制 DDD-lite 分层、Feature 模块化、单向依赖与原子能力沉淀；要求代码结构清晰、易维护、低耦合、高内聚，禁止 UI / Controller 直接承载业务逻辑 |
-| `backend-knowledge-graph-required` | Java 后端单服务需求分析前存在 `docs/knowledge-graph/backend/`，或要求生成/更新后端知识图谱时 | 按项目沉淀领域能力、原子能力、业务流程、表、枚举、API、外部依赖与代码坐标；会话中反复提及的后端业务事实自动进入用户目录候选池，确认或代码验证后才更新正式图谱 |
+| `backend-knowledge-graph-required` | 后端接口/服务开发前涉及表读写、状态判定、订单/退款/支付等业务逻辑；存在 `docs/knowledge-graph/backend/`；或要求生成/更新后端知识图谱时 | 按项目沉淀领域能力、原子能力、业务流程、表逻辑、表关系、枚举、状态判定、API 与代码坐标；编码前回顾 `07_table_logic_index.md` / `08_atomic_capability_index.md`，编码中复用已有原子能力，编码后同步 DAO/SQL、状态变化、金额聚合等图谱或候选池 |
 | `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；**默认走用户文档目录**（`{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`），仅用户明确要求时才进项目 `docs/bug/`；写入项目时按模块分组（对齐 `docs/design/`），中文命名 |
 | `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
 | `java-coding-standards` | 编写/审查任何 Java 代码时 | 强制遵守阿里黄山版编码规范 |
