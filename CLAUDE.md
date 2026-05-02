@@ -48,7 +48,7 @@
 | Skill 名称 | 目录 | 覆盖范围 | 关键词 |
 |-----------|------|---------|--------|
 | `solution-review-required` | `skills/solution-review-required/` | 用户提出具体方案或要求照某个想法、回复、目录策略、架构路径、现有代码实施时，先分离真实目标与候选方案，评估现有代码是否值得参考，识别风险、替代方案和更优建议，再决定是否实施；防止 AI 盲目照做、迎合用户或扩散低质量旧结构 | 方案审视、更优建议、想法、实施方案、不要盲从、反迎合、现有代码质量、代码惯性、风险评估、替代方案 |
-| `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档（新功能和 bug 修复均适用）；**模版分级**（轻量 `lightweight-template.md` 用于单接口/库表读写流程；完整 `template.md` 用于跨服务/新增表/复杂事务等）；Git 管理下项目正式文档默认维护稳定/current 文档，历史由 commit body 承担，版本快照仅用于重大基线、非 Git 文档或用户明确要求；完整模版自动生成 coding-summary，轻量模版无需 coding.md | 设计文档、需求、方案、实现前、新功能、修复方案、实施方案、bug修复、轻量模版、接口级、current文档、Git历史 |
+| `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档（新功能和 bug 修复均适用）；**模版分级**（轻量 `lightweight-template.md` 用于单接口自身流程/库表读写流程；完整 `template.md` 用于跨服务/新增表/复杂事务等）；图表遵循最小图原则，按场景选择流程图/时序图/依赖图，能一张图讲清就只画一张；Git 管理下项目正式文档默认维护稳定/current 文档，历史由 commit body 承担，版本快照仅用于重大基线、非 Git 文档或用户明确要求；完整模版自动生成 coding-summary，轻量模版无需 coding.md | 设计文档、需求、方案、实现前、新功能、修复方案、实施方案、bug修复、轻量模版、接口级、最小图、场景选图、current文档、Git历史 |
 | `architecture-ddd-lite-fullstack` | `skills/architecture-ddd-lite-fullstack/` | 编码前默认架构规则：DDD-lite 分层、Feature 模块化、单向依赖、原子能力沉淀；适配 Java Spring、React、Vue、Flutter；强制代码结构清晰、易维护、低耦合、高内聚，禁止 UI / Controller 直接写业务逻辑或访问 DB / HTTP；**新代码落点决策**（扩展现有功能时新代码必须放到新结构暴露 public 方法，旧文件只 +1 行调用，禁止在巨型方法 / 旧骨架文件里就地追加 N 行新逻辑） | DDD-lite、分层架构、Feature、原子能力、UseCase、Application、Domain、Repository、Infrastructure、结构清晰、易维护、低耦合、高内聚、前端、Flutter、Spring、新代码落点、strangler pattern、旧代码堆叠禁令 |
 | `git-commit-standards` | `skills/git-commit-standards/` | commit 类型前缀；中文 body；基于 diff 分析；Author 署名；team-standards 自动 push 仍受宿主命令授权策略约束；**v1.18.1 起 hook 按改动大小判定**：`hooks/check-git-commit-skill.js` 看 staged diff，≤2 文件 ∧ ≤30 行 ∧ 仅 `M` 修改时放行（让模型自行写一句 commit message），其它情况未调用本 skill 时直接 exit 2 阻断；阈值可用 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 调整；git push 不门禁 | 提交、commit、git、分支、push、授权、hook、按改动大小放行 |
 | `java-coding-standards` | `skills/java-coding-standards/` | 阿里巴巴黄山版 Java 规范：命名、格式、注释、OOP、集合、并发、异常、日志、数据库、安全 | Java、代码规范、命名、注释、异常、线程 |
@@ -79,7 +79,7 @@
 | `skills/backend-knowledge-graph-required/SKILL.md` | backend-knowledge-graph-required | Java 后端单服务知识图谱的生成、读取、更新与会话沉淀规则 |
 | `skills/design-doc-required/template.md` | design-doc-required | 18 节完整设计文档模板（跨服务/新增表/复杂事务场景） |
 | `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板（仅完整模版需要） |
-| `skills/design-doc-required/lightweight-template.md` | design-doc-required | 7 节接口级轻量模版（单接口库表读写流程；无需配套 coding.md） |
+| `skills/design-doc-required/lightweight-template.md` | design-doc-required | 7 节接口级轻量模版（单接口自身流程 / 库表读写流程；无需配套 coding.md） |
 | `hooks/check-design-doc.cmd` | 可选 Hook | 设计文档校验脚本 — Windows（默认禁用） |
 | `hooks/check-design-doc.sh` | 可选 Hook | 设计文档校验脚本 — macOS/Linux（默认禁用） |
 | `hooks/check-git-commit-skill.js` | git-commit-standards | git commit 前按 staged diff 大小判定的拦截脚本 — Node 跨平台（**默认启用**，小改放行 / 大改强制 skill；git push 不拦截） |

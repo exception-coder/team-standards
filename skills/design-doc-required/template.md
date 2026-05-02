@@ -26,8 +26,9 @@
 
 ### 3.1 功能模块总览图
 
-> **【必填·Mermaid】** 用 mermaid graph 绘制本次涉及的所有功能模块及其关系。
+> **【条件必填·Mermaid】** 仅当本次涉及 2 个以上功能模块/服务，且模块关系不画会影响理解时，用 mermaid graph 绘制本次涉及的功能模块及其关系。
 > 要求：① 列出所有模块节点 ② 标注依赖/调用关系 ③ 区分新建与改造（虚线=已有） ④ 用 subgraph 按层/域分组
+> 单个后端接口、单个业务动作可省略本图，直接在第 4 节画接口自身流程图。
 
 ```mermaid
 graph TD
@@ -40,7 +41,8 @@ graph TD
 
 ### 3.2 能力分解图
 
-> **【必填·Mermaid】** 用 mermaid mindmap 或 graph 拆解每个核心模块的具体能力点。
+> **【选填·Mermaid】** 仅当能力边界复杂、多人协作边界不清、或后续扩展点较多时，用 mermaid mindmap 或 graph 拆解核心模块的能力点。
+> 简单单接口、单后端动作不需要能力分解图。
 
 ```mermaid
 mindmap
@@ -60,11 +62,14 @@ mindmap
 
 ## 4. 业务流程设计
 
-> **【强制】** 本节所有流程图必须使用 mermaid 绘制，禁止 ASCII art。
+> **【强制】** 本节遵循最小图原则：能用一张图讲清就只画一张核心图。所有流程图必须使用 mermaid 绘制，禁止 ASCII art。
 
-### 4.1 正常流程
+### 4.1 核心流程
 
-> **【必填·Mermaid flowchart】** 用 `flowchart TD` 绘制主流程。
+> **【必填·Mermaid】** 选择最适合本场景的一张核心图：
+> - 业务分支/异常路径是核心：用 `flowchart TD`
+> - 库表读写顺序是核心：用 `sequenceDiagram`
+> - 单个退款后端接口等自身流程：优先一张 `flowchart TD` 表达入参校验、查询、判断、写表、返回
 
 ```mermaid
 flowchart TD
@@ -78,7 +83,8 @@ flowchart TD
 
 ### 4.2 异常流程
 
-> **【必填·Mermaid flowchart】** 用 `flowchart TD` 绘制异常处理流程。
+> **【条件必填·Mermaid flowchart】** 仅当异常路径复杂、包含多种兜底/补偿/回滚分支，且无法在 4.1 核心流程图中清晰表达时，单独绘制异常处理流程。
+> 若异常处理已在核心流程图中表达，本节用表格或列表说明即可。
 
 ### 4.3 状态流转
 
@@ -163,8 +169,9 @@ Content-Type: application/json
 
 ### 6.3 类调用关系
 
-> **【必填·Mermaid】** 用 mermaid graph 或 sequenceDiagram 绘制核心调用链路，禁止纯文本箭头。
+> **【条件必填·Mermaid】** 仅当新增/改造类较多，或类协作关系不画会误解时，用 mermaid graph 或 sequenceDiagram 绘制核心调用链路，禁止纯文本箭头。
 > 只画类级别的调用方向，不标注具体方法名。
+> 单个接口的类调用若已在第 4 节核心流程图中表达，可省略本图。
 
 ```mermaid
 graph LR
@@ -186,8 +193,9 @@ graph LR
 ## 11. 消息与异步设计
 ## 12. 下游依赖设计
 
-> **【必填·Mermaid graph】** 用 mermaid 绘制系统/组件间依赖关系图。
+> **【条件必填·Mermaid graph】** 仅当新增或调整外部依赖、Feign/HTTP/消息/硬件调用，且依赖关系影响设计、部署、降级或风险时，用 mermaid 绘制系统/组件间依赖关系图。
 > 同时列出依赖的外部服务/接口全类名或 FeignClient 全类名。
+> 无新增/调整下游依赖时，可写“无新增下游依赖”，不画图。
 
 ```mermaid
 graph TD
