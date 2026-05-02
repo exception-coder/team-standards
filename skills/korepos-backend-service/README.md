@@ -59,6 +59,12 @@ lib/common/backend_infra/
 │   ├── refund_button_availability_dao.dart
 │   ├── ... 共 ~17 个,每个 DAO 都是单文件 + .g.dart
 │   └── models/                            #   DAO 私有 Row 实体(JOIN/聚合的强类型返回)
+├── services/                              # ★ 跨 feature 业务原子能力(daos 的对偶,组合 dao + 业务规则)
+│   ├── INDEX.md                           # ★ 强制维护索引: 写新 service 前必查
+│   ├── order_refundable_amount_service.dart        #   按 originalOrderId 算可退余额
+│   ├── transaction_lookup_service.dart             #   按 transactionId 查原支付流水
+│   └── ...                                #   每个文件 + .g.dart, 命名不带 feature 前缀
+│                                          #   详见 SKILL.md §BackendInfra/services/ 章节
 ├── cloud/                                 # ★ 云端 HTTP 调用统一子门面(CloudApiPort)
 │   ├── cloud_api_port.dart                #   abstract interface
 │   ├── cloud_api_client.dart              #   实现
@@ -119,8 +125,11 @@ RefundV2ConfirmService refundV2ConfirmService(Ref ref) =>
 | **其它模块的 backend 层**（`features/{x}/backend/...`）| 直接 import，不必走门面（同属后台代码区，独立服务化时一起搬） | SKILL.md「引用边界 §情况 A」 |
 | **其它模块的非 backend 层**（`application/data/domain/presentation`）| 走 BackendInfra 扩展三步：① 接口加 getter ② riverpod 实现桥接 ③ service 通过 `_infra.xxx` 调 | SKILL.md「情况 B」 |
 | **新实现的"backend 内部基础设施"**（云端 HTTP / WS 推送 / 设备协议） | **不挂 BackendInfra**！必须建独立子门面 + 平级 Provider 注入（参考 `cloud/cloud_api_port.dart`） | SKILL.md「情况 C」 |
+| **跨 feature 业务原子能力**（≥2 feature 共享的业务计算 / 组合查询） | 沉到 `backend_infra/services/`，**写新 service 前先查 `services/INDEX.md`**，已有则直接 `ref.read` 注入 | SKILL.md「§BackendInfra/services/ 跨模块业务原子能力层」 |
 
 > **核心心智**：`BackendInfra` 是「**旧实现防腐过渡门面**」——演进终点是字段被一个个清空。新实现进 BackendInfra = 让新代码伪装成"将要清空的过渡通道"，重构时统计"还剩多少旧实现要剥离"会被污染。
+>
+> **写新 service 主流程前的强制工作流**：先读 `lib/common/backend_infra/services/INDEX.md` 检索是否已有可复用业务原子能力 → 有则直接注入 → 无则写完后反向评估是否抽到 `backend_infra/services/`（≥2 feature 复用即抽）。详见 SKILL.md §BackendInfra/services/。
 
 ---
 

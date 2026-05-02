@@ -44,6 +44,51 @@ refund 模块走了 `backendv2/` 是因为 `features/refund/backend/` 早已被�
 
 ---
 
+## 编写 backend 代码前的违规自检（强制前置）
+
+**触发时机**：AI 即将 Edit/Write 任何路径含 `lib/features/{module}/backend/` 或 `lib/common/backend_infra/` 下的 `.dart` 文件时——**包括首次编辑该文件**。
+
+**核心原则**：先扫存量违规 → 汇报清单 → 等用户确认处置 → 再动手编辑。**违规清单不汇报直接动代码 = 流程违反**。
+
+### 第一步：扫存量违规（grep 目标文件 + 同模块同层文件）
+
+| 违规模式 | grep 关键字 | 对应红线 |
+|---|---|---|
+| 裸 SQL 在 service / orchestrator / handler / registry / internal 文件 | `customSelect` / `select(` / `update(` / `delete(` / `into(` / `_db.batch` | Step 5「Service 内禁止任何 SQL」 |
+| 单方法 ≥80 行 | 看 `Future<...> _xxx(...)` 起止行号差 | §Service 方法粒度规则 |
+| DB 字段过滤值 / 状态判断用裸数字 | `item_type = [0-9]` / `state = [0-9]` / `flag = [0-9]` / `?? [0-9]` 在 customSelect / Value / 比较表达式中 | §DB 字段值与枚举绑定 |
+| 错误用 `throw Exception(...)` 而非 `ApiIntranetException` | `throw Exception(` | 错误处理规则 |
+
+### 第二步：汇报违规清单
+
+把扫到的违规以表格形式输出给用户：
+
+```markdown
+| 违规类型 | 文件:行 | 内容 |
+|---|---|---|
+| 裸 SQL | refund_price_service.dart:80 | `db.customSelect('SELECT * FROM orders ...')` |
+| 长方法 | refund_price_service.dart:67-500 | `_calculateRefundPriceRaw` 430 行 |
+| 魔法值 | refund_price_service.dart:88 | `item_type = 1` 应改 `ItemType.payment.code` |
+```
+
+### 第三步：与用户确认处置（三选一）
+
+| 选项 | 何时选 |
+|---|---|
+| **(a) 仅做本次任务，违规暂留** + 登记到 `docs/coding-violations.md` 待后续单独清理 | 本次任务与违规无关；违规多到一次顺手修不完 |
+| **(b) 顺手把本次 PR 范围内的违规一并修** | 违规 ≤ 3 处且与本次任务在同一文件 |
+| **(c) 单独立项重构** | 违规过多（10+ 处） / 牵涉跨文件大改 |
+
+**未与用户确认前不要擅自修存量违规**——扩大 diff 范围 = 流程违反。
+
+### 例外（不需要扫）
+
+- 创建全新文件（无存量代码可扫）
+- 只读 grep / 只读 Read（不打算改文件）
+- 修改非 backend 路径（`presentation/` / `application/` 等）
+
+---
+
 ## 前置条件：接口出入参文档（三挡处理）
 
 一份合格的 UI 对接手册必须包含：
@@ -427,6 +472,65 @@ service/get_refund_products_service.dart         → class GetRefundProductsServ
 
 ---
 
+## Service 方法粒度规则：长方法必拆私有 `_xxxStep`
+
+### 强制规则
+
+| 方法行数 | 处理 |
+|---|---|
+| ≤ 30 行 | 单方法即可 |
+| 30-80 行 | 推荐按业务步骤拆 `_xxxStepN` 私有方法，但不强制 |
+| **> 80 行** | **强制拆**：主方法只做"步骤编排 + 事务包裹 + 日志"，每个 `_xxxStep` 私有方法 ≤ 30 行完成单一职责 |
+
+### 拆分维度（按业务步骤切）
+
+按"取数 / 校验 / 装配 / 算价 / 落库 / 副作用"等业务阶段切，**不要按"代码长度"机械切**：
+
+```dart
+// ❌ 反例：430 行单方法
+Future<Map<String, dynamic>> _calculateRefundPriceRaw(...) async {
+  // 100 行查 6 张表 (orders / order_item / order_tax / additional_fee / promotion / allocate)
+  // 80 行装配 itemTaxMap / serviceFeeData / itemPromoMap
+  // 200 行调 Rust + 解析出参 + 整形 selectOption
+  // 50 行短路分支 + 出参组装
+}
+
+// ✅ 正例：拆 5 个私有 step 方法
+Future<Map<String, dynamic>> _calculateRefundPriceRaw(...) async {
+  final dbData = await _fetchOrderDataStep(orderId);
+  final mapData = _buildLookupMapsStep(dbData);
+  if (_isOnlyTipRefundStep(selectOption)) {
+    return _buildOnlyTipResultStep(mapData);
+  }
+  final rustResult = await _callRustEngineStep(mapData, selectOption);
+  return _normalizeRustOutputStep(rustResult, selectOption);
+}
+
+Future<_OrderDbData> _fetchOrderDataStep(int orderId) async { ... }
+_LookupMaps _buildLookupMapsStep(_OrderDbData d) { ... }
+bool _isOnlyTipRefundStep(Map<String, dynamic> opt) { ... }
+Map<String, dynamic> _buildOnlyTipResultStep(_LookupMaps m) { ... }
+Future<Map<String, dynamic>> _callRustEngineStep(_LookupMaps m, Map<String, dynamic> opt) async { ... }
+Map<String, dynamic> _normalizeRustOutputStep(Map<String, dynamic> r, Map<String, dynamic> opt) { ... }
+```
+
+### 与 internal/ / backend_infra/services/ 的边界（拆分梯度）
+
+| 层级 | 触发条件 | 位置 | 谁能调 |
+|---|---|---|---|
+| **私有 `_xxxStep`** | 单方法 > 80 行 | 同 service 文件内 | 仅本 service |
+| **`service/internal/`** | 同模块 ≥2 个 service 重复同段逻辑 | `features/{module}/backend/service/internal/` | 同模块多个 service |
+| **`backend_infra/services/`** | ≥2 feature 模块共享 | `lib/common/backend_infra/services/` | 跨 feature |
+
+**升级路径**：私有 step → 被同模块另一 service 想用时升级 internal/ → 被另一 feature 想用时升级 backend_infra/services/。**禁止越级**（不能直接从私有 step 跳到 backend_infra/services/，要经 internal/ 中转评估）。
+
+### 例外
+
+- 单方法虽长但**逻辑线性、无业务分阶段**（如纯字段映射 100 行）→ 可以保留，但需在 dartdoc 写明"线性映射，无拆分价值"
+- 测试方法 / 配置初始化方法不受 80 行限制
+
+---
+
 ## Service/internal 原子能力层（细粒度复用单元）
 
 ### 概念与定位
@@ -534,6 +638,165 @@ class RefundCallbackPersistenceService {
 
 ---
 
+## BackendInfra/services/ 跨模块业务原子能力层（公共能力沉淀）
+
+### 概念与定位
+
+`common/backend_infra/services/` 存放**跨多个 feature 模块共享的业务原子能力**——介于「模块内 internal 原子能力」和「全局基础设施门面（情况 C）」之间的中间层：
+
+| 层 | 路径 | 复用范围 | 性质 |
+|---|---|---|---|
+| 模块内原子能力 | `features/{module}/backend/service/internal/` | 单模块内 ≥2 个 service | 业务相关，但只服务一个 feature |
+| **跨模块业务原子能力** | `common/backend_infra/services/` | **≥2 feature 模块共享** | **业务相关，跨 feature 复用** |
+| 跨模块基础设施门面 | `common/backend_infra/{capability}/` | 全局技术能力 | 纯技术（HTTP / WS / 设备协议），无业务规则 |
+
+**典型场景**：
+- 「按 originalOrderId 计算订单可退余额」— refund / report / order 等多个 feature 都要算
+- 「按 transactionId 查找原支付流水」— refund / settlement / report 都要查
+- 「汇总订单的退款业务状态」— refund / order / cashbox 都要展示
+
+`backend_infra/daos/` 已经按"跨模块共享 DAO"分了一层（如 `RefundEligibilityDao` / `BackendOrderTransactionDao`），`backend_infra/services/` 是它的对偶——DAO 解决"原子 SQL 跨模块共享"，services 解决"原子业务能力跨模块共享"（**调用 daos 的同时可包含跨表组合 / 业务规则计算**）。
+
+### 何时下沉到 backend_infra/services/（**写代码前必须检索**）
+
+**写新 service 主流程前的强制工作流**：
+
+1. **第一步：检索索引** — 打开 [`lib/common/backend_infra/services/INDEX.md`](#indexmd-索引文档强制维护)，按业务关键词搜索是否已有可复用的原子能力
+2. **第二步：直接用** — 已有 → 直接 `ref.read(xxxServiceProvider)` 注入，**禁止复制粘贴 SQL / 业务计算到新 service**
+3. **第三步：评估抽出** — 没有 → 写完新 service 主流程后，反向 grep：本能力是否已在其他 feature 的 service 中出现（判定 ≥2 个 feature）
+
+**判定信号（命中 ≥1 项即考虑下沉）**：
+
+| 信号 | 例 |
+|---|---|
+| 同一段业务计算在 ≥2 feature 模块的 service 出现 | "按 orderId 算可退余额" 在 refund + report 两个 feature 都出现 |
+| 业务术语强烈、跨 feature 边界明显 | "订单退款时序状态推导"、"账单跨模块关联查询" |
+| 单 service 内已有 internal 原子能力，但被另一个 feature 的 service 也想用 | refund 的 `OrderLockCheckService` 被 cashbox 想用 → 升级为 `backend_infra/services/order_lock_check_service.dart` |
+
+**禁止下沉的场景**：
+
+- 仅 1 个 feature 用 → 留在 `features/{module}/backend/service/internal/`
+- 纯技术能力（HTTP / WS / 协议适配）→ 走 §BackendInfra 门面规则的「情况 C」独立子门面
+- 单 SQL 操作 → 留在 `backend_infra/daos/`
+
+### backend_infra/services/ 写法约定
+
+```dart
+// common/backend_infra/services/order_refundable_amount_service.dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../daos/refund_eligibility_dao.dart';
+
+part 'order_refundable_amount_service.g.dart';
+
+@riverpod
+OrderRefundableAmountService orderRefundableAmountService(Ref ref) =>
+    OrderRefundableAmountService(
+      eligibilityDao: ref.read(refundEligibilityDaoProvider),
+    );
+
+/// 订单可退余额计算原子能力
+///
+/// 跨 feature 复用：refund (confirm 校验阶段 1) / report (退款汇总报表) / cashbox (钱箱补退判定)
+/// 单一职责：按 originalOrderId 算"原支付流水 pay_amount - sum(pending+success refund pay_amount)" 累加。
+/// **不包事务**——纯只读查询。
+class OrderRefundableAmountService {
+  final RefundEligibilityDao _eligibilityDao;
+
+  OrderRefundableAmountService({required RefundEligibilityDao eligibilityDao})
+      : _eligibilityDao = eligibilityDao;
+
+  Future<double> calculate(int originalOrderId) async {
+    final pool = await _eligibilityDao.queryRefundableTxPool(originalOrderId);
+    return pool.fold<double>(0.0, (s, t) => s + t.maxRefundAmount);
+  }
+}
+```
+
+#### 强制规则
+
+- **路径**：`lib/common/backend_infra/services/{capability}_service.dart`
+- **命名**：以**业务能力**命名（不带 feature 模块前缀）—— `order_refundable_amount_service`、`transaction_lookup_service`、`order_status_business_code_service`
+- **不挂 endpoint**：跨模块原子能力不出现在 Registry 里、不暴露 HTTP 路径
+- **不包顶层事务**：能力本身只读，或被外部事务包裹时也明确"调方需在事务内调用"
+- **不依赖 feature 模块**：禁止 import 任何 `features/{module}/`，依赖只能来自 `backend_infra/daos/` 或更底层的工具
+- **dartdoc 必须列出复用的 feature**：类级 dartdoc 写明"跨 feature 复用：refund / report / cashbox"，便于评估改动影响面
+- **必须更新 INDEX.md**：新增 / 修改 / 删除原子能力 service 时，**同步更新 `lib/common/backend_infra/services/INDEX.md`**（详见下节）
+
+### INDEX.md 索引文档（强制维护）
+
+`lib/common/backend_infra/services/INDEX.md` 是 AI 写新 service 前的**检索入口**。**任何对该目录的增删改都必须同步更新本索引**，否则视为操作未完成。
+
+**索引格式（按业务域分组）**：
+
+```markdown
+# backend_infra/services/ 原子能力索引
+
+> 跨 feature 模块共享的业务原子能力。**写新 service 前先查本表**，已有则直接注入复用，禁止复制粘贴。
+
+## 按文件登记
+
+| 文件 | 类名 | 业务能力 | 入参 | 出参 | 复用 feature |
+| --- | --- | --- | --- | --- | --- |
+| `order_refundable_amount_service.dart` | `OrderRefundableAmountService` | 按 originalOrderId 计算订单可退余额（含 pending 扣减） | `int originalOrderId` | `double` | refund / report / cashbox |
+| `transaction_lookup_service.dart` | `TransactionLookupService` | 按 transactionId 查找原支付流水（含 deleted=0 过滤） | `int transactionId` | `OrderTransaction?` | refund / settlement |
+
+## 按业务关键词反查
+
+便于 AI 按"我要做 XX"反查：
+
+### 退款 / 退货
+- 可退余额计算：`OrderRefundableAmountService`
+- 失败重试判定：（待登记）
+
+### 流水 / 交易
+- 原流水查找：`TransactionLookupService`
+
+### 订单状态
+- （待登记）
+```
+
+**维护规则**：
+
+- 新增 service 文件 → 在「按文件登记」表追加一行 + 在「按业务关键词反查」对应分组追加
+- 修改 service 入参 / 出参 / 职责 → 同步更新表格对应行
+- 删除 service → 删表格行 + 删反查
+- 新增业务关键词领域（如新增「会员」「促销」等） → 在反查节增加分组
+- **不更新索引视为操作未完成**
+
+### 写代码时主动触发的工作流
+
+写新 service **主流程前**必须按以下步骤主动审视：
+
+1. **检索 INDEX.md** — 找业务关键词，看是否已有可复用能力
+2. **如有 → 直接注入** — 通过 `ref.read(xxxServiceProvider)` 注入，**禁止复制粘贴实现到新 service 内**
+3. **如无 → 写完主流程后反向评估** — grep 同业务计算是否已在其他 feature 的 service 中出现（≥2 feature 即考虑下沉）
+4. **下沉时同步更新 INDEX.md** — 新建 service 后立即在索引追加表格行 + 反查项
+
+> 此规则**强制性**。新写大 service 前未查 INDEX.md = 流程违反；下沉新原子能力但未更新 INDEX.md = 流程违反。
+
+### 与现有 §Service/internal 的边界
+
+| 维度 | `service/internal/` | `backend_infra/services/` |
+|---|---|---|
+| 复用范围 | 单 feature 内 ≥2 个 service | ≥2 feature 模块 |
+| 路径 | `features/{module}/backend/service/internal/` | `lib/common/backend_infra/services/` |
+| 命名 | 可带模块语义（`refund_callback_persistence_service`） | 不带模块前缀，纯业务能力（`order_refundable_amount_service`） |
+| 索引文档 | 不要求 | **强制维护 INDEX.md** |
+| 升级路径 | 被另一 feature 想用时 → 升级到 `backend_infra/services/` | — |
+
+**升级流程**（internal/ → backend_infra/services/）：
+
+1. 确认 ≥2 feature 复用 → 用户确认后开始
+2. 物理移动：`features/{module}/backend/service/internal/{xxx}_service.dart` → `lib/common/backend_infra/services/{xxx}_service.dart`
+3. 改 import 路径 + 重命名（如有 module 前缀，去掉）
+4. 跑 `dart run build_runner build --delete-conflicting-outputs`
+5. **同步更新 INDEX.md**
+6. 跑 `flutter analyze` 验证
+
+---
+
 ## Service 装配中转 DTO（`service/models/`）
 
 ### 概念与定位
@@ -624,6 +887,48 @@ class RustServiceFeeData {
 3. **否** → 保留为 service 文件底部 `_` 私有 record；**不擅自外移**
 
 > 此规则建议性，但**抽出后必须遵循 dartdoc 三项规范**（用途/source/toJson 形态），保证读者无须翻 service 文件就能理解这个中转 DTO 的语义。
+
+---
+
+## DB 字段值与枚举绑定（魔法数字硬规则）
+
+### 强制规则
+
+**任何与 DB 字段比较 / 过滤 / 写入 / 读取后判断的数字常量** —— `item_type=1`、`order_tax_type=2`、`refund_flag=1`、`transaction_state=3`、`additional_fee_type=1` 等 —— **必须用枚举类常量引用，禁止裸数字字面量**。
+
+`docs` / dartdoc 注释里"枚举出可能取值"是**额外**的可读性要求（已有规则）；本节强制的是**代码体内必须用枚举类型**，两者并存不冲突。
+
+### 适用范围（凡涉及 DB 数字常量必转）
+
+| 场景 | ❌ 反例 | ✅ 正例 |
+|---|---|---|
+| DAO SQL 过滤值 | `WHERE item_type = 1 AND deleted = 0` | `WHERE item_type = ? AND deleted = ?` + `Variable.withInt(ItemType.payment.code), Variable.withInt(CommonState.normal.code)` |
+| Service 比较 | `if (txState == 3)` | `if (txState == RefundTransactionState.failed.code)` |
+| DAO 写入 | `Value(2)` | `Value(BillRefundState.pendingRefund.code)` |
+| 读后判断 | `row.read<int>('refund_flag') == 1` | `row.read<int>('refund_flag') == RefundFlag.refund.code` |
+| 短路兜底 | `?? 1` 在 `additional_fee_method` 字段 | `?? AdditionalFeeMethod.fixedAmount.code` |
+
+### 编码工作流
+
+写代码时遇到 DB 数字常量 → 按以下顺序处理：
+
+1. **检索现有枚举**：grep `lib/common/backend_infra/enums/` + `lib/features/{module}/common/enums/business/` 是否已定义
+2. **复用**：已有 → `import` 直接用 `Xxx.yyy.code`
+3. **新建**：没有 → 按 [Step 1.5 业务枚举](#step-15业务枚举按需) 新建枚举类，把所有取值列全 + dartdoc 标注每个值的业务含义
+4. **代码体内一律走枚举**：DAO / Service / DTO / 任何位置出现 DB 字段数字字面量都视为违规
+
+### 边界
+
+| 不算违规 | 理由 |
+|---|---|
+| 算术常量（`* 100` 把元换成分、`/ 1000` 把毫秒换秒） | 不是 DB 字段值映射 |
+| 数组/列表索引（`list[0]`） | 不是业务语义 |
+| 测试代码里的 setup 数据 | 测试对枚举依赖会增加脆弱性 |
+| 边界值（`>= 0 ? a : b`） | 0 是数学边界，不是状态码 |
+
+### 违规处置
+
+发现裸数字字面量 → 先建/找枚举 → 替换 → 同步登记 `docs/coding-violations.md`（按 `coding-violation-log` skill）。
 
 ---
 
