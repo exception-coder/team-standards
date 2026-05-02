@@ -1,6 +1,6 @@
 ---
 name: backend-knowledge-graph-required
-description: "Use for backend single-service business knowledge graphs, especially table logic, state rules, and reusable atomic business capabilities behind backend APIs. Trigger when analyzing or implementing a backend API/service; when the project has docs/knowledge-graph/backend/; when code changes affect APIs, services, DAOs/Mappers/SQL, database tables, enums, state transitions, order/refund/payment status judgment, transactions, MQ/events, or external dependencies; when repeatedly asked about which tables changed, table relationships, partial-refund/order-state logic, or whether existing table logic supports a new API; or when the user asks to initialize, generate, organize, read, or update backend knowledge graphs. Scope is backend single service (Java backend and backend-service style projects), not frontend UI or cross-project topology."
+description: "Use BEFORE answering any backend single-service question about table relationships / state transitions / business judgments / atomic capabilities, AND BEFORE Write/Edit any .md describing such content (even outside docs/, e.g. ai-docs/, scenarios/). MUST invoke (BLOCKING) when: (1) about to Write/Edit a markdown whose content describes backend table relationships, ER diagrams, state transitions, business flow → DB CRUD, or data modeling — including files under ai-docs/, work-log/, scenarios/, NOT only under docs/; (2) user asks 'X 与 Y 是 1:1 还是 1:N', '改这个动哪些表', '字段从哪来', '退款/账单/流水/分摊怎么算', '是新建快照还是引用原表', or any single-service backend table-relation / state / atomic-capability question — even if framed as investigation, not implementation; (3) finished investigating backend code (own project OR another project as subject) and discovered ≥1 reusable fact about table relations / state machines / atomic capabilities — must auto-append to candidate pool; (4) user asks to initialize, generate, organize, read or update backend knowledge graphs; (5) project has docs/knowledge-graph/backend/; (6) code changes affect APIs, services, DAOs/Mappers/SQL, database tables, enums, state transitions, order/refund/payment status judgment, transactions, MQ/events, or external dependencies. Knowledge graph ownership = the investigated backend service, NOT current cwd — investigating project B from project A puts the graph under B's namespace, do NOT reroute to cross-project-locator just because cwd differs. Scope: backend single service (Java / backend-service style); cross-project topology → cross-project-locator."
 ---
 
 # 后端单服务知识图谱
@@ -20,6 +20,54 @@ description: "Use for backend single-service business knowledge graphs, especial
 
 不处理前端 UI 或跨项目全局拓扑。跨项目链路仍交给 `cross-project-locator`。
 
+## BLOCKING 强触发清单（写前 / 答前拦截）
+
+下列任一场景命中即必须**第一时间**调起本 skill，先做候选沉淀路由判定，再继续答题或落盘。错过这些时机就是流程违反。
+
+| 触发场景 | 命中信号 | 必做动作 |
+|---|---|---|
+| **Write/Edit 一份描述后端表关系 / ER / 状态扭转 / 业务流程 → 表 CRUD 的 .md**（无论路径，包括 `ai-docs/`、`work-log/`、`scenarios/` 而不仅 `docs/`） | 文档主体含表名 + 关联键 + state/字段判定 + 数据流箭头 | 先按本 skill 决定归属命名空间和模板，再 Write |
+| **用户问询表关系类问题** | "X 与 Y 是 1:1 还是 1:N"、"改这个动哪些表"、"字段从哪来"、"退款/账单/流水/分摊怎么算"、"是新建快照还是引用原表"、"哪个状态会变" | 答题同时把事实追加到候选沉淀池 |
+| **AI 已完成后端代码调查并发现 ≥1 条可复用事实**（含跨项目"以另一服务为调查对象"的场景） | 调查报告里出现具体表/Service/Mapper/枚举/状态值 | 调查结论给用户的同一回合，必须将事实候选追加到被调查项目命名空间下的候选池 |
+| 用户主动要求 | "建知识图谱"、"整理图谱"、"更新图谱"、"归档" | 先读候选池 + 现有正式图谱 + 代码证据，再写正式图谱 |
+| 项目已有正式图谱 | 存在 `docs/knowledge-graph/backend/` | 编码前必先回顾相关卡片，编码后必同步回写 |
+| 后端代码变更 | 新增/修改 API、Service、DAO、SQL、表、枚举、状态机、事务边界、MQ、外部依赖 | 同步更新对应卡片或候选池 |
+
+> **常见误判反例（已发生过的踩坑）**：
+> - ❌ "用户只是问云端逻辑，没让我建图谱，所以不用触发" → **错**，问询场景必触发并候选沉淀
+> - ❌ "本地工程没有 `docs/knowledge-graph/backend/`，所以 skill 不适用" → **错**，没有就先写候选池
+> - ❌ "主目录是 A，调查的是 B 云端，应该交给 cross-project-locator" → **错**，单服务图谱归属 = 被调查的那个服务，与 cwd 无关
+> - ❌ "我直接 Write 一份图谱文档就行了" → **错**，写前必经本 skill 决定归属和模板
+
+## 调查对象与图谱归属路由
+
+**核心规则：图谱归属永远 = 被调查的后端单服务项目，与当前主工作目录无关。**
+
+| 主目录 | 调查对象 | 图谱归属命名空间 |
+|---|---|---|
+| 本服务自身 | 本服务自身 | 本服务 |
+| 项目 A（前端 / 调用方） | 项目 B（云端单服务） | **项目 B** |
+| 项目 A（前端） | 同时跨 A+B | A 的归 A、B 的归 B；**纯跨项目链路（A 调 B 的对照映射、调用链）走 `cross-project-locator`** |
+
+候选池默认路径（被调查项目命名空间下）：
+
+```text
+{USER_DOCUMENTS}/ai-docs/{被调查项目}/knowledge-graph/_candidates.md
+{USER_DOCUMENTS}/ai-docs/{被调查项目}/knowledge-graph/scenarios/{场景}.md
+{USER_DOCUMENTS}/ai-docs/{被调查项目}/knowledge-graph/00_index.md
+```
+
+正式图谱路径（用户明确要求"上传终版到项目内"才走）：
+
+```text
+{被调查项目根目录}/docs/knowledge-graph/backend/...
+```
+
+**判定本 skill vs `cross-project-locator` 的边界**：
+- 描述对象是**单一后端服务内部**的表 / 状态 / 能力 → 本 skill
+- 描述对象是**两个工程之间**的接口对照、调用链、数据流方向 → `cross-project-locator`
+- 同一会话可能两个 skill 都触发：先用本 skill 沉淀各自服务内部图谱，再用 `cross-project-locator` 登记服务间链路
+
 ## 核心原则
 
 **后端接口开发不是只写接口文档，还必须沉淀表逻辑知识。**
@@ -34,30 +82,75 @@ description: "Use for backend single-service business knowledge graphs, especial
 
 如果项目尚无正式图谱，也不能让事实散落在会话里。必须写入用户目录候选池，至少沉淀“表逻辑候选记录”，后续确认或代码验证后再整理进正式图谱。
 
-## 推荐目录
+## 推荐目录（渐进式三层骨架）
 
-正式图谱默认位于项目内：
+**核心理念：第一份图谱只要 1 份场景卡 + 1 份扁平索引就算建立。** 不要求 8 文件齐全才叫图谱——通过多个细小场景小卡渐进汇总成全景，是这套图谱的设计目标。
+
+### Tier 1 — 起步（必须，最小可用）
+
+新建图谱时只需要这两个文件即可投入使用：
 
 ```text
-docs/knowledge-graph/backend/
-  00_backend_service_profile.md
-  01_domain_capability_map.md
-  02_data_model_map.md
-  03_enum_dictionary.md
-  04_api_entrypoints.md
-  05_external_dependencies.md
-  06_business_flow_index.md
-  07_table_logic_index.md
-  08_atomic_capability_index.md
-  capabilities/{capability-name}.md
-  flows/{flow-name}.md
-  tables/{table-name}.md
-  enums/{enum-name}.md
-  table-logic/{business-object-or-scenario}.md
-  atomic-capabilities/{capability-name}.md
+{命名空间根}/knowledge-graph/
+  00_index.md                        # 扁平索引：每个场景一行 + 关键词反查表
+  scenarios/{业务场景}.md            # 一图一表的场景小卡（一图一表是底线）
+  _candidates.md                     # 候选沉淀池（未代码验证的会话事实）
 ```
 
-写入项目 `docs/` 前必须遵循 `doc-index-required`。默认先生成用户目录草稿；但当项目已经存在 `docs/knowledge-graph/backend/`，且本次后端源码变更已通过代码/DDL/枚举/API 契约验证影响了表逻辑、状态判定或原子能力时，应同步更新对应正式图谱卡片，除非用户明确要求“不更新 docs”。
+每张场景小卡至少包含：
+
+- 一句话总述
+- 一张关系图（mermaid，遵守 `markdown-writing-standards`）
+- 表/字段速查表（每张表 1-2 行）
+- 核心规则（图里看不出的语义，每条带代码坐标）
+- 已知疑点（如有）
+- 与其他场景的交叉引用（如有）
+
+`00_index.md` 至少包含：
+
+```markdown
+| 场景 | 主表 | 一句话 | 关键词 | 文件 |
+|---|---|---|---|---|
+| 退款数据模型 | refund_bill / pos_transaction / order_item / order_item_payment_allocate | 1 bill + N tx + 新建 item 快照 + 按 tx 比例分摊 | 退款 / 账单 / 流水 / 分摊 / 部分退 | scenarios/退款数据模型.md |
+```
+
+### Tier 2 — 成熟（≥3 个场景后再细分，按需新增）
+
+当已有 ≥3 张场景小卡，且发现表 / 枚举 / 流程 / 原子能力被多个场景共享时，再单独建以下卡片：
+
+```text
+{命名空间根}/knowledge-graph/
+  tables/{table-name}.md             # 高频被多场景引用的表
+  enums/{enum-name}.md               # 高频枚举字典
+  flows/{flow-name}.md               # 跨多场景的业务流程
+  atomic-capabilities/{cap}.md       # 被多接口复用的原子能力
+  07_table_logic_index.md            # 表逻辑反查索引（场景多了再建）
+  08_atomic_capability_index.md      # 原子能力索引（能力多了再建）
+```
+
+### Tier 3 — 全景（≥10 个场景或正式发版前再建，可选）
+
+仅在图谱规模足够大、需要给 AI 做"先读图谱再读代码"门控时再补：
+
+```text
+{命名空间根}/knowledge-graph/
+  00_backend_service_profile.md      # 服务画像
+  01_domain_capability_map.md        # 领域能力地图
+  02_data_model_map.md               # 数据模型总览
+  03_enum_dictionary.md              # 枚举总字典
+  04_api_entrypoints.md              # API 入口总表
+  05_external_dependencies.md        # 外部依赖
+  06_business_flow_index.md          # 流程总索引
+```
+
+### 命名空间路径选择
+
+| 阶段 | 命名空间根 | 何时使用 |
+|---|---|---|
+| 候选 / 草稿 | `{USER_DOCUMENTS}/ai-docs/{被调查项目}/knowledge-graph/` | 默认；AI 起草、未确认、未代码验证 |
+| 正式 | `{被调查项目根目录}/docs/knowledge-graph/backend/` | 用户明确要求"上传终版到项目内"才走，遵循 `doc-index-required` |
+
+**入门门槛兜底**：项目尚未有任何图谱时，本 skill 第一次落盘只产出 Tier 1 的 3 个文件即可（`00_index.md` + 1 张 `scenarios/{xxx}.md` + `_candidates.md`），不要一次性铺满 Tier 3。
 
 ## 后端接口开发强制闭环
 
@@ -128,34 +221,56 @@ docs/knowledge-graph/backend/
   → 整理进入正式知识图谱
 ```
 
-候选沉淀池默认写入用户目录，不写项目 `docs/`：
+候选沉淀池默认写入用户目录被调查项目命名空间下，不写项目 `docs/`：
 
 ```text
-{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/backend-kg-candidates.md
-{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/backend-table-logic-candidates.md
+{USER_DOCUMENTS}/ai-docs/{被调查项目}/knowledge-graph/_candidates.md
 ```
+
+> 说明：v1.18.7 起候选池路径精简为 `_candidates.md`（按被调查项目而非按日期/agent 分），便于跨日期跨会话累积同主题事实并最终归并到 scenarios 卡。旧版 `{agent}/{YYYY-MM-DD}/backend-kg-candidates.md` 路径仅作向后兼容，不再推荐新增。
+
+**自动追加规则（强制）**：
+
+AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状态扭转 / 字段语义的问题，**即便用户没要求"建图谱"**，回答的同一回合内必须自动追加 1 条候选记录到 `_candidates.md`。这是本 skill 的最低收口动作——错过即流程违反。
 
 候选池用于防遗漏，正式图谱用于可信引用。二者职责必须分开。
 
+每条候选记录最少格式：
+
+```markdown
+## YYYY-MM-DD HH:MM | {场景关键词}
+- 事实：{一句话业务事实}
+- 涉及：{表/枚举/状态字段}
+- 来源：{代码坐标 or 用户描述 or 设计文档 or 调查报告}
+- 可信度：待确认 / 已确认 / 已代码验证
+- 后续动作：{待用户确认 / 待代码核验 / 可整理入正式 scenarios 卡}
+```
+
 ## 分析前读取顺序
 
-分析 Java 后端需求前，若存在 `docs/knowledge-graph/backend/`，按需读取：
+分析后端需求前，按图谱所在层级读取（命名空间 = 草稿 `ai-docs/{项目}/knowledge-graph/` 或 正式 `docs/knowledge-graph/backend/`）：
 
-1. `00_backend_service_profile.md`
-2. `01_domain_capability_map.md`
-3. `06_business_flow_index.md`
-4. `07_table_logic_index.md`
-5. `08_atomic_capability_index.md`
-6. 命中的 `table-logic/{scenario}.md`
-7. 命中的 `atomic-capabilities/{capability-name}.md`
-8. 命中的 `capabilities/{capability-name}.md`
-9. 命中的 `flows/{flow-name}.md`
-10. 相关 `tables/{table-name}.md`
-11. 相关 `enums/{enum-name}.md`
-12. `04_api_entrypoints.md` 与 `05_external_dependencies.md`
-13. 最后再读代码文件
+**Tier 1 起步阶段**（仅有 `00_index.md` + `scenarios/` + `_candidates.md`）：
 
-不得在已有图谱可定位时直接全量扫描代码。
+1. `00_index.md`：按关键词反查命中的场景小卡
+2. 命中的 `scenarios/{业务场景}.md`
+3. `_candidates.md`：扫一遍候选池，看本次主题是否已有未确认事实
+4. 最后再读代码文件
+
+**Tier 2/3 成熟阶段**（已有细分卡片）按以下顺序：
+
+1. `00_index.md` → `00_backend_service_profile.md`（如有）
+2. `01_domain_capability_map.md`、`06_business_flow_index.md`（如有）
+3. `07_table_logic_index.md`、`08_atomic_capability_index.md`（如有）
+4. 命中的 `scenarios/{场景}.md`
+5. 命中的 `table-logic/{scenario}.md`、`atomic-capabilities/{capability}.md`
+6. 命中的 `capabilities/{capability}.md`、`flows/{flow}.md`
+7. 相关 `tables/{table}.md`、`enums/{enum}.md`
+8. `04_api_entrypoints.md`、`05_external_dependencies.md`（如有）
+9. `_candidates.md`
+10. 最后再读代码文件
+
+不得在已有图谱可定位时直接全量扫描代码。即使图谱只有 Tier 1，也要先读 `00_index.md` 和命中的场景小卡。
 
 ## 能力分层
 
