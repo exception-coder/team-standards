@@ -14,6 +14,7 @@
 - **Markdown 编写规范**（Mermaid 图表语法、表格、代码块等）
 - **业务逻辑现状梳理**（重构/迁移前按场景维度产出流程图、知识图谱、代码索引）
 - **实施前代码定位**（从文档坐标表精准定位关键文件，禁止重新扫描）
+- **源码注释风格约束**（源码只描述当前正确逻辑，禁止变更历史和函数头大段复盘，复杂逻辑在对应代码块写短 WHY）
 - **跨项目拓扑定位与登记**（kpay POS 生态跨项目调用链、接口对照、业务全链路的唯一查询/写入入口）
 - **每日工作日志**（业务项目源码改动后按 bug / 功能 分类沉淀到 `docs/work-log/{YYYY-MM-DD}.md`，同主题合并、工时累计叠加）
 - **team-standards 源码仓库自动提交推送**（仅插件源码仓库规则变更完成后自动小步 commit + push，业务项目不触发）
@@ -153,6 +154,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `init-project-docs` | 初始化项目文档 / 生成知识图谱时 | 渐进式构建 11 份知识图谱文档 + 模块深度文档 + 技能卡（4 阶段，支持自动/确认模式） |
 | `generate-project-profile` | 要求生成项目画像时 | 生成 AI Agent 消费的 10 维度结构化 Markdown（project-profile.md） |
 | `coding-violation-log` | 用户纠正 AI 编码错误时 | 自动登记违规到 `docs/coding-violations.md`，编码前回顾防重犯 |
+| `bugfix-coding-style` | bug 修复 / 对齐云端 / 删冗余 / 任何源码改动时 | 禁止把变更历史、旧实现复盘、未来版本计划写进源码；函数/类注释只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块附近写 1-2 行 WHY 注释 |
 | `project-docs-update` | 项目代码结构变更后 | 检测代码与 docs/ 文档的差异，自动或确认式更新知识图谱 |
 | `arch-lint` | Flutter 架构检查时 | 检测 5 类架构违规（presentation 层 SQL/HTTP、domain 层框架依赖、金额 double、DAO 越层调用） |
 | `cross-project-locator` | 跨项目（≥2 个 kpay POS 工程）定位 / 排查 / 登记拓扑知识时 | 路由到 `kpay-pos-topology/` 仓库：查询模式按业务域/工程名读 mapping 或 flows；登记模式拦截错误落盘位置，强制写入拓扑仓库 |

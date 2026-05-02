@@ -1,6 +1,6 @@
 ---
 name: bugfix-coding-style
-description: "Use when applying any bug fix, alignment correction, redundant-code removal, OR adding missing logic to align with upstream/cloud during integration/联调 phase. Trigger when: (1) design-doc-required has routed the change to 「第四·五步：轻量修订流水」 branch, (2) user describes the change as 'fix bug', 'align with cloud/upstream', 'add missing piece', '修 bug', '对齐云端', '删冗余', '修正实现', '改回正确逻辑', '补上漏掉的逻辑', '补缺漏', or (3) about to Edit/Write source code with intent of replacing existing erroneous logic OR adding alignment code that was missed in previous iterations. Forbids in-source change-log comments and commented-out legacy code; requires WHY-only inline comments and pushes structural explanations into method/class doc comments."
+description: "Use when applying any bug fix, alignment correction, redundant-code removal, OR adding missing logic to align with upstream/cloud during integration/联调 phase. Trigger when: (1) design-doc-required has routed the change to 「第四·五步：轻量修订流水」 branch, (2) user describes the change as 'fix bug', 'align with cloud/upstream', 'add missing piece', '修 bug', '对齐云端', '删冗余', '修正实现', '改回正确逻辑', '补上漏掉的逻辑', '补缺漏', or (3) about to Edit/Write source code with intent of replacing existing erroneous logic OR adding alignment code that was missed in previous iterations. Forbids in-source change-log comments, commented-out legacy code, and oversized function header narratives; requires concise current-behavior comments and local WHY comments near complex blocks."
 ---
 
 # Bug 修复 / 联调期编码风格
@@ -9,13 +9,14 @@ description: "Use when applying any bug fix, alignment correction, redundant-cod
 
 ## 核心原则
 
-**代码只描述当前正确逻辑，只保留对当下读者有意义的"WHY 注释"，禁止任何形式的变更历史叙事。** 修改/替换/删除已有代码时直接覆盖，不留旧代码副本；新增对齐补丁时直接添加，不打补丁标记。过气逻辑、曾经的错误实现、某次变更原因、日期、PR/Issue 编号都属于 Git 历史，不属于源码。
+**代码只描述当前正确逻辑，只保留对当下读者有意义的"WHY 注释"，禁止任何形式的变更历史叙事和函数头大段说明。** 修改/替换/删除已有代码时直接覆盖，不留旧代码副本；新增对齐补丁时直接添加，不打补丁标记。过气逻辑、曾经的错误实现、某次变更原因、日期、PR/Issue 编号都属于 Git 历史，不属于源码。
 
 | 类型 | 处理方式 |
 |------|---------|
 | 修改/替换/删除已有代码 | 直接改写。不要 `//` 注释保留旧实现，不要写 `[DEPRECATED]`/`[BUGFIX]`/`[FIXED YYYY-MM-DD]` 等标记。 |
 | 新增之前缺漏的对齐代码 | 直接添加。不要写 `[ADDED YYYY-MM-DD]`、不要写"对齐云端 XX 第 N 行"作为头注释，不要引用调整流水编号。 |
-| 必要的 WHY 注释 | **优先上提到方法 / 类的 doc comment**；只有当某行本身的逻辑非显然且无法在方法 doc 里讲清时，才在该行加单行注释。 |
+| 方法 / 类 doc comment | 只写当前职责、输入输出语义、不变式和容易误用的业务约束；不要把设计文档、bug 复盘、实现步骤流水堆到函数头。 |
+| 必要的 WHY 注释 | 复杂逻辑的解释优先贴近对应代码块，用 1-2 行说明"为什么这样做"；只有跨整个方法的不变式才上提到方法 / 类 doc comment。 |
 
 ## 为什么反向
 
@@ -37,6 +38,8 @@ description: "Use when applying any bug fix, alignment correction, redundant-cod
 | `// 详见 v6 调整流水 2026-04-25 条目` | 引用易失效；让读者跳到外部文档才能理解的代码不合格 |
 | `// PR #1234 / Issue #56 / Linear ticket KP-789` | 同上 |
 | `// TODO(zhangkai 2026-04): 这里以后再优化` | 带个人/日期的 TODO 也是噪声；要 TODO 就匿名写"待优化原因"，但更应该开任务 |
+| `// [REWRITTEN 2026-04-28] 按 xxx 重写...` 后接旧实现问题、新实现步骤、未来版本计划 | 这是变更流水 + 设计文档摘要，应该写进 commit body / 设计文档；源码只保留当前行为和必要 WHY |
+| 函数头连续十几行说明"旧实现忽略 A/B/C、新实现第 1/2/3 步、理论上一定完成、v1.1 计划" | 函数头注释过载。当前职责写在 doc comment，步骤说明拆到对应代码块附近 |
 
 ## 推荐写法（WHY 注释只放有当下价值的）
 
@@ -45,6 +48,7 @@ description: "Use when applying any bug fix, alignment correction, redundant-cod
 | 类型 | 例子 | 摆放位置 |
 |------|------|---------|
 | 方法/类承担的隐藏不变式 | "字段映射约定：POS 回调 outTradeNO 对应本地 out_trade_no 而非 transaction_no" | 方法/类 doc comment |
+| 当前行为摘要 | "按用户选择的 refundMethods 将可退池分摊到原支付流水" | 方法 doc comment，最多 1-3 行 |
 | 与外部系统的字段语义对齐 | "对齐云端 PayV1ServiceImpl#refundOrderNotifyForKpayOffline" | 类 doc comment（不带日期/版本） |
 | 单行非显然的业务约束 | `// 加 ±0.005 浮点容差是为了让前端 toFixed(2) 与 Rust BigDecimal 的尾差不报错` | 该行上方 |
 | 对易误解参数的语义说明 | `/// [businessDate] 营业日（不一定等于 createTime 的日期）` | 参数 doc tag |
@@ -54,6 +58,40 @@ description: "Use when applying any bug fix, alignment correction, redundant-cod
 ## A vs B 不再区分
 
 旧规则的 A 类（DEPRECATED）/ B 类（ADDED）已废止。不论是修改还是新增，写法都一样：直接改、不留痕迹。需要解释 WHY 时，按上节"推荐写法"上提到 doc comment。
+
+## 函数头注释边界
+
+函数 / 类 doc comment 只承担**当前读者理解入口所必需的信息**：
+
+- 当前职责：这个方法现在做什么
+- 输入输出语义：参数、返回值、异常或副作用有什么业务含义
+- 不变式 / 误用风险：删掉这句后，下个维护者很可能写错的约束
+
+以下内容不要写进函数头注释：
+
+- 历史标记：`[REWRITTEN]`、日期、版本号、PR/Issue、"旧实现 / 新实现"
+- 事故复盘：旧逻辑错在哪里、为什么这次改、谁要求对齐
+- 实现流水：第 1 步查什么、第 2 步怎么分摊、第 3 步怎么落库
+- 文档摘要：设计文档第几节、bug 文档结论、未来版本计划
+
+如果代码块确实复杂，把说明放到**对应代码块上方**，保持短句：
+
+```dart
+/// 按用户选择的退款方式，将可退池分摊到原支付流水。
+///
+/// 分摊结果保留原流水金额，用于后续按流水维度判断撤销资格。
+Future<List<RefundTransactionAllocation>> allocateByRefundMethods(...) async {
+  final pool = await _eligibilityDao.queryRefundableTxPool(originalOrderId);
+
+  // 非现金退款只能消耗同 wireType 的原流水，避免跨渠道占用可退额度。
+  for (final method in nonCashMethods) {
+    _allocateSameWireType(pool, method);
+  }
+
+  // 现金退款先消耗现金池；外溢规则未启用时，剩余金额只记录日志不落库。
+  _allocateCashPool(pool, cashMethod);
+}
+```
 
 ## 摆放位置
 
@@ -98,7 +136,7 @@ final transaction = await ...; // 新代码
 |------|---------|---------|
 | 联调期 bug 修复 | ✅ | 直接改写，逻辑说明上提方法 doc |
 | 删除明确无效的 if/else 分支 | ✅ | 直接删，不留注释 |
-| 方法体内逻辑修正（不改签名） | ✅ | 直接改 |
+| 方法体内逻辑修正（不改签名） | ✅ | 直接改；复杂代码块只在局部加短 WHY 注释 |
 | 补上原本缺漏的对齐代码 | ✅ | 直接加，无需 ADDED 标记 |
 | 新功能开发 | ✅ | 同样适用本规范 |
 | 纯重命名 / IDE refactor | ✅ | 直接改 |
@@ -134,3 +172,4 @@ final transaction = await ...; // 新代码
 | "这段代码以前 bug 过，警示后人" | 加测试用例覆盖、写进 bug 文档；不在源码注释里复述故事 |
 | "TODO 想标个日期方便回头查" | 别。开 issue / 任务卡，源码里只留"为什么这里需要 TODO"的内容（且更应避免） |
 | "用户没说要清理，那就保留旧 DEPRECATED" | 错。本 skill v1.17 起规则反转，遇到就可以顺手清（限改同一段代码时） |
+| "函数上写一大段，后面的人就不用翻文档了" | 错。函数头只写当前行为和必要约束；设计背景、旧实现问题、未来计划归文档和 Git 历史 |

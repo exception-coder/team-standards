@@ -2,7 +2,8 @@
 
 > 本文档梳理 team-standards 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-05-02 v19.5**
+> **最后更新：2026-05-02 v19.7**
+> 变更摘要 v19.7：`bugfix-coding-style` 补强源码注释边界 —— 禁止把 `[REWRITTEN 日期]`、旧实现缺陷、新实现步骤流水、未来版本计划、设计文档摘要堆到函数头注释；函数 / 类 doc comment 只写当前职责、输入输出语义、不变式和误用风险；复杂逻辑需要解释时在对应代码块附近写 1-2 行 WHY 注释。该变更只补强注释规范，不改变主链路节点结构，按"轻微"处理未单独创建快照。
 > 变更摘要 v19.5：`backend-knowledge-graph-required` 强化后端接口开发的表逻辑闭环 —— 新增 `07_table_logic_index.md`、`08_atomic_capability_index.md`、`table-logic/`、`atomic-capabilities/` 目录规范；后端接口编码前必须回顾表逻辑索引和原子能力索引，编码中优先复用已有 DAO/原子能力，编码后将 DAO/SQL、订单/退款/支付状态判定、金额聚合、表状态变化同步到正式图谱或用户目录候选池。该变更调整后端图谱核心行为但不改变主链路节点结构，按"轻微"处理未单独创建快照。
 > 变更摘要 v19.4：`korepos-backend-service` 新增「跨 feature 业务原子能力层」规则 —— 在已有的「模块内 `service/internal/`」与「全局基础设施门面 `backend_infra/{capability}/`」之间补充中间层 `lib/common/backend_infra/services/`，沉淀 ≥2 feature 模块共享的业务原子能力（与 `daos/` 对偶，但允许跨表组合 + 业务规则计算）；强制维护 `INDEX.md` 索引（按文件登记 + 按业务关键词反查）；写新 service 主流程前必查索引，已有则注入复用、禁止复制粘贴；补充 internal/ → backend_infra/services/ 升级流程。SKILL.md 在 §Service/internal 章节后新增完整子章节，README.md 同步更新 backend_infra 目录结构 + 新增依赖落点表格行（轻微规则补充，未单独创建快照）。
 > 变更摘要 v19.3：`design-doc-required` 将完整模版从 18 节功能设计压缩为 8 节方案/接口设计，明确设计文档是“某个方案/接口开发的简明编码依据”，重点确认核心逻辑、关键规则、编码落点和风险点；功能模块总览、能力分解、类调用图、数据结构、下游依赖、缓存/消息/事务等只写本次变化，不复写项目全集资料。该变更调整模版核心行为但不改变 Skill 链路节点，按"轻微"处理未单独创建快照。
@@ -18,7 +19,7 @@
 > 变更摘要 v16.5：`korepos-backend-service` 新增「外部调用前的边界兜底校验」健壮性硬规则 —— service 调云端 HTTP / 跨子门面 / POS 硬件协议前，凡传给对方的金额/数量/配额等业务数值，若本地 DB 有可查的上限/边界，必须用 DB 实读值兜底校验，不信任入参或前序内存对象；校验抽 `_assertXxxWithinBound` 私有方法；金额比较加 ±0.005 浮点容差。Step 5 强制规则、自检清单、禁区表均同步追加（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.4：`daily-work-log` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`，与 `bug-doc-required` / `design-doc-required` / `doc-index-required` 完全对齐；项目内 `docs/work-log/` 与 `.gitignore` 兜底节降级为"用户明确指定路径"分支（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.3：`bug-doc-required` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，与 `design-doc-required` / `doc-index-required` 一致；项目内 `docs/bug/` 降级为"用户明确指定路径或上传终版"分支；流程图分叉、红色警告与"各文档类型与用途"表同步调整（轻微规则补充，未单独创建快照）。
-> 上一版：v19.4（2026-05-02，轻微规则补充未单独创建快照）；v19.3（2026-05-02，轻微规则补充未单独创建快照）；v19.2（2026-05-02，轻微规则补充未单独创建快照）；v19.1（2026-05-02，轻微规则补充未单独创建快照）；v19（2026-05-02）；v18.2（2026-05-01，轻微规则补充未单独创建快照）；v18.1（2026-05-01，轻微规则补充未单独创建快照）；v18（2026-05-01）；v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
+> 上一版：v19.5（2026-05-02，轻微规则补充未单独创建快照）；v19.4（2026-05-02，轻微规则补充未单独创建快照）；v19.3（2026-05-02，轻微规则补充未单独创建快照）；v19.2（2026-05-02，轻微规则补充未单独创建快照）；v19.1（2026-05-02，轻微规则补充未单独创建快照）；v19（2026-05-02）；v18.2（2026-05-01，轻微规则补充未单独创建快照）；v18.1（2026-05-01，轻微规则补充未单独创建快照）；v18（2026-05-01）；v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
 > 再上一版：v15（2026-04-27）；v14（2026-04-27）；v13（2026-04-27）；v12（2026-04-27）；v11（2026-04-27）；v10（2026-04-27）；v9（2026-04-26）；v8（2026-04-25）；v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
 > 历史版本：`docs/skill-flow-20260502-v19.md`（v19）、`docs/skill-flow-20260501-v18.md`（v18）、`docs/skill-flow-20260501-v17.md`（v17）、`docs/skill-flow-20260427-v15.md`（v15）、`docs/skill-flow-20260427-v14.md`（v14）、`docs/skill-flow-20260427-v13.md`（v13）、`docs/skill-flow-20260427-v12.md`（v12）、`docs/skill-flow-20260427-v11.md`（v11）、`docs/skill-flow-20260427-v10.md`（v10）、`docs/skill-flow-20260427-v9.md`（v9）、`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
@@ -54,7 +55,7 @@
 | `coding-violation-log` | team-standards | 用户纠正 AI 编码错误时登记违规；编码前回顾已登记记录防重犯（嵌入编码链路，java-coding-standards 之前） |
 | `project-docs-update` | team-standards | 项目代码结构变更后同步知识图谱文档（检测差异 + 自动/确认更新） |
 | `arch-lint` | team-standards | Flutter 架构违规检测（5 条分层规则，全量/轻量两种模式） |
-| `bugfix-coding-style` | team-standards | bug 修复 / 任何源码改动的注释规范（v1.17 起方向反转）：禁止变更历史/日期标记/PR 引用/注释保留旧代码进入源码；源码只描述当前正确逻辑，变更原因归 git log / commit body；源码内只保留 WHY 注释且优先上提到方法 doc comment |
+| `bugfix-coding-style` | team-standards | bug 修复 / 任何源码改动的注释规范（v1.17 起方向反转）：禁止变更历史/日期标记/PR 引用/注释保留旧代码进入源码；源码只描述当前正确逻辑，变更原因归 git log / commit body；函数头只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块写短 WHY 注释 |
 
 ---
 
@@ -165,7 +166,7 @@ flowchart TD
     DDR -- "改动不通过硬清单" --> ORIENT["pre-implementation-code-orientation\n优先读设计文档提取代码坐标\n降级才读 bug 文档"]
     LIGHT --> ORIENT
     ORIENT --> ARCH["architecture-ddd-lite-fullstack\n先判断修复应落在哪一层\n禁止直接塞进 UI / Controller"]
-    ARCH --> CODE["java-coding-standards\n实施修复\n+ bugfix-coding-style\n（直接改写；禁变更日志注释；逻辑说明上提方法 doc）"]
+    ARCH --> CODE["java-coding-standards\n实施修复\n+ bugfix-coding-style\n（直接改写；禁变更日志注释；函数头不堆复盘）"]
     CODE --> COMMIT["git-commit-standards\n type: fix  提交"]
     COMMIT --> MORE{"还有关联 Bug?"}
     MORE -- "有" --> BUG
@@ -294,8 +295,9 @@ flowchart LR
 | Phase 3-4 的自动模式和确认模式怎么选? | 自动模式：AI 尽力推断后生成，标注"需人工校验"，适合快速产出初稿。确认模式：逐份展示等用户确认，适合对准确度要求高的场景。 |
 | Step 0 知识图谱预热是什么? | 在 design-doc-required / bug-doc-required 执行前，先读 `00_project_overview.md` 获取全局索引，再按 AI 上下文路由表加载当前任务类型对应的 2-3 份文档。避免全量扫码，按需获取上下文。 |
 | 什么时候走「轻量修订」而不是新建快照? | 设计文档已存在 + 改动通过 design-doc-required 第四·五步硬清单（不新增接口/字段/类、不改方法签名、单文件 ≤30 行净变更、性质属修正/对齐/删冗余/修 bug）。Git 管理下必要时更新 current 文档，变更说明写 commit body；任一项 ❌ 进入需求变更处理。 |
-| 轻量修订期间代码怎么写? | 必须遵循 `bugfix-coding-style`（v1.17 起反转）：直接改写或新增，**禁止**在源码中保留 `[DEPRECATED]` / `[ADDED]` / `[BUGFIX 日期]` 等变更日志标记，**禁止**注释保留旧代码段。源码只描述当前正确逻辑，变更原因写进 commit message body；源码内只保留对当下读者有价值的 WHY 注释，且优先上提到方法 / 类 doc comment。 |
-| `bugfix-coding-style` 和 `coding-violation-log` 有什么区别? | bugfix-coding-style 是**主动规则**（写代码时必须遵循的注释规范，v1.17 起核心规则是"禁变更日志、WHY 注释上提方法 doc"），coding-violation-log 是**反应式登记**（用户纠错后记录到违规表防重犯）。前者管"怎么写"，后者管"错过的别再错"。 |
+| 轻量修订期间代码怎么写? | 必须遵循 `bugfix-coding-style`（v1.17 起反转）：直接改写或新增，**禁止**在源码中保留 `[DEPRECATED]` / `[ADDED]` / `[BUGFIX 日期]` 等变更日志标记，**禁止**注释保留旧代码段。源码只描述当前正确逻辑，变更原因写进 commit message body；函数/类 doc comment 只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块附近写 1-2 行 WHY 注释。 |
+| 函数上能不能写一大段旧实现问题和新实现步骤? | 不能。`[REWRITTEN 日期]`、旧实现缺陷、新实现 1/2/3 步、设计文档第几节、未来版本计划都不应堆在函数头。当前职责写短 doc comment，复杂步骤在对应代码块附近用短 WHY 注释说明。 |
+| `bugfix-coding-style` 和 `coding-violation-log` 有什么区别? | bugfix-coding-style 是**主动规则**（写代码时必须遵循的注释规范，核心规则是"禁变更日志、函数头不堆复盘、复杂逻辑局部短 WHY"），coding-violation-log 是**反应式登记**（用户纠错后记录到违规表防重犯）。前者管"怎么写"，后者管"错过的别再错"。 |
 | 项目没有知识图谱时 Step 0 怎么办? | 自动跳过。Step 0 检测 `docs/00_project_overview.md` 不存在时直接进入后续流程，完全向后兼容。 |
 | 什么时候走「轻量模版」? | 命中第一·七步全部 9 项硬清单（不新增表/字段/对外契约/类 ≥3、不跨服务、不引入新中间件、不重设状态机、改动可由「核心流程图 + 规则表 + 失败行为表」描述）。任一 ❌ 升级到完整模版。已有架构内的单接口新增/调整、接口自身流程或库表读写流程描述就是典型轻量场景。 |
 | 轻量模版需要 coding.md 吗? | **不需要**。核心流程图 + 规则表 + 失败行为表已经覆盖编码所需的最小信息。第四步（生成 coding.md）和第六步（同步 coding.md）只对完整模版生效，轻量分支跳过。 |

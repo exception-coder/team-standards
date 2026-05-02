@@ -24,7 +24,7 @@
 | 后端接口/服务开发前涉及表读写、状态判定、订单/退款/支付等业务逻辑；存在 `docs/knowledge-graph/backend/`；要求生成/更新后端知识图谱；或会话中反复提及后端业务事实需要候选沉淀 | `backend-knowledge-graph-required` |
 | **用户纠正了 AI 的编码写法（分层违规、命名错误等）** | `coding-violation-log` |
 | **开始编写代码前（若项目存在 coding-violations.md）** | `coding-violation-log`（回顾模式） |
-| **bug 修复 / 对齐云端 / 删冗余 / 任何源码改动** | `bugfix-coding-style`（源码只描述当前逻辑；禁变更日志注释；逻辑说明上提方法 doc） |
+| **bug 修复 / 对齐云端 / 删冗余 / 任何源码改动** | `bugfix-coding-style`（源码只描述当前逻辑；禁变更日志注释；函数头不堆历史/设计摘要；复杂逻辑在对应代码块写短 WHY） |
 | **写 korepos / korepos-refund 后端接口**（shelf endpoint / handler / service / DAO / request-response DTO，路径含 `lib/features/{module}/backend/`）；用户说「加接口 / 加 endpoint / 写 backend 服务 / 实现服务端 / 按 UI 对接手册实现接口」 | `korepos-backend-service` |
 | 项目代码结构变更后需要同步文档 | `project-docs-update` |
 | Flutter 代码架构违规检查 | `arch-lint` |
@@ -60,7 +60,7 @@
 | `init-project-docs` | `skills/init-project-docs/` | 渐进式构建项目知识图谱：Phase 1 核心文档（概要+架构+约束）→ Phase 2 映射文档（模块+数据模型+API+前后端映射+开发参考）→ Phase 3 流程与术语（业务流程+术语表+重构计划+变更记录）→ Phase 4 模块深度文档+技能卡；支持自动/确认两种模式 | 初始化项目文档、生成知识图谱、分析项目能力、生成项目概要、架构分析、init project docs、knowledge graph |
 | `generate-project-profile` | `skills/generate-project-profile/` | 生成 AI Agent 消费的项目画像（project-profile.md）：10 维度结构化 Markdown，可独立向量化分片；覆盖项目概述、技术栈、结构、架构、数据模型、Service 能力、API 接口、外部依赖、配置、编码约定 | 项目画像、project profile、代码感知、扫描项目、AI 上下文、generate profile |
 | `coding-violation-log` | `skills/coding-violation-log/` | 用户纠正编码错误时自动登记到 `docs/coding-violations.md`；编码前自动回顾已登记的违规记录，防止重犯 | 编码违规、纠正、分层违规、依赖方向、命名错误、规范错误、coding violation |
-| `bugfix-coding-style` | `skills/bugfix-coding-style/` | **v1.17 起方向反转**：禁止把变更历史写进源码内（`[BUGFIX]`/`[DEPRECATED]`/`[ADDED]`/日期标记/PR 引用/注释保留旧代码全部禁止）；源码只描述当前正确逻辑，过气逻辑和变更原因归 git log / commit message，bug 文档 / 设计文档只沉淀长期业务事实；代码内只保留对当下读者有价值的 WHY 注释，且优先上提到方法 / 类 doc comment；适用于所有源码改动（不限联调期），遇到旧 `[DEPRECATED]` / `[ADDED]` 标记可在改同段代码时顺手清理 | bug修复、对齐云端、删冗余、补缺漏、源码注释、变更日志禁令、当前逻辑、方法 doc、WHY 注释、bugfix style |
+| `bugfix-coding-style` | `skills/bugfix-coding-style/` | **v1.17 起方向反转**：禁止把变更历史写进源码内（`[BUGFIX]`/`[DEPRECATED]`/`[ADDED]`/日期标记/PR 引用/注释保留旧代码全部禁止）；源码只描述当前正确逻辑，过气逻辑和变更原因归 git log / commit message，bug 文档 / 设计文档只沉淀长期业务事实；函数/类 doc comment 只写当前职责、输入输出语义、不变式和误用风险，禁止堆旧实现复盘、实现步骤流水、未来版本计划；复杂逻辑在对应代码块附近写 1-2 行 WHY 注释；适用于所有源码改动（不限联调期），遇到旧 `[DEPRECATED]` / `[ADDED]` 标记可在改同段代码时顺手清理 | bug修复、对齐云端、删冗余、补缺漏、源码注释、变更日志禁令、当前逻辑、函数头注释、短注释、WHY 注释、bugfix style |
 | `project-docs-update` | `skills/project-docs-update/` | 知识图谱持续维护：检测代码结构变更（新增 Controller/Service/模块/数据表/API）与 docs/ 文档的差异，生成差异报告并执行更新；支持自动/确认模式 | 更新项目文档、同步知识图谱、文档过时、update project docs、sync knowledge graph |
 | `arch-lint` | `skills/arch-lint/` | Flutter 架构违规检测：5 条规则（presentation 层禁 SQL/HTTP、domain 层禁技术框架、金额禁 double、DAO 不可被 presentation 直接调用）；全量检查 + 轻量自动检查两种模式 | 架构检查、arch lint、检测违规、分层违规、Flutter 架构 |
 | `markdown-writing-standards` | `skills/markdown-writing-standards/` | Markdown 编写规范：Mermaid 图表语法（致命错误清单、各图类型骨架、自检清单）、表格、代码块、标题结构、目录结构复核（TOC Review — 分类混杂/重复/层级断层/交叉引用失效/快速导航判断） | Mermaid、mermaid、图表、流程图、时序图、mindmap、状态图、markdown、表格规范、目录结构、TOC、章节重构、目录复核 |
