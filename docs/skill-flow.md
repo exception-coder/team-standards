@@ -2,7 +2,8 @@
 
 > 本文档梳理 team-standards 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-05-02 v19.2**
+> **最后更新：2026-05-02 v19.3**
+> 变更摘要 v19.3：`design-doc-required` 将完整模版从 18 节功能设计压缩为 8 节方案/接口设计，明确设计文档是“某个方案/接口开发的简明编码依据”，重点确认核心逻辑、关键规则、编码落点和风险点；功能模块总览、能力分解、类调用图、数据结构、下游依赖、缓存/消息/事务等只写本次变化，不复写项目全集资料。该变更调整模版核心行为但不改变 Skill 链路节点，按"轻微"处理未单独创建快照。
 > 变更摘要 v19.2：`design-doc-required` 调整 Mermaid 图表策略 —— 从“完整模版固定多图必备”改为“最小图原则 + 场景选图”；单个后端接口/单业务动作默认只要求 1 张接口自身核心流程图或库表读写时序图，模块图、能力图、状态图、依赖图仅在对应场景命中时触发。该变更只补强节点文字与 FAQ，链路节点结构未变，按"轻微"处理未单独创建快照。
 > 变更摘要 v19.1：`git-commit-standards` hook 从"一刀切强制"调整为"按 staged diff 大小放行" —— `hooks/check-git-commit-skill.js` 在拦截 `git commit` 时先跑 `git diff --staged --shortstat` + `--name-status`，若 ≤2 文件 ∧ insertions+deletions ≤30 ∧ 全部为 `M` 修改则直接放行（让模型自行写一句 clear commit message），其它情况才强制 skill；阈值通过 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 环境变量可调；同时移除 `git push` 拦截（commit 已落地、push 无需再门禁）。SKILL.md description、CLAUDE.md/AGENTS.md 主动触发表 + Skill 索引、README.md 能力条目同步更新。该变更只调整触发条件粒度，链路节点结构未变，按"轻微"处理未单独创建快照。
 > 变更摘要 v19：`git-commit-standards` 由"模型自觉调用"升级为"hook 强制调用" —— 新增 `hooks/check-git-commit-skill.js`（跨平台 Node 脚本），通过 `hooks/hooks.json` 默认启用 PreToolUse Bash matcher，在每次 `git commit` / `git push` 前 grep 当前会话 transcript 是否含 `team-standards:git-commit-standards` skill 调用记录，未命中直接 exit 2 阻断。同步更新 SKILL.md description、CLAUDE.md/AGENTS.md 主动触发表 + Skill 索引 + 辅助资源表、README.md 能力表 + 顶层目录表，新增 `git commit/push 前 skill 触发拦截` 链路节点。该变更属于触发机制语义变化（建议 → 强制），创建 v19 快照。
@@ -15,7 +16,7 @@
 > 变更摘要 v16.5：`korepos-backend-service` 新增「外部调用前的边界兜底校验」健壮性硬规则 —— service 调云端 HTTP / 跨子门面 / POS 硬件协议前，凡传给对方的金额/数量/配额等业务数值，若本地 DB 有可查的上限/边界，必须用 DB 实读值兜底校验，不信任入参或前序内存对象；校验抽 `_assertXxxWithinBound` 私有方法；金额比较加 ±0.005 浮点容差。Step 5 强制规则、自检清单、禁区表均同步追加（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.4：`daily-work-log` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`，与 `bug-doc-required` / `design-doc-required` / `doc-index-required` 完全对齐；项目内 `docs/work-log/` 与 `.gitignore` 兜底节降级为"用户明确指定路径"分支（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.3：`bug-doc-required` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，与 `design-doc-required` / `doc-index-required` 一致；项目内 `docs/bug/` 降级为"用户明确指定路径或上传终版"分支；流程图分叉、红色警告与"各文档类型与用途"表同步调整（轻微规则补充，未单独创建快照）。
-> 上一版：v19.1（2026-05-02，轻微规则补充未单独创建快照）；v19（2026-05-02）；v18.2（2026-05-01，轻微规则补充未单独创建快照）；v18.1（2026-05-01，轻微规则补充未单独创建快照）；v18（2026-05-01）；v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
+> 上一版：v19.2（2026-05-02，轻微规则补充未单独创建快照）；v19.1（2026-05-02，轻微规则补充未单独创建快照）；v19（2026-05-02）；v18.2（2026-05-01，轻微规则补充未单独创建快照）；v18.1（2026-05-01，轻微规则补充未单独创建快照）；v18（2026-05-01）；v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
 > 再上一版：v15（2026-04-27）；v14（2026-04-27）；v13（2026-04-27）；v12（2026-04-27）；v11（2026-04-27）；v10（2026-04-27）；v9（2026-04-26）；v8（2026-04-25）；v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
 > 历史版本：`docs/skill-flow-20260502-v19.md`（v19）、`docs/skill-flow-20260501-v18.md`（v18）、`docs/skill-flow-20260501-v17.md`（v17）、`docs/skill-flow-20260427-v15.md`（v15）、`docs/skill-flow-20260427-v14.md`（v14）、`docs/skill-flow-20260427-v13.md`（v13）、`docs/skill-flow-20260427-v12.md`（v12）、`docs/skill-flow-20260427-v11.md`（v11）、`docs/skill-flow-20260427-v10.md`（v10）、`docs/skill-flow-20260427-v9.md`（v9）、`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
@@ -35,7 +36,7 @@
 | Skill 名称 | 来源 | 触发时机 |
 |---|---|---|
 | `solution-review-required` | team-standards | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时，先审视目标、现有代码质量、风险和更优方案 |
-| `design-doc-required` | team-standards | 写任何实现代码前，或被要求提供修复方案/实施方案时（新功能和 bug 修复均适用）；**任何源码 Edit/Write 请求（含「根据文档改代码」「帮我改一下」等）也必须先触发**；图表遵循最小图原则，按场景选择流程图/时序图/依赖图；Git 管理下默认维护稳定/current 文档，历史由 commit body 承担 |
+| `design-doc-required` | team-standards | 写任何实现代码前，或被要求提供修复方案/实施方案时（新功能和 bug 修复均适用）；**任何源码 Edit/Write 请求（含「根据文档改代码」「帮我改一下」等）也必须先触发**；文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、编码落点和风险点；图表遵循最小图原则；Git 管理下默认维护稳定/current 文档，历史由 commit body 承担 |
 | `doc-index-required` | team-standards | **(辅助)** 创建任何 Markdown 文档前先确定输出路径；AI 生成 Markdown 默认写用户 Documents 下的 `ai-docs/{project}/`，仅用户指定 `docs/` 路径时更新索引 |
 | `backend-knowledge-graph-required` | team-standards | Java 后端单服务需求分析前读取 `docs/knowledge-graph/backend/`；生成/更新后端图谱；会话事实自动候选沉淀，确认或代码验证后整理进正式图谱 |
 | `bug-doc-required` | team-standards | 编写 bug 分析文档时；完成后必须继续调用 design-doc-required 写修复实施方案 |
@@ -276,6 +277,8 @@ flowchart LR
 | 为什么每次 push 还可能要授权? | 自动 push 是 skill 的行为规则；是否弹授权由 Codex/宿主运行环境的命令审批策略控制。若环境没有持久化允许 `git push`，skill 不能绕过授权，只能在获准后继续执行。 |
 | init-project-docs 什么时候调? | 仅在明确要求"初始化项目文档"或"分析项目能力"时调用，是独立的分析类 skill，不属于功能开发或 bug 修复链路。 |
 | markdown-writing-standards 和 design-doc-required 的 Mermaid 章节什么关系? | design-doc-required 规定「什么场景适合画什么图」，并遵循最小图原则：能一张图讲清就只画一张；markdown-writing-standards 规定「图怎么画不出错」（语法规则、自检清单）。前者定义 what，后者定义 how。 |
+| 设计文档需要写完整模块资料吗? | 不需要。`design-doc-required` 的设计文档是某个方案/接口开发的编码依据，重点写核心逻辑、关键规则、编码落点、风险与验证。项目全集资料里已有的数据结构、下游依赖、缓存/消息/事务等，只在本次有新增、修改或风险时写。 |
+| 功能模块总览图、能力分解图还要画吗? | 默认不画。简单接口设计、单个后端动作、已有模块内方案开发都不需要；涉及模块交互时也优先用文字/表格说明，只有不画就无法确认风险或职责边界时才画。 |
 | 写 Mermaid 时需要显式调用 markdown-writing-standards 吗? | 自动应用，与 java-coding-standards 同级。只要检测到要写 Mermaid 代码块，规则自动生效。 |
 | business-logic-orientation 和 design-doc-required 的区别? | business-logic-orientation 梳理**现有代码的现状**（是什么），design-doc-required 规划**要改成什么样**（怎么改）。重构场景先梳理现状，再写设计文档。 |
 | AI 速查索引和 coding.md 有什么区别? | AI 速查索引是对**现有代码**的紧凑索引（文件/方法/调用链/表操作），coding.md 是对**设计方案**的编码摘要（接口契约/类清单/业务规则）。前者面向理解，后者面向实施。 |

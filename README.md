@@ -140,7 +140,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | Skill | 触发时机 | 作用 |
 |-------|----------|------|
 | `solution-review-required` | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时 | 先分离真实目标与候选方案，评估现有代码是否值得参考，识别风险、缺口和替代方案，给出更优建议后再进入设计或实施 |
-| `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；图表遵循最小图原则，按场景选择流程图/时序图/依赖图；Git 管理下默认维护稳定/current 文档，历史写入 commit body；完整模版自动生成编码摘要 |
+| `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；设计文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、关键规则和风险点；图表遵循最小图原则；Git 管理下默认维护稳定/current 文档，历史写入 commit body；完整模版自动生成编码摘要 |
 | `architecture-ddd-lite-fullstack` | 开始编写或审查 Java / React / Vue / Flutter 业务代码前 | 强制 DDD-lite 分层、Feature 模块化、单向依赖与原子能力沉淀；要求代码结构清晰、易维护、低耦合、高内聚，禁止 UI / Controller 直接承载业务逻辑 |
 | `backend-knowledge-graph-required` | Java 后端单服务需求分析前存在 `docs/knowledge-graph/backend/`，或要求生成/更新后端知识图谱时 | 按项目沉淀领域能力、原子能力、业务流程、表、枚举、API、外部依赖与代码坐标；会话中反复提及的后端业务事实自动进入用户目录候选池，确认或代码验证后才更新正式图谱 |
 | `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；**默认走用户文档目录**（`{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`），仅用户明确要求时才进项目 `docs/bug/`；写入项目时按模块分组（对齐 `docs/design/`），中文命名 |
@@ -165,14 +165,15 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 
 ### 完整模版（`skills/design-doc-required/template.md`）
 
-适用：跨服务/跨模块协作、新增数据库表、新增对外契约入口、复杂事务/分布式锁、状态机重设计。
+适用：超出轻量范围的方案/接口设计，例如新增表/字段/对外契约入口、复杂事务/分布式锁、状态机调整、跨服务风险等。
 
-包含 18 个章节：
+包含 8 个章节，聚焦编码依据：
 
-- 基本信息、背景与目标、功能范围
-- 业务流程、接口设计、类设计、数据库设计
-- 事务并发、缓存、消息异步、安全、日志监控、异常处理
-- 测试要点、上线回滚方案、风险点
+- 目标与边界、接口 / 入口契约
+- 核心流程（必填 1 张核心图，主流程和异常流程优先合并）
+- 核心业务规则、编码落点
+- 数据与依赖变更（只写本次变化，不复写项目全集资料）
+- 风险与待确认、验证要点
 
 完整模版必须配套 `-coding.md`（基于 `coding-template.md`）作为编码摘要。
 
