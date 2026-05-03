@@ -1,13 +1,13 @@
 ---
 name: backend-knowledge-graph-required
-description: "Use BEFORE answering any backend single-service question about table relationships / state transitions / business judgments / atomic capabilities, AND BEFORE Write/Edit any .md describing such content (even outside docs/, e.g. ai-docs/, scenarios/). MUST invoke (BLOCKING) when: (1) about to Write/Edit a markdown whose content describes backend table relationships, ER diagrams, state transitions, business flow → DB CRUD, or data modeling — including files under ai-docs/, work-log/, scenarios/, NOT only under docs/; (2) user asks 'X 与 Y 是 1:1 还是 1:N', '改这个动哪些表', '字段从哪来', '退款/账单/流水/分摊怎么算', '是新建快照还是引用原表', or any single-service backend table-relation / state / atomic-capability question — even if framed as investigation, not implementation; (3) finished investigating backend code (own project OR another project as subject) and discovered ≥1 reusable fact about table relations / state machines / atomic capabilities — must auto-append to candidate pool; (4) user asks to initialize, generate, organize, read or update backend knowledge graphs; (5) project has docs/knowledge-graph/backend/; (6) code changes affect APIs, services, DAOs/Mappers/SQL, database tables, enums, state transitions, order/refund/payment status judgment, transactions, MQ/events, or external dependencies. Knowledge graph ownership = the investigated backend service, NOT current cwd — investigating project B from project A puts the graph under B's namespace, do NOT reroute to cross-project-locator just because cwd differs. Scope: backend single service (Java / backend-service style); cross-project topology → cross-project-locator."
+description: "Use BEFORE answering any backend single-service question about table relationships / ER / SQL query logic / state transitions / business judgments / atomic capabilities, AND BEFORE Write/Edit any .md describing such content (even outside docs/, e.g. ai-docs/, scenarios/). MUST invoke (BLOCKING) when: (1) about to Write/Edit a markdown whose content describes backend table relationships, ER diagrams, SQL, DAO/Mapper query logic, state transitions, business flow → DB CRUD, or data modeling — including files under ai-docs/, work-log/, scenarios/, NOT only under docs/; (2) user asks 'X 与 Y 是 1:1 还是 1:N', '改这个动哪些表', '字段从哪来', '这个业务怎么查', '这个 SQL 怎么写/完善', '退款/账单/流水/分摊怎么算', '是新建快照还是引用原表', or any single-service backend table-relation / SQL / state / atomic-capability question — even if framed as investigation, not implementation; (3) finished investigating backend code (own project OR another project as subject) and discovered ≥1 reusable fact about table relations / SQL query patterns / state machines / atomic capabilities — must auto-append to candidate pool and SQL query index candidate; (4) user asks to initialize, generate, organize, read or update backend knowledge graphs, ER diagrams, SQL archives, or query logic indexes; (5) project has docs/knowledge-graph/backend/; (6) code changes affect APIs, services, DAOs/Mappers/SQL, database tables, enums, state transitions, order/refund/payment status judgment, transactions, MQ/events, or external dependencies. Knowledge graph ownership = the investigated backend service, NOT current cwd — investigating project B from project A puts the graph under B's namespace, do NOT reroute to cross-project-locator just because cwd differs. Scope: backend single service (Java / backend-service style); cross-project topology → cross-project-locator."
 ---
 
 # 后端单服务知识图谱
 
 ## 定位
 
-本 skill 负责 **后端单服务业务视角** 的知识图谱，尤其是接口开发中反复使用的 **表逻辑关系、状态判定规则、业务流程读写顺序、可复用原子函数**。
+本 skill 负责 **后端单服务业务视角** 的知识图谱，尤其是接口开发中反复使用的 **表逻辑关系、全景 ER、SQL 查询逻辑、状态判定规则、业务流程读写顺序、可复用原子函数**。
 
 目标是让 AI 在后端接口开发前先理解：
 
@@ -16,6 +16,7 @@ description: "Use BEFORE answering any backend single-service question about tab
 - 涉及哪些表、表关系、枚举、状态机、事务边界、外部依赖
 - 一个业务流程如何读写表、调用能力、流转状态、判定业务结果
 - 订单部分退、订单业务状态判定、可退金额/可退商品等链式规则是否已有沉淀
+- 某个业务查询到底由哪些表 join、哪些过滤条件、哪些聚合字段组成，是否已有 SQL 指纹可复用
 - 当前需求是否应该复用已有原子能力，而不是重新写一遍 SQL / 判定逻辑
 
 不处理前端 UI 或跨项目全局拓扑。跨项目链路仍交给 `cross-project-locator`。
@@ -26,15 +27,16 @@ description: "Use BEFORE answering any backend single-service question about tab
 
 | 触发场景 | 命中信号 | 必做动作 |
 |---|---|---|
-| **Write/Edit 一份描述后端表关系 / ER / 状态扭转 / 业务流程 → 表 CRUD 的 .md**（无论路径，包括 `ai-docs/`、`work-log/`、`scenarios/` 而不仅 `docs/`） | 文档主体含表名 + 关联键 + state/字段判定 + 数据流箭头 | 先按本 skill 决定归属命名空间和模板，再 Write |
-| **用户问询表关系类问题** | "X 与 Y 是 1:1 还是 1:N"、"改这个动哪些表"、"字段从哪来"、"退款/账单/流水/分摊怎么算"、"是新建快照还是引用原表"、"哪个状态会变" | 答题同时把事实追加到候选沉淀池 |
-| **AI 已完成后端代码调查并发现 ≥1 条可复用事实**（含跨项目"以另一服务为调查对象"的场景） | 调查报告里出现具体表/Service/Mapper/枚举/状态值 | 调查结论给用户的同一回合，必须将事实候选追加到被调查项目命名空间下的候选池 |
+| **Write/Edit 一份描述后端表关系 / ER / SQL / 状态扭转 / 业务流程 → 表 CRUD 的 .md**（无论路径，包括 `ai-docs/`、`work-log/`、`scenarios/` 而不仅 `docs/`） | 文档主体含表名 + 关联键 + SQL / DAO / Mapper + state/字段判定 + 数据流箭头 | 先按本 skill 决定归属命名空间和模板，再 Write |
+| **用户问询表关系 / SQL 查询逻辑类问题** | "X 与 Y 是 1:1 还是 1:N"、"改这个动哪些表"、"字段从哪来"、"这个业务怎么查"、"这个 SQL 怎么写/完善"、"退款/账单/流水/分摊怎么算"、"是新建快照还是引用原表"、"哪个状态会变" | 答题同时把事实追加到候选沉淀池；涉及查询时同步记录 SQL 指纹候选 |
+| **AI 已完成后端代码调查并发现 ≥1 条可复用事实**（含跨项目"以另一服务为调查对象"的场景） | 调查报告里出现具体表/SQL/DAO/Mapper/Service/枚举/状态值 | 调查结论给用户的同一回合，必须将事实候选追加到被调查项目命名空间下的候选池；有 SQL 时同步到查询索引候选 |
 | 用户主动要求 | "建知识图谱"、"整理图谱"、"更新图谱"、"归档" | 先读候选池 + 现有正式图谱 + 代码证据，再写正式图谱 |
 | 项目已有正式图谱 | 存在 `docs/knowledge-graph/backend/` | 编码前必先回顾相关卡片，编码后必同步回写 |
 | 后端代码变更 | 新增/修改 API、Service、DAO、SQL、表、枚举、状态机、事务边界、MQ、外部依赖 | 同步更新对应卡片或候选池 |
 
 > **常见误判反例（已发生过的踩坑）**：
 > - ❌ "用户只是问云端逻辑，没让我建图谱，所以不用触发" → **错**，问询场景必触发并候选沉淀
+> - ❌ "用户只是让我完善 SQL，所以只回答 SQL 就行" → **错**，必须归档查询逻辑、涉及表、join/where/group by/order by、业务语义和复用原子能力
 > - ❌ "本地工程没有 `docs/knowledge-graph/backend/`，所以 skill 不适用" → **错**，没有就先写候选池
 > - ❌ "主目录是 A，调查的是 B 云端，应该交给 cross-project-locator" → **错**，单服务图谱归属 = 被调查的那个服务，与 cwd 无关
 > - ❌ "我直接 Write 一份图谱文档就行了" → **错**，写前必经本 skill 决定归属和模板
@@ -82,6 +84,21 @@ description: "Use BEFORE answering any backend single-service question about tab
 
 如果项目尚无正式图谱，也不能让事实散落在会话里。必须写入用户目录候选池，至少沉淀“表逻辑候选记录”，后续确认或代码验证后再整理进正式图谱。
 
+**SQL 是后端知识图谱的一等资产。** 只要会话中提到了某个业务查询逻辑、SQL、DAO/Mapper 方法、join 关系、过滤条件、聚合条件或排序分页规则，就必须沉淀为可合并的 SQL 指纹：
+
+```text
+业务问题 → 涉及表/ER → SQL 指纹 → 原子能力 → 代码坐标 → 复用建议
+```
+
+SQL 图谱不追求保存一堆一次性 SQL 字符串，而是归档“业务查询能力”：
+
+- 这个查询回答什么业务问题
+- 从哪些表取数，主表和关联表是什么关系
+- join/on、where、group by、having、order by、limit 的业务语义是什么
+- 读取了哪些状态/金额/时间字段，是否依赖枚举
+- 对应 DAO/Mapper/Repository/Service 原子能力在哪里
+- 后续新增接口能否直接复用，不能复用时缺什么字段/索引/原子能力
+
 ## 推荐目录（渐进式三层骨架）
 
 **核心理念：第一份图谱只要 1 份场景卡 + 1 份扁平索引就算建立。** 不要求 8 文件齐全才叫图谱——通过多个细小场景小卡渐进汇总成全景，是这套图谱的设计目标。
@@ -95,6 +112,7 @@ description: "Use BEFORE answering any backend single-service question about tab
   00_index.md                        # 扁平索引：每个场景一行 + 关键词反查表
   scenarios/{业务场景}.md            # 一图一表的场景小卡（一图一表是底线）
   _candidates.md                     # 候选沉淀池（未代码验证的会话事实）
+  _sql_candidates.md                 # SQL / 查询逻辑候选池（未正式合并的查询指纹）
 ```
 
 每张场景小卡至少包含：
@@ -126,6 +144,8 @@ description: "Use BEFORE answering any backend single-service question about tab
   atomic-capabilities/{cap}.md       # 被多接口复用的原子能力
   07_table_logic_index.md            # 表逻辑反查索引（场景多了再建）
   08_atomic_capability_index.md      # 原子能力索引（能力多了再建）
+  09_sql_query_index.md              # 原子能力 ↔ SQL 查询逻辑索引（查询多了再建）
+  sql-queries/{business-scenario}.md # 按业务场景合并后的 SQL 查询卡
 ```
 
 ### Tier 3 — 全景（≥10 个场景或正式发版前再建，可选）
@@ -150,7 +170,20 @@ description: "Use BEFORE answering any backend single-service question about tab
 | 候选 / 草稿 | `{USER_DOCUMENTS}/ai-docs/{被调查项目}/knowledge-graph/` | 默认；AI 起草、未确认、未代码验证 |
 | 正式 | `{被调查项目根目录}/docs/knowledge-graph/backend/` | 用户明确要求"上传终版到项目内"才走，遵循 `doc-index-required` |
 
-**入门门槛兜底**：项目尚未有任何图谱时，本 skill 第一次落盘只产出 Tier 1 的 3 个文件即可（`00_index.md` + 1 张 `scenarios/{xxx}.md` + `_candidates.md`），不要一次性铺满 Tier 3。
+**入门门槛兜底**：项目尚未有任何图谱时，本 skill 第一次落盘只产出 Tier 1 的最小文件即可（`00_index.md` + 1 张 `scenarios/{xxx}.md` + `_candidates.md`；若本次涉及 SQL，再加 `_sql_candidates.md`），不要一次性铺满 Tier 3。
+
+### SQL 图谱渐进规则
+
+SQL 图谱同样按渐进方式建立：
+
+| 阶段 | 文件 | 何时创建 |
+|---|---|---|
+| 候选 | `_sql_candidates.md` | 任意会话提到业务查询、SQL、DAO/Mapper 查询逻辑时立即追加 |
+| 索引 | `09_sql_query_index.md` | 同一项目累计 ≥3 条 SQL 候选，或用户要求“整理 SQL / 完善 SQL / 归档查询逻辑”时创建 |
+| 场景卡 | `sql-queries/{business-scenario}.md` | 同一业务场景存在 ≥2 条查询，或一个 SQL 涉及 ≥3 张表 / 聚合 / 状态判定时创建 |
+| 全景 ER | `02_data_model_map.md` + `tables/{table}.md` | 累计 ≥5 张核心表，或用户要求“全景 ER 图”时创建 / 更新 |
+
+**SQL 候选不可长期散落。** 当用户要求“整理 / 归档 / 完善 SQL”时，必须先读取 `_sql_candidates.md`、`09_sql_query_index.md`、命中的 `sql-queries/` 与表卡，然后去重合并，更新正式索引和场景卡。
 
 ## 后端接口开发强制闭环
 
@@ -160,10 +193,12 @@ description: "Use BEFORE answering any backend single-service question about tab
 
 1. `07_table_logic_index.md`：按业务对象/场景反查表关系和判定规则
 2. `08_atomic_capability_index.md`：按业务关键词反查可复用原子能力
-3. 命中的 `table-logic/{scenario}.md`
-4. 命中的 `atomic-capabilities/{capability}.md`
-5. 相关 `tables/{table-name}.md`、`flows/{flow-name}.md`、`enums/{enum-name}.md`
-6. 最后才读 DAO/Mapper/Service 代码
+3. `09_sql_query_index.md`：按业务关键词 / 表名 / DAO 方法反查已有 SQL 查询逻辑
+4. 命中的 `table-logic/{scenario}.md`
+5. 命中的 `atomic-capabilities/{capability}.md`
+6. 命中的 `sql-queries/{business-scenario}.md`
+7. 相关 `tables/{table-name}.md`、`flows/{flow-name}.md`、`enums/{enum-name}.md`
+8. 最后才读 DAO/Mapper/Service 代码
 
 若上述文件不存在，应在设计/编码过程中创建用户目录候选记录，不得因为“还没建图谱”就跳过沉淀。
 
@@ -177,6 +212,7 @@ description: "Use BEFORE answering any backend single-service question about tab
 | 已有原子能力覆盖该计算/查询 | 注入/调用原子能力，禁止复制 SQL 或业务计算 |
 | 只有 DAO 原子查询，没有业务原子能力 | 优先复用 DAO；若本次组合逻辑会被多接口复用，沉淀新原子能力 |
 | 发现旧代码有重复判定 | 本次改动范围允许时抽出原子函数；否则登记“待抽取原子能力”候选 |
+| 已有 `09_sql_query_index.md` 命中类似 SQL | 复用现有 DAO/Mapper/SQL 指纹，只补差异条件，不重新拼一份相似查询 |
 
 典型原子能力包括但不限于：
 
@@ -186,6 +222,29 @@ description: "Use BEFORE answering any backend single-service question about tab
 - 按支付流水查原支付记录
 - 判定订单业务状态展示码
 - 按表组合判断是否允许取消、退款、补单、重试
+
+### 编码中：SQL 复用与完善
+
+当用户要求“完善 SQL”或 AI 需要新增 / 修改查询时，必须按以下顺序处理：
+
+1. **先查图谱**：`09_sql_query_index.md` → `sql-queries/` → `tables/` / `02_data_model_map.md`
+2. **定位原子能力**：确认是否已有 DAO/Mapper/Repository/Service 方法覆盖同一业务问题
+3. **对比差异**：新增条件是过滤字段、状态枚举、聚合字段、排序分页还是权限租户边界
+4. **完善 SQL 指纹**：只补必要字段 / join / where / group by / having / order by，不复制一份语义相近的新 SQL
+5. **回写图谱**：把最终 SQL、业务语义、参数、返回字段、索引建议、代码坐标写回 `_sql_candidates.md` 或正式 `09_sql_query_index.md` / `sql-queries/`
+
+SQL 完善输出时必须显式说明：
+
+```text
+SQL 完善依据：
+- 业务问题：
+- 复用 / 参考的原子能力：
+- 涉及表与 ER 关系：
+- 新增或调整的 join / where / group by / order by：
+- 状态 / 枚举 / 金额字段语义：
+- 索引风险：
+- 需回写图谱：
+```
 
 ### 编码后：图谱回写
 
@@ -225,6 +284,7 @@ description: "Use BEFORE answering any backend single-service question about tab
 
 ```text
 {USER_DOCUMENTS}/ai-docs/{被调查项目}/knowledge-graph/_candidates.md
+{USER_DOCUMENTS}/ai-docs/{被调查项目}/knowledge-graph/_sql_candidates.md
 ```
 
 > 说明：v1.18.7 起候选池路径精简为 `_candidates.md`（按被调查项目而非按日期/agent 分），便于跨日期跨会话累积同主题事实并最终归并到 scenarios 卡。旧版 `{agent}/{YYYY-MM-DD}/backend-kg-candidates.md` 路径仅作向后兼容，不再推荐新增。
@@ -232,6 +292,8 @@ description: "Use BEFORE answering any backend single-service question about tab
 **自动追加规则（强制）**：
 
 AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状态扭转 / 字段语义的问题，**即便用户没要求"建图谱"**，回答的同一回合内必须自动追加 1 条候选记录到 `_candidates.md`。这是本 skill 的最低收口动作——错过即流程违反。
+
+AI 在会话中只要回答了任何关于 SQL / DAO / Mapper / 查询逻辑 / 过滤条件 / join / 聚合的问题，**同一回合还必须自动追加 1 条 SQL 候选记录到 `_sql_candidates.md`**。如果答案里出现了 SQL 代码块、伪 SQL、查询字段清单、表 join 说明或 DAO 方法名，就视为命中。
 
 候选池用于防遗漏，正式图谱用于可信引用。二者职责必须分开。
 
@@ -245,6 +307,44 @@ AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状�
 - 可信度：待确认 / 已确认 / 已代码验证
 - 后续动作：{待用户确认 / 待代码核验 / 可整理入正式 scenarios 卡}
 ```
+
+SQL 候选记录最少格式：
+
+```markdown
+## YYYY-MM-DD HH:MM | {业务问题 / 查询能力}
+- 业务问题：{这个 SQL 回答什么问题}
+- SQL 指纹：{SELECT 主字段 FROM 主表 JOIN ... WHERE ... GROUP BY ... ORDER BY ...，可脱敏 / 参数化}
+- 参数：{入参及业务含义}
+- 返回字段：{字段及业务含义}
+- 涉及表：{主表、关联表、关联键}
+- 过滤 / 聚合 / 排序：{where/group by/having/order by 的业务语义}
+- 状态 / 枚举：{字段值与枚举含义}
+- 原子能力：{DAO/Mapper/Repository/Service 方法，未知则写待定位}
+- 代码坐标：{文件:行 / 方法名，未知则写待定位}
+- 索引建议：{可能需要的索引，未知则写待评估}
+- 可信度：待确认 / 已确认 / 已代码验证
+- 合并目标：`09_sql_query_index.md` / `sql-queries/{场景}.md` / `tables/{table}.md`
+```
+
+### SQL 自动归档与合并规则
+
+整理 SQL 图谱时，必须先按“SQL 指纹”去重，而不是按原始字符串去重：
+
+| 合并维度 | 说明 |
+|---|---|
+| 业务问题 | 同样回答“订单可退金额 / 退款流水池 / 账单明细查询”等问题的 SQL 归为同一查询能力 |
+| 主表 + 关联表 | 主表相同、join 链路相同，只是 where 条件不同，合并为同一 SQL 卡的变体 |
+| 过滤语义 | `deleted=0`、租户/门店、状态枚举、时间范围、金额方向等按语义归并 |
+| 聚合语义 | `sum/count/max` 等聚合按“业务指标”命名，避免只写表达式 |
+| 原子能力 | 同一 DAO/Mapper/Service 方法产生的 SQL 必须归到同一原子能力下 |
+
+合并后保留：
+
+- 标准 SQL 指纹（参数化、格式化、去掉一次性临时条件）
+- 查询变体（不同状态、不同入口、不同排序分页）
+- 代码坐标和调用入口
+- 适用场景 / 禁用场景
+- 索引建议和性能风险
 
 ## 分析前读取顺序
 
@@ -262,13 +362,14 @@ AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状�
 1. `00_index.md` → `00_backend_service_profile.md`（如有）
 2. `01_domain_capability_map.md`、`06_business_flow_index.md`（如有）
 3. `07_table_logic_index.md`、`08_atomic_capability_index.md`（如有）
-4. 命中的 `scenarios/{场景}.md`
-5. 命中的 `table-logic/{scenario}.md`、`atomic-capabilities/{capability}.md`
-6. 命中的 `capabilities/{capability}.md`、`flows/{flow}.md`
-7. 相关 `tables/{table}.md`、`enums/{enum}.md`
-8. `04_api_entrypoints.md`、`05_external_dependencies.md`（如有）
-9. `_candidates.md`
-10. 最后再读代码文件
+4. `09_sql_query_index.md`（如有）
+5. 命中的 `scenarios/{场景}.md`
+6. 命中的 `table-logic/{scenario}.md`、`atomic-capabilities/{capability}.md`、`sql-queries/{business-scenario}.md`
+7. 命中的 `capabilities/{capability}.md`、`flows/{flow}.md`
+8. 相关 `tables/{table}.md`、`enums/{enum}.md`、`02_data_model_map.md`
+9. `04_api_entrypoints.md`、`05_external_dependencies.md`（如有）
+10. `_candidates.md`、`_sql_candidates.md`
+11. 最后再读代码文件
 
 不得在已有图谱可定位时直接全量扫描代码。即使图谱只有 Tier 1，也要先读 `00_index.md` 和命中的场景小卡。
 
@@ -305,6 +406,76 @@ AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状�
 | 订单 | 部分退判定 | order | refund_order / order_item | order_status / refund_status / refund_amount | 已退金额 < 可退金额且存在未退商品 | table-logic/order-refund.md | calculateRefundableAmount |
 ```
 
+### SQL 查询索引
+
+`09_sql_query_index.md` 是项目级“原子能力 ↔ SQL”反查入口，至少包含：
+
+```text
+- 按业务问题索引：订单查询 / 退款池 / 账单明细 / 流水聚合等
+- 按主表索引：从主表反查有哪些查询能力
+- 按原子能力索引：DAO/Mapper/Service 方法对应哪些 SQL 指纹
+- 按状态 / 枚举 / 金额字段索引：哪些查询依赖这些关键字段
+- SQL 变体：同一查询能力在不同入口下的 where/order/page 差异
+```
+
+推荐表格：
+
+```markdown
+| 业务问题 | 原子能力 | 主表 | 关联表 | SQL 指纹 | 参数 | 返回字段 | 过滤/聚合语义 | 代码坐标 | 场景卡 |
+|---|---|---|---|---|---|---|---|---|---|
+| 查询订单可退流水池 | queryRefundableTxPool | order_transaction | refund_transaction / refund_method | `SELECT ... FROM order_transaction tx LEFT JOIN ... WHERE tx.order_id=? AND tx.support_refund=1 ...` | orderId | txId / payAmount / refundedAmount / maxRefundAmount | support_refund=1、已退金额扣减、按云端优先级排序 | RefundEligibilityDao#queryRefundableTxPool | sql-queries/order-refund.md |
+```
+
+每行必须能够回答“新接口要查这个业务问题时，应该复用哪个 SQL / 原子能力”。
+
+### SQL 查询卡
+
+`sql-queries/{business-scenario}.md` 至少包含：
+
+```text
+- 场景名称
+- 回答的业务问题
+- Mermaid ER 图或局部 ER 图（主表 + 关联表）
+- 标准 SQL 指纹（参数化）
+- SQL 变体（不同入口 / 状态 / 排序分页）
+- 参数语义
+- 返回字段语义
+- join/on 业务含义
+- where/group by/having/order by 业务含义
+- 依赖枚举 / 状态字段
+- 对应原子能力 / DAO / Mapper / Repository / Service
+- 调用入口
+- 索引建议与性能风险
+- 与 `tables/`、`table-logic/`、`atomic-capabilities/` 的交叉引用
+```
+
+推荐结构（实际文件中可使用 Mermaid / SQL fenced code block；本处只展示骨架）：
+
+```text
+# 订单退款查询 SQL
+
+## 业务问题
+- 查询某订单当前还可以退款的原支付流水池。
+
+## ER
+- order_transaction ||--o{ refund_transaction : original_transaction_id
+
+## 标准 SQL 指纹
+- SELECT ...
+- FROM order_transaction tx
+- LEFT JOIN refund_transaction rt ON rt.original_transaction_id = tx.id
+- WHERE tx.order_id = :orderId AND tx.support_refund = 1
+- GROUP BY tx.id
+
+## 字段语义
+| 字段 | 来源 | 业务含义 |
+|---|---|---|
+
+## 原子能力
+| 方法 | 说明 | 代码坐标 |
+|---|---|---|
+```
+
 ### 原子能力索引
 
 `08_atomic_capability_index.md` 至少包含：
@@ -314,6 +485,7 @@ AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状�
 - 业务关键词
 - 入参 / 出参
 - 读写表
+- SQL 指纹 / 查询卡
 - 状态/金额/枚举规则
 - 代码坐标
 - 被哪些 API / Service 复用
@@ -323,9 +495,9 @@ AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状�
 推荐表格：
 
 ```markdown
-| 能力 | 关键词 | 入参 | 出参 | 涉及表 | 代码坐标 | 复用入口 |
-|---|---|---|---|---|---|---|
-| 计算订单可退金额 | 退款 / 可退 / 部分退 | orderId | amount | order / refund_order / order_item | XxxService#calculateRefundableAmount | 退款申请 / 退款预览 |
+| 能力 | 关键词 | 入参 | 出参 | 涉及表 | SQL / 查询卡 | 代码坐标 | 复用入口 |
+|---|---|---|---|---|---|---|---|
+| 计算订单可退金额 | 退款 / 可退 / 部分退 | orderId | amount | order / refund_order / order_item | sql-queries/order-refund.md | XxxService#calculateRefundableAmount | 退款申请 / 退款预览 |
 ```
 
 ### 表逻辑卡
@@ -485,9 +657,10 @@ AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状�
 
 当用户后续要求“整理知识图谱 / 更新正式图谱 / 归档”时，必须先读取：
 
-1. 用户目录中的 `backend-kg-candidates.md`
+1. 用户目录中的 `_candidates.md`、`_sql_candidates.md`
 2. 项目内 `docs/knowledge-graph/backend/` 现有正式图谱
-3. 命中主题的代码、DDL、枚举或 API 契约
+3. 命中主题的 `09_sql_query_index.md`、`sql-queries/`、`02_data_model_map.md`、表卡、原子能力卡
+4. 命中主题的代码、DDL、枚举、DAO/Mapper/SQL 或 API 契约
 
 然后去重、合并、补证据，再写正式图谱。
 
@@ -499,6 +672,7 @@ AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状�
 - 新增/修改 Service、UseCase、Domain capability
 - 新增/修改 Repository、Mapper、SQL、DAO
 - 新增/修改数据库表、字段、索引
+- 新增/修改业务查询 SQL、join/on、where、group by、having、order by、分页、排序、聚合字段
 - 新增/修改枚举、状态机、状态流转
 - 新增/修改跨表判定逻辑、金额/数量聚合规则、订单/退款/支付状态展示规则
 - 新增/修改可复用原子能力，或复制了已有表逻辑导致应该抽取复用
@@ -553,7 +727,9 @@ AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状�
 - 项目：
 - 命中能力：
 - 读取图谱：
+- 命中 ER / 表关系：
 - 命中表逻辑：
+- 命中 SQL 查询：
 - 可复用原子能力：
 - 需更新图谱：
 - 更新依据：
@@ -569,8 +745,11 @@ AI 在会话中只要回答了任何关于后端表关系 / 业务判定 / 状�
 | “一个 plugin 把所有端都做了” | 本 skill 只管后端单服务，不管前端 UI 或跨项目全局拓扑 |
 | “先全量扫代码再说” | 有图谱先读图谱，再按代码坐标读文件 |
 | “表字段照抄一遍就算图谱” | 必须写字段业务含义、读写能力和一致性约束 |
+| “SQL 回答完就结束” | 必须同步沉淀 SQL 指纹、业务问题、涉及表、join/where/group by/order by 语义和原子能力 |
+| “全景 ER 等最后再画” | 当用户要求全景 ER 或核心表累计到一定规模时，必须更新 `02_data_model_map.md`，并从 SQL / 表卡反推关系 |
+| “同一个业务查询换个 where 就另建一份 SQL” | 按 SQL 指纹合并，作为同一查询能力的变体，不制造重复卡 |
 | “订单部分退这类规则问过很多次但不用沉淀” | 错。反复出现的表逻辑、状态判定、金额聚合必须进入表逻辑候选池或正式图谱 |
-| “写新接口时直接再查一遍 SQL” | 先查 `07_table_logic_index.md` 和 `08_atomic_capability_index.md`，已有能力直接复用 |
+| “写新接口时直接再查一遍 SQL” | 先查 `07_table_logic_index.md`、`08_atomic_capability_index.md` 和 `09_sql_query_index.md`，已有 SQL / 原子能力直接复用 |
 | “Service 里临时复制一段表判定最快” | 应优先复用原子能力；确需临时兼容时登记待抽取原子能力 |
 | “枚举值不用单独整理” | 后端需求分析必须显式读取相关枚举卡 |
 | “跨项目链路也写这里” | 单服务只记录本服务视角；跨项目交给 `cross-project-locator` |
