@@ -1,6 +1,6 @@
 {
   "name": "team-standards",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "description": "Team development standards plugin with Java coding rules, design-doc requirements, and workflow guidance.",
   "author": {
     "name": "Zhang Kai",
