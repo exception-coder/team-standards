@@ -10,7 +10,7 @@
 - **Bug 分析文档规范**（报告 Bug 时强制规范章节结构、Mermaid 图、根因表格）
 - **Git 提交规范**（基于实际 diff 分析生成标准化中文提交信息；**v1.18.1 起 hook 按改动大小放行**：`hooks/check-git-commit-skill.js` 看 staged diff，小改 ≤2 文件 ∧ ≤30 行 ∧ 仅 `M` 修改时直接放行让模型写 commit message，大改才强制走 skill 五步；git push 不门禁）
 - **文档索引优先约束**（编写任何文档前读取索引，分析内容边界，避免重复，写完后半自动更新索引）
-- **文档输出路径规则**（AI 生成 Markdown 默认进用户 Documents 下的 `ai-docs/{project}/`，终版由用户自行上传）
+- **文档输出路径规则**（AI 生成 Markdown 默认进用户 Documents 下的 `ai-docs/{project}/{type}/{topic}/{filename}`，按类型 + 主题归档，无日期/agent 目录层；**v1.20 起用户目录知识库与项目 `docs/` 索引等同**，必须经 Phase-A/B 查重和登记）
 - **Markdown 编写规范**（Mermaid 图表语法、表格、代码块等）
 - **业务逻辑现状梳理**（重构/迁移前按场景维度产出流程图、知识图谱、代码索引）
 - **实施前代码定位**（从文档坐标表精准定位关键文件，禁止重新扫描）
@@ -141,14 +141,14 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | Skill | 触发时机 | 作用 |
 |-------|----------|------|
 | `solution-review-required` | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时 | 先分离真实目标与候选方案，评估现有代码是否值得参考，识别风险、缺口和替代方案，给出更优建议后再进入设计或实施 |
-| `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；设计文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、关键规则和风险点；图表遵循最小图原则；Git 管理下默认维护稳定/current 文档，历史写入 commit body；完整模版自动生成编码摘要 |
+| `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；设计文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、关键规则和风险点；图表遵循最小图原则；**v1.20 起默认输出** `{USER_DOCUMENTS}/ai-docs/{project}/design/{需求名称}/{需求名称}-current.md`（不带日期，由 `doc-index-required` Phase-A/B 管控）；Git 管理下默认维护稳定/current 文档，历史写入 commit body；完整模版自动生成编码摘要 |
 | `architecture-ddd-lite-fullstack` | 开始编写或审查 Java / React / Vue / Flutter 业务代码前 | 强制 DDD-lite 分层、Feature 模块化、单向依赖与原子能力沉淀；要求代码结构清晰、易维护、低耦合、高内聚，禁止 UI / Controller 直接承载业务逻辑 |
 | `backend-knowledge-graph-required` | 后端接口/服务开发前涉及表读写、SQL、状态判定、订单/退款/支付等业务逻辑；会话中提到业务、表、字段来源、查询逻辑或 SQL；存在 `docs/knowledge-graph/backend/`；或要求生成/更新后端知识图谱、全景 ER、SQL 归档时 | 按项目沉淀领域能力、原子能力、业务流程、全景 ER、表逻辑、SQL 查询指纹、表关系、枚举、状态判定、API 与代码坐标；会话中提到 SQL/DAO/Mapper 查询逻辑时自动归档到 `_sql_candidates.md`，整理时合并到 `09_sql_query_index.md` / `sql-queries/` / `02_data_model_map.md`；编码前回顾表逻辑索引、原子能力索引和 SQL 查询索引，编码后同步 DAO/SQL、状态变化、金额聚合等图谱或候选池 |
-| `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；**默认走用户文档目录**（`{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`），仅用户明确要求时才进项目 `docs/bug/`；写入项目时按模块分组（对齐 `docs/design/`），中文命名 |
+| `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；**v1.20 起默认输出** `{USER_DOCUMENTS}/ai-docs/{project}/bug/{模块名}/{bug名称}/{bug名称}.md`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；用户目录知识库与项目 `docs/bug/` 索引体系等同，必须执行 Phase-A/B；模块名必须与同根下 `design/{模块名}/` 完全一致，无对应模块时退化为一级扁平 |
 | `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
 | `java-coding-standards` | 编写/审查任何 Java 代码时 | 强制遵守阿里黄山版编码规范 |
 | `git-commit-standards` | 执行 git commit 前 | 分析 staged 变更，生成标准化中文提交信息 |
-| `doc-index-required` | 编写/创建任何 Markdown 文档，或编辑 `docs/` 下文档时 | AI 生成 Markdown 默认写入用户 Documents 下的 `ai-docs/{project}/`；只有用户明确指定 `docs/` 路径时才读取并更新索引 |
+| `doc-index-required` | 编写/创建任何 Markdown 文档，或编辑 `ai-docs/{project}/` / `docs/` 下文档时 | AI 生成 Markdown 默认写入用户 Documents 下的 `ai-docs/{project}/{type}/{topic}/{filename}`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；**v1.20 起用户目录知识库与项目 `docs/` 索引体系等同**：写文档前必须 Phase-A 读 INDEX 查重，写完必须 Phase-B 登记；`work-log/` 和 `knowledge-graph/` 走自管模式 |
 | `markdown-writing-standards` | 生成或修改含 Mermaid 图表的 Markdown 时 | Mermaid 语法规范、表格规范、代码块规范 |
 | `business-logic-orientation` | 重构/复写/迁移前需要理解现有业务逻辑时 | 按场景维度产出流程图、知识图谱、核心代码索引 |
 | `init-project-docs` | 初始化项目文档 / 生成知识图谱时 | 渐进式构建 11 份知识图谱文档 + 模块深度文档 + 技能卡（4 阶段，支持自动/确认模式） |

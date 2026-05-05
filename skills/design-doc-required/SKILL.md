@@ -83,8 +83,8 @@ flowchart TD
     C -->|"否"| F["询问用户设计文档路径或名称"]
     F --> G{"用户能提供文档?"}
     G -->|"是"| D
-    G -->|"否"| USER_DOC["调用 doc-index-required\n生成用户目录草稿\n不写项目 docs"]
-    USER_DOC --> WEIGHT{"第一·七步\n模版分级选择"}
+    G -->|"否"| PHASE_A["调用 doc-index-required Phase-A\n读 INDEX 查重 / 边界判断\n（用户目录知识库默认）"]
+    PHASE_A --> WEIGHT{"第一·七步\n模版分级选择"}
     WEIGHT -->|"轻量\n通过准入清单"| H_LIGHT["生成轻量文档草稿\n输出 lightweight-template.md"]
     WEIGHT -->|"完整"| TYPE{"第一·八步\n业务 vs 技术"}
     TYPE -->|"业务/流程主导"| H_BIZ["生成业务方案草稿\n输出 template.md"]
@@ -93,8 +93,10 @@ flowchart TD
     H_TECH --> API_DOC
     H_LIGHT --> J_LIGHT["等待用户确认文档已填写"]
     API_DOC --> J_HEAVY["等待用户确认文档已填写"]
-    J_LIGHT --> POST_WEIGHT{"刚创建的是\n轻量模版?"}
-    J_HEAVY --> POST_WEIGHT
+    J_LIGHT --> PHASE_B_L["调用 doc-index-required Phase-B\n登记 design/INDEX.md"]
+    J_HEAVY --> PHASE_B_H["调用 doc-index-required Phase-B\n登记 design/INDEX.md"]
+    PHASE_B_L --> POST_WEIGHT{"刚创建的是\n轻量模版?"}
+    PHASE_B_H --> POST_WEIGHT
     POST_WEIGHT -->|"是"| Z
     POST_WEIGHT -->|"否"| CODING
 ```
@@ -103,20 +105,25 @@ flowchart TD
 
 ## 文档目录结构规范
 
-AI 生成的设计文档默认存放在用户文档目录，不直接写入项目 `docs/design/`。用户确认终版后，可自行上传到项目 `docs/design/` 或明确指定项目内路径让 AI 写入。
+AI 生成的设计文档默认存放在**用户文档目录的项目知识库** `{USER_DOCUMENTS}/ai-docs/{project}/design/`，不直接写入项目 `docs/design/`。用户确认终版后，可自行上传到项目 `docs/design/` 或明确指定项目内路径让 AI 写入。
 
-> **输出路径边界：** AI 生成的方案草稿、设计文档、代码扫描笔记、对照分析、个人备忘默认写入 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`。项目 `docs/design/` 只接收用户明确指定路径或用户自行上传的终版文档。
+> **v1.20 起的关键变化：** 用户目录不再是「草稿堆」。`{USER_DOCUMENTS}/ai-docs/{project}/design/` 与项目 `docs/design/` 享有同等的索引体系（INDEX.md + 主题目录），**必须经过 `doc-index-required` Phase-A 查重和 Phase-B 登记**。
+>
+> **路径硬约束：** 路径中禁止 `{agent}/`、`{YYYY-MM-DD}/` 层；文件名禁止带日期后缀；同一需求始终更新 `{需求名称}-current.md`，不为日常迭代新建 `-vN` 快照。
+
+### 用户目录知识库（默认）与项目 docs/（终版）共用结构
 
 ```
-docs/design/
-  {需求名称}/                              ← 顶层需求目录
-    {需求名称}-current.md                  ← Git 管理下的默认稳定文档（业务方案 / 技术方案）
-    {需求名称}-api-current.md              ← 接口文档（如涉及对外接口）
-    {需求名称}-coding.md                   ← 完整模版对应的当前编码摘要（仅完整模版需要）
-    snapshots/                              ← 仅重大基线/发布快照/用户明确要求时创建
+{ROOT}/design/                              ← {ROOT} = {USER_DOCUMENTS}/ai-docs/{project} 或 {项目根}/docs
+  INDEX.md                                  ← 子索引，由 doc-index-required Phase-B 维护
+  {需求名称}/                                ← 顶层需求目录
+    {需求名称}-current.md                    ← 默认稳定文档（业务方案 / 技术方案）
+    {需求名称}-api-current.md                ← 接口文档（如涉及对外接口）
+    {需求名称}-coding.md                     ← 完整模版对应的当前编码摘要（仅完整模版需要）
+    snapshots/                               ← 仅重大基线 / 发布快照 / 用户明确要求时创建
       {需求名称}-{YYYYMMDD}-v{N}.md
       {需求名称}-api-{YYYYMMDD}-v{N}.md
-    {子模块名称}/                           ← 子模块目录（当本需求是更大架构的一部分时）
+    {子模块名称}/                            ← 子模块目录（当本需求是更大架构的一部分时）
       {子模块名称}-current.md
       snapshots/
         {子模块名称}-{YYYYMMDD}-v{N}.md
@@ -165,20 +172,27 @@ docs/design/
 
 ### 第一步：查找设计文档
 
-在当前项目 `docs/design/` 目录下按以下优先级查找：
+在以下两个根下按以下优先级查找（**项目 `docs/` 命中优先**，未命中再查用户目录知识库）：
+
+| 优先级 | 根 | 路径 |
+|---|---|---|
+| 1 | 项目终版 | `{项目根}/docs/design/` |
+| 2 | 用户目录知识库 | `{USER_DOCUMENTS}/ai-docs/{project}/design/` |
+
+每个根内按以下顺序查找：
 
 1. 询问用户本次开发对应的**需求名称**
-2. 在 `docs/design/{需求名称}/` 目录下优先查找 `{需求名称}-current.md` 或用户指定的稳定文档
+2. 在 `{ROOT}/{需求名称}/` 目录下优先查找 `{需求名称}-current.md` 或用户指定的稳定文档
 3. 若完整模版命中，同时查找 `{需求名称}-coding.md`
 4. 若未找到稳定文档，再查找 `snapshots/` 或目录内最新 `YYYYMMDD-vN` 快照作为参考
-5. 若顶层未找到，**递归搜索子目录**（如 `docs/design/{父需求}/{需求名称}/`）
-6. 若目录不存在，则认为文档缺失，进入第一·五步（目录归属分析）后再进入第三步
+5. 若顶层未找到，**递归搜索子目录**（如 `{ROOT}/{父需求}/{需求名称}/`）
+6. 若两个根都不存在该目录，则认为文档缺失，进入第一·五步（目录归属分析）后再进入第三步
 
 ### 第一·五步：目录归属分析
 
 文档缺失需要新建时，**在创建目录前必须先分析目录归属**：
 
-1. **扫描 `docs/design/` 下所有已有目录**（读取 `docs/design/INDEX.md` 获取各需求摘要）
+1. **扫描 `design/` 下所有已有目录**（同时读取项目 `docs/design/INDEX.md` 与用户目录 `ai-docs/{project}/design/INDEX.md` 获取各需求摘要）
 2. **判断本次需求是否属于某个已有架构/系统设计的子模块**，判断依据：
 
 | 判断维度 | 归属为子模块的信号 | 保持独立的信号 |
@@ -301,10 +315,10 @@ docs/design/
 
 1. 告知用户未找到对应需求的设计文档
 2. 询问是否有已有文档需要手动指定路径
-3. 若无文档，先执行 `doc-index-required` 的**文档输出路径规则**，默认写入 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`
-4. 仅当用户明确指定 `docs/...` 终版路径时，才调用 `doc-index-required Phase-A / Phase-B` 更新项目索引
+3. 若无文档，确定输出根（默认用户目录知识库 `{USER_DOCUMENTS}/ai-docs/{project}/design/`；用户明确指定 `docs/...` 时用项目 `docs/design/`），并执行 `doc-index-required` 的**输出路径回显**
+4. **调用 `doc-index-required` Phase-A**（读取顶层 INDEX + design/INDEX，分析内容边界，判断是新建主题目录还是补充到已有 `-current.md`）；用户目录与项目 docs/ 同等执行
 5. **执行第一·七步模版分级选择**
-6. 按对应模版生成用户目录草稿：
+6. 按对应模版生成稳定文档（`{需求名称}-current.md`）；不为首次创建动作建带日期的 v1 快照
 
 ---
 
@@ -313,16 +327,17 @@ docs/design/
 > **本次改动判定为【轻量级】，按接口级模版处理。**
 >
 > 请按以下步骤操作：
-> 1. 默认创建到用户目录：`{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`
-> 2. 创建文件：`{需求名称}-{今日日期}-v1.md`
+> 1. 默认创建到用户目录知识库：`{USER_DOCUMENTS}/ai-docs/{project}/design/{需求名称}/`
+> 2. 创建/更新文件：`{需求名称}-current.md`（首次创建即用 -current 命名，**不带日期后缀、不建 v1**）
 > 3. 参考 `lightweight-template.md`，至少完成以下章节：
 >    - 第 1 节：代码入口（先写"待实现"也可以）
 >    - 第 2 节：接口契约（核心入参/出参）
 >    - 第 3 节：核心流程图（接口自身流程 / 库表读写顺序，必填 1 张 Mermaid flowchart 或 sequenceDiagram）
 >    - 第 4 节：关键过滤/写入规则
 >    - 第 5 节：失败行为
-> 4. 草稿确认后告知我文件路径，我将读取后开始实现；终版是否上传到项目 `docs/` 由用户自行决定
-> 5. **本分支无需生成 `-coding.md`**
+> 4. 文档写完后调用 `doc-index-required` Phase-B 登记到 `{USER_DOCUMENTS}/ai-docs/{project}/design/INDEX.md`
+> 5. 草稿确认后告知我文件路径，我将读取后开始实现；终版是否上传到项目 `docs/` 由用户自行决定
+> 6. **本分支无需生成 `-coding.md`**
 
 模板文件位于：`skills/design-doc-required/lightweight-template.md`
 
@@ -333,16 +348,17 @@ docs/design/
 > **本次改动判定为【完整-业务】，按 `template.md` 处理。**
 >
 > 请按以下步骤操作：
-> 1. 默认创建到用户目录：`{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`
-> 2. 创建文件：`{需求名称}-{今日日期}-v1.md`
+> 1. 默认创建到用户目录知识库：`{USER_DOCUMENTS}/ai-docs/{project}/design/{需求名称}/`
+> 2. 创建/更新文件：`{需求名称}-current.md`（首次创建即用 -current 命名）
 > 3. 参考模板填写内容（至少完成以下章节）：
 >    - 第 1 节：目标与边界
 >    - 第 2 节：核心流程（必填 1 张 Mermaid 核心图）
 >    - 第 3 节：核心业务规则
 >    - 第 4 节：编码落点（目录树结构）
 >    - 第 6 节：风险与待确认
-> 4. **如涉及对外接口**：同步生成 `{需求名称}-api-{今日日期}-v1.md`，按 `api-template.md` 填写字段级契约
-> 5. 草稿确认后告知我文件路径，我将读取后开始实现；终版是否上传到项目 `docs/` 由用户自行决定
+> 4. **如涉及对外接口**：同步生成 `{需求名称}-api-current.md`，按 `api-template.md` 填写字段级契约
+> 5. 文档写完后调用 `doc-index-required` Phase-B 登记到 `{USER_DOCUMENTS}/ai-docs/{project}/design/INDEX.md`
+> 6. 草稿确认后告知我文件路径，我将读取后开始实现；终版是否上传到项目 `docs/` 由用户自行决定
 
 模板文件位于：`skills/design-doc-required/template.md`（业务方案）+ `api-template.md`（接口文档）
 
@@ -353,8 +369,8 @@ docs/design/
 > **本次改动判定为【完整-技术】，按 `template-tech.md` 处理。**
 >
 > 请按以下步骤操作：
-> 1. 默认创建到用户目录：`{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`
-> 2. 创建文件：`{需求名称}-{今日日期}-v1.md`
+> 1. 默认创建到用户目录知识库：`{USER_DOCUMENTS}/ai-docs/{project}/design/{需求名称}/`
+> 2. 创建/更新文件：`{需求名称}-current.md`（首次创建即用 -current 命名）
 > 3. 参考模板填写内容（至少完成以下章节）：
 >    - 第 1 节：目标与边界
 >    - 第 2 节：整体架构（必填 1 张架构图，subgraph 分组）
@@ -363,14 +379,20 @@ docs/design/
 >    - 第 5 节：核心业务规则
 >    - 第 6 节：编码落点（目录树结构）
 >    - 第 8 节：风险与待确认
-> 4. **如涉及对外接口**：同步生成 `{需求名称}-api-{今日日期}-v1.md`，按 `api-template.md` 填写字段级契约
-> 5. 草稿确认后告知我文件路径，我将读取后开始实现；终版是否上传到项目 `docs/` 由用户自行决定
+> 4. **如涉及对外接口**：同步生成 `{需求名称}-api-current.md`，按 `api-template.md` 填写字段级契约
+> 5. 文档写完后调用 `doc-index-required` Phase-B 登记到 `{USER_DOCUMENTS}/ai-docs/{project}/design/INDEX.md`
+> 6. 草稿确认后告知我文件路径，我将读取后开始实现；终版是否上传到项目 `docs/` 由用户自行决定
 
 模板文件位于：`skills/design-doc-required/template-tech.md`（技术方案）+ `api-template.md`（接口文档）
 
 ### 第三·五步：文档写完后更新索引
 
-用户目录草稿确认后，不自动调用 `doc-index-required Phase-B`，也不更新 `docs/design/INDEX.md`。只有用户明确指定项目 `docs/...` 终版路径时，才执行 Phase-B 并登记索引。
+文档写完后**必须**调用 `doc-index-required` Phase-B 登记/更新索引，**用户目录知识库与项目 `docs/` 同等执行**：
+
+- 默认目标：`{USER_DOCUMENTS}/ai-docs/{project}/design/INDEX.md`
+- 用户指定项目内路径时：`{项目根}/docs/design/INDEX.md`
+
+新建主题目录时，Phase-B 还会检查并更新顶层 `INDEX.md`（确保 `design/` 子目录条目存在）。
 
 ---
 
@@ -778,7 +800,7 @@ Git 管理下的项目正式文档以稳定/current 文档为主。版本快照�
 | Skill | 何时调用 |
 |-------|---------|
 | `markdown-writing-standards` | 生成或修改设计文档中的 Mermaid 图表时，必须先调用进行语法自检 |
-| `doc-index-required` | 创建设计文档草稿前必须先执行输出路径规则；默认写用户目录。只有用户明确指定 `docs/...` 终版路径时，才执行 Phase-A / Phase-B 更新索引 |
+| `doc-index-required` | 创建设计文档前必须先执行 Phase-A（读 INDEX、查重、判断新建/补充）；写完后必须执行 Phase-B 登记索引。**用户目录知识库与项目 `docs/` 同等执行**（v1.20 起） |
 | `backend-knowledge-graph-required` | 后端接口/服务需求分析与编码前，若项目存在 `docs/knowledge-graph/backend/`，必须先读取后端知识图谱中的能力、流程、表逻辑、原子能力、枚举、API 与外部依赖；编码后同步表读写、状态判定和原子能力变化 |
 | `pre-implementation-code-orientation` | 设计文档确认完毕、开始写第一行实现代码前调用 |
 | `dev-log` | 仅 team-standards 自身发生决策型规则变更时调用；业务项目设计文档的普通演进由 git commit body 记录 |
@@ -795,10 +817,13 @@ Git 管理下的项目正式文档以稳定/current 文档为主。版本快照�
 | "用户让我快点做" | 先确认文档，再快速实现 |
 | "我已经理解需求了" | 理解 ≠ 文档存在，仍须检查 |
 | "只改一个方法" | 判断是否属于例外情况，否则仍须检查 |
-| "直接建文件，不用查索引" | 必须先执行 doc-index-required 的输出路径规则；只有用户指定 `docs/...` 时才进入 Phase-A |
-| "先把草稿也放到 docs/design 里" | AI 生成文档默认放用户目录；终版由用户自行上传，或用户明确指定 `docs/...` 路径后再写项目目录 |
-| "直接建文件，不用确认输出路径" | 仍需先执行 doc-index-required 的输出路径规则；默认用户目录，用户指定 `docs/...` 时才进入项目索引流程 |
-| "doc-index-required 会自动触发" | 不会。必须在本流程中显式执行输出路径规则；只有用户指定 `docs/...` 时才显式调用 Phase-A 和 Phase-B |
+| "直接建文件，不用查索引" | 必须先执行 doc-index-required Phase-A（读 INDEX 查重）；用户目录知识库与项目 docs/ 同等待遇 |
+| "先把草稿也放到 docs/design 里" | AI 生成文档默认放用户目录知识库 `ai-docs/{project}/design/`；终版由用户自行上传，或用户明确指定 `docs/...` 路径后再写项目目录 |
+| "直接建文件，不用确认输出路径" | 仍需先执行 doc-index-required 的输出路径回显 + Phase-A；不论用户目录还是项目 docs/ 都不豁免 |
+| "doc-index-required 会自动触发" | 不会。必须在本流程中显式调用 Phase-A 和 Phase-B；写到用户目录也必须调用 |
+| "用户目录是草稿，可以随便写" | **错（v1.20 起）**。用户目录承载本项目知识图谱和 1-to-N 长期文档，与项目 docs/ 享有同等的索引规范 |
+| "同一需求每次新建 `-{日期}-v1.md`" | **错**。默认更新 `-current.md`；版本快照仅限重大基线/发布或用户明确要求 |
+| "路径里加 `claude/` 或 `codex/` 隔离一下吧" | **错**。{agent} 层已废除；所有 AI agent 共享同一知识库 |
 | "子功能文件放父目录就行" | 子模块必须创建独立子目录，禁止将文件直接放在父需求目录下 |
 | "项目文档已经进 Git，但每次变更还要新建 vN 文件" | 不需要。Git 管理下默认更新稳定/current 文档，历史由 commit 负责；只有重大基线、非 Git 文档或用户明确要求才建快照 |
 | "文档末尾追加调整流水更保险" | 默认不要。流水账属于 commit body；设计文档只描述当前业务规则、接口、表操作和实现边界 |

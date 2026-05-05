@@ -37,17 +37,25 @@ flowchart TD
 
 ## 文档目录结构
 
+> **v1.20 起：** 现状梳理默认写入用户目录知识库 `{USER_DOCUMENTS}/ai-docs/{project}/orientation/`，由 `doc-index-required` Phase-A/B 管控；用户明确指定项目路径或要求上传终版时才进入 `{项目根}/docs/orientation/`。
+
 ```
-docs/design/
-  {业务模块名}/                              
-    {业务模块名}-现状梳理-{YYYYMMDD}.md       ← 完整梳理文档（人类阅读）
-    {业务模块名}-ai-ref.md                    ← AI 速查索引（AI 阅读，可覆盖更新）
+{ROOT}/orientation/                              ← {ROOT} = {USER_DOCUMENTS}/ai-docs/{project} 或 {项目根}/docs
+  INDEX.md                                       ← 子索引，由 doc-index-required Phase-B 维护
+  {业务模块名}/
+    {业务模块名}-现状梳理.md                      ← 完整梳理文档（人类阅读，不带日期）
+    {业务模块名}-ai-ref.md                        ← AI 速查索引（AI 阅读，可覆盖更新）
+    snapshots/                                   ← 仅重大基线 / 重构启动锚点 / 用户明确要求时建
+      {业务模块名}-现状梳理-{YYYYMMDD}.md
 ```
 
 **命名规则：**
-- 梳理文档带日期，作为时间点快照
-- AI 速查索引不带日期，始终反映最新状态，随代码变更直接覆盖更新
-- 若已有同模块的设计文档目录，梳理文档放在同一目录下
+- 梳理文档默认**不带日期**，始终反映最新代码现状，随代码变更直接覆盖更新
+- AI 速查索引同样不带日期，始终反映最新状态
+- 仅重大重构启动锚点 / 基线快照 / 用户明确要求 / 非 Git 管理时才在 `snapshots/` 下建带日期版本
+- 若同根下已有同模块的 `design/{业务模块名}/` 设计文档，本梳理文档放在 `orientation/{业务模块名}/`（与 design 目录平级，不混在一起）
+
+**路径硬约束：** 路径中禁止 `{agent}/`、`{YYYY-MM-DD}/` 层；同一模块的现状梳理始终更新同一份 `-现状梳理.md`，不为日常迭代新建带日期的副本。
 
 ---
 

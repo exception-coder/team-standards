@@ -2,7 +2,8 @@
 
 > 本文档梳理 team-standards 各 skill 的触发时机、调用关系及两条主链路，用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
-> **最后更新：2026-05-04 v19.10**
+> **最后更新：2026-05-05 v19.11**
+> 变更摘要 v19.11：`doc-index-required` / `design-doc-required` / `bug-doc-required` / `business-logic-orientation` 联合调整 —— 用户目录 `{USER_DOCUMENTS}/ai-docs/{project}/` 从「草稿堆」升级为**项目级知识库**，承载本项目知识图谱、1-to-N 设计文档、bug 分析、现状梳理。① **路径硬约束**：删除 `{agent}/`（不再按 claude/codex 隔离）和 `{YYYY-MM-DD}/`（同一主题跨会话稳定汇聚），文件名禁止带日期后缀；新结构按 `{type}/{topic_path}/{filename}` 组织，design / bug / orientation 各 type 各有 `INDEX.md`。② **`doc-index-required` Phase-A/B 对用户目录开放**：v1.20 起用户目录知识库与项目 `docs/` 索引体系等同，写文档前必须 Phase-A 读 INDEX 查重，写完必须 Phase-B 登记；`work-log/`（日期型日志）和 `knowledge-graph/`（自有 `00_index.md`）走自管模式豁免。③ **`design-doc-required`** 输出从 `{agent}/{YYYY-MM-DD}/{需求名称}-{今日日期}-v1.md` 切换到 `design/{需求名称}/{需求名称}-current.md`，第一步查找设计文档同时扫两个根（项目 `docs/design/` + 用户目录 `ai-docs/{project}/design/`）。④ **`bug-doc-required`** 输出从带日期文件名切换到 `bug/{模块名}/{bug名称}/{bug名称}.md`，归档结构与项目 `docs/bug/` 保持一致。⑤ **`business-logic-orientation`** 默认输出 `orientation/{业务模块名}/{业务模块名}-现状梳理.md`（不带日期，始终最新）。该变更属于输出路径与索引覆盖范围的扩展，链路节点结构未变，按"轻微"处理未单独创建快照。
 > 变更摘要 v19.10：`backend-knowledge-graph-required` 将 SQL 查询逻辑升级为后端图谱一等资产 —— 会话中只要提到业务、表、字段来源、DAO/Mapper 查询、SQL 写法/完善、join/where/group by/order by/聚合，就必须在同一回合追加 SQL 指纹候选到 `_sql_candidates.md`；整理或归档时合并到 `09_sql_query_index.md`、`sql-queries/{业务场景}.md` 和 `02_data_model_map.md`，形成“业务问题 → 全景 ER / 表关系 → SQL 指纹 → 原子能力 → 代码坐标 → 复用建议”的闭环。补充 SQL 候选格式、SQL 查询索引模板、SQL 查询卡模板、SQL 指纹去重合并规则和“完善 SQL”输出要求。该变更增强 backend-kg 核心行为但不改变主链路节点结构，按"轻微"处理未单独创建快照。
 > 变更摘要 v19.9：`design-doc-required` 新增第三档「极简跳过」分支 —— 在原「轻量 / 完整」之上补一档**完全跳过文档**的合法例外，落在「合法的例外情况」章节。极简改动硬清单：≤2 文件 ∧ ≤30 行净变更 ∧ 0 新类/表/字段/对外契约 ∧ 不改既有出参语义 ∧ 不跨模块 ∧ 改动性质属于（透传层补漏字段 / 局部行为修正 / 简单条件分支调整 / 移除 dead code / 注释 import 整理）之一；命中所有项时跳过文档，**git commit body 必须承担变更说明（改了什么 + 为什么改 + 影响范围）**。执行流程图新增 TRIVIAL 前置判定节点，红色警告新增「用户说简单不需要文档」「commit body 简写」两条防线。CLAUDE.md skill 索引覆盖范围更新为「三档分级」。本次新增的是合法例外路径而非链路主节点，按"轻微"处理未单独创建快照。
 > 变更摘要 v19.8：`backend-knowledge-graph-required` 强化主动触发并简化骨架 —— ① **写前拦截**：即将 Write/Edit 任何描述后端表关系/ER/状态扭转/业务流程→DB CRUD 的 .md（无论路径，含 `ai-docs/`、`work-log/`、`scenarios/` 而不仅 `docs/`）必须先经本 skill；② **会话问询触发**：用户问「X 与 Y 是 1:1 还是 1:N」/「改这个动哪些表」/「字段从哪来」/「分摊怎么算」/「是新建快照还是引用原表」等表关系/状态/原子能力问题必须自动触发并候选沉淀，不再等用户说"建图谱"才动；③ **调查对象路由**：图谱归属永远 = 被调查的后端单服务项目，与 cwd 无关（cwd=A 调查 B 云端时图谱归 B 命名空间），明确不再被误判为跨项目转给 `cross-project-locator`；④ **渐进式三层骨架**：Tier 1 起步只要 `00_index.md` + `scenarios/{场景}.md` + `_candidates.md` 即可投入使用，Tier 2（tables/enums/flows/atomic-capabilities）和 Tier 3（service profile / domain map / api entrypoints）按规模扩展；⑤ **候选池路径精简**：从 `{agent}/{YYYY-MM-DD}/backend-kg-candidates.md` 改为 `_candidates.md`（按被调查项目而非按日期累积）；⑥ **会话事实自动追加规则强化**：AI 回答任何后端表关系问题的同一回合必须自动追加 1 条候选记录，错过即流程违反。SKILL.md description、CLAUDE.md 主动触发表 + Skill 索引同步更新。该变更属于触发条件强化但不改变链路图节点和连线（同 v19.5 backend-kg 强化），按"轻微"处理未单独创建快照。
@@ -23,7 +24,7 @@
 > 变更摘要 v16.5：`korepos-backend-service` 新增「外部调用前的边界兜底校验」健壮性硬规则 —— service 调云端 HTTP / 跨子门面 / POS 硬件协议前，凡传给对方的金额/数量/配额等业务数值，若本地 DB 有可查的上限/边界，必须用 DB 实读值兜底校验，不信任入参或前序内存对象；校验抽 `_assertXxxWithinBound` 私有方法；金额比较加 ±0.005 浮点容差。Step 5 强制规则、自检清单、禁区表均同步追加（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.4：`daily-work-log` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md`，与 `bug-doc-required` / `design-doc-required` / `doc-index-required` 完全对齐；项目内 `docs/work-log/` 与 `.gitignore` 兜底节降级为"用户明确指定路径"分支（轻微规则补充，未单独创建快照）。
 > 变更摘要 v16.3：`bug-doc-required` 默认输出路径切换到用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/`，与 `design-doc-required` / `doc-index-required` 一致；项目内 `docs/bug/` 降级为"用户明确指定路径或上传终版"分支；流程图分叉、红色警告与"各文档类型与用途"表同步调整（轻微规则补充，未单独创建快照）。
-> 上一版：v19.9（2026-05-03，轻微规则补充未单独创建快照）；v19.8（2026-05-03，轻微规则补充未单独创建快照）；v19.7（2026-05-02，轻微规则补充未单独创建快照）；v19.6（2026-05-02，轻微规则补充未单独创建快照）；v19.5（2026-05-02，轻微规则补充未单独创建快照）；v19.4（2026-05-02，轻微规则补充未单独创建快照）；v19.3（2026-05-02，轻微规则补充未单独创建快照）；v19.2（2026-05-02，轻微规则补充未单独创建快照）；v19.1（2026-05-02，轻微规则补充未单独创建快照）；v19（2026-05-02）；v18.2（2026-05-01，轻微规则补充未单独创建快照）；v18.1（2026-05-01，轻微规则补充未单独创建快照）；v18（2026-05-01）；v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
+> 上一版：v19.10（2026-05-04，轻微规则补充未单独创建快照）；v19.9（2026-05-03，轻微规则补充未单独创建快照）；v19.8（2026-05-03，轻微规则补充未单独创建快照）；v19.7（2026-05-02，轻微规则补充未单独创建快照）；v19.6（2026-05-02，轻微规则补充未单独创建快照）；v19.5（2026-05-02，轻微规则补充未单独创建快照）；v19.4（2026-05-02，轻微规则补充未单独创建快照）；v19.3（2026-05-02，轻微规则补充未单独创建快照）；v19.2（2026-05-02，轻微规则补充未单独创建快照）；v19.1（2026-05-02，轻微规则补充未单独创建快照）；v19（2026-05-02）；v18.2（2026-05-01，轻微规则补充未单独创建快照）；v18.1（2026-05-01，轻微规则补充未单独创建快照）；v18（2026-05-01）；v17（2026-05-01）；v16.7（2026-05-01，轻微规则补充未单独创建快照）；v16.6（2026-04-30，轻微规则补充未单独创建快照）；v16.5（2026-04-30，轻微规则补充未单独创建快照）；v16.4（2026-04-30，轻微规则补充未单独创建快照）；v16.3（2026-04-30，轻微规则补充未单独创建快照）；v16.2（2026-04-27）；v16.1（2026-04-27）；v16（2026-04-27，轻微规则补充未单独创建快照）。
 > 再上一版：v15（2026-04-27）；v14（2026-04-27）；v13（2026-04-27）；v12（2026-04-27）；v11（2026-04-27）；v10（2026-04-27）；v9（2026-04-26）；v8（2026-04-25）；v7（2026-04-22）；v6.2 `bug-doc-required` 调整目录结构为三级；v6.1 新增 Step 0 知识图谱预热。
 > 历史版本：`docs/skill-flow-20260502-v19.md`（v19）、`docs/skill-flow-20260501-v18.md`（v18）、`docs/skill-flow-20260501-v17.md`（v17）、`docs/skill-flow-20260427-v15.md`（v15）、`docs/skill-flow-20260427-v14.md`（v14）、`docs/skill-flow-20260427-v13.md`（v13）、`docs/skill-flow-20260427-v12.md`（v12）、`docs/skill-flow-20260427-v11.md`（v11）、`docs/skill-flow-20260427-v10.md`（v10）、`docs/skill-flow-20260427-v9.md`（v9）、`docs/skill-flow-20260425-v8.md`（v8）、`docs/skill-flow-20260422-v7.md`（v7）、`docs/skill-flow-20260416-v6.md`（v6）、`docs/skill-flow-20260410-v5.1.md`（v5.1）、`docs/skill-flow-20260404-v4.md`（v4）、`docs/skill-flow-20260403-v3.md`（v3）、`docs/skill-flow-20260402-v2.md`（v2）
 
@@ -44,7 +45,7 @@
 |---|---|---|
 | `solution-review-required` | team-standards | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时，先审视目标、现有代码质量、风险和更优方案 |
 | `design-doc-required` | team-standards | 写任何实现代码前，或被要求提供修复方案/实施方案时（新功能和 bug 修复均适用）；**任何源码 Edit/Write 请求（含「根据文档改代码」「帮我改一下」等）也必须先触发**；文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、编码落点和风险点；图表遵循最小图原则；Git 管理下默认维护稳定/current 文档，历史由 commit body 承担 |
-| `doc-index-required` | team-standards | **(辅助)** 创建任何 Markdown 文档前先确定输出路径；AI 生成 Markdown 默认写用户 Documents 下的 `ai-docs/{project}/`，仅用户指定 `docs/` 路径时更新索引 |
+| `doc-index-required` | team-standards | **(辅助)** 创建任何 Markdown 文档前先确定输出路径；AI 生成 Markdown 默认写用户 Documents 下的 `ai-docs/{project}/{type}/{topic}/{filename}`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；**v1.20 起用户目录知识库与项目 `docs/` 索引体系等同**，写文档前必须 Phase-A 读 INDEX 查重，写完必须 Phase-B 登记；`work-log/`（日期型）和 `knowledge-graph/`（自有 `00_index.md`）走自管模式 |
 | `backend-knowledge-graph-required` | team-standards | 后端接口/服务开发前读取后端图谱，重点回顾表逻辑索引、原子能力索引和 SQL 查询索引；会话中提到业务、表、字段来源、SQL/DAO/Mapper 查询逻辑时自动沉淀 SQL 指纹；生成/更新全景 ER、SQL 查询卡、表逻辑和原子能力；编码后同步 DAO/SQL、表关系、订单/退款/支付状态判定、金额聚合、原子能力复用 |
 | `bug-doc-required` | team-standards | 编写 bug 分析文档时；完成后必须继续调用 design-doc-required 写修复实施方案 |
 | `pre-implementation-code-orientation` | team-standards | 文档写完后、开始实施代码前（含「帮我修改代码」「改代码」等直接编码请求） |
@@ -140,8 +141,8 @@ flowchart TD
     START(["收到功能需求\n或用户给出具体方案"]) --> SRR["solution-review-required\n分离目标与方案\n识别风险和更优建议"]
     SRR --> CTX["Step 0: 知识图谱预热\n读 00_project_overview\n按任务类型加载必读文档"]
     CTX --> BKG["backend-knowledge-graph-required\n后端命中时读取\n表逻辑/原子能力/流程/枚举图谱"]
-    BKG --> DOP["doc-index-required\n先确定输出路径\n默认用户目录 ai-docs"]
-    DOP --> DDR["design-doc-required\n检查已有设计文档或生成用户目录草稿\n用户指定 docs 时才更新 INDEX.md"]
+    BKG --> DOP["doc-index-required Phase-A\n读 INDEX 查重 + 边界判断\n用户目录知识库与 docs 同等"]
+    DOP --> DDR["design-doc-required\n检查已有设计文档或生成 -current.md\n用户目录与 docs 都走 Phase-A/B"]
 
     DDR --> WEIGHT{"第一·七步\n模版分级选择"}
     WEIGHT -- "命中升级触发条件\n（新增表/跨服务/复杂事务等）" --> HEAVY["完整模版分支\ntemplate.md + coding.md"]
@@ -251,8 +252,8 @@ flowchart LR
 | `{需求}-current.md` | Git 管理下的项目正式设计文档（默认） | 人 + AI 优先读取 | 随代码演进直接更新，历史由 git commit 负责 |
 | `{需求}-coding.md` | 完整模版读完设计文档后自动生成 | AI（节省 token） | 随 current 文档同步 |
 | `snapshots/{需求}-{日期}-v{N}.md` | 重大基线、发布快照、非 Git 管理文档或用户明确要求时 | 人 | 创建后不改，后续重大基线另建快照 |
-| `{USER_DOCUMENTS}/ai-docs/{project}/{agent}/{YYYY-MM-DD}/{bug 名称}-bug分析-{YYYYMMDD}-v{N}.md` | 确认 bug 根因后（**默认**） | 人 + AI 分析阶段 | 可补充，修复方案节只写方向摘要；终版由用户上传 |
-| `docs/bug/{名称}/{名称}.md` | 用户明确要求"上传终版 / 写到 docs/" 时 | 人 + AI 分析阶段 | 可补充；写入项目时按模块分组 + 触发 doc-index-required |
+| `{USER_DOCUMENTS}/ai-docs/{project}/bug/{模块名}/{bug名称}/{bug名称}.md` | 确认 bug 根因后（**默认**） | 人 + AI 分析阶段 | 可补充，修复方案节只写方向摘要；用户目录知识库由 doc-index-required Phase-A/B 管控 |
+| `docs/bug/{模块名}/{bug名称}/{bug名称}.md` | 用户明确要求"上传终版 / 写到 docs/" 时 | 人 + AI 分析阶段 | 可补充；归档结构与用户目录一致，按模块分组 + 触发 doc-index-required |
 | `docs/design/{名称}修复/{名称}修复-current.md` | bug 分析完成后 | AI 实施阶段 | 随修复方案演进直接更新，历史由 git commit 负责 |
 | `docs/{subdir}/INDEX.md` | 首个文档创建时 | doc-index-required 读取 | 随文档新增自动追加 |
 | `docs/dev-log/YYYY-MM-DD.md` | team-standards 决策型变更时 | 人（追溯重大规则为什么存在） | 当天可追加，禁止修改历史日期文件；普通小改不写 |
@@ -273,8 +274,8 @@ flowchart LR
 | “完善 SQL”时能直接新写一条吗? | 不能默认新写。先查 `09_sql_query_index.md` 和 `sql-queries/`，命中相似 SQL 时按 SQL 指纹合并为同一查询能力的变体，只补必要的 join/where/group by/order by，并回写图谱。 |
 | 订单部分退、订单状态判定这类反复问题怎么处理? | 必须沉淀到 `table-logic/` 和原子能力索引。卡片要写清涉及表、状态/金额字段、判定矩阵、状态变化矩阵、可复用 DAO/Service 方法和代码坐标，后续新增接口先按图谱判断是否支持。 |
 | 多项目知识图谱还要整理什么? | 不做各服务内部能力的重复沉淀，主要记录服务间调用关系、入口契约、关键业务对象、数据归属、失败传播和幂等补偿边界；具体跨项目链路由 `cross-project-locator` 负责。 |
-| 需要单独调用 doc-index-required 吗? | 创建任何 Markdown 文档前都要先应用它的“输出路径规则”。默认写入用户目录，不更新 INDEX；只有用户明确指定 `docs/` 路径或编辑已有 `docs/` 文件时，才执行 Phase-A/Phase-B。 |
-| AI 生成文档默认写到哪里? | 默认写到用户 Documents 下的 `ai-docs/{project}/{agent}/{YYYY-MM-DD}/`；Windows 为 `%USERPROFILE%\Documents\ai-docs\...`，macOS/Linux 为 `~/Documents/ai-docs/...`，无 Documents 时兜底 `~/ai-docs/...`。 |
+| 需要单独调用 doc-index-required 吗? | 创建任何 Markdown 文档前都要先应用它的"输出路径规则"。**v1.20 起：用户目录知识库与项目 `docs/` 索引体系等同**，写文档前都要 Phase-A 读 INDEX 查重，写完都要 Phase-B 登记；`work-log/`（日期型）和 `knowledge-graph/`（自管 `00_index.md`）走豁免模式。 |
+| AI 生成文档默认写到哪里? | 默认写到用户 Documents 下的 `ai-docs/{project}/{type}/{topic}/{filename}`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；Windows 为 `%USERPROFILE%\Documents\ai-docs\...`，macOS/Linux 为 `~/Documents/ai-docs/...`，无 Documents 时兜底 `~/ai-docs/...`。例：`ai-docs/{project}/design/{需求名}/{需求名}-current.md`、`ai-docs/{project}/bug/{模块名}/{bug名}/{bug名}.md`。 |
 | 正式设计文档还能写 `docs/design/` 吗? | 可以，但不再由 AI 默认写入。终版文档由用户自行上传；或用户明确指定 `docs/...` 路径后，AI 才写项目目录并更新索引。 |
 | pre-implementation-code-orientation 什么时候调? | 两份文档（bug 分析 + 设计文档）都写完后、敲第一行代码前 |
 | pre-implementation-code-orientation 读哪份文档? | 优先读设计文档（coding.md），没有则降级读 bug 文档的涉及类清单 |
