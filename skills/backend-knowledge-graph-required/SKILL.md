@@ -1,13 +1,16 @@
 ---
 name: backend-knowledge-graph-required
-description: "Use BEFORE answering any backend single-service question about table relationships / ER / SQL query logic / state transitions / business judgments / atomic capabilities, AND BEFORE Write/Edit any .md describing such content (even outside docs/, e.g. ai-docs/, scenarios/). MUST invoke (BLOCKING) when: (1) about to Write/Edit a markdown whose content describes backend table relationships, ER diagrams, SQL, DAO/Mapper query logic, state transitions, business flow → DB CRUD, or data modeling — including files under ai-docs/, work-log/, scenarios/, NOT only under docs/; (2) user asks 'X 与 Y 是 1:1 还是 1:N', '改这个动哪些表', '字段从哪来', '这个业务怎么查', '这个 SQL 怎么写/完善', '退款/账单/流水/分摊怎么算', '是新建快照还是引用原表', or any single-service backend table-relation / SQL / state / atomic-capability question — even if framed as investigation, not implementation; (3) finished investigating backend code (own project OR another project as subject) and discovered ≥1 reusable fact about table relations / SQL query patterns / state machines / atomic capabilities — must auto-append to candidate pool and SQL query index candidate; (4) user asks to initialize, generate, organize, read or update backend knowledge graphs, ER diagrams, SQL archives, or query logic indexes; (5) project has docs/knowledge-graph/backend/; (6) code changes affect APIs, services, DAOs/Mappers/SQL, database tables, enums, state transitions, order/refund/payment status judgment, transactions, MQ/events, or external dependencies. Knowledge graph ownership = the investigated backend service, NOT current cwd — investigating project B from project A puts the graph under B's namespace, do NOT reroute to cross-project-locator just because cwd differs. Scope: backend single service (Java / backend-service style); cross-project topology → cross-project-locator."
+description: "Use BEFORE answering any backend single-service question about table relationships / ER / SQL query logic / state transitions / business judgments / atomic capabilities OR project-level technical pain points (subprocess orchestration, concurrency, perf, external dependencies, runtime edge cases), AND BEFORE Write/Edit any .md describing such content (even outside docs/, e.g. ai-docs/, scenarios/). MUST invoke (BLOCKING) when: (1) about to Write/Edit a markdown whose content describes backend table relationships, ER diagrams, SQL, DAO/Mapper query logic, state transitions, business flow → DB CRUD, or data modeling — including files under ai-docs/, work-log/, scenarios/, NOT only under docs/; (2) user asks 'X 与 Y 是 1:1 还是 1:N', '改这个动哪些表', '字段从哪来', '这个业务怎么查', '这个 SQL 怎么写/完善', '退款/账单/流水/分摊怎么算', '是新建快照还是引用原表', or any single-service backend table-relation / SQL / state / atomic-capability question — even if framed as investigation, not implementation; (3) finished investigating backend code (own project OR another project as subject) and discovered ≥1 reusable fact about table relations / SQL query patterns / state machines / atomic capabilities — must auto-append to candidate pool and SQL query index candidate; (4) user asks to initialize, generate, organize, read or update backend knowledge graphs, ER diagrams, SQL archives, or query logic indexes; (5) project has docs/knowledge-graph/backend/; (6) code changes affect APIs, services, DAOs/Mappers/SQL, database tables, enums, state transitions, order/refund/payment status judgment, transactions, MQ/events, or external dependencies; (7) **long-conversation tech-pain-point pattern**: same technical concern raised by the user ≥3 rounds in a single session — direct questions, verification follow-ups, regression-style phrasing ('为什么...还' / '怎么又...' / '上次说...' / '是不是...占用了' / '现在又卡了'), or persistent worry about the same constraint / perf / resource boundary; auto-append a 技术难点 candidate to `_candidates.md` even when the topic is subprocess management, concurrency, IO contention, or runtime edge cases that aren't strictly business / SQL — long-conversation patterns are the strongest signal that something deserves sediment. Knowledge graph ownership = the investigated backend service, NOT current cwd — investigating project B from project A puts the graph under B's namespace, do NOT reroute to cross-project-locator just because cwd differs. Scope: backend single service (Java / backend-service style) + project-level technical pain points within that service; cross-project topology → cross-project-locator."
 ---
 
 # 后端单服务知识图谱
 
 ## 定位
 
-本 skill 负责 **后端单服务业务视角** 的知识图谱，尤其是接口开发中反复使用的 **表逻辑关系、全景 ER、SQL 查询逻辑、状态判定规则、业务流程读写顺序、可复用原子函数**。
+本 skill 负责 **后端单服务业务图谱 + 项目级技术难点图谱** 双重职责：
+
+1. **后端业务图谱**（原有职责）：接口开发中反复使用的 **表逻辑关系、全景 ER、SQL 查询逻辑、状态判定规则、业务流程读写顺序、可复用原子函数**。
+2. **项目级技术难点图谱**（v1.21+ 扩展）：会话中**反复出现的非业务技术陷阱** —— 子进程编排、并发模型、性能瓶颈、资源争夺、外部依赖编排、运维边界、JVM/进程生命周期、缓存键策略、超时与回收机制等。这类陷阱不是 SQL 也不是表关系，但同样需要沉淀，避免下次同坑再踩。
 
 目标是让 AI 在后端接口开发前先理解：
 
@@ -18,6 +21,9 @@ description: "Use BEFORE answering any backend single-service question about tab
 - 订单部分退、订单业务状态判定、可退金额/可退商品等链式规则是否已有沉淀
 - 某个业务查询到底由哪些表 join、哪些过滤条件、哪些聚合字段组成，是否已有 SQL 指纹可复用
 - 当前需求是否应该复用已有原子能力，而不是重新写一遍 SQL / 判定逻辑
+- **本服务有哪些已知的技术陷阱、性能边界、并发约束**（本次需求会不会再踩）
+
+**长对话识别**是项目级技术难点的最重要触发信号：用户在同一会话中对同一技术点反复疑问 / 多轮验证 / 出现回归性措辞，就是该技术点应当沉淀的强证据。AI **不必等用户显式说"记到知识图谱"**，命中长对话模式即自动追加候选记录。
 
 不处理前端 UI 或跨项目全局拓扑。跨项目链路仍交给 `cross-project-locator`。
 
@@ -33,6 +39,8 @@ description: "Use BEFORE answering any backend single-service question about tab
 | 用户主动要求 | "建知识图谱"、"整理图谱"、"更新图谱"、"归档" | 先读候选池 + 现有正式图谱 + 代码证据，再写正式图谱 |
 | 项目已有正式图谱 | 存在 `docs/knowledge-graph/backend/` | 编码前必先回顾相关卡片，编码后必同步回写 |
 | 后端代码变更 | 新增/修改 API、Service、DAO、SQL、表、枚举、状态机、事务边界、MQ、外部依赖 | 同步更新对应卡片或候选池 |
+| **同一技术主题反复疑问 ≥3 轮**（项目级技术难点） | 用户在同一会话中对同一技术点重复提问 / 验证 / 担忧 ≥3 次；或出现回归性措辞："为什么...还" / "怎么又..." / "上次说..." / "是不是...占用了" / "现在又卡了"；或修复后 ≥2 轮验证性追问 | 答题同一回合**自动追加候选**到 `_candidates.md`，分类标记 `技术难点`；超过 5 轮反复或用户显式提示"这是核心点"时主动起 `scenarios/` 场景卡 |
+| **AI 完成涉及子进程 / 并发 / 性能 / 资源边界的代码改动** | 修复 transferTo 阻塞、Semaphore 限流、孤儿进程清理、缓存键策略、超时回收、磁盘/CPU 争夺等"非业务技术陷阱" | 编码后必候选记录；用户提示"这是难点要登记"时立刻整理为正式场景卡 |
 
 > **常见误判反例（已发生过的踩坑）**：
 > - ❌ "用户只是问云端逻辑，没让我建图谱，所以不用触发" → **错**，问询场景必触发并候选沉淀
@@ -40,6 +48,9 @@ description: "Use BEFORE answering any backend single-service question about tab
 > - ❌ "本地工程没有 `docs/knowledge-graph/backend/`，所以 skill 不适用" → **错**，没有就先写候选池
 > - ❌ "主目录是 A，调查的是 B 云端，应该交给 cross-project-locator" → **错**，单服务图谱归属 = 被调查的那个服务，与 cwd 无关
 > - ❌ "我直接 Write 一份图谱文档就行了" → **错**，写前必经本 skill 决定归属和模板
+> - ❌ "技术难点（子进程 / 并发 / 性能）不是表关系，所以不归本 skill" → **错**，本 skill v1.21 起范围已扩到项目级技术难点；用户反复疑问的技术陷阱必须沉淀
+> - ❌ "用户没显式说'记到知识图谱'，所以不用沉淀" → **错**，会话同主题反复疑问 ≥3 轮即自动触发，无需用户提醒；事后才记容易丢上下文
+> - ❌ "技术难点等下次会话再说" → **错**，当场记录，错过即流程违反；会话结束后重新还原难点上下文成本极高
 
 ## 调查对象与图谱归属路由
 
@@ -638,6 +649,10 @@ SQL 候选记录最少格式：
 | 本次后端代码变更新增/修改 API、Service、DAO/Mapper/SQL、表、枚举、状态流转、MQ、外部依赖 | 必须更新相关图谱卡片或候选池 |
 | 本次后端代码涉及订单/退款/支付等表逻辑判定 | 必须更新 `07_table_logic_index.md` / `table-logic/` / `08_atomic_capability_index.md` 中至少一处 |
 | 会话中反复出现同一后端业务事实，但尚未代码验证 | 自动追加到候选沉淀池，默认写用户目录，不进正式图谱 |
+| **同一会话同一技术主题用户反复疑问 ≥3 轮**（含直接提问 / 验证性追问 / 担忧性表达 / 回归性措辞） | 自动追加候选记录，标记 `分类: 技术难点`；超过 5 轮反复或用户显式提示"这是核心点"时直接生成 `scenarios/` 场景卡 |
+| 用户出现回归性措辞（"为什么...还"、"怎么又..."、"上次说..."、"是不是...占用了"、"现在又卡了"） | 视为技术难点信号，自动追加候选 |
+| 修复后用户提出 ≥2 轮验证性追问（"是不是真的解决了"、"会不会再出现"、"还有没有其它"、"重启后还会有么"） | 答题同回合追加候选，标注 "已修复 + 验证关注点"，便于下次回归测试覆盖 |
+| 涉及子进程 / 并发 / 性能 / 资源边界 / 外部依赖编排的非业务代码变更 | 编码后必候选记录到 `_candidates.md`，分类 `技术难点`；本身就是项目重点资产 |
 | 事实来自代码、DDL、枚举类、接口契约、已确认设计文档 | 可作为正式图谱依据；更新前仍需合并候选池同主题内容 |
 | 只是猜测、临时讨论、未确认方案 | 可记录为“待确认假设”，禁止写入正式图谱 |
 
@@ -648,10 +663,12 @@ SQL 候选记录最少格式：
 ```text
 - 记录时间
 - 服务/模块
+- 分类：业务事实 / 技术难点 / 性能 / 资源 / 进程 / 并发 / 运维 / 其它
 - 会话事实
-- 关联能力/流程/表/枚举
+- 关联能力/流程/表/枚举/外部依赖
+- 触发模式：用户主动要求 / 长对话同主题 ≥3 轮 / 修复后验证追问 / 代码改动后自动归档 / ...
 - 可信度：待确认 / 已确认 / 已代码验证
-- 来源：用户描述 / 代码坐标 / DDL / 枚举类 / API 契约
+- 来源：用户描述 / 代码坐标 / DDL / 枚举类 / API 契约 / 实战 bug
 - 后续动作：待用户确认 / 待代码核验 / 可整理入正式图谱
 ```
 
@@ -753,3 +770,7 @@ SQL 候选记录最少格式：
 | “Service 里临时复制一段表判定最快” | 应优先复用原子能力；确需临时兼容时登记待抽取原子能力 |
 | “枚举值不用单独整理” | 后端需求分析必须显式读取相关枚举卡 |
 | “跨项目链路也写这里” | 单服务只记录本服务视角；跨项目交给 `cross-project-locator` |
+| “ffmpeg / 子进程 / 性能 / 资源争夺这些是技术坑，不是表关系，不归图谱” | 错。v1.21 起范围已扩到项目级技术难点；反复出现的非业务技术陷阱同样必须沉淀 |
+| “用户没显式说'记到知识图谱'，那就先不记” | 错。同主题 ≥3 轮反复疑问、回归性措辞、修复后验证追问，都是自动触发条件，无需用户提醒 |
+| “技术难点等下次会话再说” | 错。当场记录是硬规则，错过即流程违反；会话结束后还原难点上下文成本极高 |
+| “修复了就完事了，不用记" | 错。修复后用户多轮验证追问 = 这是项目持续关注的难点，必须沉淀供下次回归参考 |
