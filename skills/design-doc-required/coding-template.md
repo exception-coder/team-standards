@@ -26,28 +26,15 @@
 
 ---
 
-## 2. 接口契约
+## 2. 接口入口指针
 
-### 入口接口
+> 字段级契约见 `{需求}-api-{YYYYMMDD}-v{N}.md`。
+> 本节只列接口入口与对应实现类，方便代码定位，不展开 Headers / 字段表 / 示例。
 
-```
-{HTTP方法} {路径}
-请求：{全类名} - 关键字段列表
-返回：{全类名} - 关键字段列表
-```
-
-### 请求示例
-
-> 新增接口时必填，直接从设计文档 5.5 节提取。
-
-```http
-{HTTP方法} /v1/{path}
-Content-Type: application/json
-
-{
-  "field1": "value1"
-}
-```
+| 接口 | 实现类 #方法 |
+|------|-------------|
+| `POST /api/xxx` | `com.example.XxxController#create` |
+| `GET /api/xxx/{id}` | `com.example.XxxController#getById` |
 
 ---
 
