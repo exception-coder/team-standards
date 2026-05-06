@@ -48,7 +48,7 @@ team-standards/
 | `.claude-plugin/` | Claude Code 插件声明目录，包含插件版本、展示信息和 marketplace 条目 | 发布前必须同步递增 `plugin.json` 与 `marketplace.json` 的 `version` |
 | `.codex-plugin/` | Codex 插件声明目录，包含 Codex 侧插件元数据 | 维护 Codex 分发时同步递增 `plugin.json` 的 `version` |
 | `skills/` | 插件核心目录，每个子目录是一个独立 Skill，至少包含 `SKILL.md` | 新增或修改 Skill 后，同步更新 `AGENTS.md`、`CLAUDE.md`、README 的 Skills 表和 `docs/skill-flow.md` |
-| `hooks/` | 强制拦截脚本目录：`check-git-commit-skill.js` 默认启用（拦截未调用 git-commit-standards skill 的 git commit / push）；`check-design-doc.{cmd,sh}` 默认禁用模板 | 新增 hook 时同步更新 `hooks.json`、CLAUDE.md/AGENTS.md 辅助资源表 |
+| `hooks/` | 强制拦截脚本目录：`check-git-commit-skill.js` 默认启用（拦截未调用 git-commit-standards skill 的 git commit / push）；`check-dto-annotation.js` 默认启用（拦截 wire DTO 用 `@freezed` 或裸 `@JsonSerializable()` 的违规）；`check-design-doc.{cmd,sh}` 默认禁用模板 | 新增 hook 时同步更新 `hooks.json`、CLAUDE.md/AGENTS.md 辅助资源表 |
 | `docs/` | 维护文档目录，记录 Skill 链路、历史版本、配置机制和决策型变更背景 | 链路结构变化时更新 `skill-flow.md` 并创建版本快照 |
 
 ### 关键文件
@@ -62,6 +62,8 @@ team-standards/
 | `docs/skill-flow-*.md` | `skill-flow.md` 的历史快照 | 链路节点或连线发生结构性变化时创建 |
 | `docs/dev-log/YYYY-MM-DD.md` | 决策型变更日志，只记录长期背景 | 新增/删除 Skill、规则方向反转、触发链路变化、重大团队原则沉淀时 |
 | `hooks/hooks.json` | Hook 注册配置，控制是否启用写入前脚本校验 | 需要启用或调整 Hook 时 |
+| `hooks/check-git-commit-skill.js` | git commit 前按 staged diff 大小判定的拦截脚本（Node 跨平台，默认启用） | 调整阈值或拦截逻辑时（环境变量 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 也可调） |
+| `hooks/check-dto-annotation.js` | wire DTO 注解拦截脚本（Node 跨平台，默认启用，PreToolUse Write/Edit/MultiEdit）：拦截 `lib/features/*/common/models/(request\|response)/*.dart` 下的 `@freezed` 与裸 `@JsonSerializable()`；例外文件需在头部加 `// FREEZED-EXCEPTION:` 标记 | 调整 wire DTO 注解校验规则时（环境变量 `TEAM_STANDARDS_DTO_HOOK=off` 临时禁用） |
 | `hooks/check-design-doc.cmd` | Windows 设计文档检查脚本 | 调整 Windows 下的强制门禁逻辑时 |
 | `hooks/check-design-doc.sh` | macOS/Linux 设计文档检查脚本 | 调整 Unix 系统下的强制门禁逻辑时 |
 | `.claude-plugin/plugin.json` | Claude 插件基础元数据 | 每次发布前递增版本 |

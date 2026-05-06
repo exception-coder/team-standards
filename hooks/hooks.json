@@ -1,5 +1,5 @@
 {
-  "_comment": "默认启用 git commit/push 前的 skill 校验 hook（跨平台 Node 脚本，无需用户区分平台）。其它 hook（如 design-doc 检查）仍按 _disabled_* 模板手动启用。Windows 使用 .cmd，macOS/Linux 使用 .sh。",
+  "_comment": "默认启用 git commit/push 前的 skill 校验 hook + DTO 注解校验 hook（跨平台 Node 脚本，无需用户区分平台）。其它 hook（如 design-doc 检查）仍按 _disabled_* 模板手动启用。Windows 使用 .cmd，macOS/Linux 使用 .sh。",
   "hooks": {
     "PreToolUse": [
       {
@@ -8,6 +8,16 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/check-git-commit-skill.js\"",
+            "async": false
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/check-dto-annotation.js\"",
             "async": false
           }
         ]

@@ -1020,11 +1020,78 @@ common/enums/business/
 - 已存在的 refund 业务枚举范本：`refund/common/enums/{order_state_type_enum, bill_state_type_enum, transaction_state_type_enum, kpos_pay_result_enum, prepared_reason_type_enum}.dart`
 - 这些 `business/` 枚举可被 UI、backend、跨模块共同 import — 是契约层的一部分
 
+### Step 2/3 通用：DTO 注解强制约束（@JsonSerializable + explicitToJson:true，禁止 @freezed）
+
+**所有 wire DTO（`features/{module}/common/models/request|response/` 下的 Request/Response 类，含嵌套子 DTO）必须用 `@JsonSerializable(explicitToJson: true)`，禁止用 `@freezed`。** Hook `hooks/check-dto-annotation.js` 默认启用，违规即阻断。
+
+#### 为什么必须 `explicitToJson: true`
+
+项目未配置全局 `explicit_to_json`（`build.yaml` 不存在）。json_serializable / freezed 默认 `toJson` **不递归**——生成代码里 `'nested': instance.nested` 直接赋值，嵌套子项仍是原对象（不是 Map）。仅 `jsonEncode(dto)` 时 Dart SDK 才会隐式调子项 `toJson` 完成 wire 序列化。
+
+但 service 内部经常 `dto.toJson()` 拿 Map 做就地修改 / Map 风格读字段（如 `map['xxx']`），此时拿到的是嵌套对象不是 Map，`as Map<String, dynamic>` cast 直接抛 `_TypeError`。**已在算价接口 commit `b8dc1a610` 踩坑修复一次**。
+
+加 `explicitToJson: true` 强制 toJson 递归调子项 toJson，从根上避坑。
+
+#### 为什么禁 `@freezed`
+
+| 维度 | `@JsonSerializable(explicitToJson: true)` | `@freezed` |
+|---|---|---|
+| `toJson` 递归 | ✅ 强制 | ❌ 默认不递归（同上踩坑点） |
+| `fromJson` 严格校验 | ✅ `CheckedFromJsonException` | ✅ 同 |
+| 字段拼写编译期 | ✅ | ✅ |
+| 不可变 / `copyWith` / `==` | ❌（wire DTO 不需要） | ✅ |
+| 生成代码体积 | 小 | 大（含 `_$XxxImpl` mixin） |
+
+wire DTO 短生命周期（构造一次发出 / 解析一次消费），不需要 `不可变 / copyWith / ==` 三件套。`@JsonSerializable(explicitToJson: true)` 等价覆盖**所有真实需求**且避开 freezed 的 toJson 不递归坑。
+
+#### 强制写法
+
+```dart
+import 'package:json_annotation/json_annotation.dart';
+
+part '{action}_request.g.dart';
+
+@JsonSerializable(explicitToJson: true)
+class {Action}Request {
+  final int orderId;
+  final List<NestedDto> items;
+
+  const {Action}Request({
+    required this.orderId,
+    this.items = const [],
+  });
+
+  factory {Action}Request.fromJson(Map<String, dynamic> json) =>
+      _${Action}RequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _${Action}RequestToJson(this);
+}
+```
+
+#### 唯一例外
+
+只有当类**同时满足以下两条**时才允许使用 `@freezed`：
+- 需要 sealed class / union types（`@Freezed(unionKey: ...)`）表达多态结果
+- 需要 Dart 3 pattern matching（`switch` expression）消费
+
+普通 wire DTO 不在例外范围。需走例外时在文件头注释里写明理由（`// FREEZED-EXCEPTION: <原因>`），hook 检测到该标记后放行。
+
+#### Hook 兜底
+
+`hooks/check-dto-annotation.js`（默认启用 PreToolUse Write/Edit/MultiEdit）拦截 `lib/features/*/common/models/(request|response)/*.dart` 的违规：
+- 检测到 `@freezed`（无 `FREEZED-EXCEPTION` 标记）→ exit 2 阻断
+- 检测到裸 `@JsonSerializable()`（缺 `explicitToJson: true`）→ exit 2 阻断
+- 输出错误信息 + 修复建议回灌给 AI
+
+存量违规由「编辑前违规自检」节负责，编辑既有违规文件时同步修正。
+
+---
+
 ### Step 2：Request DTO
 
 **路径**：`lib/features/{module}/common/models/request/{action}_request.dart`（每个接口一个文件）
 
-> DTO 落在 **common 层**，UI 与 backend 共用同一份。统一用 `@JsonSerializable()`（不是 freezed）—— 与现有 `refund/common/models/` 风格保持一致，单边支持 `fromJson` / `toJson`。
+> DTO 落在 **common 层**，UI 与 backend 共用同一份。注解必须用 `@JsonSerializable(explicitToJson: true)`（详见上方「Step 2/3 通用：DTO 注解强制约束」），单边支持 `fromJson` / `toJson`。
 
 ```dart
 import 'package:json_annotation/json_annotation.dart';
@@ -1040,7 +1107,7 @@ part '{action}_request.g.dart';
 ///
 /// wire 干净规则：本类**不允许**出现 `@JsonKey(includeToJson: false)` 标注的 internal 字段；
 /// service 内部需要的过滤/调试字段一律拆到 backend 私有 record/class（详见「ACL」节）。
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class {Action}Request {
   /// {字段 1 业务含义、单位、取值范围、来源}
   final int orderId;
@@ -1071,6 +1138,8 @@ class {Action}Request {
 
 **路径**：`lib/features/{module}/common/models/response/{action}_response.dart`（对应 `ApiIntranetResponse.data` 的形状）
 
+> 注解必须用 `@JsonSerializable(explicitToJson: true)`（详见上方「Step 2/3 通用：DTO 注解强制约束」）。
+
 ```dart
 import 'package:json_annotation/json_annotation.dart';
 
@@ -1081,7 +1150,7 @@ part '{action}_response.g.dart';
 /// 文档：`docs/{模块}/{模块}-UI对接手册-*.md` §4.N 出参表
 ///
 /// 任何字段增删改后，**必须同步更新文档的 §4.N 出参表 + §8 变更记录**。
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class {Action}Response {
   final bool success;
 
