@@ -61,7 +61,8 @@ process.stdin.on('end', () => {
     process.exit(0);
   }
 
-  if (/"skill"\s*:\s*"team-standards:git-commit-standards"/.test(content)) {
+  // JSONL transcript 是 compact JSON，无内嵌空白；字面量 includes() 比正则在 MB 级文件上快数倍
+  if (content.includes('"skill":"team-standards:git-commit-standards"')) {
     process.exit(0);
   }
 
@@ -76,36 +77,26 @@ process.stdin.on('end', () => {
 });
 
 function isTrivialChange(cwd) {
-  let nameStatus;
+  // 先 name-status：状态字母或文件数任一不达标就早退，省一次 shortstat 调用
   let shortstat;
   try {
-    nameStatus = execSync('git diff --staged --name-status', { cwd, encoding: 'utf8' }).trim();
+    const nameStatus = execSync('git diff --staged --name-status', { cwd, encoding: 'utf8' }).trim();
+    if (!nameStatus) return false;
+
+    const lines = nameStatus.split(/\r?\n/).filter(Boolean);
+    if (lines.some((line) => !/^M\b|^M\t/.test(line))) return false;
+    if (lines.length > TRIVIAL_FILES) return false;
+
     shortstat = execSync('git diff --staged --shortstat', { cwd, encoding: 'utf8' }).trim();
   } catch (e) {
     return false;
   }
 
-  if (!nameStatus || !shortstat) {
-    return false;
-  }
-
-  const lines = nameStatus.split(/\r?\n/).filter(Boolean);
-  const hasNonModify = lines.some((line) => !/^M\b|^M\t/.test(line));
-  if (hasNonModify) {
-    return false;
-  }
-
-  if (lines.length > TRIVIAL_FILES) {
-    return false;
-  }
+  if (!shortstat) return false;
 
   const insMatch = shortstat.match(/(\d+)\s+insertion/);
   const delMatch = shortstat.match(/(\d+)\s+deletion/);
   const totalLines = (insMatch ? parseInt(insMatch[1], 10) : 0)
     + (delMatch ? parseInt(delMatch[1], 10) : 0);
-  if (totalLines > TRIVIAL_LINES) {
-    return false;
-  }
-
-  return true;
+  return totalLines <= TRIVIAL_LINES;
 }

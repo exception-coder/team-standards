@@ -1,36 +1,25 @@
 ---
 name: git-commit-standards
-description: Use when the user asks to commit code or generate a commit message AND the staged diff is non-trivial (>2 files, >30 net lines, or contains new/renamed/deleted files). For trivial commits (≤2 files, ≤30 lines, only modifications to existing files) skip this skill and write a clear `git commit` message directly — `hooks/check-git-commit-skill.js` enforces the same threshold at the Bash layer (only blocks `git commit` when staged diff exceeds it). MUST analyze actual code changes before composing the message. Automatic stage/commit/push applies ONLY to the team-standards plugin source repository, never to business projects that merely install this plugin.
+description: Use when the user asks to commit code or generate a commit message AND the staged diff is non-trivial (>2 files, >30 net lines, or contains new/renamed/deleted files). For trivial commits (≤2 files, ≤30 lines, only modifications to existing files) skip this skill and write a clear `git commit` message directly — `hooks/check-git-commit-skill.js` enforces the same threshold at the Bash layer (only blocks `git commit` when staged diff exceeds it). Compose the message from the current session's edit intent first; only re-read diffs to cover gaps. Automatic stage/commit/push applies ONLY to the team-standards plugin source repository, never to business projects that merely install this plugin.
 ---
-
-<EXTREMELY-IMPORTANT>
-This skill is RIGID. Follow every step exactly, in order. No shortcuts, no skipping, no adapting.
-
-YOU CANNOT COMMIT WITHOUT COMPLETING ALL FIVE STEPS.
-
-If you think any step is unnecessary, that thought is a Red Flag. Stop and re-read this skill.
-</EXTREMELY-IMPORTANT>
 
 # Git 提交规范
 
-## 核心原则
+## 何时进入本 skill
 
-**提交信息必须基于实际代码变更分析生成，禁止凭记忆或猜测填写。**
+`hooks/check-git-commit-skill.js` 已经替你做了路由：
 
-每次提交前先执行 `git diff --staged`，读取变更内容后再撰写提交信息。
+- **小改放行**：≤ 2 文件 ∧ insertions+deletions ≤ 30 ∧ 全部为 `M`（仅修改现有文件，无 `A`/`R`/`D`）→ hook 直接放过 `git commit`，**根本不会进本 skill**，模型用一句清晰的 commit message 提交即可。阈值可用环境变量 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 调整。
+- **大改强制**：以上任一不满足时，hook 检查当前 transcript 是否含 `"skill":"team-standards:git-commit-standards"` 调用记录，未调用直接 exit 2 阻断 → 你看到这套五步清单就意味着本次属于"大改"。
+- **git push 不再拦截**：commit 已落地，push 不门禁。
 
-> **Hook 强制说明（v1.18.1 起按改动大小放行）：** `hooks/check-git-commit-skill.js` 在每次 `git commit` 的 Bash 调用前先看 staged diff：
-> - **小改放行**：≤ 2 文件 ∧ insertions+deletions ≤ 30 ∧ 全部为 `M`（仅修改现有文件，无 `A`/`R`/`D`）→ 直接放行，让模型用一句清晰的 commit message 提交，不必启动本 skill 五步清单。阈值可用环境变量 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 调整。
-> - **大改强制**：以上任一不满足时，hook 会 grep 当前 transcript 是否含 `"skill":"team-standards:git-commit-standards"` 调用记录，未调用直接 exit 2 阻断。
-> - **git push 不再拦截**：commit 已落地，push 不门禁。
->
-> 模型侧的判定流程：收到 commit 请求 → Bash 跑 `git diff --staged --shortstat` + `--name-status` 看大小 → 小改直接 commit，大改先 Skill 调用本 skill。
+**核心原则**：提交信息以**当前会话的实际改动意图**为准；diff 只是用来兜底校验"有没有遗漏"或"有没有出现你没碰过的文件"。不要把 diff 再翻译成文字——那是重复劳动，且会丢掉只在会话里有的 WHY（设计取舍、踩坑、跟用户对齐的结论）。
 
-**team-standards 特例（只作用于插件源码仓库）：** 仅当以下三项同时满足时，才自动完成 `git add` → `git diff --staged` → `git commit` → `git push`：
+**team-standards 特例（只作用于插件源码仓库）：** 仅当以下三项同时满足时，才自动完成 `git add` → `git commit` → `git push`：
 
 1. 当前 git 仓库的目录名或 remote URL 明确指向 `team-standards` / `kpay-team-standards`。
 2. 本次变更对象属于插件自身文件：`skills/`、`hooks/`、`.claude-plugin/`、`.codex-plugin/`、`AGENTS.md`、`CLAUDE.md`、`README.md`、`docs/skill-flow*`、`docs/dev-log/`。
-3. 用户没有明确说“不要提交 / 不要 push / 只改不提交”。
+3. 用户没有明确说"不要提交 / 不要 push / 只改不提交"。
 
 业务项目即使安装了 team-standards plugin，也**绝不**触发自动 stage、自动 commit、自动 push 或自动版本号递增。业务项目提交必须走普通确认流程。
 
@@ -83,9 +72,9 @@ Author: <姓名> <邮箱>
 
 ```
 [ ] 第一步：读取 git config user.name / user.email
-[ ] 第二步：执行 git status；必要时 git add 后执行 git diff --staged 读取变更内容
-[ ] 第三步：分析变更，确定 type / scope / body 要点
-[ ] 第四步：输出完整提交信息；team-standards 自动收尾场景记录“自动确认”
+[ ] 第二步：基于会话上下文确认改动范围；用 git diff --staged --name-only 兜底校验
+[ ] 第三步：用会话已知的改动意图直接写 type / scope / body
+[ ] 第四步：输出完整提交信息；team-standards 自动收尾场景记录"自动确认"
 [ ] 第五步：执行 git commit；team-standards 自动收尾场景继续执行 git push
 ```
 
@@ -99,23 +88,33 @@ git config user.email
 - 两项均有值 → 记为 Author，继续第二步
 - 任意一项为空 → **暂停**，告知用户缺失哪项，等用户补充后再继续，禁止使用占位值
 
-### 第二步：获取变更内容
+### 第二步：基于会话上下文确认改动范围
+
+**优先用会话上下文，不要直接全量读 diff。**
+
+a) 从对话历史归纳本次会话中你 Edit/Write 过的所有源文件，以及每个文件的改动意图。
+
+b) 跑一次轻量校验：
 
 ```bash
 git status --short
-git diff --staged
-git diff --staged --stat
+git diff --staged --name-only
 ```
 
-- 有暂存内容 → 继续第三步
-- 无暂存内容但工作区有变更：
-  - team-standards 插件源码仓库自动收尾场景 → 执行 `git add -A` 后重新读取 staged diff
-  - 其他场景 → **暂停**，提示用户先执行 `git add`，禁止继续
-- 无任何变更 → 停止，不提交空 commit
+c) 比对 staged 文件列表 vs 你在本次会话改过的文件：
 
-### 第三步：分析变更，确定 type 和 scope
+| 情况 | 处理 |
+|------|------|
+| staged ⊆ 会话改过的文件 | 直接进第三步，不用读完整 diff |
+| 出现你没碰过的文件（用户在 IDE 手动改 / 之前残留的 stage） | 对**这部分文件**跑 `git diff --staged -- <file>`，必要时问用户是否要一起提 |
+| 工作区有未暂存变更 | team-standards 自动收尾场景执行 `git add -A` 后重新校验；其它场景**暂停**让用户先 `git add` |
+| 当前会话被压缩过（关键改动上下文已丢失） | 降级：跑完整 `git diff --staged` + `--stat` 重建上下文 |
+| 无任何变更 | 停止，不提交空 commit |
 
-根据变更内容判断：
+### 第三步：基于会话意图写 type / scope / body
+
+直接用会话里已知的改动目的填：
+
 - 新增了类/方法/接口 → `feat`
 - 修改了已有逻辑修复问题 → `fix`
 - 改了代码结构但功能不变 → `refactor`
@@ -126,12 +125,17 @@ git diff --staged --stat
 
 scope 从变更的包路径或模块名中提取（取最小公共前缀）。
 
+**body 段重点**：
+- 写**为什么这样改**（设计取舍、踩坑、跟用户对齐的结论）——这部分只在会话里有
+- **不要**把 diff 当成 changelog 翻译一遍——文件名、方法名 git 本身会显示
+- 第二步 c) 兜底发现的"你没碰过的文件"，body 里**单独标一段**说明来源
+
 ### 第四步：输出提交信息并处理确认
 
 将完整提交信息输出给用户。
 
 - 普通场景：**明确询问"是否确认提交"**，收到确认后才能进入第五步。
-- team-standards 插件源码仓库自动收尾场景：记录“自动确认：team-standards 源码仓库收尾规则授权”，直接进入第五步。
+- team-standards 插件源码仓库自动收尾场景：记录"自动确认：team-standards 源码仓库收尾规则授权"，直接进入第五步。
 
 普通场景禁止在未收到用户确认的情况下执行 git commit。
 
@@ -167,19 +171,17 @@ push 前必须确认 `.claude-plugin/plugin.json`、`.claude-plugin/marketplace.
 
 ## Red Flags
 
-出现以下念头时立即停止，回到步骤一：
+出现以下念头时立即停止，回到对应步骤：
 
 | 念头 | 现实 |
 |------|------|
-| "用户已经说清楚了，我知道要提交什么" | 你必须 diff 验证，记忆和猜测不可靠 |
+| "我已经改完了，直接全量 git diff --staged 再读一遍才放心" | 第二步明确：会话上下文优先，diff 只兜底；全量读是重复劳动 |
 | "git config 肯定有值，跳过读取" | 必须执行命令确认，不能假设 |
-| "提交信息很简单，不用确认直接提交" | 第四步确认是刚性要求，不能省略 |
+| "提交信息很简单，不用确认直接提交" | 普通场景第四步确认是刚性要求；只有 team-standards 仓库自动收尾才免确认 |
 | "业务项目安装了 team-standards，所以也自动提交推送" | 错。自动提交推送只作用于 team-standards 插件源码仓库 |
 | "team-standards 改完先放着下次一起提" | 插件源码仓库要求小步提交并自动 push，避免累计大包变更 |
 | "加上 Co-Authored-By 是好习惯" | 这是明确禁止的行为，立即删除 |
-| "这只是个小提交，走完流程太麻烦" | 规模不影响流程，所有提交都走完五步 |
 | "用户让我快点，可以省几步" | 用户说"提交"是 WHAT，流程是 HOW，不可跳过 |
-| "我已经知道 Author 是谁" | 必须从 git config 动态读取，不能写死 |
 
 ---
 
