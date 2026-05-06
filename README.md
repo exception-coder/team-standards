@@ -159,7 +159,7 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `generate-project-profile` | 要求生成项目画像时 | 生成 AI Agent 消费的 10 维度结构化 Markdown（project-profile.md） |
 | `coding-violation-log` | 用户纠正 AI 编码错误时 | 自动登记违规到 `docs/coding-violations.md`，编码前回顾防重犯 |
 | `bugfix-coding-style` | bug 修复 / 对齐云端 / 删冗余 / 任何源码改动时 | 禁止把变更历史、旧实现复盘、未来版本计划写进源码；函数/类注释只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块附近写 1-2 行 WHY 注释 |
-| `korepos-backend-service` | korepos / korepos-refund 后端接口开发时 | 约束 backend 目录结构、BackendInfra 边界、一接口一 service、Service 禁裸 SQL、跨 feature 业务原子能力、编辑前违规自检、长方法拆 step、DB 字段值枚举绑定等后端服务规则 |
+| `korepos-backend-service` | korepos / korepos-refund 后端接口开发时 | 约束 backend 目录结构、BackendInfra 边界、一接口一 service、Service 禁裸 SQL、跨 feature 业务原子能力、编辑前违规自检、长方法拆 step、DB 字段值枚举绑定、wire DTO 注解强制（@JsonSerializable + explicitToJson）、**DTO 字段类型强制**（禁 `Object?` / `dynamic` / `Map<String, dynamic>` 容忍多形态）等后端服务规则 |
 | `project-docs-update` | 项目代码结构变更后 | 检测代码与 docs/ 文档的差异，自动或确认式更新知识图谱 |
 | `arch-lint` | Flutter 架构检查时 | 检测 5 类架构违规（presentation 层 SQL/HTTP、domain 层框架依赖、金额 double、DAO 越层调用） |
 | `cross-project-locator` | 跨项目（≥2 个 kpay POS 工程）定位 / 排查 / 登记拓扑知识时 | 路由到 `kpay-pos-topology/` 仓库：查询模式按业务域/工程名读 mapping 或 flows；登记模式拦截错误落盘位置，强制写入拓扑仓库 |

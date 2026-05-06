@@ -1087,6 +1087,48 @@ class {Action}Request {
 
 ---
 
+### Step 2/3 通用：字段类型强制约束（禁止 `Object?` / `dynamic` / `Map<String, dynamic>` 容忍多形态）
+
+**所有 Request / Response / Data 块字段必须声明唯一确定的类型**（`String` / `int` / `double` / `bool` / 强类型子 DTO / 强类型 List / 强类型 Map），**禁止**用 `Object?` / `dynamic` / `Map<String, dynamic>` / `List<Map<String, dynamic>>` 来同时承载多条产生分支（短路 vs Rust FFI、本地组装 vs 云端透传 等）的不同形态。多形态融合一律在 service 层完成后再写入 DTO 的固定类型字段。
+
+#### 反例（必须改造）
+
+`features/refund/common/models/response/calculate_refund_price_response.dart` 顶层金额 `taxAmount` / `serviceFeeAmount` / `tipAmount` / `refundAmount` 当前声明为 `Object?`，理由是"短路分支返回 `num`、Rust FFI 分支返回 `String`"——这种两形态混合契约**违反本规则**。同文件嵌套块 `selectedOption` / `posOrder` / `serviceFeeData` / `mainItems` / `orderAdditionalFees` / `orderTaxes` 用 `Map<String, dynamic>` / `List<Map<String, dynamic>>` 占位也是反例。
+
+```dart
+// ❌ 反例：Object? / Map<String, dynamic> 容忍多形态
+final Object? taxAmount;            // Rust=String 短路=num → 必须归一
+final Map<String, dynamic>? posOrder; // 26 字段 vs 36 字段 → 必须建强类型子类
+final List<Map<String, dynamic>> orderTaxes; // → 必须建 OrderTaxDto
+
+// ✅ 正例：service 层提前归一，DTO 字段唯一类型
+final String taxAmount;             // 统一序列化为 String，调用方不再分支判断
+final PosOrderDto? posOrder;        // 强类型嵌套，字段拼写编译期校验
+final List<OrderTaxDto> orderTaxes; // 强类型列表
+```
+
+#### 为什么
+
+- **契约边界**：wire DTO 是 UI / backend / 文档共识的契约层，多形态融合应在 service 层封死，不应外泄给调用方做运行时分支
+- **编译期保护**：固定类型让调用方拥有 IDE 跳转、字段拼写校验、`json_serializable` 直接 codegen；`Object?` / `Map<String, dynamic>` 退化成 hash-map 编程，字段拼错运行时才炸
+- **杜绝 `parseRustDecimal` 分支扩散**：若每个调用方都要 `parseRustDecimal(taxAmount)`，等价于把"两形态"这个 backend 内部细节硬塞给所有 UI 调用方
+- **嵌套结构同样禁占位**：`Map<String, dynamic>` / `List<Map<String, dynamic>>` 嵌套块属于"省事但失去字段拼写校验"的反模式，必须建强类型子 DTO
+
+#### 强制做法
+
+- 写新 Request/Response 时，每个字段必须能用一句话回答"返回什么具体类型"——回答不出来就**先回 service 层归一**或**拆分支建独立 DTO**，再回头建字段
+- **多形态归一在 service**：金额类字段统一在 service 层转 `String`（保留小数精度）或转 `double`（精度可接受时），DTO 侧字段就声明为 `String` / `double`；`String` 序列化由 backend_infra 工具方法统一
+- **嵌套结构建强类型子 DTO**：分支字段并集时，差异字段在另一分支为 null，子 DTO 字段全部声明 `Type?`，service 层负责按分支填空
+- **可空就用 `Type?`**：字段确实可能为空时声明 `String?` / `double?` / `PosOrderDto?`，**不要用 `Object?` 替代可空语义**
+- **存量改造**：编辑 `Object?` / `Map<String, dynamic>` / `List<Map<String, dynamic>>` 字段所属的 DTO 文件时，必须顺手把字段改为强类型，并把分支差异搬到对应 service（短路侧 toString / 转 double，Rust 侧 `parseRustDecimal` 后再写回 DTO）；不允许"只改我的字段、其他保持反例"
+- **review 必查项**：design-doc / 接口契约定稿前，把"是否存在 `Object` / `dynamic` / `Map<String, dynamic>` / `List<Map<String, dynamic>>` 字段"列为评审硬卡点
+
+#### 唯一例外
+
+字段语义本身就是"任意 JSON 值"（如真正自由的扩展位、第三方透传的 raw payload）才允许 `Object?` / `Map<String, dynamic>`，必须在 dartdoc 里写明"语义=任意 JSON，非分支多形态"。**金额 / 数量 / 状态 / 业务 ID / 嵌套业务对象不在例外范围。**
+
+---
+
 ### Step 2：Request DTO
 
 **路径**：`lib/features/{module}/common/models/request/{action}_request.dart`（每个接口一个文件）
