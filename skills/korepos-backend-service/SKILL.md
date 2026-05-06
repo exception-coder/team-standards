@@ -46,9 +46,41 @@ refund 模块走了 `backendv2/` 是因为 `features/refund/backend/` 早已被�
 
 ## 编写 backend 代码前的违规自检（强制前置）
 
-**触发时机**：AI 即将 Edit/Write 任何路径含 `lib/features/{module}/backend/` 或 `lib/common/backend_infra/` 下的 `.dart` 文件时——**包括首次编辑该文件**。
+**触发时机**：AI 即将 Edit/Write 任何路径含 `lib/features/{module}/backend/`、`lib/features/{module}/common/`（仅当 backend 接口涉及）或 `lib/common/backend_infra/` 下的 `.dart` 文件时——**包括首次编辑该文件**。
 
-**核心原则**：先扫存量违规 → 汇报清单 → 等用户确认处置 → 再动手编辑。**违规清单不汇报直接动代码 = 流程违反**。
+**核心原则**：**先做路径合规预检 → 再扫存量违规 → 汇报清单 → 等用户确认处置 → 才动手编辑**。
+
+- **路径合规预检不通过直接动代码 = 流程违反**（典型："凭模块内一致性把新 DTO 写到 `backend/dto/`"）
+- **违规清单不汇报直接动代码 = 流程违反**
+
+### 第零步：目标路径合规预检（必须先于扫存量违规）
+
+按本 skill「目录结构模板」节当前规范，对每个**新建文件**核对目标路径：
+
+| 文件类型 | ✅ 必须的目标路径 | ❌ 红色警告（看到立即停） |
+|---|---|---|
+| Request DTO | `features/{module}/common/models/request/` | 目标路径含 `backend/dto/`（无论目录是否已存在） |
+| Response DTO | `features/{module}/common/models/response/` | 目标路径含 `backend/dto/`（无论目录是否已存在） |
+| 路由枚举 | `features/{module}/common/enums/endpoints/` | 新建 `backend/endpoint/{module}_endpoint.dart`，或往已存在的同名文件追加新枚举值（新代码） |
+| 业务枚举 | `features/{module}/common/enums/business/` | 目标路径含 `backend/enums/` 或 `backend/dto/` 内嵌枚举 |
+| Service | `features/{module}/backend/service/` 或 `service/internal/` | 出现 `backend/application/`、`backend/data/`（v1 老骨架） |
+| DAO | `features/{module}/backend/dao/` 或 `lib/common/backend_infra/daos/` | 出现 `backend/data/repos/`、`backend/data/sources/`（v1 老骨架） |
+| Handler | `features/{module}/backend/endpoint/{module}_handler.dart` | 文件名错位、或 handler 不薄壳（详见 Step 6） |
+| Registry | `features/{module}/backend/registry/{module}_backend_routes.dart` | 函数名缺 `register{Module}BackendRoutes` 形式 |
+
+**反 Anti-pattern（这些推理一旦出现立即停下回到合规路径）**：
+
+| 错误推理 | 正确处理 |
+|---|---|
+| ❌ "模块内已有 N 个 DTO 在 `backend/dto/`，为了一致性新 DTO 也放那里" | 新 DTO 必须放 `common/models/`，模块内一致性 ≠ 跟随历史缺陷继续繁殖 |
+| ❌ "目录已存在，所以追加文件不算新增、不算违规" | 目录历史存在 ≠ 路径合规；详见「现存 `backend/dto/` 副本…的存量处理」节 |
+| ❌ "skill 举例只有 refund/backendv2，所以本模块不适用" | 「现存 `backend/dto/` 存量处理」是通用规则，判定信号是 `backend/dto/` 目录形态而非模块名 |
+| ❌ "common/ 目录还不存在，建起来太麻烦，先放 backend/dto/" | `common/models/` / `common/enums/` 目录由首次编辑时自动创建，不构成借口 |
+
+**预检处置**：
+
+- **预检通过**：进入「第一步：扫存量违规」
+- **预检不通过**：立即调整目标路径到合规位置（首次创建 common/ 子目录视为正常工作量）；如用户明确指示要走老路径（如"模块统一保留 backend/dto/ 风格"），必须在回复中**显式标注违反 skill 规范**并征得用户口头确认，而不是默认照做
 
 ### 第一步：扫存量违规（grep 目标文件 + 同模块同层文件）
 
@@ -2106,37 +2138,47 @@ Skill 在 Edit DTO 前**必须跑**这一步识别，把结果和字段改动影
 
 ---
 
-## 现存 backend/dto/ 与 backend/endpoint/{module}_endpoint.dart 存量处理
+## 现存 `backend/dto/` 副本与 `backend/endpoint/{module}_endpoint.dart` 路由枚举的存量处理（适用于所有按旧风格落地的模块）
 
-`refund/backendv2/dto/`（11+ 份 freezed Request/Response 副本）与 `refund/backendv2/endpoint/refund_v2_endpoint.dart`（路由枚举）是**历史缺陷副本**，与当前 `refund/common/models/` + `refund/common/enums/` 双轨并存。
+> **本节规则适用于任何已经按 `backend/dto/ + freezed` 旧风格落地的模块**，不限于 refund/backendv2/。已知典型样本：`refund/backendv2/dto/`、`reopen_order/backend/dto/`、`refund/backendv2/endpoint/refund_v2_endpoint.dart`、`reopen_order/backend/endpoint/reopen_order_endpoint.dart`。**模块名不重要，目录形态才是判定信号**：只要 `features/{x}/backend/dto/` 或 `features/{x}/backend/endpoint/{x}_endpoint.dart` 已经存在并住着旧风格 DTO / 路由枚举，就启动本节规则——新接口一律走 `common/`，让旧副本由"机会主义迁移"自然下线。
+
+`refund/backendv2/dto/`（11+ 份 freezed Request/Response 副本）、`reopen_order/backend/dto/`（v2 落地的 7 接口 freezed 副本）、`refund/backendv2/endpoint/refund_v2_endpoint.dart`（路由枚举）等都是**历史缺陷副本**，与当前 `common/models/` + `common/enums/` 新规范双轨并存。
+
+### ⚠️ 反 Anti-pattern（编辑前必须警惕）
+
+| 错误论证 | 真相 |
+|---|---|
+| ❌ "模块内现有 N 个接口都是 `backend/dto/ + freezed`，为了一致性新增的第 N+1 个也走老路径" | **错**。模块内一致性 ≠ 跟随历史缺陷继续繁殖；新接口必须按 skill 当前规范走 `common/models/`。模块内「双轨期」是必经过渡，不是对新代码的豁免理由 |
+| ❌ "目录已存在，不算 `新增 backend/dto/ 目录`，所以追加文件不违规" | **错**。「禁区·新增 `backend/dto/` 目录」的本意包括"已存在的 `backend/dto/` 下追加新 DTO 文件"；目录历史存在 ≠ 路径合规 |
+| ❌ "skill 里举的反例只有 refund/backendv2，所以我的模块（reopen_order 等）不适用本节规则" | **错**。本节是**通用规则**，举例只是表象；判定信号是 `backend/dto/` 目录形态，不是模块名 |
 
 ### 处置原则
 
 | 场景 | 动作 |
 |---|---|
-| **新增接口** | ✅ 一律走 `common/`，**禁止**往 `backendv2/dto/` 加新文件、**禁止**往 `backendv2/endpoint/refund_v2_endpoint.dart` 加新枚举值；新接口的 Endpoint 枚举值加在 `common/enums/endpoints/refund_endpoint.dart`（首次添加该文件时一并新建） |
-| **改老接口字段** | ✅ 直接改 `common/` 下的 DTO；**不要**回头改 `backendv2/dto/` 下的副本（让副本自然腐朽，下次顺手迁） |
-| **下次改老接口主流程时（同一 PR）** | ✅ 顺手把该接口的 `backendv2/dto/{action}_request.dart` + `backendv2/dto/{action}_response.dart` 删掉，service/handler import 改成 `common/models/...`，跑 build_runner —— **这是机会主义迁移**，不强制 |
+| **新增接口** | ✅ 一律走 `common/models/{request,response}/` + `common/enums/endpoints/`，**禁止**往任何已存在的 `backend/dto/` 加新文件、**禁止**往任何已存在的 `backend/endpoint/{module}_endpoint.dart` 加新枚举值；新模块的 Endpoint 枚举值加在 `common/enums/endpoints/{module}_endpoint.dart`（首次添加该文件时一并新建） |
+| **改老接口字段** | ✅ 直接改 `common/` 下的 DTO；**不要**回头改 `backend/dto/` 下的副本（让副本自然腐朽，下次顺手迁） |
+| **下次改老接口主流程时（同一 PR）** | ✅ 顺手把该接口的 `backend/dto/{action}_request.dart` + `backend/dto/{action}_response.dart` 删掉，service/handler import 改成 `common/models/...`，跑 build_runner —— **这是机会主义迁移**，不强制 |
 | **专门为迁移开 PR** | ❌ 不要 — 跨 PR 大搬家成本高且容易引战；让迁移随业务改动自然发生 |
-| **`registerRefundV2Routes` 的 path 引用** | 当 `common/enums/endpoints/refund_endpoint.dart` 落地后，可逐步把 `RefundV2Endpoint.xxx.path` 替换成 `RefundEndpoint.xxx.path`；**保留** `registerRefundV2Routes` 函数名（动 `api_intranet_handler.dart` 的挂载行风险大，等 backendv2 整体改名 PR 一并处理） |
+| **老路由枚举文件**（如 `refund/backendv2/endpoint/refund_v2_endpoint.dart` / `reopen_order/backend/endpoint/reopen_order_endpoint.dart`） | 当 `common/enums/endpoints/{module}_endpoint.dart` 落地后，可逐步把老枚举值搬过去；**保留** `register{Module}BackendRoutes` 函数名（动 `api_intranet_handler.dart` 的挂载行风险大，等 backend 整体改名 PR 一并处理） |
 
 ### 双轨期一致性问题
 
-如果 `backendv2/dto/get_refund_allocations_request.dart`（freezed 副本）和 `common/models/request/get_refund_allocations_request.dart`（JsonSerializable 真源）**字段对不上**，应：
+如果 `backend/dto/{action}_request.dart`（freezed 副本）和 `common/models/request/{action}_request.dart`（JsonSerializable 真源）**字段对不上**，应：
 
 1. 以 **common 为准**——它是 wire 真源
-2. 老的 backendv2/dto/ 副本是局部失真，等迁移时一并清掉
-3. **不要**往 backendv2/dto/ 加 `@Default` 或新字段去对齐 common —— 那等于在缺陷版本上贴胶布
+2. 老的 `backend/dto/` 副本是局部失真，等迁移时一并清掉
+3. **不要**往 `backend/dto/` 加 `@Default` 或新字段去对齐 common —— 那等于在缺陷版本上贴胶布
 
 ### 老接口的 import 现状
 
-- service 文件目前 import `../dto/request/...`（backendv2 副本）
-- 改 service 主流程时，**优先**把 import 改成 `../../common/models/request/...`（按本节"机会主义迁移"规则），同 PR 删掉 backendv2 副本
+- service 文件目前 import `../dto/request/...`（`backend/dto/` 副本）
+- 改 service 主流程时，**优先**把 import 改成 `../../common/models/request/...`（按本节"机会主义迁移"规则），同 PR 删掉旧副本
 - 如果老接口 service 在历史代码大段没人动，**保持现状**——不要为它单独发 PR
 
 ### 下线节点
 
-未来某天 `refund/backendv2/dto/` 完全空了（所有接口都迁完）→ 删空目录 + 把 `refund_v2_endpoint.dart` 删掉 / 改名 → `registerRefundV2Routes` 改名为 `registerRefundBackendRoutes`（与其它模块对齐）。这一步走独立 PR，不在本 skill 流程内。
+未来某天某模块的 `backend/dto/` 完全空了（所有接口都迁完）→ 删空目录 + 把老路由枚举文件删掉 / 改名 → `register{Module}BackendRoutes` 函数名保持稳定（与其它模块对齐）。这一步走独立 PR，不在本 skill 流程内。
 
 ---
 
@@ -2197,8 +2239,8 @@ git-commit-standards（提交）
 |---|---|
 | 新模块命名为 `backendv2/` | `backendv2` 是 refund 的一次性历史名，新模块一律用 `backend/` |
 | 在 `backend/` 下新建 `application/` 或 `data/` 或 `domain/` 目录（新代码） | 这是 v1 老结构；新代码走 `endpoint(handler) / registry / service / dao` 加 `common/` 共享契约层 |
-| **新增** `backend/dto/` 目录或在 backend 下自持 DTO 副本 | DTO 必须放 `features/{module}/common/models/{request,response}/`，UI 与 backend 共用；backend 不再自持 |
-| **新增** `backend/endpoint/{module}_endpoint.dart` 路由枚举文件 | 路由枚举搬到 `features/{module}/common/enums/endpoints/`；backend/endpoint/ 仅留 `{module}_handler.dart` 与 `intranet_handler_base.dart` |
+| **新建 `backend/dto/` 目录、或往已存在的 `backend/dto/` 追加新 DTO 文件、或在 backend 任意位置自持 DTO 副本** | DTO 必须放 `features/{module}/common/models/{request,response}/`，UI 与 backend 共用；backend 不再自持。⚠️ **目录已存在不构成豁免** ——`refund/backendv2/dto/`、`reopen_order/backend/dto/` 等遗留 `backend/dto/` 目录的存在是历史缺陷；**禁止以"模块内一致性"为由往这些目录追加新 DTO 文件**，新 DTO 必须落 `common/models/`。详见「现存 `backend/dto/` 副本…的存量处理」节 |
+| **新建 `backend/endpoint/{module}_endpoint.dart` 路由枚举文件、或往已存在的同名文件追加新枚举值（新代码）** | 路由枚举搬到 `features/{module}/common/enums/endpoints/`；backend/endpoint/ 仅留 `{module}_handler.dart` 与 `intranet_handler_base.dart`。已存在的旧枚举文件由「机会主义迁移」清理（详见存量处理节）；**新枚举值默认放 common，不得追加到旧文件**（用户明确要求保持模块内一致时按用户指示，但需在回复中显式标注违反 skill） |
 | **DTO 用 freezed**（新代码） | 与现有 `refund/common/models/` 风格分裂；统一用 `@JsonSerializable()` 单边支持 fromJson/toJson |
 | **common DTO 加 `@JsonKey(includeToJson: false, includeFromJson: false)` 标注的 internal 字段** | common 是 UI 与 backend 共享的契约层，internal 字段 IDE 仍会提示给 UI 端；必须拆到 backend 私有 record / `_` 前缀类（详见 ACL L1） |
 | **DAO 内部包 `db.transaction(...)` 做多步 SQL 编排** | 违反 DAO 原子化原则（Step 4）；事务由 service 包，DAO 一方法一 SQL |
