@@ -178,14 +178,16 @@ description: 触发时机描述   # 明确说明何时 MUST 调用
 
 ---
 
-**每次修改 Skill 后，必须同步更新 `docs/skill-flow.md`：**
+**每次修改 Skill 后,必须同步更新 `docs/skill-flow.md`:**
 
 | 变更程度 | 操作 |
 |---|---|
-| 轻微（措辞调整、新增红色警告、补充说明） | 直接更新 `skill-flow.md` 中对应行或节点文字 |
-| 较大（链路结构调整、skill 新增/删除、触发条件根本性变化） | 同时创建 `docs/skill-flow-{YYYYMMDD}-v{N}.md` 作为版本快照，并在 `skill-flow.md` 头部 blockquote 中更新"最后更新"和"历史版本"字段 |
+| 轻微(措辞调整、新增红色警告、补充说明) | 直接更新 `skill-flow.md` 中对应行或节点文字,头部 blockquote 追加变更摘要 |
+| 较大(链路结构调整、skill 新增/删除、触发条件根本性变化) | 直接更新 `skill-flow.md`,头部 blockquote 追加变更摘要(同样直接改本体);**不再**创建 `docs/skill-flow-{YYYYMMDD}-v{N}.md` 文件式快照 |
 
-**判断标准**：链路图的节点或连线发生变化 = 较大变更；只有文字描述变化 = 轻微变更。
+**判断标准**:链路图的节点或连线发生变化 = 较大变更;只有文字描述变化 = 轻微变更。**判断结果只用于决定是否同时调 dev-log 记录决策背景,不再触发文件创建。**
+
+**为什么不建快照(v21.1 规则反转)**:`skill-flow.md` 在 git 仓库内,任意历史版本可通过 `git show <sha>:docs/skill-flow.md` 还原,文件快照与 git 历史完全冗余。同样原则在 v18.2 已应用于设计文档(current.md + git log)。需要某历史版本时执行 `git log --follow docs/skill-flow.md` 找 commit。
 
 不更新 skill-flow.md 视为操作未完成。
 
@@ -207,5 +209,5 @@ description: 触发时机描述   # 明确说明何时 MUST 调用
 1. `.claude-plugin/plugin.json` 的 `version` 已按上表递增
 2. `.claude-plugin/marketplace.json` 中对应插件的 `version` 已同步递增（两处必须一致，插件系统以 marketplace.json 为基准判断是否有更新）
 3. 本文件 Skill 索引表已同步（新增/修改/删除）
-4. `docs/skill-flow.md` 已同步（链路结构变化时同时创建版本快照）
+4. `docs/skill-flow.md` 已同步（直接更新,不再建文件式快照）
 5. README.md 的「包含的 Skills」表已同步（如有新增 Skill）

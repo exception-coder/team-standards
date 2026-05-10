@@ -37,7 +37,7 @@ team-standards/
   .codex-plugin/        Codex 插件元数据
   skills/               各个 Skill 的规则、模板和辅助资料
   hooks/                可选 Hook 脚本，用于更强的写入前校验
-  docs/                 插件维护文档、skill-flow 链路图、历史快照和决策日志
+  docs/                 插件维护文档、skill-flow 链路图和决策日志（历史由 git 管理，不保留文件快照）
   AGENTS.md             Codex 入口规范，定义主动触发规则和 Skill 索引
   CLAUDE.md             Claude 入口规范，定义主动触发规则和 Skill 索引
   README.md             对外安装、使用、维护说明
@@ -51,7 +51,7 @@ team-standards/
 | `.codex-plugin/` | Codex 插件声明目录，包含 Codex 侧插件元数据 | 维护 Codex 分发时同步递增 `plugin.json` 的 `version` |
 | `skills/` | 插件核心目录，每个子目录是一个独立 Skill，至少包含 `SKILL.md` | 新增或修改 Skill 后，同步更新 `AGENTS.md`、`CLAUDE.md`、README 的 Skills 表和 `docs/skill-flow.md` |
 | `hooks/` | 强制拦截脚本目录：`check-git-commit-skill.js` 默认启用（拦截未调用 git-commit-standards skill 的 git commit / push）；`check-dto-annotation.js` 默认启用（拦截 wire DTO 用 `@freezed` 或裸 `@JsonSerializable()` 的违规）；`check-design-doc.{cmd,sh}` 默认禁用模板 | 新增 hook 时同步更新 `hooks.json`、CLAUDE.md/AGENTS.md 辅助资源表 |
-| `docs/` | 维护文档目录，记录 Skill 链路、历史版本、配置机制和决策型变更背景 | 链路结构变化时更新 `skill-flow.md` 并创建版本快照 |
+| `docs/` | 维护文档目录，记录 Skill 链路、配置机制和决策型变更背景 | 链路结构变化时直接更新 `skill-flow.md`，历史由 git log 承担，不再创建文件式快照（v21.1 起反转） |
 
 ### 关键文件
 
@@ -60,8 +60,7 @@ team-standards/
 | `AGENTS.md` | Codex 读取的插件开发规范入口，包含 Skill 主动触发表、Skill 索引、维护规则 | Skill 覆盖范围、触发条件、辅助资源或维护规则变化时 |
 | `CLAUDE.md` | Claude Code 读取的插件开发规范入口，内容与 `AGENTS.md` 保持同类同步 | 与 `AGENTS.md` 同步维护，避免两个入口规则不一致 |
 | `README.md` | 面向使用者和维护者的安装、升级、结构和能力说明 | 对外说明、安装方式、Skills 总览、发版规则变化时 |
-| `docs/skill-flow.md` | Skill 调用链路全景图，解释什么时候调哪个 Skill、顺序是什么 | Skill 新增/删除、触发顺序、维护链路或 FAQ 变化时 |
-| `docs/skill-flow-*.md` | `skill-flow.md` 的历史快照 | 链路节点或连线发生结构性变化时创建 |
+| `docs/skill-flow.md` | Skill 调用链路全景图，解释什么时候调哪个 Skill、顺序是什么 | Skill 新增/删除、触发顺序、维护链路或 FAQ 变化时直接更新；历史由 git log 承担，不再建文件快照 |
 | `docs/dev-log/YYYY-MM-DD.md` | 决策型变更日志，只记录长期背景 | 新增/删除 Skill、规则方向反转、触发链路变化、重大团队原则沉淀时 |
 | `hooks/hooks.json` | Hook 注册配置，控制是否启用写入前脚本校验 | 需要启用或调整 Hook 时 |
 | `hooks/check-git-commit-skill.js` | git commit 前按 staged diff 大小判定的拦截脚本（Node 跨平台，默认启用） | 调整阈值或拦截逻辑时（环境变量 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 也可调） |
