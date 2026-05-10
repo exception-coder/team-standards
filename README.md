@@ -18,6 +18,8 @@
 - **源码注释风格约束**（源码只描述当前正确逻辑，禁止变更历史和函数头大段复盘，复杂逻辑在对应代码块写短 WHY）
 - **跨项目拓扑定位与登记**（kpay POS 生态跨项目调用链、接口对照、业务全链路的唯一查询/写入入口）
 - **每日工作日志**（业务项目源码改动后按 bug / 功能 分类沉淀到 `docs/work-log/{YYYY-MM-DD}.md`，同主题合并、工时累计叠加）
+- **业务术语会话级强制登记**（PRD / 设计 / 对话中出现业务领域名词且术语表未登记时必须候选追加；用户与 AI 同义词错位必须主动对齐到规范术语；与 init-project-docs 的批量初始化术语表分工互补）
+- **反向影响索引强制维护**（4 类索引：状态判断点 / 字段读写点 / 同步事件订阅 / API 调用方；冷启动用 `hooks/scan-reverse-index.js` 扫描 Java/Dart/TS 枚举与 SQL 字面量产出 states 初版；增量维护规则：变更枚举/字段/事件/API 同回合必须回写）
 - **team-standards 源码仓库自动提交推送**（仅插件源码仓库规则变更完成后自动小步 commit + push，业务项目不触发）
 
 ## 仓库地址
@@ -64,6 +66,7 @@ team-standards/
 | `hooks/hooks.json` | Hook 注册配置，控制是否启用写入前脚本校验 | 需要启用或调整 Hook 时 |
 | `hooks/check-git-commit-skill.js` | git commit 前按 staged diff 大小判定的拦截脚本（Node 跨平台，默认启用） | 调整阈值或拦截逻辑时（环境变量 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 也可调） |
 | `hooks/check-dto-annotation.js` | wire DTO 注解拦截脚本（Node 跨平台，默认启用，PreToolUse Write/Edit/MultiEdit）：拦截 `lib/features/*/common/models/(request\|response)/*.dart` 下的 `@freezed` 与裸 `@JsonSerializable()`；例外文件需在头部加 `// FREEZED-EXCEPTION:` 标记 | 调整 wire DTO 注解校验规则时（环境变量 `TEAM_STANDARDS_DTO_HOOK=off` 临时禁用） |
+| `hooks/scan-reverse-index.js` | 反向索引冷启动扫描器（Node 跨平台，**手工运行，未注册到 hooks.json**）：扫描项目 Java / Dart / TS 源码，识别 enum 定义 + `EnumName.VALUE` 引用 + SQL 字面量候选，产出 `states.md`；fields / events / apis 仅生成存根需人工填充；用法 `node hooks/scan-reverse-index.js --project=. --output=./docs/knowledge-graph/reverse-index/`；`--output=user-candidates` 写入用户文档目录候选池 | 项目首次接入反向索引时一次性运行；后续由 `reverse-index-required` skill 增量维护 |
 | `hooks/check-design-doc.cmd` | Windows 设计文档检查脚本 | 调整 Windows 下的强制门禁逻辑时 |
 | `hooks/check-design-doc.sh` | macOS/Linux 设计文档检查脚本 | 调整 Unix 系统下的强制门禁逻辑时 |
 | `.claude-plugin/plugin.json` | Claude 插件基础元数据 | 每次发布前递增版本 |
@@ -164,6 +167,8 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 | `arch-lint` | Flutter 架构检查时 | 检测 5 类架构违规（presentation 层 SQL/HTTP、domain 层框架依赖、金额 double、DAO 越层调用） |
 | `cross-project-locator` | 跨项目（≥2 个 kpay POS 工程）定位 / 排查 / 登记拓扑知识时 | 路由到 `kpay-pos-topology/` 仓库：查询模式按业务域/工程名读 mapping 或 flows；登记模式拦截错误落盘位置，强制写入拓扑仓库 |
 | `daily-work-log` | 业务项目源码 Edit/Write 后 / 用户说「记一下工作日志」 / 会话结束前 | 按 🐛 Bug 修复 vs ✨ 功能开发 写入 `docs/work-log/{YYYY-MM-DD}.md`；同主题合并；一行一条明细；累计预估工时；与 `dev-log`（team-standards 内部）分工互补 |
+| `glossary-required` | PRD / 设计 / 对话中出现业务领域名词（订单 / 账单 / 退款 / 分摊 / 流水 等）且本项目术语表未登记时；用户与 AI 用了同义词不同字面（「退货」vs「退款」）；用户说「补术语 / 整理术语表 / 维护 glossary」 | 业务术语会话级强制登记：精简五栏（中文名 / 英文标识 / 一行定义 / 同义词 / 关联代码坐标）；候选池 `{USER_DOCUMENTS}/ai-docs/{project}/glossary/_candidates.md`、正式版 `docs/knowledge-graph/glossary.md`；与 `init-project-docs/templates/07_glossary.md` 分工 — init 批量初始化、本 skill 日常对话级增量；不收录通用编程概念（归 backend-knowledge-graph 技术难点）和跨项目同名异叫法（归 cross-project-locator） |
+| `reverse-index-required` | 用户问反向影响类问题（「加状态会破坏哪些旧逻辑」「字段哪里在用」「事件订阅清单」「API 谁在调」）；即将 Edit/Write 枚举 / 字段 / 事件 / API 定义；变更落地后；项目存在 `docs/knowledge-graph/reverse-index/` 或用户目录候选池；用户说「建反向索引 / 冷启动反向索引」 | 4 类反向索引强制维护：状态判断点 / 字段读写 / 同步事件订阅 / API 调用方；冷启动 `node hooks/scan-reverse-index.js` 扫描 Java/Dart/TS 枚举 + SQL 字面量产出 `states.md` 初版（不识别 case 裸值 / 反射 / 配置文件，需人工补）；增量维护规则：变更同回合必须回写反向索引；与 `backend-knowledge-graph-required` 互补（正向 vs 反向）；与 `cross-project-locator` 边界（单服务内 vs 跨项目调用方） |
 | `dev-log` | team-standards 决策型变更后 | 仅记录新增/删除 Skill、触发链路变化、规则方向反转、重大团队原则等长期背景；普通小改和版本号递增写清楚 git commit body 即可 |
 
 ## 设计文档模板
