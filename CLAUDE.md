@@ -178,16 +178,20 @@ description: 触发时机描述   # 明确说明何时 MUST 调用
 
 ---
 
-**每次修改 Skill 后,必须同步更新 `docs/skill-flow.md`:**
+**每次修改 Skill 后,必须同步更新 `docs/skill-flow.md` 本体(链路图 / Skill 总览 / FAQ):**
 
 | 变更程度 | 操作 |
 |---|---|
-| 轻微(措辞调整、新增红色警告、补充说明) | 直接更新 `skill-flow.md` 中对应行或节点文字,头部 blockquote 追加变更摘要 |
-| 较大(链路结构调整、skill 新增/删除、触发条件根本性变化) | 直接更新 `skill-flow.md`,头部 blockquote 追加变更摘要(同样直接改本体);**不再**创建 `docs/skill-flow-{YYYYMMDD}-v{N}.md` 文件式快照 |
+| 轻微(措辞调整、新增红色警告、补充说明) | 直接更新 `skill-flow.md` 中对应行或节点文字 |
+| 较大(链路结构调整、skill 新增/删除、触发条件根本性变化) | 直接更新 `skill-flow.md`(链路图节点 + Skill 总览表 + FAQ) |
 
-**判断标准**:链路图的节点或连线发生变化 = 较大变更;只有文字描述变化 = 轻微变更。**判断结果只用于决定是否同时调 dev-log 记录决策背景,不再触发文件创建。**
+**判断标准**:链路图的节点或连线发生变化 = 较大变更;只有文字描述变化 = 轻微变更。**判断结果只用于决定是否同时调 dev-log 记录长期决策背景,不触发任何文件式变更档(快照 / 头部 changelog 段都不建)。**
 
-**为什么不建快照(v21.1 规则反转)**:`skill-flow.md` 在 git 仓库内,任意历史版本可通过 `git show <sha>:docs/skill-flow.md` 还原,文件快照与 git 历史完全冗余。同样原则在 v18.2 已应用于设计文档(current.md + git log)。需要某历史版本时执行 `git log --follow docs/skill-flow.md` 找 commit。
+**为什么 skill-flow.md 不留任何文件式变更档(v21.1 / v21.2 规则反转)**:`skill-flow.md` 在 git 仓库内,任何变更摘要 + 历史版本都已由 git log + commit body + `git show` 提供:
+- v21.1 删除 `docs/skill-flow-{YYYYMMDD}-v{N}.md` 快照
+- v21.2 删除 skill-flow.md 头部 blockquote 中累加的「变更摘要 vN」段
+
+每次改动的"为什么"写到 git commit body;长期决策背景写到 `docs/dev-log/`(由 dev-log skill 控制门槛)。同一原则 v18.2 已应用于设计文档(current.md + git log)。需要查某历史版本:`git log --follow docs/skill-flow.md` 找 commit → `git show <sha>:docs/skill-flow.md`。
 
 不更新 skill-flow.md 视为操作未完成。
 
