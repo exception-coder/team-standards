@@ -35,3 +35,14 @@ jobs:
           node-version: '20'
       - name: verify AGENTS.md = transform(CLAUDE.md)
         run: node scripts/sync-agents.js --check
+
+  cross-refs-check:
+    name: Cross-skill references resolve
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: validate cross-skill / cross-section references
+        run: node scripts/check-cross-refs.js

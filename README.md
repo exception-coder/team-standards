@@ -1,5 +1,37 @@
 # team-standards
 
+> **30 秒 TL;DR**:Claude Code 插件,把"AI 协作开发"从"凭运气"变成"按流程"——24 个 skill + 3 个 hook 强制执行从需求分析 → 设计文档 → 代码定位 → 架构门禁 → 编码规范 → 提交规范 → 知识沉淀的完整链路。让 AI 改代码前先想清楚,改完后留下可追溯的痕迹。
+
+**它解决什么问题:**
+- AI 一上来就改代码,绕过设计 / 不查既有 / 不沉淀 → 强制 `design-doc-required` + `pre-implementation-code-orientation` 门禁
+- AI 在 god service 里继续追加方法 → `architecture-ddd-lite-fullstack` 的"业务分支 = 新 focused service"铁律
+- AI 在源码注释里堆变更历史 / 旧实现复盘 → `bugfix-coding-style` 禁止变更日志注释
+- 团队 AI 协作经验不沉淀 / 每个新人重复踩坑 → 知识图谱四件套(backend / reverse-index / glossary / cross-project)
+- AI 改完代码不会自己合规 commit → `hooks/check-git-commit-skill.js` 拦截大改、强制走五步流程
+
+## 快速上手(5 分钟试用)
+
+装完插件后,在 Claude Code 中开一个项目,试这个流程感受规则生效:
+
+```
+你: "帮我加一个订单退款接口"
+Claude: (触发 design-doc-required) 我需要先和你确认设计...
+        (生成 ai-docs/{project}/design/订单退款/订单退款-current.md)
+你: 确认设计
+Claude: (触发 pre-implementation-code-orientation) 我会先 Read 这些关键文件...
+        (触发 architecture-ddd-lite-fullstack) 落点判定:RefundService 新建...
+        (触发 coding-standards-common) 命名 / 函数原子 / 注释三档自检...
+        (开始写代码)
+你: 提交
+Claude: (触发 git-commit-standards 五步流程) 生成规范 commit
+```
+
+如果你看到 AI 跳过其中任何一步(比如想直接改代码而没有设计文档),说明 hook 或 skill 触发被绕过——可以提:"你跳过了 design-doc-required",AI 会立刻回到该 skill。
+
+更详细的链路图见 [docs/skill-flow.md](docs/skill-flow.md);完整 skill 索引见 [CLAUDE.md](CLAUDE.md#skill-索引)。
+
+---
+
 团队 Claude Code 开发规范插件，包含：
 
 - **跨语言通用编码规范**（命名表意 / 函数原子 80 行硬阈值 / 层次分明单向依赖 / 零魔法值强制枚举 / 注释三档 / 异常不静默 / DRY rule of 3；任何源码语言 Edit/Write 前先于具体语言 skill 触发）

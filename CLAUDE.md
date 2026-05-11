@@ -71,6 +71,79 @@
 
 ---
 
+## Skill 并发触发顺序与冲突解决
+
+> 一次源码改动可能同时命中 5-6 个 skill。本节给出**唯一的全局调用顺序**,避免 AI 自由排序时遗漏门禁、或同一 skill 反复触发。
+
+### 核心调用顺序(自上而下,先满足才能进入下一步)
+
+```text
+[第 0 步] solution-review-required       ← 用户给出具体方案/参考代码时(否则跳过)
+            ↓
+[第 1 步] glossary-required               ← PRD/对话含未登记业务术语时(否则跳过)
+            ↓
+[第 2 步] backend-knowledge-graph-required ← 后端表/SQL/状态/原子能力相关时(否则跳过)
+            ↓
+[第 3 步] reverse-index-required           ← 影响面分析 / 改枚举/字段/事件/API 时(否则跳过)
+            ↓
+[第 4 步] design-doc-required              ← 强制门禁,改代码前必经(无例外)
+            ↓
+[第 5 步] bug-doc-required                 ← 仅 bug 修复场景(在 design-doc 之前/并列写)
+            ↓
+[第 6 步] doc-index-required (Phase-A)     ← 写 .md 前查重(完成后再 Phase-B 登记)
+            ↓
+[第 7 步] pre-implementation-code-orientation ← 改代码前精准 Read 关键文件
+            ↓
+[第 8 步] architecture-ddd-lite-fullstack  ← 强制门禁,改代码前必经(无例外)
+            ↓
+[第 9 步] coding-violation-log (回顾模式)  ← 项目存在违规表时(否则跳过)
+            ↓
+[第 10 步] bugfix-coding-style              ← 仅 bug 修复 / 删冗余 / 对齐云端场景
+            ↓
+[第 11 步] coding-standards-common          ← 任何源码 Edit/Write 必经(无例外)
+            ↓
+[第 12 步] java-coding-standards 或 korepos-backend-service ← 按语言/项目叠加
+            ↓
+[第 13 步] markdown-writing-standards       ← 仅写 Mermaid / 结构性改 markdown 时
+            ↓
+[第 14 步] cross-project-locator            ← 仅 ≥2 个 kpay POS 工程命中时
+            ↓
+[第 15 步] arch-lint                        ← 仅 Flutter 代码变更后(异步触发)
+            ↓
+[第 16 步] git-commit-standards             ← commit 前(hook 兜底大改强制走)
+            ↓
+[第 17 步] daily-work-log                   ← 业务项目源码改动后(会话结束前回补)
+            ↓
+[第 18 步] reverse-index-required (回写)   ← 改完枚举/字段/事件/API 同回合
+            ↓
+[第 19 步] coding-violation-log (登记模式) ← 用户纠错时(异步)
+            ↓
+[第 20 步] dev-log + project-docs-update    ← 仅决策型变更 / 结构变更时
+```
+
+### 冲突解决规则
+
+| 冲突场景 | 解决规则 |
+|---------|---------|
+| 多个 skill 同时命中 | 按上面"核心调用顺序"逐个走,不并行 |
+| 同一 skill 在多个步骤出现(如 `reverse-index-required` / `coding-violation-log` 各有读/写两个模式) | 第一次"读"模式,第二次"写"模式;不视为重复触发 |
+| `solution-review-required` vs `design-doc-required` | 永远 solution-review 先;review 完成后 design-doc 才进入 |
+| `bug-doc-required` vs `design-doc-required` | bug 修复链路两者都必走;bug 文档负责分析根因,design 文档负责实施方案 |
+| `business-logic-orientation` vs `pre-implementation-code-orientation` | orientation 是重构前的现状梳理(产出独立文档),pre-implementation 是基于已写好的 design 文档定位代码 |
+| `architecture-ddd-lite-fullstack` vs `korepos-backend-service` | architecture 在前(通用分层),korepos 在后(项目专属约束叠加);写后端时两者都触发 |
+| `coding-standards-common` vs `java-coding-standards` | common 先(跨语言 7 条铁律),Java 后(独占条款);两者叠加不替代 |
+| `bugfix-coding-style` vs `coding-standards-common` | bugfix 关注注释 / 历史痕迹清理,common 关注命名 / 函数原子 / 注释三档;两者叠加 |
+| `git-commit-standards` 触发后又来一次小改 commit | hook 按改动大小判定:小改放行不再过 skill;大改才强制走 |
+| `daily-work-log` vs `dev-log` | daily-work-log 记业务项目改动;dev-log 仅 team-standards 自身决策;不重叠 |
+
+### 异常 / 中断
+
+- 任一**强制门禁 skill**(design-doc-required / architecture-ddd-lite-fullstack / coding-standards-common)未满足 → **中断本回合所有源码 Edit/Write**,先回到该 skill,再继续。
+- 用户明确说"跳过 X skill" → 在本会话内尊重,但不影响其它强制门禁;并提醒用户跳过的影响。
+- hook 阻断(check-git-commit-skill / check-dto-annotation) → **不绕过**,按 stderr 提示修正后重试。
+
+---
+
 ## Skill 索引
 
 | Skill 名称 | 目录 | 覆盖范围 | 关键词 |
