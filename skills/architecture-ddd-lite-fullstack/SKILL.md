@@ -244,6 +244,7 @@ RefundService
 - 功能扩展要在已有 ~500 行以上的方法/类里追加分支
 - 数据同步、事件订阅、状态机等链路要补齐字段、新事件、新副作用
 - 即将动 SKILL 已识别为"历史巨型方法 / 待重构骨架"的旧代码
+- **扩展既有 service：在已存在多个业务动作 public 方法（如 `refund` / `cancel` / `reject`）的 service 里追加新业务动作（如 `reverseCheckout`）** —— 详见下面「Service 业务动作扩展」专节
 
 **正确决策流程**（编码前必须走完）：
 
@@ -255,6 +256,73 @@ RefundService
 
 **反模式（即使旧代码本来就乱也不允许）**：在 1500 行的历史方法中再加 95 行新逻辑、跟旧风格混在一起、SQL 内联、决策门 inline、字段名靠字符串 key——只因为"旧代码已经这样了我跟着抄"。这是把新代码的目标态成本一并计入未来重构债。
 
+#### Service 业务动作扩展（强制拆子 service / UseCase，不允许往既有 service 内塞第 N 个 public 方法）
+
+> 立场:**这是被反复违反的高频违规**——AI 看到既有 `OrderService` 已经容纳了 `refund` / `cancel` / `reject` 三个业务动作,准备加 `reverseCheckout`(反结账)时,会"惯性追加"成第 4 个 public 方法,理由是"反正旧 service 才 300 行还没到巨型"。这个判断错。**service 不是"行数到 1500 才算骨架文件",而是只要它已经承载 ≥ 1 个稳定业务动作,任何新增业务动作就要走"新结构暴露 + 原 service 1 行 delegate(或调用方直接注入新 service)"的路径**,与上面通用「新代码落点决策」同向但触发阈值更低、命中更早。
+
+**强制拆分阈值**(命中任意一条,新业务动作就**必须**拆到新 service / UseCase / Handler,不允许在原 service 内追加 public 方法):
+
+| # | 阈值 | 说明 / 举例 |
+|---|------|-------------|
+| T1 | **新动作引入新状态机或新状态转换** | 原 service 的 `refund/cancel/reject` 围绕订单生命周期状态机;新动作 `reverseCheckout` 涉及账单 / 结账状态机 → 拆 |
+| T2 | **新动作引入新下游依赖** | 原 service 只依赖 `OrderDao`;新动作要调外部 `BillingClient` / 新表 `bill_reverse_log` → 拆 |
+| T3 | **新动作引入新事务边界** | 新动作需要独立事务、补偿事务或不与原方法共事务 → 拆 |
+| T4 | **前置校验 / 权限规则 / 幂等键与原 service 既有方法语义不同** | 反结账要校验"账单已结" + "今日内可反结",原 refund 是"订单已支付";不可共用一套前置 → 拆 |
+| T5 | **原 service 已有 ≥ 3 个业务动作 public 方法,准备加第 4 个** | `refund / cancel / reject` 已 3 个,再加任何一个新动作 → 拆(不论新动作复杂度) |
+| T6 | **新动作主方法预估 > 80 行** | 与 `coding-standards-common §2` 函数原子阈值一致 → 拆 |
+
+**只有同时满足以下所有条件,才允许在原 service 内追加 public 方法**(下沉为豁免清单):
+
+- 新动作与原 service 既有方法**共享同一状态机、同一下游、同一事务边界、同一前置校验**;
+- 原 service 当前业务动作 public 方法 ≤ 2 个;
+- 新动作主方法 ≤ 30 行,无独立可命名子步骤;
+- 不引入任何新的类成员变量(`@Autowired` / `final` 字段);
+- 新动作语义上是原 service 既有动作的**变种 / 参数化版本**(如 `refund` 与 `partialRefund`),不是新的业务概念。
+
+**正确形态**(以"加反结账"为例):
+
+```text
+[新建] features/billing/application/ReverseCheckoutService.java
+        - public void execute(ReverseCheckoutRequest req) { ... }   // 唯一 public,内部拆 _xxxStep 私有方法
+        - 自己注入 BillingDao / OrderDao / 状态机校验
+
+[修改] 调用方(Controller / 上游 UseCase)直接注入 ReverseCheckoutService 调用;
+        OrderService 不新增 public 方法。
+
+[或者]  若必须保留 OrderService 作为统一入口:
+        - OrderService 注入 ReverseCheckoutService;
+        - OrderService 新方法只 1 行: `reverseCheckoutService.execute(req);`
+        - 禁止把任何业务逻辑写在该 1 行方法里。
+```
+
+**反模式**(即使原 service 才 200 行也不允许):
+
+```java
+// ❌ 把 reverseCheckout 作为第 4 个业务动作 public 方法塞进 OrderService
+class OrderService {
+    public void refund(...) { ... }            // 既有
+    public void cancel(...) { ... }            // 既有
+    public void reject(...) { ... }            // 既有
+    public void reverseCheckout(...) {         // ❌ 违反 T5(已有 3 个再加 = 必拆)
+        // 80 行新业务逻辑、新下游、新状态机...
+    }
+}
+```
+
+**自检三连问**(写第一行前必须答):
+
+1. 我准备改的 service 当前有几个业务动作 public 方法?新动作是第几个?(命中 T5 直接拆)
+2. 新动作的"状态机 / 下游 / 事务边界 / 前置校验"四项中,有几项与既有方法不同?(命中任一 T1-T4 必拆)
+3. 新动作主方法预估行数?(> 80 命中 T6 必拆)
+
+任意一题答案触发阈值,本回合**禁止**在原 service 新增 public 方法,**必须**新建子 service / UseCase,原 service 若有必要只能 1 行 delegate。
+
+**与既有规则的关系**:
+
+- 通用「新代码落点决策」(上一节)的特化与下钻——上一节兜底所有"扩展旧代码"场景,本节专门盯"扩展既有 service"这个高频违规子类,**阈值更低、判定更显式**。
+- `coding-standards-common §2 函数原子`(80 行硬阈值)在方法粒度限制单一方法体积;本节在 service 粒度限制 service 业务动作数。两者**正交**:80 行内的方法也可能因 T1-T5 必须拆出去。
+- `korepos-backend-service` 的"一接口一 service"是 Flutter backend 侧的强约束;本节是它在 Java/Spring + 通用全栈侧的对应规则,触发更宽松(允许有限的方法合并),但阈值同向。
+
 ### 禁止行为
 
 | 禁止行为 | 正确处理 |
@@ -265,6 +333,7 @@ RefundService
 | 上层直接依赖 DAO / HTTP Client / 其它 feature 内部类 | 通过 Repository、Application Service 或能力端口隔离 |
 | 继续沿用低质量旧结构，只因为项目里已有类似写法 | 先评估现有代码质量；差结构只能提取业务事实，不能扩散 |
 | 在已有的巨型方法 / 旧骨架文件里就地追加新逻辑（新增 N 行内联在旧代码段里） | 新逻辑放到新 service / 新子门面 / 新原子能力暴露 public 方法，旧文件只 +1 行调用，详见「新代码落点决策」节 |
+| 在已有 ≥3 个业务动作 public 方法（如 `refund`/`cancel`/`reject`）的 service 里追加第 4 个业务动作 public 方法（如 `reverseCheckout`），即使原 service 只有 200-300 行 | 新业务动作必须建独立 `ReverseCheckoutService` / `XxxUseCase` / `XxxHandler`；调用方直接注入新 service，或原 service 只保留 1 行 delegate，禁止把任何业务逻辑写进 delegate 方法。详见「Service 业务动作扩展」节 T1-T6 阈值 |
 
 ---
 
@@ -341,7 +410,7 @@ Infrastructure Mapper / Client / MQ Adapter
 强制规则：
 
 1. Controller 只处理协议适配、参数校验入口、响应包装。
-2. Service 不能变成巨型类；一个 Service 应围绕一个清晰业务能力或流程。
+2. Service 不能变成巨型类；一个 Service 应围绕一个清晰业务能力或流程。**扩展既有 service 业务动作时**(如 `OrderService` 已有 `refund`/`cancel`/`reject`,要加 `reverseCheckout`),必须按「Service 业务动作扩展」节 T1-T6 阈值判定;命中任一必须建独立子 service / UseCase / Handler,原 service 不新增第 N 个业务动作 public 方法。
 3. 领域规则不能写在 Mapper、Controller、Feign Client 中。
 4. Feign / Mapper / Redis / MQ 调用必须隔离到 Infrastructure 或 Adapter。
 5. 事务边界放在 Application 层，Domain 不感知事务框架。
@@ -376,6 +445,7 @@ Infrastructure Mapper / Client / MQ Adapter
 - [ ] 可复用业务能力是否已沉淀为原子能力。
 - [ ] 是否复用了已有原子能力，而不是重复实现。
 - [ ] 是否避免新增巨型 Service。
+- [ ] **扩展既有 service 时,是否回答了「Service 业务动作扩展」自检三连问?命中 T1-T6 任一阈值必须拆子 service / UseCase,原 service 不允许新增第 N 个业务动作 public 方法。**
 - [ ] 代码结构是否清晰，文件/类/方法职责是否单一。
 - [ ] 新增实现是否易于维护，未来规则扩展是否有稳定落点。
 - [ ] 是否保持低耦合，避免跨层、跨 feature 直接依赖内部实现。
@@ -414,5 +484,7 @@ Infrastructure Mapper / Client / MQ Adapter
 | "多个 UseCase 复制一段计算逻辑" | 抽成原子能力并补测试 |
 | "Domain 里注入 HTTP Client / Mapper" | Domain 保持纯业务，技术依赖放 Infrastructure |
 | "一个 Service 什么都管" | 按 UseCase / 原子能力拆分，职责单一 |
+| "原 service 才 200 行,反正还没到巨型,加个 reverseCheckout 没事" | 错。Service 业务动作扩展看的不是行数,是「已有 ≥3 个业务动作 / 新动作引入新状态机/新下游/新事务边界/新前置校验 / 新方法 > 80 行」六条阈值;命中任一必拆子 service,原 service 不新增 public 方法 |
+| "新增方法只有几十行,先在原 service 加,以后再拆" | "以后再拆"几乎不会发生;一旦塞进去,下次再加第 5 个动作时阈值已被自己破坏,会继续向同一容器堆叠。第一次扩展就走子 service |
 | "先能跑，结构以后再说" | 结构质量是编码前门禁，先拆职责和依赖边界再写 |
 | "复制旧实现最快" | 先判断旧实现是否值得参考；低质量旧结构不能扩散 |
