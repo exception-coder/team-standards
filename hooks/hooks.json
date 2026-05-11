@@ -1,5 +1,5 @@
 {
-  "_comment": "默认启用 git commit/push 前的 skill 校验 hook + DTO 注解校验 hook（跨平台 Node 脚本，无需用户区分平台）。其它 hook（如 design-doc 检查）仍按 _disabled_* 模板手动启用。Windows 使用 .cmd，macOS/Linux 使用 .sh。",
+  "_comment": "默认启用三道 PreToolUse hook（跨平台 Node 脚本，无需用户区分平台）：(1) check-git-commit-skill 拦截 Bash `git commit` 中的大改未走 skill 的情况；(2) check-dto-annotation 拦截 Flutter wire DTO 用 @freezed / 裸 @JsonSerializable() 的违规；(3) check-design-doc 拦截源码 Edit/Write 但项目缺设计文档的情况（按源码扩展名识别，跳过 .md / .json / 测试 / Dockerfile 等；可用 TEAM_STANDARDS_DESIGN_DOC_HOOK=off 一次性绕过）。",
   "hooks": {
     "PreToolUse": [
       {
@@ -19,33 +19,14 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/check-dto-annotation.js\"",
             "async": false
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/check-design-doc.js\"",
+            "async": false
           }
         ]
       }
     ]
-  },
-  "_disabled_PreToolUse_windows": [
-    {
-      "matcher": "Write|Edit|MultiEdit",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "cmd /c .\\hooks\\check-design-doc.cmd",
-          "async": false
-        }
-      ]
-    }
-  ],
-  "_disabled_PreToolUse_unix": [
-    {
-      "matcher": "Write|Edit|MultiEdit",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bash ./hooks/check-design-doc.sh",
-          "async": false
-        }
-      ]
-    }
-  ]
+  }
 }
