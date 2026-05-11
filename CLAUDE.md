@@ -46,6 +46,31 @@
 
 ---
 
+## Skill 分类导航
+
+> 24 个 skill 按使用阶段分 8 组，遇到具体任务先按组检索而不是遍历全表。每个 skill 详细描述见下方「Skill 索引」。
+
+| 阶段 / 类别 | 包含 Skill | 用途速记 |
+|---|---|---|
+| **① 方案 / 需求分析（动手前最先触发）** | `solution-review-required` / `design-doc-required` / `bug-doc-required` / `business-logic-orientation` | 把"用户想做什么"和"实际怎么做"分离；产出设计文档 / bug 文档 / 现状梳理文档 |
+| **② 实施前定位（文档写完、动手前）** | `pre-implementation-code-orientation` / `doc-index-required` | 精准 Read 关键代码坐标；文档输出路径 / Phase-A 查重 |
+| **③ 架构与编码门禁（实施时）** | `architecture-ddd-lite-fullstack` / `coding-standards-common` / `java-coding-standards` / `korepos-backend-service` / `bugfix-coding-style` | 分层 + 每分支一 focused service / 命名 + 函数原子 + 注释三档 / Java 独占条款 / Flutter backend 强约束 / bug 修复注释规范 |
+| **④ 提交与日志（收尾时）** | `git-commit-standards` / `daily-work-log` | 规范 commit；业务项目源码改动后按 bug/功能分类沉淀工作日志 |
+| **⑤ 知识图谱（沉淀时）** | `backend-knowledge-graph-required` / `reverse-index-required` / `glossary-required` / `cross-project-locator` | 正向单服务图谱（表 / SQL / 状态机 / 原子能力 / 技术难点）/ 反向影响索引（枚举 / 字段 / 事件 / API）/ 业务术语登记 / 跨项目拓扑 |
+| **⑥ 质量回路（持续）** | `coding-violation-log` / `arch-lint` / `markdown-writing-standards` / `project-docs-update` | 编码违规登记防重犯 / Flutter 架构 lint / Mermaid 语法 + 目录复核 / 项目结构变更后同步文档 |
+| **⑦ 项目初始化（一次性）** | `init-project-docs` / `generate-project-profile` | 4 阶段渐进式构建知识图谱 / 生成 AI Agent 消费的 10 维度项目画像 |
+| **⑧ plugin 自身维护** | `dev-log` | 仅 team-standards 决策型变更记录长期背景 |
+
+**选 skill 决策助手**:
+
+- "我要做需求 / 改代码 / 修 bug" → ① + ② + ③ + ④（一条主链路）
+- "我要查 / 分析 / 整理已有代码" → ① 的 business-logic-orientation + ⑤ 知识图谱组
+- "我要纠正 AI 错误 / 防止再犯" → ⑥ 的 coding-violation-log
+- "我要给新项目铺规范" → ⑦
+- "我在改 team-standards plugin 本身" → ⑧ + ④
+
+---
+
 ## Skill 索引
 
 | Skill 名称 | 目录 | 覆盖范围 | 关键词 |

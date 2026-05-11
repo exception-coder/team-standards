@@ -86,8 +86,29 @@ skills/
 维护 Skill 时遵循三条原则：
 
 1. `SKILL.md` 的 frontmatter `name` 必须与目录名一致。
-2. 新增或修改 Skill 覆盖范围后，必须同步 `AGENTS.md`、`CLAUDE.md` 的 Skill 索引。
+2. 新增或修改 Skill 覆盖范围后，编辑 **`CLAUDE.md`**（canonical source），然后运行 `node scripts/sync-agents.js` 同步生成 `AGENTS.md`（不要手动编辑 AGENTS.md，CI 会校验）。
 3. 若影响触发链路或调用顺序，必须同步 `docs/skill-flow.md`；链路结构变化时创建 `docs/skill-flow-{YYYYMMDD}-v{N}.md` 快照。
+
+## 前置依赖
+
+- **Claude Code** ≥ 当前稳定版（Skill / Hook 机制基于 Claude Code 插件接口）
+- **Node.js ≥ 18**（hooks/check-git-commit-skill.js、check-dto-annotation.js、scan-reverse-index.js 用 Node 写,Claude Code 自带运行时通常即满足。若用宿主 Node,执行 `node --version` 确认）
+- **Git ≥ 2.20**（hook 内用 `git diff --staged --name-status` 等命令）
+
+## 维护者本地开发
+
+```bash
+# 拉源码后,运行 hook 单元测试(无第三方依赖,只用 Node 内置 node --test)
+cd hooks && npm test
+
+# 修改 CLAUDE.md 后必须重新同步 AGENTS.md(CI 会校验)
+node scripts/sync-agents.js
+
+# CI 校验 AGENTS.md 是否同步:
+node scripts/sync-agents.js --check
+```
+
+CI(GitHub Actions)在 push / PR 时自动跑 hook 测试(Linux/macOS/Windows × Node 18/20/22)+ AGENTS.md 同步校验。
 
 ## 安装
 
@@ -143,32 +164,49 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 
 ## 包含的 Skills
 
-| Skill | 触发时机 | 作用 |
-|-------|----------|------|
-| `solution-review-required` | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时 | 先分离真实目标与候选方案，评估现有代码是否值得参考，识别风险、缺口和替代方案，给出更优建议后再进入设计或实施 |
-| `design-doc-required` | 提出任何新需求、开始开发任务前 | 检查设计文档，缺失时引导创建；设计文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、关键规则和风险点；图表遵循最小图原则；**v1.20 起默认输出** `{USER_DOCUMENTS}/ai-docs/{project}/design/{需求名称}/{需求名称}-current.md`（不带日期，由 `doc-index-required` Phase-A/B 管控）；Git 管理下默认维护稳定/current 文档，历史写入 commit body；完整模版自动生成编码摘要 |
-| `architecture-ddd-lite-fullstack` | 开始编写或审查 Java / Python / Dart / React / Vue / Flutter 业务代码前 | 强制 DDD-lite 分层、Feature 模块化、单向依赖与原子能力沉淀（**与语言无关，三栈一致适用**：Java Spring、Python FastAPI/Django、Dart Serverpod/Shelf）；要求代码结构清晰、易维护、低耦合、高内聚，禁止 UI / Controller / Endpoint 直接承载业务逻辑；**Service 业务动作扩展铁律——每个业务分支一个 focused service，任何新方法都不进 god service**：不允许往多分支 god service 追加任何 public 业务方法，新业务分支新建 focused service，同分支变种进该分支 focused service（散落在 god service 则一并迁出），god service 最多保留 1 行 delegate 入口；**跨分支编排**走独立 `XxxOrchestrator` / `XxxSaga`，不进任一 focused service；**横切关注点**（日志/审计/权限/事务/metrics）走 AOP/拦截器统一注入，不在 focused service 内重复实现；**服务命名 taxonomy**（`Service` / `UseCase` / `CommandHandler` 项目级选一种贯彻，禁止 `XxxApplicationService` / `XxxManager`）；**聚合边界**（一个事务只改一个聚合根，跨聚合走 Domain Event / Saga，5 问判定独立聚合 vs 聚合内动作） |
-| `backend-knowledge-graph-required` | 后端接口/服务开发前涉及表读写、SQL、状态判定、订单/退款/支付等业务逻辑；会话中提到业务、表、字段来源、查询逻辑或 SQL；存在 `docs/knowledge-graph/backend/`；要求生成/更新后端知识图谱、全景 ER、SQL 归档；**或同一会话同一技术主题用户反复疑问 ≥3 轮 / 修复后 ≥2 轮验证追问 / 出现回归性措辞**（含子进程编排、并发、性能、资源争夺等非业务技术陷阱） | 双重职责：(1) 后端业务图谱——按项目沉淀领域能力、原子能力、业务流程、全景 ER、表逻辑、SQL 查询指纹、表关系、枚举、状态判定、API 与代码坐标；(2) **项目级技术难点图谱**（v1.21+）——子进程编排、并发模型、性能瓶颈、资源争夺、外部依赖、JVM 进程生命周期、缓存键策略等；长对话同主题反复疑问自动触发候选记录，无需用户显式提醒；编码前回顾各类索引，编码后同步图谱或候选池 |
-| `bug-doc-required` | 报告 Bug、描述异常、请求分析问题根因时 | 强制规范章节结构；调用链用 Mermaid；根因用表格；**v1.20 起默认输出** `{USER_DOCUMENTS}/ai-docs/{project}/bug/{模块名}/{bug名称}/{bug名称}.md`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；用户目录知识库与项目 `docs/bug/` 索引体系等同，必须执行 Phase-A/B；模块名必须与同根下 `design/{模块名}/` 完全一致，无对应模块时退化为一级扁平 |
-| `pre-implementation-code-orientation` | 文档确认后、开始写代码前 | 从文档坐标表精准 Read 关键文件，禁止重新扫描 |
-| `coding-standards-common` | 编写/修改任何源码语言（Java / TS / JS / Dart / Python / Kotlin / Go 等）前 | 跨语言通用编码铁律 7 条 + 注释三档：命名表意 / 函数原子（80 行硬阈值）/ 层次分明 / 零魔法值（强制枚举 DB 字段值与协议码）/ 注释三档（类 1-3 行 + 方法 1-2 行 + 核心块 1 行）+ **§5.0 注释语言 = 当前会话沟通语言（沟通语言一票否决）**（中文沟通写中文注释、英文沟通写英文；**无存量文件豁免**——不沿袭原文件语言、短期内单文件中英混杂可接受待后续重构统一；唯一覆盖默认的合法路径是用户在本会话明确要求特定语言）/ 异常不静默 / DRY rule of 3 |
-| `java-coding-standards` | 编写/审查任何 Java 代码时 | 阿里黄山版 Java 独占条款（Javadoc 语法、Integer 比较、SimpleDateFormat、SLF4J、HashMap 容量等），通用 7 条见 coding-standards-common |
-| `git-commit-standards` | 执行 git commit 前 | 分析 staged 变更，生成标准化中文提交信息 |
-| `doc-index-required` | 编写/创建任何 Markdown 文档，或编辑 `ai-docs/{project}/` / `docs/` 下文档时 | AI 生成 Markdown 默认写入用户 Documents 下的 `ai-docs/{project}/{type}/{topic}/{filename}`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；**v1.20 起用户目录知识库与项目 `docs/` 索引体系等同**：写文档前必须 Phase-A 读 INDEX 查重，写完必须 Phase-B 登记；`work-log/` 和 `knowledge-graph/` 走自管模式 |
-| `markdown-writing-standards` | 生成或修改含 Mermaid 图表的 Markdown 时 | Mermaid 语法规范、表格规范、代码块规范 |
-| `business-logic-orientation` | 重构/复写/迁移前需要理解现有业务逻辑时 | 按场景维度产出流程图、知识图谱、核心代码索引 |
-| `init-project-docs` | 初始化项目文档 / 生成知识图谱时 | 渐进式构建 11 份知识图谱文档 + 模块深度文档 + 技能卡（4 阶段，支持自动/确认模式） |
-| `generate-project-profile` | 要求生成项目画像时 | 生成 AI Agent 消费的 10 维度结构化 Markdown（project-profile.md） |
-| `coding-violation-log` | 用户纠正 AI 编码错误时 | 自动登记违规到 `docs/coding-violations.md`，编码前回顾防重犯 |
-| `bugfix-coding-style` | bug 修复 / 对齐云端 / 删冗余 / 任何源码改动时 | 禁止把变更历史、旧实现复盘、未来版本计划写进源码；函数/类注释只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块附近写 1-2 行 WHY 注释 |
-| `korepos-backend-service` | korepos / korepos-refund 后端接口开发时 | 约束 backend 目录结构、BackendInfra 边界、一接口一 service、Service 禁裸 SQL、跨 feature 业务原子能力、编辑前违规自检、长方法拆 step、DB 字段值枚举绑定、wire DTO 注解强制（@JsonSerializable + explicitToJson）、**DTO 字段类型强制**（禁 `Object?` / `dynamic` / `Map<String, dynamic>` 容忍多形态）等后端服务规则 |
-| `project-docs-update` | 项目代码结构变更后 | 检测代码与 docs/ 文档的差异，自动或确认式更新知识图谱 |
-| `arch-lint` | Flutter 架构检查时 | 检测 5 类架构违规（presentation 层 SQL/HTTP、domain 层框架依赖、金额 double、DAO 越层调用） |
-| `cross-project-locator` | 跨项目（≥2 个 kpay POS 工程）定位 / 排查 / 登记拓扑知识时 | 路由到 `kpay-pos-topology/` 仓库：查询模式按业务域/工程名读 mapping 或 flows；登记模式拦截错误落盘位置，强制写入拓扑仓库 |
-| `daily-work-log` | 业务项目源码 Edit/Write 后 / 用户说「记一下工作日志」 / 会话结束前 | 按 🐛 Bug 修复 vs ✨ 功能开发 写入 `docs/work-log/{YYYY-MM-DD}.md`；同主题合并；一行一条明细；累计预估工时；与 `dev-log`（team-standards 内部）分工互补 |
-| `glossary-required` | PRD / 设计 / 对话中出现业务领域名词（订单 / 账单 / 退款 / 分摊 / 流水 等）且本项目术语表未登记时；用户与 AI 用了同义词不同字面（「退货」vs「退款」）；用户说「补术语 / 整理术语表 / 维护 glossary」 | 业务术语会话级强制登记：精简五栏（中文名 / 英文标识 / 一行定义 / 同义词 / 关联代码坐标）；候选池 `{USER_DOCUMENTS}/ai-docs/{project}/glossary/_candidates.md`、正式版 `docs/knowledge-graph/glossary.md`；与 `init-project-docs/templates/07_glossary.md` 分工 — init 批量初始化、本 skill 日常对话级增量；不收录通用编程概念（归 backend-knowledge-graph 技术难点）和跨项目同名异叫法（归 cross-project-locator） |
-| `reverse-index-required` | 用户问反向影响类问题（「加状态会破坏哪些旧逻辑」「字段哪里在用」「事件订阅清单」「API 谁在调」）；即将 Edit/Write 枚举 / 字段 / 事件 / API 定义；变更落地后；项目存在 `docs/knowledge-graph/reverse-index/` 或用户目录候选池；用户说「建反向索引 / 冷启动反向索引」 | 4 类反向索引强制维护：状态判断点 / 字段读写 / 同步事件订阅 / API 调用方；冷启动 `node hooks/scan-reverse-index.js` 扫描 Java/Dart/TS 枚举 + SQL 字面量产出 `states.md` 初版（不识别 case 裸值 / 反射 / 配置文件，需人工补）；增量维护规则：变更同回合必须回写反向索引；与 `backend-knowledge-graph-required` 互补（正向 vs 反向）；与 `cross-project-locator` 边界（单服务内 vs 跨项目调用方） |
-| `dev-log` | team-standards 决策型变更后 | 仅记录新增/删除 Skill、触发链路变化、规则方向反转、重大团队原则等长期背景；普通小改和版本号递增写清楚 git commit body 即可 |
+> **完整 skill 索引（含触发时机、覆盖范围、关键词）见 [CLAUDE.md](CLAUDE.md#skill-索引)；调用链路图见 [docs/skill-flow.md](docs/skill-flow.md)。** 本节只列名称 + 一句话用途，避免与 CLAUDE.md 重复维护。
+
+按使用阶段分 8 组：
+
+### ① 方案 / 需求分析（动手前）
+- `solution-review-required` — 分离用户的真实目标与候选方案，识别风险与更优建议，反迎合
+- `design-doc-required` — 写代码前强制设计文档（极简跳过 / 轻量 / 完整 三档模版分级）
+- `bug-doc-required` — bug 分析文档规范（章节 + Mermaid + 根因表）
+- `business-logic-orientation` — 重构 / 迁移前梳理现状（流程图 + 知识图谱 + AI 索引）
+
+### ② 实施前定位
+- `pre-implementation-code-orientation` — 从文档坐标表精准 Read 关键文件，禁重新扫描
+- `doc-index-required` — Phase-A 写前查重 + Phase-B 写完登记（用户目录 / 项目 docs 等同）
+
+### ③ 架构与编码（实施时）
+- `architecture-ddd-lite-fullstack` — DDD-lite 分层 + Feature 模块 + 每分支一 focused service + 跨分支编排 + 横切关注点豁免 + 命名 taxonomy + 聚合边界（**Java / Python / Dart 三栈一致适用**）
+- `coding-standards-common` — 跨语言通用 7 条铁律 + 注释三档（沟通语言一票否决）
+- `java-coding-standards` — Java 独占条款（Javadoc / Integer 比较 / SLF4J / HashMap 容量等）
+- `korepos-backend-service` — Flutter backend 强约束（一接口一 service / wire DTO 注解 / 字段类型禁 dynamic）
+- `bugfix-coding-style` — 源码只描述当前逻辑，禁变更日志注释 / 函数头复盘
+
+### ④ 提交与日志
+- `git-commit-standards` — 规范 commit（type 前缀 + 中文 body + diff 分析，hook 按改动大小放行）
+- `daily-work-log` — 业务项目源码改动后按 Bug / 功能分类沉淀工作日志
+
+### ⑤ 知识图谱（沉淀）
+- `backend-knowledge-graph-required` — 后端单服务业务图谱 + 项目级技术难点图谱
+- `reverse-index-required` — 反向影响索引 4 类（状态 / 字段 / 事件 / API）
+- `glossary-required` — 业务术语会话级登记 + 同义词归一
+- `cross-project-locator` — 跨项目（≥2 个工程）拓扑定位与登记
+
+### ⑥ 质量回路
+- `coding-violation-log` — 编码违规登记 + 编码前回顾防重犯
+- `arch-lint` — Flutter 架构违规检测（5 类）
+- `markdown-writing-standards` — Mermaid 语法 + 表格 + 目录复核
+- `project-docs-update` — 项目结构变更后同步知识图谱文档
+
+### ⑦ 项目初始化（一次性）
+- `init-project-docs` — 4 阶段渐进式构建知识图谱
+- `generate-project-profile` — 生成 AI Agent 消费的 10 维度项目画像
+
+### ⑧ plugin 自身维护
+- `dev-log` — team-standards 决策型变更记录长期背景
 
 ## 设计文档模板
 

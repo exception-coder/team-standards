@@ -1,6 +1,6 @@
 ---
 name: glossary-required
-description: "Use BEFORE answering any question that uses a domain business term (订单/账单/退款/分摊/流水/快照/对账 etc.) AND BEFORE Write/Edit any .md (设计文档 / bug 文档 / 场景文档 / orientation 文档) that introduces or relies on a business term. MUST invoke (BLOCKING) when: (1) PRD / 需求 / 设计描述里出现 ≥1 个业务领域名词且本项目术语表未登记;(2) 同一会话里用户与 AI 对同一名词使用了不同字面表达(例如用户说「退货」AI 答「退款」),需对齐到同一规范术语;(3) AI 完成代码调查发现 ≥1 个新业务术语对应的代码命名(实体类 / 表名 / 枚举 / 字段)未登记;(4) 用户主动要求「补术语」「整理术语表」「维护 glossary」「建术语表」;(5) 即将 Write/Edit 描述业务场景 / 业务流程 / 业务规则的 .md 且其中包含未登记的领域名词。范围:仅管业务领域术语 ↔ 代码命名 ↔ 同义词 三方映射,不管通用编程/技术概念(线程 / 事务 / 缓存 / 子进程等技术词汇归 backend-knowledge-graph-required 的「技术难点」)。与 init-project-docs/templates/07_glossary.md 分工:本 skill 负责会话级日常补登的精简表(轻量五栏),init-project-docs 的 07_glossary.md 负责项目初始化批量生成。"
+description: "Use BEFORE answering questions using domain business terms (订单/账单/退款/分摊/流水/快照/对账 等) AND BEFORE Write/Edit any .md that introduces/relies on business terms. 5 BLOCKING triggers (PRD 含未登记词 / 用户与 AI 同义词错位 / 调查发现新术语 / 用户要求整理 / 场景文档含未登记词) — full list in SKILL.md body. Scope: 业务领域术语 ↔ 代码命名 ↔ 同义词 三方映射;通用技术词汇归 `backend-knowledge-graph-required` 的「技术难点」。与 `init-project-docs/templates/07_glossary.md` 互补——本 skill 会话级日常补登轻量五栏,init 负责项目初始化批量。"
 ---
 
 # 业务术语强制登记

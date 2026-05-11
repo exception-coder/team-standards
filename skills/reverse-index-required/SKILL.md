@@ -1,6 +1,6 @@
 ---
 name: reverse-index-required
-description: "Use BEFORE answering any impact-analysis question (新增 / 修改状态 / 字段 / 同步事件 / API 会破坏哪些旧逻辑) AND BEFORE Write/Edit any source file that adds / modifies / removes a state enum / business field / sync event payload / API endpoint. MUST invoke (BLOCKING) when: (1) 用户问『加这个状态会破坏哪些旧逻辑』『这个字段哪里在用』『这个事件订阅清单』『这个 API 谁在调』等反向影响类问题;(2) AI 即将 Edit/Write 任何枚举定义文件 / 状态机定义文件 / DTO/Entity 字段定义 / 同步事件 payload 定义 / API endpoint 定义类源码;(3) AI 完成代码改动且改动涉及 ≥1 个枚举值 / 字段 / 事件 / API 的新增 / 修改 / 删除,必须同步更新对应反向索引;(4) 项目存在 docs/knowledge-graph/reverse-index/(正式索引)或用户目录候选池 ai-docs/{project}/knowledge-graph/reverse-index/_candidates.md;(5) 用户要求『建反向索引』『扫反向影响』『生成 reverse index』『冷启动反向索引』。范围:覆盖单服务内 4 类反向索引 — states.md(枚举/状态值 → 判断点)、fields.md(字段 → 读写点)、events.md(同步事件 → 订阅场景)、apis.md(API → 调用方);跨项目 API 调用方索引仍归 cross-project-locator。冷启动方式:运行 `node ${CLAUDE_PLUGIN_ROOT}/hooks/scan-reverse-index.js` 一次性扫描产出初版,后续由本 skill 增量维护。"
+description: "Use BEFORE answering impact-analysis questions (加这个状态会破坏哪些旧逻辑 / 字段哪里在用 / 事件订阅清单 / API 谁在调) AND BEFORE Write/Edit枚举/状态机/字段/事件 payload/API endpoint 定义类源码。维护 4 类反向索引（states / fields / events / apis）。冷启动用 `hooks/scan-reverse-index.js` 一次性扫描，后续增量。详细 5 类 BLOCKING 触发条件与边界（与 backend-knowledge-graph-required 正向图谱 / cross-project-locator 跨项目调用方互补）见 SKILL.md body 的「触发时机」节。"
 ---
 
 # 反向影响索引强制维护
