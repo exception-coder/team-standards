@@ -19,8 +19,10 @@ description: "Use before writing or reviewing any business code in Java Spring B
 
 - **触发与门禁** → [触发时机](#触发时机) / [编码前检查清单](#编码前检查清单) / [输出要求](#输出要求)
 - **架构分层** → [标准分层模型](#标准分层模型) / [各层职责](#各层职责)
-- **项目组织** → [Feature 模块化结构](#feature-模块化结构) / [原子能力沉淀](#原子能力沉淀) / [结构质量门禁](#结构质量门禁)
+- **项目组织** → [Feature 模块化结构](#feature-模块化结构) / [原子能力沉淀](#原子能力沉淀) / [聚合边界与事务一致性](#聚合边界与事务一致性) / [结构质量门禁](#结构质量门禁)
+- **Service 形态铁律** → [Service 业务动作扩展铁律](#service-业务动作扩展铁律每个业务分支一个-focused-service任何新方法都不进-god-service) / [跨分支编排](#跨分支编排同一回合调用-2-个-focused-service-时的归属) / [横切关注点不计入 god service 判定](#横切关注点不计入-god-service-判定aop--拦截器--事务声明的豁免)
 - **技术栈约束** → [前端约束](#前端约束) / [Flutter 约束](#flutter-约束) / [Java 后端约束](#java-后端约束)
+- **命名规范** → [服务命名 taxonomy](#服务命名-taxonomyservice--usecase--handler--orchestrator)
 
 ---
 
@@ -189,6 +191,55 @@ RefundService
 ```
 
 禁止在多个 UseCase 中重复写同一份退款、支付、库存、订单状态流转逻辑。
+
+---
+
+## 聚合边界与事务一致性
+
+> 立场:focused service 拆分回答的是"**业务分支**怎么分",聚合边界回答的是"**数据一致性边界**怎么分"——这是两个正交但配套的决策。一个 focused service 的方法体内修改了哪些数据、能不能在同事务里完成、跨聚合需要不需要发 Domain Event,**取决于这些数据落在哪几个聚合里**。本节给出实用判定规则,不展开 DDD 教科书全套。
+
+### 核心规则(3 条)
+
+1. **一个事务只修改一个聚合根** —— `@Transactional` 标注的方法,只允许修改一个聚合的状态(及其内部 Entity / VO)。跨聚合的"同时修改"必须改为:**事务内只改一个聚合 + 发 Domain Event + 异步另一聚合订阅消费**。
+2. **跨聚合调用走 Domain Event 或 Saga**,不走同事务直接修改。两个聚合之间不互相持有强引用,只持有 ID。
+3. **聚合内部 → 强一致** / **聚合之间 → 最终一致**。Saga 模式负责跨聚合编排 + 失败补偿,见上面「跨分支编排」节。
+
+### 判定:Refund 是 Order 聚合内动作还是独立 Refund 聚合?(实用 5 问)
+
+| # | 判定问 | 答 Yes → Refund 是**独立聚合** | 答 No → Refund 是**Order 聚合内动作** |
+|---|--------|--------------------------------|---------------------------------------|
+| A1 | Refund 有独立生命周期吗?(待退 → 已退 → 已撤销,与 Order 状态机不重合) | ✓ 独立聚合 | 跟 Order 状态机绑死 |
+| A2 | Refund 需要独立查询吗?(列表页 / 详情页能脱离 Order 单独打开) | ✓ 独立聚合 | 只通过 Order 详情页展开 |
+| A3 | Refund 需要独立审计 / 版本号 / 乐观锁吗? | ✓ 独立聚合 | 跟 Order 共审计 |
+| A4 | Refund 会被其它业务流程独立引用吗?(对账 / 财务 / 风控独立拉取) | ✓ 独立聚合 | 只在 Order 流程内使用 |
+| A5 | Refund 改动量和频次 ≥ Order 主表?或独立扩展字段持续增加? | ✓ 独立聚合 | 共表或单字段足够 |
+
+**判定输出**:
+
+- ≥3 个 Yes → **独立聚合**:建 `RefundRepository`、`refund_order` 表、`Refund` 实体;`RefundService` 操作 Refund 聚合,与 `OrderService` 通过 `OrderRefundedEvent` / Saga 协同。
+- ≤2 个 Yes → **Order 聚合内动作**:Refund 是 Order 的状态变迁,`RefundService` 仍然是 focused branch service,但内部直接通过 `OrderRepository` 修改 Order 聚合,事务内完成。
+- 模糊 → 默认按"独立聚合"处理,因为反向重构(独立 → 内置)比正向(内置 → 独立)简单。
+
+### 聚合边界 → focused service 的影响
+
+| 场景 | focused service 的形态 |
+|------|------------------------|
+| Order 聚合内动作(refund / cancel / reject 都修改 Order 状态) | focused service 直接通过 `OrderRepository` 修改 Order;同事务;不发 Domain Event(除非外部需要监听) |
+| Refund 是独立聚合 | `RefundService` 通过 `RefundRepository` 操作 Refund 聚合;不直接修改 Order;Order 状态变化通过订阅 `RefundCompletedEvent` 异步更新 |
+| 跨 ≥2 聚合的复合动作(approveAndRefund 改 Order + Refund + Inventory) | 走 `Saga` / `Orchestrator`:事务内只改一个聚合,其余通过 Event / 补偿动作 |
+
+### 反模式
+
+- ❌ **一个 `@Transactional` 方法同时修改 ≥2 个聚合根**(`Order` + `Refund` + `Inventory` 同事务硬改) → 走 Domain Event 或 Saga
+- ❌ **跨聚合持有强引用 / 同事务 join 修改** → 只持有 ID,通过 Repository 查
+- ❌ **业务流程紧耦合聚合**:订单创建必须等库存扣减完成才返回(同事务) → 库存预占(同事务)+ 库存扣减(异步 / Saga)
+- ❌ **没想清楚聚合边界就拆 focused service** → 先按上面 5 问判定聚合,再决定 focused service 的数据访问路径
+
+### 与既有规则的关系
+
+- 「Service 业务动作扩展铁律」回答"业务分支怎么拆 service";本节回答"数据一致性怎么拆事务"。两者**正交且必须同时满足**——focused service 不会自动给出聚合边界,聚合边界也不会自动决定 focused service 数量。
+- 「跨分支编排」节的 `Orchestrator` / `Saga` 命名,在本节的"跨聚合协同"语境下复用同一套类——一个 `Saga` 既可能是跨分支编排,也可能是跨聚合最终一致性载体,两者本质同源(都是"协调多个不能放同事务的动作")。
+- `backend-knowledge-graph-required` 的全景 ER / 表关系图是聚合判定的输入证据;判定结果反过来更新该图谱(标注哪些表属于同一聚合)。
 
 ---
 
@@ -372,6 +423,133 @@ class OrderService {
 - `coding-standards-common §2 函数原子`(80 行硬阈值)在方法粒度限制单一方法体积;本节在 service 粒度限制每个 service 只服务一个业务分支。两者**正交**。
 - `korepos-backend-service` 的"一接口一 service"是 Flutter backend 侧的强约束;本节是它在 Java/Spring + 通用全栈侧的对应规则,本质同向:**业务分支隔离 + god service 只做 delegate 入口**。
 
+#### 跨分支编排(同一回合调用 ≥2 个 focused service 时的归属)
+
+> 一旦"focused service per branch"落实,新的问题就来了:用户点一个按钮"批准并退款",对应 cancel + refund 两个分支需要在同一事务 / 同一回合内顺序执行——这段编排代码**不能**写在 `RefundService` 里(它就该只管退款分支),也**不能**写在 `CancelService` 里,更**不能**留在 Controller / UI 里。它有自己的归属。
+
+**核心原则**:**跨分支编排逻辑(顺序、事务、补偿、回滚)走独立的上层 Orchestrator / UseCase / Saga**,不进任何一个 focused service 内部。
+
+**判定 — 何时必须建独立 orchestrator**:
+
+满足以下**任一**条件,跨分支调用必须收敛到独立 orchestrator,而不是让上游(Controller / 上层 UseCase / 另一个 focused service)直接连续调用 ≥2 个 focused service:
+
+| # | 条件 | 举例 |
+|---|------|------|
+| O1 | 调用 ≥2 个 focused service 且需要**原子事务边界** | `approveAndRefund`:cancel + refund 必须同事务,任一失败全部回滚 |
+| O2 | 调用 ≥2 个 focused service 且有**顺序依赖**或**条件分支** | "先校验是否可退,再决定走全额退还是部分退" |
+| O3 | 调用 ≥2 个 focused service 且需要**失败补偿**(Saga 模式) | "退款成功但通知失败 → 不回滚退款,补一条异步重试" |
+| O4 | 业务概念本身就是**一个独立可命名的复合动作** | "审核通过 + 通知卖家 + 释放库存"在 UI 上是一个按钮、一个流程节点 |
+
+**正确形态**:
+
+```text
+[新建] features/order/application/ApproveAndRefundOrchestrator.java
+        - public void execute(ApproveAndRefundRequest req) {
+              cancelService.cancel(...);       // 调用 CancelService 的 focused 能力
+              refundService.refund(...);       // 调用 RefundService 的 focused 能力
+              // orchestrator 只编排:顺序 / 事务声明 / 失败补偿 / 编排日志
+              // 不写任何 cancel 或 refund 的业务逻辑(那些归 focused service)
+          }
+
+[调用方] Controller / 上层 UseCase 注入 ApproveAndRefundOrchestrator 调用,
+        不再直接连续调用 CancelService + RefundService。
+```
+
+**Orchestrator 内部职责清单**(只允许这些):
+
+- 调用顺序编排
+- 事务边界声明(`@Transactional` / 显式事务管理)
+- 失败补偿 / 回滚 / Saga 补偿动作触发
+- 跨分支幂等键的协调
+- 编排级别的流程日志(不是分支内部日志,那归 focused service)
+
+**Orchestrator 内部禁止**:
+
+- **业务规则**(状态判断 / 金额计算 / 校验逻辑)——这些归对应 focused service 或 Domain
+- **数据访问**(SQL / DAO / Repository 直接调用)——必须经过 focused service
+- **协议适配**(HTTP / DTO 转换)——归 Controller
+- **业务方法 ≥ 2 个 public**——一个 orchestrator 一个复合动作;多个复合动作建多个 orchestrator(与"每分支一 service"原则同向)
+
+**反模式**:
+
+```java
+// ❌ 反例 1:Controller 直接连续调用 ≥2 个 focused service,编排逻辑漏到 Controller
+class OrderController {
+    public void approveAndRefund(Request req) {
+        cancelService.cancel(req);    // ❌ 编排在 Controller
+        refundService.refund(req);    // ❌ 事务边界不清
+    }
+}
+
+// ❌ 反例 2:把编排塞进其中一个 focused service
+class RefundService {
+    public void refundWithApprove(Request req) {
+        cancelService.cancel(req);    // ❌ RefundService 不该知道 cancel 分支
+        // refund 逻辑...
+    }
+}
+
+// ✅ 正确:独立 orchestrator
+class ApproveAndRefundOrchestrator {
+    @Transactional
+    public void execute(ApproveAndRefundRequest req) {
+        cancelService.cancel(req);
+        refundService.refund(req);
+    }
+}
+```
+
+**自检**:写第一行前问——本次新代码是否要在同一回合调用 ≥2 个 focused service?是 → 必须落到独立 orchestrator,不进任何 focused service 内部。
+
+#### 横切关注点不计入 god service 判定(AOP / 拦截器 / 事务声明的豁免)
+
+> 容易混淆的边界:日志、审计、权限、事务声明、metrics、缓存、限流、链路追踪——这些**横切关注点**如果按"每个 focused service 各自实现一遍"就重复污染;但它们的**集中实现类**(`AuditAspect` / `LoggingInterceptor` / `SecurityFilter`)看起来像 god class(一个类切到所有 service)。**这种集中实现不算 god service,不受本节约束**,因为它们处理的不是业务分支,是横切机制。
+
+**横切关注点的归属**:
+
+| 横切类别 | 标准归属 / 实现机制 |
+|---------|---------------------|
+| 日志 / 审计 | Spring AOP `@Aspect` / Servlet Filter / 框架 Interceptor / NestJS Middleware |
+| 权限 / 鉴权 | Spring Security / 自定义 `@PreAuthorize` 注解 + AOP / Filter |
+| 事务声明 | `@Transactional`(Spring)/ 编程式事务 in orchestrator |
+| Metrics / 链路追踪 | Micrometer / OpenTelemetry / AOP 拦截器 |
+| 缓存 | `@Cacheable` + AOP / 装饰器模式 / Redis 中间件 |
+| 限流 / 熔断 | Resilience4j / Sentinel / 网关层 |
+| 入参校验 | `@Valid` + Bean Validation / Schema 校验中间件 |
+
+**强制规则**:
+
+- **focused service 内部不重复实现横切**——不在每个 service 方法里手写 `log.info(...)` + `auditService.record(...)` + `permissionCheck(...)`;这些走 AOP / 拦截器统一注入。
+- **横切实现类不计入业务 service**——`AuditAspect` 切到 100 个 service 也不是 god service;它是**横切机制**,不是**业务容器**。判定 god service 的标准是"承载多个业务分支的业务方法",不是"被很多人调用"。
+- **事务边界归 orchestrator / Application 层**,不归 Domain / focused service 内部;focused service 的方法应该可以脱离事务运行(便于单测)。
+- **横切关注点不算"新下游依赖"**——focused service 上加 `@Transactional` / `@Cacheable` / `@PreAuthorize` 不触发"引入新下游 → 拆分支"的判定,因为它们是机制不是业务依赖。
+
+**反模式**:
+
+```java
+// ❌ 在每个 focused service 方法内手写横切
+class RefundService {
+    public void refund(...) {
+        log.info("refund start, req={}", req);      // ❌ 横切,走 AOP
+        permissionCheck(req.getUserId(), "REFUND");  // ❌ 横切,走 @PreAuthorize
+        auditService.record("refund", req);          // ❌ 横切,走 @Audited + AOP
+        // ... 实际业务逻辑
+        auditService.record("refund_done", req);     // ❌ 同上
+        log.info("refund done");                     // ❌ 同上
+    }
+}
+
+// ✅ 横切由 AOP / 注解统一注入,focused service 只写业务
+@Audited
+@PreAuthorize("hasPermission('REFUND')")
+class RefundService {
+    @Transactional
+    public void refund(...) {
+        // 只写退款业务逻辑
+    }
+}
+```
+
 ### 禁止行为
 
 | 禁止行为 | 正确处理 |
@@ -468,17 +646,46 @@ Infrastructure Mapper / Client / MQ Adapter
 
 ## 命名规范
 
-| 类型 | 命名示例 |
-|------|----------|
-| UseCase | `ConfirmRefundUseCase` |
-| Application Service | `RefundApplicationService` |
-| Domain Service / 原子能力 | `RefundService` |
-| Repository 接口 | `OrderRepository` |
-| Repository 实现 | `OrderRepositoryImpl` |
-| Controller | `RefundController` |
-| React Hook | `useRefund` |
-| Vue Composable | `useRefund` |
-| Flutter ViewModel | `RefundViewModel` |
+### 服务命名 taxonomy(Service / UseCase / Handler / Orchestrator)
+
+> 立场:Application 层的"业务容器类"在不同流派下有不同叫法——CQRS 流派叫 `XxxCommandHandler` / `XxxHandler`、Clean Architecture 流派叫 `XxxUseCase` / `XxxInteractor`、传统 Spring 流派叫 `XxxService`。**三种叫法语义等价**(都是 focused 业务分支容器),但**同一项目内必须选定一种贯彻**,不能 `RefundService` / `CancelUseCase` / `ReverseCheckoutHandler` 三种混用。本节给出选型矩阵 + 强制映射,把"叫法之争"封死。
+
+**1. 选型矩阵(项目级选定一种,后续所有 focused service 沿用)**:
+
+| 项目主流派 | 选用命名 | 理由 |
+|-----------|---------|------|
+| 传统 Spring Boot / 主流 Java 后端 | **`XxxService`** | 与团队既有命名一致,降低 onboarding 成本 |
+| CQRS / 命令-查询分离 / EventSourcing | **`XxxCommandHandler`**(写)/ **`XxxQueryHandler`**(读) | CQRS 教科书命名,与 MediatR / Axon 生态一致 |
+| Clean Architecture / Hexagonal / 强调用例 | **`XxxUseCase`** / **`XxxInteractor`** | Robert Martin 命名,与 Use Case Driven Design 一致 |
+| Flutter backend / 跨端项目 | **`XxxService`**(与 `korepos-backend-service` 对齐) | 已有 skill 强约束 |
+
+**2. 跨分支编排类(orchestrator)统一叫法**(与上面 focused service 命名解耦):
+
+| 编排类型 | 统一命名 | 用途 |
+|---------|---------|------|
+| 跨分支同步编排 | **`XxxOrchestrator`** | 调用 ≥2 个 focused service,同事务边界 |
+| 跨分支异步编排 / 失败补偿 | **`XxxSaga`** | 长事务 / 补偿动作 / 跨服务最终一致性 |
+| Application 层用例聚合(可选) | **`XxxUseCase`** | 注意:若 focused service 已选 `XxxUseCase`,则 orchestrator 用 `XxxOrchestrator` 区分 |
+
+**3. 其它角色命名(全局统一)**:
+
+| 类型 | 命名示例 | 备注 |
+|------|----------|------|
+| Domain Service / 原子能力(纯业务规则,无 IO) | `RefundCalculator` / `RefundPolicy` / `RefundValidator` | 避免与 focused service 同名;用 `Calculator` / `Policy` / `Validator` / `Resolver` 等表达"纯规则" |
+| Repository 接口 | `OrderRepository` | 业务语义命名 |
+| Repository 实现 | `OrderRepositoryImpl` / `MybatisOrderRepository` | 实现可带技术前缀 |
+| Controller | `RefundController` | RESTful 路由对应 |
+| React Hook | `useRefund` | 复用业务流程 |
+| Vue Composable | `useRefund` | 同上 |
+| Flutter ViewModel | `RefundViewModel` | 状态编排 |
+| 横切实现(AOP / Filter) | `AuditAspect` / `LoggingInterceptor` / `SecurityFilter` | 用 `Aspect` / `Interceptor` / `Filter` / `Middleware` 后缀标明横切机制 |
+
+**4. 反模式(禁止)**:
+
+- ❌ **同一项目混用 focused service 命名**:`RefundService` + `CancelUseCase` + `ReverseCheckoutHandler` 三种叫法并存,后续 AI / 新人不知道该建哪种 → 选定一种贯彻
+- ❌ **`XxxApplicationService` 容器化命名**:这个名字暗示"一个 aggregate 一个 service 含多方法"的传统 DDD 模式,与本 SKILL 的"每分支一 focused service"相反,**禁止新建**;若历史代码已有,按 god service 处置(对应分支抽到独立 focused service)
+- ❌ **`XxxManager` / `XxxHelper` / `XxxUtil`**:语义模糊,容易演化成 god class → 改用 `XxxService` / `XxxCalculator` / `XxxPolicy` 等表意命名
+- ❌ **focused service 与 Domain 原子能力同名**:`RefundService`(application 编排)与 `RefundService`(domain 规则)冲突 → Domain 侧改 `RefundCalculator` / `RefundPolicy` 等
 
 ---
 
@@ -495,6 +702,10 @@ Infrastructure Mapper / Client / MQ Adapter
 - [ ] 是否复用了已有原子能力，而不是重复实现。
 - [ ] 是否避免新增巨型 Service。
 - [ ] **扩展既有 service 时,是否答了两连问:(1) 新方法属于哪个业务分支?(2) 该分支有 focused service 吗?——任何情况下都不允许往多分支 god service 里加业务方法,新分支新建 focused service,同分支变种进该分支的 focused service(若散落在 god service 则新建并把既有方法一并迁过去),god service 只保留 1 行 delegate 入口。**
+- [ ] **本次新代码是否在同一回合调用 ≥2 个 focused service?是 → 必须落到独立 Orchestrator / Saga,不进任一 focused service 内部,Controller 也不直接连续调用。**
+- [ ] **横切关注点(日志/审计/权限/事务/metrics/缓存/限流)是否走 AOP / 拦截器 / 注解统一注入,而不是在 focused service 内部手写?横切实现类(`AuditAspect` 等)不算 god service。**
+- [ ] **本次新建 / 复用的 focused service / orchestrator 命名是否符合项目选定的 taxonomy(同一项目内 `Service` / `UseCase` / `CommandHandler` 三种叫法只选一种贯彻)?Orchestrator / Saga 命名是否与 focused service 区分?禁止 `XxxApplicationService` / `XxxManager` / `XxxHelper` 等模糊命名。**
+- [ ] **本次修改涉及 ≥2 个表 / ≥2 个领域对象时,是否先用「聚合边界 5 问」判定它们是否同聚合?同聚合 → 同事务直接修改;不同聚合 → 走 Domain Event 或 Saga,禁止 `@Transactional` 内硬改 ≥2 个聚合根。**
 - [ ] 代码结构是否清晰，文件/类/方法职责是否单一。
 - [ ] 新增实现是否易于维护，未来规则扩展是否有稳定落点。
 - [ ] 是否保持低耦合，避免跨层、跨 feature 直接依赖内部实现。
