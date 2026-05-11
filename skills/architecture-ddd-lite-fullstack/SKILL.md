@@ -244,7 +244,7 @@ RefundService
 - 功能扩展要在已有 ~500 行以上的方法/类里追加分支
 - 数据同步、事件订阅、状态机等链路要补齐字段、新事件、新副作用
 - 即将动 SKILL 已识别为"历史巨型方法 / 待重构骨架"的旧代码
-- **扩展既有 service:在既有 service 里追加任何新业务分支(如 `OrderService` 已有 `refund/cancel/reject`,要加 `reverseCheckout`)** —— 详见下面「Service 业务动作扩展铁律」专节,**新业务分支 = 新子 service,无阈值无豁免**
+- **扩展既有 service:任何往多分支 god service(如 `OrderService` 已有 `refund/cancel/reject`)追加 public 业务方法的动作——不论是新业务分支(`reverseCheckout`)还是同分支变种(`partialRefund`)** —— 详见下面「Service 业务动作扩展铁律」专节,**god service 不加方法,每个分支去自己的 focused service**
 
 **正确决策流程**（编码前必须走完）：
 
@@ -256,33 +256,42 @@ RefundService
 
 **反模式（即使旧代码本来就乱也不允许）**：在 1500 行的历史方法中再加 95 行新逻辑、跟旧风格混在一起、SQL 内联、决策门 inline、字段名靠字符串 key——只因为"旧代码已经这样了我跟着抄"。这是把新代码的目标态成本一并计入未来重构债。
 
-#### Service 业务动作扩展铁律:**新业务分支 = 新子 service,无阈值,无豁免**
+#### Service 业务动作扩展铁律:**每个业务分支一个 focused service,任何新方法都不进 god service**
 
-> **核心一句话**:扩展既有 service 时,**只要新增的是一个新的业务分支,就必须拆成独立子 service / UseCase / Handler**,原 service 不允许新增第 N 个业务动作 public 方法。这条规则**没有"行数没到""动作还少""逻辑简单""以后再拆"这类退路**。
+> **核心一句话**:扩展既有 service 时,**不允许往多分支 god service(如 `OrderService` 同时承载 `refund`/`cancel`/`reject`)里追加任何 public 业务方法**——无论新方法是新业务分支(`reverseCheckout`)还是既有分支的变种(`partialRefund`)。所有新方法必须落到**该分支自己的 focused sub-service** 里。
 >
-> 上一节「新代码落点决策」是通用兜底,适用所有"扩展旧代码"场景;本节是它在 service 层面的特化与下钻——**判定更硬、退路更少**,因为 service 是被惯性追加最严重的容器,每一次"先在原 service 加一个"都会让下一次更难拒绝。
+> 上一节「新代码落点决策」是通用兜底,适用所有"扩展旧代码"场景;本节是它在 service 层面的特化与下钻——**判定更硬、零退路**,因为 service 是被惯性追加最严重的容器,每一次"先在原 service 加一个"都会让下一次更难拒绝。
 
-**判断标准只有一条**:新增逻辑是否构成一个独立可命名的业务分支?
+**核心原则**:
 
-如果是,**必须**拆。判断"是新业务分支"的几个识别信号(命中任一即认定为新分支,不是阈值,是认定依据):
+1. **每个业务分支聚焦到一个独立 service** —— `RefundService` 只管退款分支,`CancelService` 只管取消分支,`ReverseCheckoutService` 只管反结账分支。
+2. **同一分支的所有方法都放在该分支自己的 service 内** —— `refund` + `partialRefund` 都属于退款分支,**两者都放在 `RefundService` 里**,作为该 service 的两个 public 方法(或参数化的同一方法);**不论原入口是不是 `OrderService`,都不该往 `OrderService` 里塞**。
+3. **god service 只能做 1 行 delegate 入口** —— 若历史遗留的 `OrderService` 同时承载多个分支动作,新方法**一律**走新建/已有的 focused sub-service;原 `OrderService` 若需要保留统一入口,新方法只能 1 行 `xxxService.execute(req);`,**不允许在 `OrderService` 内写任何业务逻辑**。
+
+**判断哪个分支:新增逻辑是否构成一个独立可命名的业务分支?**
+
+判断"是新业务分支"的识别信号(命中任一即认定为独立分支):
 
 | 信号 | 说明 / 举例 |
 |------|-------------|
-| 业务语义上是新动作 | `refund` / `cancel` / `reject` / `reverseCheckout` 是 4 个独立的业务动作 |
+| 业务语义上是独立动作 | `refund` / `cancel` / `reject` / `reverseCheckout` 是 4 个独立分支 |
 | 对应 UI / 流程图上一个独立动作节点 | 用户在前端可单独触发 / 业务流程图上独立的菱形或矩形 |
 | 引入新状态机或新状态转换 | 反结账涉及账单状态机 ≠ 订单生命周期状态机 |
 | 引入新下游依赖 | 新增对其它 service / 外部 HTTP / 新表的依赖 |
 | 引入新事务边界 | 独立事务 / 补偿事务 / 不与原方法共事务 |
 | 前置校验 / 权限规则 / 幂等键语义与既有方法不同 | "账单已结+今日内"≠"订单已支付" |
 
-只要新增逻辑命中以上**任意一个**信号,就是新业务分支,**必须**拆。
+**变种的归属**:`refund` 与 `partialRefund` 共享同一状态机 + 同一下游 + 同一前置校验 → 属于**同一退款分支**,两者都进 `RefundService`,**不进** `OrderService`。
 
-**唯一不算新业务分支的情况**(允许在原 service 加方法,只此一种):
+**新方法落点决策表**:
 
-- **同一业务分支的参数化变种**:如 `refund` 与 `partialRefund`、`cancel` 与 `cancelWithReason`——两个方法对应同一业务概念,只是参数 / 数据范围不同,共享同一状态机、同一下游、同一前置校验。这种情况下两个方法**属于同一分支**,可以共存于同一 service,甚至应该 refactor 为参数化的单一方法。
-- 这是**唯一**例外。其它任何"看起来简单 / 行数很少 / 暂时只是个开关"的新动作,都不是变种,都属于新分支,都必须拆。
+| 新方法是什么 | 已有该分支的 focused service 吗? | 落点 |
+|-------------|------------------------------|------|
+| 新业务分支(如反结账) | 没有 | **新建** `ReverseCheckoutService`,新方法作为其 public |
+| 同一分支的变种(如 partialRefund) | 已有(如 `RefundService`) | 加进该 service,作为它的第 2 个 public 方法或参数化合并 |
+| 同一分支的变种(如 partialRefund) | 没有,既有方法 `refund` 还在 god service | **新建** `RefundService`,把变种 + 既有方法**一并迁过去**;god service 内对应方法降级为 1 行 delegate(或彻底删掉让调用方直接注入) |
 
-**正确形态**(以"加反结账"为例):
+**正确形态 — 加反结账(新分支)**:
 
 ```text
 [新建] features/billing/application/ReverseCheckoutService.java
@@ -298,42 +307,70 @@ RefundService
         - 禁止把任何业务逻辑写在该 1 行方法里。
 ```
 
-**反模式**(无任何例外):
+**正确形态 — 加 partialRefund(同分支变种,但既有 refund 还在 god service)**:
+
+```text
+[新建] features/refund/application/RefundService.java
+        - public void refund(RefundRequest req) { ... }                  // 把既有 OrderService.refund 迁过来
+        - public void partialRefund(PartialRefundRequest req) { ... }    // 新增的变种
+        - (或 refactor 成参数化的单一 refund(RefundRequest req, RefundScope scope))
+
+[修改] 调用方直接注入 RefundService;
+        OrderService 中原 refund 方法降级为 1 行 delegate `refundService.refund(req)`,
+        或彻底删掉,让调用方切到新 service。
+```
+
+**反模式 — 无任何例外**:
 
 ```java
-// ❌ 把 reverseCheckout 作为第 4 个业务动作 public 方法塞进 OrderService
+// ❌ 反例 1:新业务分支塞进 god service
 class OrderService {
-    public void refund(...) { ... }            // 既有
-    public void cancel(...) { ... }            // 既有
-    public void reject(...) { ... }            // 既有
-    public void reverseCheckout(...) {         // ❌ 是新业务分支 → 必须新建子 service
+    public void refund(...) { ... }
+    public void cancel(...) { ... }
+    public void reject(...) { ... }
+    public void reverseCheckout(...) {  // ❌ 新业务分支 → 必须新建 ReverseCheckoutService
         // 任何业务逻辑都不允许
+    }
+}
+
+// ❌ 反例 2:同分支变种也不能塞进 god service
+class OrderService {
+    public void refund(...) { ... }
+    public void cancel(...) { ... }
+    public void reject(...) { ... }
+    public void partialRefund(...) {    // ❌ 即使共享退款状态机,也不放 god service
+        // 应该把 refund + partialRefund 一起搬到 RefundService
     }
 }
 ```
 
-**自检一连问**(写第一行前必须答):
+**自检两连问**(写第一行前必须答):
 
-> **"我准备加的是新业务分支,还是同一分支的参数化变种?"**
+1. **"这个新方法属于哪个业务分支?"** — 用前面"识别信号"表认定。
+2. **"这个分支有自己的 focused service 吗?"** —
+   - 有 → 新方法进该 focused service,作为它的下一个 public 方法或参数化合并。
+   - 没有,但既有方法散落在 god service → **新建该分支的 focused service**,把既有方法 + 新方法**一并迁过去**;god service 对应位置降级为 1 行 delegate 或删除。
+   - 完全是新分支 → 新建该分支的 focused service,新方法作为它的首个 public。
 
-- 答"新业务分支"(或任何模糊回答) → 本回合**禁止**在原 service 新增 public 方法,**必须**新建子 service / UseCase,原 service 若需要统一入口只能 1 行 delegate。
-- 答"同一分支参数化变种" → 必须给出佐证:与既有方法共享同一状态机 + 同一下游 + 同一前置校验。佐证不充分按"新分支"处理。
+**任何情况下都不允许往 god service 里加业务方法**——god service 最多保留 1 行 delegate 入口,且禁止写任何业务逻辑。
 
-**常见自我说服话术 → 一律视为新分支**:
+**常见自我说服话术 → 一律视为违规**:
 
 - "反正只是加个开关 / 一个字段判断 / 几十行"
 - "这个 service 才 200 行还没到巨型"
 - "和 cancel 长得差不多,放一起也行"
 - "先加进来,以后再拆"
 - "建新文件太麻烦,审 PR 的人会觉得过度设计"
+- "partialRefund 和 refund 共享状态机,所以可以放 OrderService" — **错**,共享状态机说明它们属于同一退款分支,**两者都应该在 `RefundService` 里**,而不是都留在 god service
+- "把既有 refund 也迁出去太大动静,先把新方法塞进来" — strangler pattern 的目的就是逐步迁出,**这次扩展就是迁出契机**
 
-以上任何一种,都是把"AI 惯性追加"包装成"合理判断"。**听到自己说这些话时直接停手,新建子 service**。
+以上任何一种,都是把"AI 惯性追加"包装成"合理判断"。**听到自己说这些话时直接停手,新建/复用 focused sub-service**。
 
 **与既有规则的关系**:
 
-- 通用「新代码落点决策」(上一节)兜底所有"扩展旧代码"场景;本节是它在 service 粒度的**硬化下钻**——退路更少。
-- `coding-standards-common §2 函数原子`(80 行硬阈值)在方法粒度限制单一方法体积;本节在 service 粒度限制 service 业务分支数。两者**正交**:80 行内的方法也可能因"是新业务分支"必须拆出去。
-- `korepos-backend-service` 的"一接口一 service"是 Flutter backend 侧的强约束;本节是它在 Java/Spring + 通用全栈侧的对应规则,触发标准更宽(允许同分支变种合并),但本质同向:**业务分支隔离**。
+- 通用「新代码落点决策」(上一节)兜底所有"扩展旧代码"场景;本节是它在 service 粒度的**硬化下钻**——零退路。
+- `coding-standards-common §2 函数原子`(80 行硬阈值)在方法粒度限制单一方法体积;本节在 service 粒度限制每个 service 只服务一个业务分支。两者**正交**。
+- `korepos-backend-service` 的"一接口一 service"是 Flutter backend 侧的强约束;本节是它在 Java/Spring + 通用全栈侧的对应规则,本质同向:**业务分支隔离 + god service 只做 delegate 入口**。
 
 ### 禁止行为
 
@@ -345,7 +382,7 @@ class OrderService {
 | 上层直接依赖 DAO / HTTP Client / 其它 feature 内部类 | 通过 Repository、Application Service 或能力端口隔离 |
 | 继续沿用低质量旧结构，只因为项目里已有类似写法 | 先评估现有代码质量；差结构只能提取业务事实，不能扩散 |
 | 在已有的巨型方法 / 旧骨架文件里就地追加新逻辑（新增 N 行内联在旧代码段里） | 新逻辑放到新 service / 新子门面 / 新原子能力暴露 public 方法，旧文件只 +1 行调用，详见「新代码落点决策」节 |
-| 往既有 service 里追加新业务分支（如 `OrderService` 已有 `refund`/`cancel`/`reject`，再加 `reverseCheckout`），不论原 service 行数、动作数、新逻辑复杂度 | 新业务分支必须建独立 `ReverseCheckoutService` / `XxxUseCase` / `XxxHandler`；调用方直接注入新 service，或原 service 只保留 1 行 delegate，禁止把任何业务逻辑写进 delegate 方法。**唯一例外是同一分支的参数化变种**（如 `refund` 与 `partialRefund` 共享同一状态机/下游/前置校验）。详见「Service 业务动作扩展铁律」节 |
+| 往多分支 god service（如 `OrderService` 同时承载 `refund`/`cancel`/`reject`）里追加**任何** public 业务方法——不论新方法是新业务分支（`reverseCheckout`）还是同分支变种（`partialRefund`） | **新业务分支** → 新建该分支的 focused service（`ReverseCheckoutService`），作为其 public 方法；**同分支变种** → 若该分支已有 focused service（`RefundService`）则加进去，若分支仍散落在 god service 则新建 focused service 并把既有方法+变种**一并迁过去**。任何情况下 god service 都不新增业务方法，最多保留 1 行 delegate 入口，且禁止写任何业务逻辑。详见「Service 业务动作扩展铁律」节 |
 
 ---
 
@@ -422,7 +459,7 @@ Infrastructure Mapper / Client / MQ Adapter
 强制规则：
 
 1. Controller 只处理协议适配、参数校验入口、响应包装。
-2. Service 不能变成巨型类；一个 Service 应围绕一个清晰业务能力或流程。**扩展既有 service 时只要新增的是新业务分支**(如 `OrderService` 已有 `refund`/`cancel`/`reject`,要加 `reverseCheckout`),**必须**建独立子 service / UseCase / Handler,原 service 不新增 public 方法(若需统一入口只允许 1 行 delegate)。无阈值无豁免,详见「Service 业务动作扩展铁律」节。唯一例外是同一分支的参数化变种(`refund` vs `partialRefund`)。
+2. Service 不能变成巨型类；一个 Service 应围绕一个清晰业务能力或流程。**多分支 god service**(如 `OrderService` 同时承载 `refund`/`cancel`/`reject`)**不允许追加任何 public 业务方法**——无论新方法是新业务分支(`reverseCheckout`)还是同分支变种(`partialRefund`)。新业务分支新建该分支的 focused service;同分支变种进该分支的 focused service(若分支散落在 god service 则新建并把既有方法+变种**一并迁过去**)。god service 只保留 1 行 delegate 入口。详见「Service 业务动作扩展铁律」节。
 3. 领域规则不能写在 Mapper、Controller、Feign Client 中。
 4. Feign / Mapper / Redis / MQ 调用必须隔离到 Infrastructure 或 Adapter。
 5. 事务边界放在 Application 层，Domain 不感知事务框架。
@@ -457,7 +494,7 @@ Infrastructure Mapper / Client / MQ Adapter
 - [ ] 可复用业务能力是否已沉淀为原子能力。
 - [ ] 是否复用了已有原子能力，而不是重复实现。
 - [ ] 是否避免新增巨型 Service。
-- [ ] **扩展既有 service 时,是否答了一连问「我加的是新业务分支,还是同一分支的参数化变种?」答"新业务分支"或模糊回答 → 必须拆子 service / UseCase,原 service 不允许新增 public 方法(只允许 1 行 delegate)。**
+- [ ] **扩展既有 service 时,是否答了两连问:(1) 新方法属于哪个业务分支?(2) 该分支有 focused service 吗?——任何情况下都不允许往多分支 god service 里加业务方法,新分支新建 focused service,同分支变种进该分支的 focused service(若散落在 god service 则新建并把既有方法一并迁过去),god service 只保留 1 行 delegate 入口。**
 - [ ] 代码结构是否清晰，文件/类/方法职责是否单一。
 - [ ] 新增实现是否易于维护，未来规则扩展是否有稳定落点。
 - [ ] 是否保持低耦合，避免跨层、跨 feature 直接依赖内部实现。
@@ -496,8 +533,9 @@ Infrastructure Mapper / Client / MQ Adapter
 | "多个 UseCase 复制一段计算逻辑" | 抽成原子能力并补测试 |
 | "Domain 里注入 HTTP Client / Mapper" | Domain 保持纯业务，技术依赖放 Infrastructure |
 | "一个 Service 什么都管" | 按 UseCase / 原子能力拆分，职责单一 |
-| "原 service 才 200 行,反正还没到巨型,加个 reverseCheckout 没事" | 错。Service 业务动作扩展看的不是行数,是**是否新业务分支**。只要新增的是新业务分支(独立可命名的业务动作 / 新状态机 / 新下游 / 新事务 / 新前置校验任一),就必须拆,无阈值无豁免 |
-| "新增方法只有几十行,先在原 service 加,以后再拆" | "以后再拆"几乎不会发生;一旦塞进去,下次再加新分支时上一个先例就成了借口,会持续向同一容器堆叠。**第一次扩展就走子 service** |
-| "和 cancel 长得差不多 / 都是订单操作,放一起也行" | "长得差不多"不是同一分支的证据。同一分支需要佐证:共享同一状态机 + 同一下游 + 同一前置校验。佐证不充分按新分支处理 |
+| "原 service 才 200 行,反正还没到巨型,加个 reverseCheckout 没事" | 错。Service 业务动作扩展看的不是行数,是**新方法属于哪个业务分支 + 该分支有没有 focused service**。多分支 god service 一律不允许加业务方法,只允许 1 行 delegate |
+| "新增方法只有几十行,先在原 service 加,以后再拆" | "以后再拆"几乎不会发生;一旦塞进去,下次再加新分支时上一个先例就成了借口,会持续向同一容器堆叠。**第一次扩展就建 focused sub-service** |
+| "partialRefund 和 refund 共享状态机,所以可以放 OrderService" | 错。共享状态机说明它们属于同一退款分支——**两者都应该在 `RefundService` 里**,不是都留在 god service。若既有 refund 还在 god service,本次扩展就是把它+新变种一并迁出的契机 |
+| "把既有 refund 也迁出去太大动静,先把新方法塞 god service" | strangler pattern 的目的就是逐步迁出,**这次扩展就是迁出契机**。如果只迁新方法、既有方法还留在 god service,既有方法以后永远迁不出去 |
 | "先能跑，结构以后再说" | 结构质量是编码前门禁，先拆职责和依赖边界再写 |
 | "复制旧实现最快" | 先判断旧实现是否值得参考；低质量旧结构不能扩散 |
