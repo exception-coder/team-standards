@@ -1,6 +1,6 @@
 ---
 name: architecture-ddd-lite-fullstack
-description: "Use before writing or reviewing any business code in Java Spring Boot/Spring Cloud, React, Vue, or Flutter. MUST be invoked after design/pre-implementation orientation and before the first source-code edit to decide the target layer, feature module, reusable atomic capability, and maintainability boundaries. Enforces DDD-lite layering, feature-based structure, one-way dependencies, clear code structure, low coupling, high cohesion, and prevents business logic from being written directly in Controller/UI/Page."
+description: "Use before writing or reviewing any business code in Java (Spring Boot/Spring Cloud), Python (FastAPI/Django/Flask), Dart (Flutter/Serverpod/Shelf), React, or Vue. MUST be invoked after design/pre-implementation orientation and before the first source-code edit to decide the target layer, feature module, reusable atomic capability, and maintainability boundaries. Enforces DDD-lite layering, feature-based structure, one-way dependencies, clear code structure, low coupling, high cohesion, and prevents business logic from being written directly in Controller/UI/Page."
 ---
 
 # DDD-lite 全栈架构编码规范
@@ -9,9 +9,11 @@ description: "Use before writing or reviewing any business code in Java Spring B
 
 该项目采用 DDD-lite + Feature 模块化架构，目标是：代码结构清晰、易于维护、低耦合、高内聚、可复用、可扩展、适合 AI 协作开发。
 
+**本 SKILL 与语言无关**——所有核心原则（分层+单向依赖 / Feature 模块化 / focused service per branch / 跨分支编排独立 / 横切走中间件 / 命名 taxonomy 项目级统一 / 聚合边界）是 SOLID + Clean Architecture + DDD-lite 的应用级表达，**在 Java、Python、Dart、TypeScript 上都一致适用**。SKILL 内的代码示例多用 Java 写法是因为它能精确表达事务/AOP/注解等机制，但**所有规则都有对应的 Python（decorator / contextvar / middleware）、Dart（class + middleware / Riverpod provider）、TypeScript（decorator / NestJS Pipe）等价实现**,见各章节后端机制对照表与「Python 后端约束」「Dart 后端约束」节。
+
 任何业务代码，必须先判断属于哪一层，再实现；不允许直接写在 Controller / UI / Page 中。
 
-清晰结构不是“代码写完后再优化”的附加项，而是第一行代码前的门禁。AI 不得为了快速完成而新增难读、难测、难替换、职责混杂的实现。
+清晰结构不是"代码写完后再优化"的附加项，而是第一行代码前的门禁。AI 不得为了快速完成而新增难读、难测、难替换、职责混杂的实现。
 
 ---
 
@@ -21,7 +23,7 @@ description: "Use before writing or reviewing any business code in Java Spring B
 - **架构分层** → [标准分层模型](#标准分层模型) / [各层职责](#各层职责)
 - **项目组织** → [Feature 模块化结构](#feature-模块化结构) / [原子能力沉淀](#原子能力沉淀) / [聚合边界与事务一致性](#聚合边界与事务一致性) / [结构质量门禁](#结构质量门禁)
 - **Service 形态铁律** → [Service 业务动作扩展铁律](#service-业务动作扩展铁律每个业务分支一个-focused-service任何新方法都不进-god-service) / [跨分支编排](#跨分支编排同一回合调用-2-个-focused-service-时的归属) / [横切关注点不计入 god service 判定](#横切关注点不计入-god-service-判定aop--拦截器--事务声明的豁免)
-- **技术栈约束** → [前端约束](#前端约束) / [Flutter 约束](#flutter-约束) / [Java 后端约束](#java-后端约束)
+- **技术栈约束** → [前端约束](#前端约束) / [Flutter 约束](#flutter-约束) / [Java 后端约束](#java-后端约束) / [Python 后端约束](#python-后端约束) / [Dart 后端约束](#dart-后端约束)
 - **命名规范** → [服务命名 taxonomy](#服务命名-taxonomyservice--usecase--handler--orchestrator)
 
 ---
@@ -32,7 +34,7 @@ description: "Use before writing or reviewing any business code in Java Spring B
 
 | 场景 | 动作 |
 |------|------|
-| 准备编写 Java / React / Vue / Flutter 业务代码 | 先判断代码所属层级与 feature 模块 |
+| 准备编写 Java / Python / Dart / TypeScript / React / Vue / Flutter 业务代码 | 先判断代码所属层级与 feature 模块 |
 | 根据设计文档或 coding.md 开始实现 | 在第一行源码改动前完成分层检查 |
 | 新增接口、页面、UseCase、Service、Repository、DAO、HTTP Client | 明确职责边界和调用链 |
 | 重构现有业务逻辑 | 先识别现有逻辑应沉到 Application / Domain / Infrastructure 的哪一层 |
@@ -505,17 +507,18 @@ class ApproveAndRefundOrchestrator {
 
 > 容易混淆的边界:日志、审计、权限、事务声明、metrics、缓存、限流、链路追踪——这些**横切关注点**如果按"每个 focused service 各自实现一遍"就重复污染;但它们的**集中实现类**(`AuditAspect` / `LoggingInterceptor` / `SecurityFilter`)看起来像 god class(一个类切到所有 service)。**这种集中实现不算 god service,不受本节约束**,因为它们处理的不是业务分支,是横切机制。
 
-**横切关注点的归属**:
+**横切关注点的归属(Java / Python / Dart 三栈对照)**:
 
-| 横切类别 | 标准归属 / 实现机制 |
-|---------|---------------------|
-| 日志 / 审计 | Spring AOP `@Aspect` / Servlet Filter / 框架 Interceptor / NestJS Middleware |
-| 权限 / 鉴权 | Spring Security / 自定义 `@PreAuthorize` 注解 + AOP / Filter |
-| 事务声明 | `@Transactional`(Spring)/ 编程式事务 in orchestrator |
-| Metrics / 链路追踪 | Micrometer / OpenTelemetry / AOP 拦截器 |
-| 缓存 | `@Cacheable` + AOP / 装饰器模式 / Redis 中间件 |
-| 限流 / 熔断 | Resilience4j / Sentinel / 网关层 |
-| 入参校验 | `@Valid` + Bean Validation / Schema 校验中间件 |
+| 横切类别 | Java(Spring) | Python(FastAPI / Django) | Dart(Flutter / Shelf / Serverpod) |
+|---------|-------------|--------------------------|-----------------------------------|
+| 日志 / 审计 | Spring AOP `@Aspect` / Servlet Filter / Interceptor | `@audit` decorator / FastAPI `Depends` / Django middleware | Shelf middleware / Riverpod ProviderObserver / Serverpod future hooks |
+| 权限 / 鉴权 | Spring Security / `@PreAuthorize` + AOP | FastAPI `Depends(get_current_user)` / Django `@login_required` / DRF `permission_classes` | Shelf middleware / Serverpod auth handler / Flutter route guard |
+| 事务声明 | `@Transactional` | SQLAlchemy `with session.begin():` / Django `@transaction.atomic` / 上下文管理器 | Drift `transaction()` / SQLite `db.transaction()` / Serverpod `db.transaction()` |
+| Metrics / 链路追踪 | Micrometer / OpenTelemetry / AOP | OpenTelemetry / Prometheus client + middleware / `@trace` decorator | OpenTelemetry Dart SDK / Riverpod observer |
+| 缓存 | `@Cacheable` + AOP | `functools.lru_cache` / `@cache` decorator / Redis client + middleware | `package:cache` / Riverpod `AsyncValue` cache |
+| 限流 / 熔断 | Resilience4j / Sentinel / 网关层 | `slowapi` / `aiolimiter` / API Gateway | Shelf rate-limiter middleware / API Gateway |
+| 入参校验 | `@Valid` + Bean Validation | Pydantic models / FastAPI 自动校验 / Django Form | freezed + json_serializable / built_value / 手动 assert |
+| 错误统一处理 | `@ControllerAdvice` + `@ExceptionHandler` | FastAPI `@app.exception_handler` / Django middleware | Shelf middleware / Serverpod endpoint error handler |
 
 **强制规则**:
 
@@ -524,29 +527,63 @@ class ApproveAndRefundOrchestrator {
 - **事务边界归 orchestrator / Application 层**,不归 Domain / focused service 内部;focused service 的方法应该可以脱离事务运行(便于单测)。
 - **横切关注点不算"新下游依赖"**——focused service 上加 `@Transactional` / `@Cacheable` / `@PreAuthorize` 不触发"引入新下游 → 拆分支"的判定,因为它们是机制不是业务依赖。
 
-**反模式**:
+**反模式与正确形态对照(Java / Python / Dart 三栈写法等价)**:
 
 ```java
-// ❌ 在每个 focused service 方法内手写横切
+// Java ❌ — focused service 内手写横切
 class RefundService {
-    public void refund(...) {
-        log.info("refund start, req={}", req);      // ❌ 横切,走 AOP
-        permissionCheck(req.getUserId(), "REFUND");  // ❌ 横切,走 @PreAuthorize
-        auditService.record("refund", req);          // ❌ 横切,走 @Audited + AOP
-        // ... 实际业务逻辑
-        auditService.record("refund_done", req);     // ❌ 同上
-        log.info("refund done");                     // ❌ 同上
+    public void refund(req) {
+        log.info("refund start, req={}", req);      // ❌ 横切走 AOP
+        permissionCheck(req.userId, "REFUND");       // ❌ 走 @PreAuthorize
+        auditService.record("refund", req);          // ❌ 走 @Audited + AOP
+        // ... 业务逻辑
     }
 }
 
-// ✅ 横切由 AOP / 注解统一注入,focused service 只写业务
-@Audited
-@PreAuthorize("hasPermission('REFUND')")
+// Java ✅ — 横切由注解 + AOP 统一注入
+@Audited @PreAuthorize("hasPermission('REFUND')")
 class RefundService {
     @Transactional
-    public void refund(...) {
-        // 只写退款业务逻辑
-    }
+    public void refund(req) { /* 只写退款业务 */ }
+}
+```
+
+```python
+# Python ❌ — focused service 内手写横切
+class RefundService:
+    def refund(self, req):
+        logger.info("refund start, req=%s", req)              # ❌ 走 middleware/decorator
+        if not has_permission(req.user_id, "REFUND"): raise   # ❌ 走 Depends 注入
+        audit_service.record("refund", req)                   # ❌ 走 @audit decorator
+        # ... 业务逻辑
+
+# Python ✅ — 横切由 decorator + Depends 统一注入
+@audit("refund")
+@require_permission("REFUND")
+class RefundService:
+    @transactional
+    def refund(self, req): pass  # 只写退款业务
+```
+
+```dart
+// Dart ❌ — focused service 内手写横切
+class RefundService {
+  Future<void> refund(req) async {
+    logger.info('refund start, req=$req');                    // ❌ 走 middleware
+    if (!hasPermission(req.userId, 'REFUND')) throw ...;      // ❌ 走 auth guard
+    await auditService.record('refund', req);                 // ❌ 走 middleware
+    // ... 业务逻辑
+  }
+}
+
+// Dart ✅ — 横切由 middleware / interceptor 统一注入
+// (在 endpoint 注册时挂上 auth/audit/logging middleware)
+class RefundService {
+  Future<void> refund(req) async {
+    await db.transaction(() async {
+      // 只写退款业务
+    });
+  }
 }
 ```
 
@@ -644,6 +681,74 @@ Infrastructure Mapper / Client / MQ Adapter
 
 ---
 
+## Python 后端约束
+
+适用于 FastAPI / Django(含 DRF) / Flask。
+
+标准调用链：
+
+```text
+Endpoint(FastAPI router / Django view / Flask route)
+  ↓
+Application Service / UseCase  (XxxService class)
+  ↓
+Domain Service / Policy / Entity  (纯业务规则,无 IO)
+  ↓
+Repository Interface(协议 / Protocol / ABC)
+  ↓
+Infrastructure(SQLAlchemy / Django ORM / httpx / aio-pika)
+```
+
+强制规则：
+
+1. Endpoint(`@router.post(...)` / `views.py` / `@app.route(...)`)只处理协议适配、Pydantic / DRF Serializer 校验、响应包装。
+2. Service 不能变成巨型类;一个 Service 围绕一个清晰业务分支。**god service 不允许新增业务方法**——铁律与 Java 完全一致,详见「Service 业务动作扩展铁律」节。
+3. 领域规则(纯函数 / Pydantic model 方法 / dataclass 行为)**不依赖** FastAPI / Django ORM / SQLAlchemy / Celery 等框架,可脱离 web 框架单测。
+4. SQLAlchemy / Django ORM / httpx / redis-py / aio-pika 等技术调用必须隔离到 Infrastructure 或 Adapter。
+5. **事务边界放在 Application 层**(`with session.begin():` / `@transaction.atomic` / `async with db.transaction():`),Domain 不感知 session / transaction;事务跨聚合时改走 Domain Event(blinker / Celery / Kafka)+ Saga。
+6. **依赖注入用 FastAPI `Depends()` / Django app 配置 / DI 容器**,禁止在 Service 内部 import 具体 Infrastructure 实现;Service 只依赖 Repository 协议(`Protocol` / `ABC`)。
+7. **异步与同步分层一致**——同步项目(Django)和异步项目(FastAPI)的分层规则一致,异步项目所有 IO 必须 `async`,Service / Repository 接口同步异步选定一种贯彻。
+8. **数据 DTO 用 Pydantic / dataclass**,禁 ORM 模型穿透到 Endpoint / Domain;DTO ↔ Domain ↔ ORM 三态分离,在 Application / Infrastructure 边界做转换。
+
+横切机制对照(同上「横切关注点不计入 god service 判定」节的 Python 列):FastAPI `Depends` / decorator / middleware 等价 Spring 的 `@Aspect` + AOP,**横切实现类不计入 god service**。
+
+---
+
+## Dart 后端约束
+
+适用于 Serverpod / Shelf / koreposBackendService / Aqueduct 等。
+
+> Flutter 客户端约束见上面「Flutter 约束」节;本节专管 Dart 服务端 / Flutter backend 模块的业务代码。
+
+标准调用链：
+
+```text
+Endpoint(Shelf router / Serverpod Endpoint class / koreposBackendService backend)
+  ↓
+Application Service / UseCase  (XxxService class)
+  ↓
+Domain Service / Policy / Entity  (纯 Dart class / freezed model)
+  ↓
+Repository Interface(abstract class)
+  ↓
+Infrastructure(Drift / sqflite / dio / Serverpod db)
+```
+
+强制规则：
+
+1. Endpoint(Shelf handler / Serverpod `Endpoint` 子类 / koreposBackendService 的 `backend/` 目录入口)只处理协议适配、freezed / json_serializable DTO 反序列化、响应包装。
+2. Service 不能变成巨型类;一个 Service 围绕一个清晰业务分支。**god service 不允许新增业务方法**——铁律与 Java / Python 完全一致;`korepos-backend-service` 的"一接口一 service"是它在 Flutter backend 侧的更强表达。
+3. 领域规则(纯 class / freezed sealed class / value object)**不依赖** Flutter / Drift / Riverpod / Serverpod 框架,可在纯 Dart VM 下单测。
+4. Drift / sqflite / dio / Serverpod db / shared_preferences 等技术调用必须隔离到 Infrastructure / DAO。
+5. **事务边界放在 Application 层**(`db.transaction(() async { ... })` / Drift `transaction()` / Serverpod `session.db.transaction()`),Domain 不感知 transaction;跨聚合走 Serverpod stream / Riverpod provider 通信 + Saga。
+6. **依赖注入用 get_it / Riverpod / 构造器注入**,禁止在 Service 内部直接 `new` 具体 Infrastructure 实现;Service 只依赖 Repository 抽象。
+7. **DTO 用 freezed + json_serializable**(参见 `korepos-backend-service` 强约束:wire DTO 必须 `@JsonSerializable(explicitToJson: true)`,禁 `@freezed`);DTO ↔ Domain ↔ DB Entity 三态分离,在 Application / Infrastructure 边界做转换。
+8. **避免在 Service 用 `dynamic` / `Object?` / `Map<String, dynamic>` 容忍多形态**(详见 `korepos-backend-service` Step 2/3 通用章节),所有字段声明唯一确定类型。
+
+横切机制对照见上面「横切关注点不计入 god service 判定」节的 Dart 列:Shelf middleware / Riverpod ProviderObserver / Serverpod future hooks 等价 Spring AOP,**横切实现类不计入 god service**。
+
+---
+
 ## 命名规范
 
 ### 服务命名 taxonomy(Service / UseCase / Handler / Orchestrator)
@@ -652,12 +757,16 @@ Infrastructure Mapper / Client / MQ Adapter
 
 **1. 选型矩阵(项目级选定一种,后续所有 focused service 沿用)**:
 
-| 项目主流派 | 选用命名 | 理由 |
-|-----------|---------|------|
-| 传统 Spring Boot / 主流 Java 后端 | **`XxxService`** | 与团队既有命名一致,降低 onboarding 成本 |
-| CQRS / 命令-查询分离 / EventSourcing | **`XxxCommandHandler`**(写)/ **`XxxQueryHandler`**(读) | CQRS 教科书命名,与 MediatR / Axon 生态一致 |
-| Clean Architecture / Hexagonal / 强调用例 | **`XxxUseCase`** / **`XxxInteractor`** | Robert Martin 命名,与 Use Case Driven Design 一致 |
-| Flutter backend / 跨端项目 | **`XxxService`**(与 `korepos-backend-service` 对齐) | 已有 skill 强约束 |
+| 项目主流派 | 语言典型框架 | 选用命名 | 理由 |
+|-----------|-------------|---------|------|
+| 传统 Spring Boot / 主流 Java 后端 | Spring Boot / Spring Cloud | **`XxxService`** | 与 `@Service` 注解 + Spring 教科书 + 团队既有命名一致 |
+| Python Web 后端(主流) | FastAPI / Django / Flask | **`XxxService`** | Python 社区主流命名(FastAPI 文档、cosmic-python 等),与 Java 跨栈一致 |
+| Dart 后端(跨端 + Flutter backend) | Serverpod / Shelf / `korepos-backend-service` | **`XxxService`**(与 `korepos-backend-service` 对齐) | 已有 skill 强约束 + Flutter 社区主流 |
+| TypeScript 后端 | NestJS / tRPC | **`XxxService`** | NestJS `@Injectable()` 标准命名 |
+| CQRS / 命令-查询分离 / EventSourcing | Axon(Java) / MediatR(.NET) / cqrs(Python) | **`XxxCommandHandler`**(写)/ **`XxxQueryHandler`**(读) | CQRS 教科书命名 |
+| Clean Architecture / Hexagonal / 强调用例 | 跨语言通用 | **`XxxUseCase`** / **`XxxInteractor`** | Robert Martin 命名,与 Use Case Driven Design 一致 |
+
+> 多语言项目原则:**全栈选同一种命名**(默认 `XxxService`),避免 Java 项目用 `XxxService`、Python 项目用 `XxxUseCase`、Dart 项目用 `XxxHandler` 这种"按语言切换叫法"——团队 onboarding 成本太高。CQRS 流派除外(它本身就是跨语言一致的)。
 
 **2. 跨分支编排类(orchestrator)统一叫法**(与上面 focused service 命名解耦):
 
