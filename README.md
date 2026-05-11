@@ -138,9 +138,22 @@ node scripts/sync-agents.js
 
 # CI 校验 AGENTS.md 是否同步:
 node scripts/sync-agents.js --check
+
+# 校验跨 skill / 跨章节引用是否全部解析(被引文件改章节名会被检出):
+node scripts/check-cross-refs.js
+
+# Skill 健康度审计(描述长度 / 文件大小 / 引用次数 / 最近修改时间 / dev-log 提及次数):
+node scripts/audit-skills.js                # 全表 + 警告
+node scripts/audit-skills.js --warnings     # 只输出有警告的 skill
+node scripts/audit-skills.js --markdown     # 输出 markdown 表(贴 issue 用)
 ```
 
-CI(GitHub Actions)在 push / PR 时自动跑 hook 测试(Linux/macOS/Windows × Node 18/20/22)+ AGENTS.md 同步校验。
+CI(GitHub Actions)在 push / PR 时自动跑:
+- Hook 单测矩阵(Linux/macOS/Windows × Node 18/20/22)
+- AGENTS.md 同步校验
+- 跨引用解析校验
+
+`audit-skills.js` 是手动维护工具(定期看 skill 是否需要拆分 / 描述压缩),不进 CI 强校验。
 
 ## 安装
 
