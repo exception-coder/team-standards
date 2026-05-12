@@ -213,7 +213,7 @@ flowchart LR
     subgraph 分析阶段
         direction TB
         A1["触发：\nbug-doc-required\n→ design-doc-required"]
-        A2["默认生成用户目录草稿\n不更新 INDEX.md\n用户指定 docs 时才走索引"]
+        A2["默认生成用户目录文档\n用户目录与 docs 同等\n两侧都走 Phase-A 查重 + Phase-B 登记\n(v1.20+ 规则反转)"]
         A1 --> A2
     end
 

@@ -82,7 +82,7 @@ team-standards/
 | `.claude-plugin/` | Claude Code 插件声明目录，包含插件版本、展示信息和 marketplace 条目 | 发布前必须同步递增 `plugin.json` 与 `marketplace.json` 的 `version` |
 | `.codex-plugin/` | Codex 插件声明目录，包含 Codex 侧插件元数据 | 维护 Codex 分发时同步递增 `plugin.json` 的 `version` |
 | `skills/` | 插件核心目录，每个子目录是一个独立 Skill，至少包含 `SKILL.md` | 新增或修改 Skill 后，同步更新 `AGENTS.md`、`CLAUDE.md`、README 的 Skills 表和 `docs/skill-flow.md` |
-| `hooks/` | 强制拦截脚本目录：`check-git-commit-skill.js` 默认启用（拦截未调用 git-commit-standards skill 的 git commit / push）；`check-dto-annotation.js` 默认启用（拦截 wire DTO 用 `@freezed` 或裸 `@JsonSerializable()` 的违规）；`check-design-doc.{cmd,sh}` 默认禁用模板 | 新增 hook 时同步更新 `hooks.json`、CLAUDE.md/AGENTS.md 辅助资源表 |
+| `hooks/` | 强制拦截脚本目录：`check-git-commit-skill.js` 默认启用（拦截未调用 git-commit-standards skill 的大改 git commit）；`check-dto-annotation.js` 默认启用（拦截 wire DTO 用 `@freezed` 或裸 `@JsonSerializable()` 的违规）；`check-design-doc.js` **v1.26 起默认启用**（项目级设计文档存在性兜底——源码 Edit/Write 前在项目 `docs/design/` + 用户目录 `ai-docs/{project}/design/` 任一位置找不到 `.md` 则阻断；`TEAM_STANDARDS_DESIGN_DOC_HOOK=off` 一次性绕过） | 新增 hook 时同步更新 `hooks.json`、CLAUDE.md/AGENTS.md 辅助资源表 |
 | `docs/` | 维护文档目录，记录 Skill 链路、配置机制和决策型变更背景 | 链路结构变化时直接更新 `skill-flow.md`，历史由 git log 承担，不再创建文件式快照（v21.1 起反转） |
 
 ### 关键文件
@@ -98,8 +98,7 @@ team-standards/
 | `hooks/check-git-commit-skill.js` | git commit 前按 staged diff 大小判定的拦截脚本（Node 跨平台，默认启用） | 调整阈值或拦截逻辑时（环境变量 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 也可调） |
 | `hooks/check-dto-annotation.js` | wire DTO 注解拦截脚本（Node 跨平台，默认启用，PreToolUse Write/Edit/MultiEdit）：拦截 `lib/features/*/common/models/(request\|response)/*.dart` 下的 `@freezed` 与裸 `@JsonSerializable()`；例外文件需在头部加 `// FREEZED-EXCEPTION:` 标记 | 调整 wire DTO 注解校验规则时（环境变量 `TEAM_STANDARDS_DTO_HOOK=off` 临时禁用） |
 | `hooks/scan-reverse-index.js` | 反向索引冷启动扫描器（Node 跨平台，**手工运行，未注册到 hooks.json**）：扫描项目 Java / Dart / TS 源码，识别 enum 定义 + `EnumName.VALUE` 引用 + SQL 字面量候选，产出 `states.md`；fields / events / apis 仅生成存根需人工填充；用法 `node hooks/scan-reverse-index.js --project=. --output=./docs/knowledge-graph/reverse-index/`；`--output=user-candidates` 写入用户文档目录候选池 | 项目首次接入反向索引时一次性运行；后续由 `reverse-index-required` skill 增量维护 |
-| `hooks/check-design-doc.cmd` | Windows 设计文档检查脚本 | 调整 Windows 下的强制门禁逻辑时 |
-| `hooks/check-design-doc.sh` | macOS/Linux 设计文档检查脚本 | 调整 Unix 系统下的强制门禁逻辑时 |
+| `hooks/check-design-doc.js` | **项目级设计文档存在性兜底**（Node 跨平台，**v1.26 起默认启用**，PreToolUse Write/Edit/MultiEdit）：仅对源码扩展名触发（`.dart` / `.java` / `.kt` / `.ts` / `.py` 等），跳过 `.md` / `.json` / 测试 / Dockerfile / Makefile；在项目 `docs/design/`、用户目录 `~/Documents/ai-docs/{project}/design/`、`~/ai-docs/{project}/design/` 任一位置找到 `.md` 即放行；**只兜底"项目里存在任何设计文档"，不强校验"本次需求对应文档"**——后者由 `design-doc-required` skill 承担。环境变量 `TEAM_STANDARDS_DESIGN_DOC_HOOK=off` 一次性禁用 | 调整源码扩展名集合 / 测试文件识别 / 路径查找规则时 |
 | `.claude-plugin/plugin.json` | Claude 插件基础元数据 | 每次发布前递增版本 |
 | `.claude-plugin/marketplace.json` | Claude marketplace 入口 | 每次发布前与 `.claude-plugin/plugin.json` 保持版本一致 |
 | `.codex-plugin/plugin.json` | Codex 插件基础元数据 | 每次发布前递增版本 |
@@ -286,16 +285,21 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 
 项目内正式设计文档进入 Git 后，默认维护稳定文档（如 `{需求}-current.md` / `{需求}-coding.md`），普通迭代直接更新原文件，历史和变更原因写入 git commit body。只有重大架构基线、发布快照、非 Git 管理文档或用户明确要求时，才创建 `YYYYMMDD-vN` 快照文件。
 
-## 可选：脚本级强制拦截
+## 脚本级拦截（默认启用）
 
-默认情况下，规范约束通过 Skill 描述强制执行。
+**v1.26 起，三道 PreToolUse hook 默认启用**（跨平台 Node 脚本，无需平台分支）：
 
-如需更强的拦截（Claude 调用写文件工具前由脚本检查），可启用 Hook：
+| Hook | 触发 matcher | 默认启用 | 旁路 |
+|---|---|---|---|
+| `check-git-commit-skill.js` | `Bash`（仅命中 `git commit`） | ✅ | 小改自动放行（≤2 文件 ∧ ≤30 行 ∧ 仅 M）；`TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 可调阈值 |
+| `check-dto-annotation.js` | `Write` / `Edit` / `MultiEdit` | ✅ | 文件头加 `// FREEZED-EXCEPTION:` 标记；`TEAM_STANDARDS_DTO_HOOK=off` 一次性关闭 |
+| `check-design-doc.js` | `Write` / `Edit` / `MultiEdit` | ✅ | 跳过 .md / .json / 测试 / Dockerfile；项目 `docs/design/` 或用户目录 `ai-docs/{project}/design/` 存在任意 `.md` 即放行；`TEAM_STANDARDS_DESIGN_DOC_HOOK=off` 一次性关闭 |
 
-1. 编辑 `hooks/hooks.json`，根据平台选择对应的 `_disabled_PreToolUse_windows`（Windows）或 `_disabled_PreToolUse_unix`（macOS/Linux），将其改为 `PreToolUse` 并移入 `hooks` 对象内
-2. 重新安装插件或执行 `/reload-plugins`
+**check-design-doc.js 的语义边界**：它是**项目级设计文档存在性兜底**——只要项目里有任何一份设计文档就放行，不验证"本次需求对应文档"。"本次需求是否真的有设计"由 `design-doc-required` skill 负责（软门禁，依赖 AI 自律 + S/M/L 档位分流）。两者协同：skill 决定"该不该写设计"，hook 兜底"项目至少要有设计文档存在"。
 
-Hook 脚本：Windows 使用 `hooks/check-design-doc.cmd`，macOS/Linux 使用 `hooks/check-design-doc.sh`。
+**新项目首次接入插件后第一次写源码会被 hook 阻断**——这是设计内行为，提醒你先建立项目设计文档体系（最低只需要在 `docs/design/` 下放一份 README 占位）；或用 `TEAM_STANDARDS_DESIGN_DOC_HOOK=off` 跳过本次会话。
+
+如需临时禁用某个 hook（debug / 实验），编辑 `hooks/hooks.json` 把对应行注释掉即可，无需重装插件——hook 配置随 `/reload-plugins` 立即生效。
 
 ## 配置个人 Git 署名
 

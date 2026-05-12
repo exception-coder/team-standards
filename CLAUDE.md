@@ -103,6 +103,16 @@
 
 **这张表与 `git-commit-standards` hook 的关系**:hook 在 commit 时按 staged diff 大小判定(≤2 文件 ∧ ≤30 行 ∧ 仅 M = 放行)——和本表的 S 档判定**完全一致**。换言之 hook 是 commit 时的最后一道兜底,本表是**开始改之前**的前置判定;两者协同把"小改不打断、大改强门禁"做实。
 
+**这张表与 `check-design-doc.js` hook 的关系**(v1.26 起默认启用):该 hook 是**项目级设计文档存在性兜底**,只要项目 `docs/design/` 或用户目录 `~/Documents/ai-docs/{project}/design/`、`~/ai-docs/{project}/design/` 任一位置存在任意 `.md` 就放行——**不与档位重叠**,它管的是"项目里至少要有设计文档存在",档位管的是"本次改动要不要走 design-doc-required skill"。三类典型情形:
+
+| 情形 | S 档行为 | hook 行为 |
+|---|---|---|
+| 已有任意设计文档的成熟项目 | 跳过 design-doc-required skill | 自动放行(项目已有 `.md`) |
+| 新项目首次接入插件、`docs/design/` 完全为空 | 跳过 design-doc-required skill | **会阻断** —— 解法二选一:(1) 先创建一份占位 `docs/design/README.md`(推荐);(2) 本次会话设 `TEAM_STANDARDS_DESIGN_DOC_HOOK=off` |
+| M / L 档 | 走 design-doc-required skill 生成新文档 | 文档生成后自然放行 |
+
+**所以 S 档"不需要调 design-doc-required"指的是跳过 skill 工作流程(不起草新文档 / 不读模板),不等于完全无视项目设计文档体系**——hook 仍然要求项目至少存在过设计文档。新项目第一次写源码时,这是一道"提醒先建立项目设计文档基线"的硬门禁,不是误报。
+
 **沉淀类 skill 的特殊处理**:`glossary-required` / `reverse-index-required` / `daily-work-log` 三类在 M / L 档不应在编码中途打断,而是**会话结束前批处理**——编码过程中只往 `{USER_DOCUMENTS}/ai-docs/{project}/_pending.md` 追加候选记录,改完代码后一次性整理入正式索引。详见各 skill 自身的「会话末批处理」节。
 
 ---
@@ -220,8 +230,7 @@
 | `skills/design-doc-required/template.md` | design-doc-required | 8 节方案/接口设计文档模板（核心逻辑、编码落点、风险点，超出轻量范围时使用） |
 | `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板（仅完整模版需要） |
 | `skills/design-doc-required/lightweight-template.md` | design-doc-required | 7 节接口级轻量模版（单接口自身流程 / 库表读写流程；无需配套 coding.md） |
-| `hooks/check-design-doc.cmd` | 可选 Hook | 设计文档校验脚本 — Windows（默认禁用） |
-| `hooks/check-design-doc.sh` | 可选 Hook | 设计文档校验脚本 — macOS/Linux（默认禁用） |
+| `hooks/check-design-doc.js` | design-doc-required（兜底） | **项目级设计文档存在性兜底** — Node 跨平台（**v1.26 起默认启用**，PreToolUse Write/Edit/MultiEdit）：仅对源码扩展名触发（`.dart` / `.java` / `.kt` / `.ts` / `.py` / `.go` 等），跳过 `.md` / `.json` / 测试 / Dockerfile；在项目 `docs/design/` 或用户目录 `~/Documents/ai-docs/{project}/design/`、`~/ai-docs/{project}/design/` 任一位置找到 `.md` 即放行；只兜底"项目里存在任何设计文档"，**不强校验"本次需求对应文档"**——后者由 `design-doc-required` skill 承担；环境变量 `TEAM_STANDARDS_DESIGN_DOC_HOOK=off` 一次性禁用 |
 | `hooks/check-git-commit-skill.js` | git-commit-standards | git commit 前按 staged diff 大小判定的拦截脚本 — Node 跨平台（**默认启用**，小改放行 / 大改强制 skill；git push 不拦截） |
 | `hooks/check-dto-annotation.js` | korepos-backend-service | wire DTO 注解校验脚本 — Node 跨平台（**默认启用**，PreToolUse Write/Edit/MultiEdit 拦截 `lib/features/*/common/models/(request\|response)/*.dart` 下的 `@freezed` 与裸 `@JsonSerializable()`；例外：文件头加 `// FREEZED-EXCEPTION:` 标记；环境变量 `TEAM_STANDARDS_DTO_HOOK=off` 临时禁用） |
 | `hooks/scan-reverse-index.js` | reverse-index-required | 反向索引冷启动扫描器 — Node 跨平台（**默认未注册到 hooks.json,手工运行**），扫描 Java / Dart / TS 源码,识别 enum 定义 + `EnumName.VALUE` 引用 + SQL 字面量候选,产出 `states.md`,fields/events/apis 输出存根；用法 `node hooks/scan-reverse-index.js --project=. --output=./docs/knowledge-graph/reverse-index/`；输出选 `--output=user-candidates` 走用户文档目录候选池 |
