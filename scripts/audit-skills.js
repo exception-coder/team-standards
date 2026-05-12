@@ -13,9 +13,10 @@
  *   - dev-log 中出现次数(决策密度)
  *
  * 用法:
- *   node scripts/audit-skills.js                # 输出全表 + 警告
+ *   node scripts/audit-skills.js                # 输出全表 + 警告(exit 0)
  *   node scripts/audit-skills.js --markdown     # 输出 markdown 表格(用于贴到 issue)
- *   node scripts/audit-skills.js --warnings     # 只输出有警告的 skill
+ *   node scripts/audit-skills.js --warnings     # 只输出有警告的 skill(exit 0)
+ *   node scripts/audit-skills.js --ci           # CI 守卫模式:有任何警告则 exit 1(可与 --warnings 叠加)
  */
 
 const fs = require('fs');
@@ -34,6 +35,7 @@ const TH_STALE_DAYS = 180;      // 半年未改可能 stale
 
 const ARG_MD = process.argv.includes('--markdown');
 const ARG_WARN_ONLY = process.argv.includes('--warnings');
+const ARG_CI = process.argv.includes('--ci');
 
 function listSkills() {
   return fs.readdirSync(SKILLS_DIR).filter((d) => {
@@ -174,3 +176,13 @@ function output(rows) {
 
 const rows = analyze();
 output(rows);
+
+if (ARG_CI) {
+  const warnSkills = rows.filter((r) => r.warnings.length > 0);
+  if (warnSkills.length > 0) {
+    console.error(`\n[audit-skills] ✖ CI 模式: 发现 ${warnSkills.length} 个 skill 有警告,阻断 PR`);
+    console.error(`修复: 按警告类型处理(SKILL.md 拆 rules/ 子文档 / 压缩 description / 补 dev-log 等)`);
+    process.exit(1);
+  }
+  console.log(`\n[audit-skills] ✓ CI 模式: 0 警告`);
+}

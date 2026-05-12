@@ -16,7 +16,11 @@
 //   - 测试文件 (路径含 /test/ / /tests/ / __tests__ / 文件名 *_test.ext / *.test.ext / *.spec.ext)
 //   - 配置/脚本 (.sh / .cmd / .bat / .ps1 / Dockerfile / Makefile / *.yml)
 //   - hidden 文件 (以 . 开头)
-//   - 创建新文件且文件不存在(允许 design-doc-required skill 走完正常流程后再 Write)
+//
+// 注:源码新文件(尚不存在的 .dart / .java / .ts 等)同样进入设计文档检查,
+//    不存在豁免——这是有意为之:新增源码同样需要先有项目设计文档基线,
+//    否则等于把"边写代码边补文档"合法化。新项目首次落地用 TEAM_STANDARDS_DESIGN_DOC_HOOK=off
+//    或先创建 docs/design/README.md 占位即可。
 //
 // 旁路:
 //   环境变量 TEAM_STANDARDS_DESIGN_DOC_HOOK=off 一次性禁用

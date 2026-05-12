@@ -124,13 +124,16 @@ function main() {
     headingsBySkill[name] = loadHeadings(path.join(SKILLS_DIR, name, 'SKILL.md'));
   }
 
-  // 扫描所有 SKILL.md + CLAUDE.md / AGENTS.md / README.md
+  // 扫描所有 SKILL.md + CLAUDE.md / AGENTS.md / README.md + docs/ 下含 skill 引用的关键文档
   const targets = [
     ...allSkills.map((n) => path.join(SKILLS_DIR, n, 'SKILL.md')),
     path.join(ROOT, 'CLAUDE.md'),
     path.join(ROOT, 'AGENTS.md'),
     path.join(ROOT, 'README.md'),
     path.join(ROOT, 'docs', 'skill-flow.md'),
+    path.join(ROOT, 'docs', 'skill-dependencies.md'),
+    path.join(ROOT, 'docs', 'skill-triggers.md'),
+    path.join(ROOT, 'docs', 'anti-pattern-case-library.md'),
   ].filter(fs.existsSync);
 
   const errors = [];

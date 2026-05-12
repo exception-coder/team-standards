@@ -138,21 +138,28 @@ node scripts/sync-agents.js
 # CI 校验 AGENTS.md 是否同步:
 node scripts/sync-agents.js --check
 
-# 校验跨 skill / 跨章节引用是否全部解析(被引文件改章节名会被检出):
+# 校验跨 skill / 跨章节引用是否全部解析(被引文件改章节名会被检出,扫描 SKILL.md +
+# CLAUDE.md / AGENTS.md / README.md + docs/skill-flow.md / skill-dependencies.md / skill-triggers.md
+# / anti-pattern-case-library.md):
 node scripts/check-cross-refs.js
 
+# 校验三处插件 manifest 的 version 一致(.claude-plugin/plugin.json,
+# .claude-plugin/marketplace.json#plugins[0], .codex-plugin/plugin.json):
+node scripts/check-version-sync.js --verbose
+
 # Skill 健康度审计(描述长度 / 文件大小 / 引用次数 / 最近修改时间 / dev-log 提及次数):
-node scripts/audit-skills.js                # 全表 + 警告
+node scripts/audit-skills.js                # 全表 + 警告(exit 0)
 node scripts/audit-skills.js --warnings     # 只输出有警告的 skill
 node scripts/audit-skills.js --markdown     # 输出 markdown 表(贴 issue 用)
+node scripts/audit-skills.js --warnings --ci # CI 守卫模式,有警告则 exit 1
 ```
 
-CI(GitHub Actions)在 push / PR 时自动跑:
+CI(GitHub Actions)在 push / PR 时自动跑(v1.26.2 起 5 个 job):
 - Hook 单测矩阵(Linux/macOS/Windows × Node 18/20/22)
 - AGENTS.md 同步校验
 - 跨引用解析校验
-
-`audit-skills.js` 是手动维护工具(定期看 skill 是否需要拆分 / 描述压缩),不进 CI 强校验。
+- **插件 manifest 版本一致性校验**(v1.26.2 新增)
+- **Skill 健康度守卫**(v1.26.2 新增,任一 skill 描述 > 800 字 / SKILL.md > 800 行 / 零引用 / stale 即阻断)
 
 ## 安装
 
@@ -205,6 +212,18 @@ git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
 ```
 
 > 如果是本地目录安装方式，需先进入仓库目录执行 `git pull`，再执行 `/reload-plugins`。
+
+### ⚠️ 从 v1.25.x 或更早版本升级到 v1.26+ 的注意事项
+
+v1.26 起 **`check-design-doc.js` hook 默认启用**（[hooks/hooks.json](hooks/hooks.json)）。升级后第一次在源码上执行 `Write` / `Edit` / `MultiEdit` 时，若项目内 `docs/design/` 与用户目录 `~/Documents/ai-docs/{project}/design/`、`~/ai-docs/{project}/design/` 都找不到任何 `.md`，**hook 会阻断**操作并提示先建立项目设计文档基线。这不是 bug，是有意的"项目级设计文档存在性兜底"。
+
+| 你的项目情况 | 推荐处置 |
+|---|---|
+| 已经有 `docs/design/` 且至少有 1 份 `.md`（常见） | 不用动，hook 自动放行 |
+| 新项目 / 还没建立 `docs/design/` | 先 `mkdir docs/design && echo "# 设计文档目录" > docs/design/README.md`，即可解除阻断 |
+| 紧急 hotfix / 实验性脚本，临时不想被拦 | 当前会话 `$env:TEAM_STANDARDS_DESIGN_DOC_HOOK = 'off'`（PowerShell）或 `export TEAM_STANDARDS_DESIGN_DOC_HOOK=off`（bash） |
+
+`check-design-doc.js` 只校验"项目级是否存在任意设计文档"，**不**强校验"本次需求对应文档存在"——后者由 `design-doc-required` skill 配合 S/M/L 档位分流承担。两者协同详见 [CLAUDE.md § 改动规模 → 链路档位](CLAUDE.md#改动规模--链路档位sml-三档对照表)。
 
 ## 包含的 Skills
 
