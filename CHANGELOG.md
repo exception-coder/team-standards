@@ -4,6 +4,14 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.27.1] - 2026-05-13
+
+**修复 `/reset-kpos-local` 中 korepos.db 路径写死开发者用户名 `zhangkai` 的问题。**
+
+### Changed
+- `commands/reset-kpos-local.md`：第 2 个文件路径 `D:\Users\zhangkai\Documents\korepos.db` → `D:\Users\$env:USERNAME\Documents\korepos.db`，由 PowerShell 在执行时展开为当前 Windows 登录用户名，其他成员安装后无需改动即可生效
+- 路径表下方注释改为明确说明：盘符 `D:` 是团队约定（Documents 统一放 D 盘），**不要**替换为 `$env:USERPROFILE` 或 `MyDocuments`，那些会解析到 C 盘
+
 ## [1.27.0] - 2026-05-13
 
 **新增 `/reset-kpos-local` slash command + 配套语义触发 skill，用于一键删除 kpos 本地缓存与本地数据库。**

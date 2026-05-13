@@ -11,9 +11,9 @@ description: 删除 kpos 本地状态文件（shared_preferences + korepos.db）
 | # | 路径 | 含义 |
 |---|------|------|
 | 1 | `$env:APPDATA\com.example\kpos\shared_preferences.json` | Flutter `shared_preferences` 本地键值缓存（账号/会话/UI 偏好等） |
-| 2 | `D:\Users\zhangkai\Documents\korepos.db` | korepos 本地 SQLite 数据库 |
+| 2 | `D:\Users\$env:USERNAME\Documents\korepos.db` | korepos 本地 SQLite 数据库 |
 
-> 第 2 条目前固定写死在 `D:\Users\zhangkai\Documents\`——这是当前开发者的 Documents 重定向位置。若其他成员 Documents 仍在默认 C 盘，需要后续扩展为可配置。
+> 第 2 条路径中 `$env:USERNAME` 由 PowerShell 在执行时展开为当前 Windows 登录用户名；盘符固定 `D:` 是团队开发环境约定（Documents 统一放在 D 盘 `\Users\<user>\Documents\`），不要替换为 `$env:USERPROFILE` 或 `MyDocuments` 等可能解析到 C 盘的形式。
 
 ## 执行步骤
 
@@ -23,7 +23,7 @@ description: 删除 kpos 本地状态文件（shared_preferences + korepos.db）
    ```powershell
    $paths = @(
      "$env:APPDATA\com.example\kpos\shared_preferences.json",
-     "D:\Users\zhangkai\Documents\korepos.db"
+     "D:\Users\$env:USERNAME\Documents\korepos.db"
    )
    foreach ($p in $paths) {
      if (Test-Path -LiteralPath $p) {
