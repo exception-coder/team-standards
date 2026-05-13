@@ -4,6 +4,18 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.27.0] - 2026-05-13
+
+**新增 `/reset-kpos-local` slash command + 配套语义触发 skill，用于一键删除 kpos 本地缓存与本地数据库。**
+
+### Added
+- `commands/reset-kpos-local.md` — 首个 plugin 自带 slash command。删除 `$env:APPDATA\com.example\kpos\shared_preferences.json` 与 `D:\Users\zhangkai\Documents\korepos.db` 两个本地状态文件。显式调用 = 已确认，不再询问；使用 PowerShell `Remove-Item -Force` 实现，逐文件独立成功/失败计数
+- `skills/reset-kpos-local-state/SKILL.md` — 配套语义触发 skill。识别"重置 kpos 本地 / 清空 shared_preferences / 删 korepos.db"等狭义短语后**路由到** `/reset-kpos-local`，不自己 `Remove-Item`，所有边界与回报由 slash command 唯一负责
+
+### Notes
+- 第 2 个文件路径 `D:\Users\zhangkai\Documents\korepos.db` 仍是当前开发者本机硬编码——其他成员若 Documents 目录在 C 盘，需要后续扩展为可配置或环境变量化
+- 故意**不**用 hook 实现：destructive 操作靠正则/事件匹配自动开火属反模式，必须靠 AI 语义层 + 显式入口
+
 ## [1.25.0] - 2026-05-12
 
 **Plugin maintainability 重构。完整设计评审请见 commit `9d3c1d7`。**
