@@ -4,6 +4,28 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.28.0] - 2026-05-15
+
+**新增第四道 PreToolUse hook `check-backend-kg-readiness.js`，兜底 `backend-knowledge-graph-required` skill 的"编码前必读图谱"约束。**
+
+### Added
+- `hooks/check-backend-kg-readiness.js` — Node 跨平台 PreToolUse Write/Edit/MultiEdit 兜底脚本。路径白名单 `lib/features/{module}/backend(v\d+)?/**/*.dart` 与 `lib/common/backend_infra/(daos|services)/**/*.dart`，命中后扫 transcript 是否 Read 过 `**/knowledge-graph/00_index.md` 或任一 `**/knowledge-graph/scenarios/*.md`；未命中按模式提示
+- `hooks/tests/check-backend-kg-readiness.test.js` — 端到端测试 10 例（含 warn / block / off 三模式 + 路径白名单 + 小改豁免 + 已读图谱放行）
+- `backend-knowledge-graph-required/SKILL.md` BLOCKING 段补一行"会话首次 Edit 后端业务源码 + 未读图谱即 hook 提示"；误判反例段补一条"改 bug 直接 grep + Read 源码就够了"的反例
+
+### Changed
+- `hooks/hooks.json` 注册第四道 hook 与前三道并列；`_comment` 同步
+- `CLAUDE.md` 辅助资源表新增 `check-backend-kg-readiness.js` 条目
+
+### Configuration
+- `TEAM_STANDARDS_BACKEND_KG_HOOK`：`warn`（默认，exit 0 + stderr 提示）/ `block`（exit 2 硬阻断）/ `off`（完全跳过）
+- `TEAM_STANDARDS_KG_TRIVIAL_FILES`（默认 1）/ `TEAM_STANDARDS_KG_TRIVIAL_LINES`（默认 20）—— 小改豁免阈值
+
+### Motivation
+- AI 在跨会话编码中反复出现"直接 grep + Read 源码就动手改，跳过项目知识图谱"的偷懒模式，导致重复发明状态判定 / 金额聚合 / SQL 查询逻辑、踩已沉淀过的坑（典型案例：korepos-refund 退款金额双计 tip bug 修复，对应 commit `ff39eccb2`，事后回顾发现 memory 含 tip 矩阵在会话起始就已加载但未主动应用）
+- skill 自身已写明 BLOCKING 但靠 AI 自觉判断；与 `check-design-doc` / `check-git-commit-skill` 的成熟拦截范式对齐：v1.28 起加 hook 兜底
+- 试用期采用 warn 模式（exit 0）评估误报率，成熟后用户可切换 `=block` 升级为硬阻断
+
 ## [1.27.1] - 2026-05-13
 
 **修复 `/reset-kpos-local` 中 korepos.db 路径写死开发者用户名 `zhangkai` 的问题。**

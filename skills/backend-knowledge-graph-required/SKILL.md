@@ -41,6 +41,7 @@ description: "Use BEFORE answering single-service backend questions about table 
 | 后端代码变更 | 新增/修改 API、Service、DAO、SQL、表、枚举、状态机、事务边界、MQ、外部依赖 | 同步更新对应卡片或候选池 |
 | **同一技术主题反复疑问 ≥3 轮**（项目级技术难点） | 用户在同一会话中对同一技术点重复提问 / 验证 / 担忧 ≥3 次；或出现回归性措辞："为什么...还" / "怎么又..." / "上次说..." / "是不是...占用了" / "现在又卡了"；或修复后 ≥2 轮验证性追问 | 答题同一回合**自动追加候选**到 `_candidates.md`，分类标记 `技术难点`；超过 5 轮反复或用户显式提示"这是核心点"时主动起 `scenarios/` 场景卡 |
 | **AI 完成涉及子进程 / 并发 / 性能 / 资源边界的代码改动** | 修复 transferTo 阻塞、Semaphore 限流、孤儿进程清理、缓存键策略、超时回收、磁盘/CPU 争夺等"非业务技术陷阱" | 编码后必候选记录；用户提示"这是难点要登记"时立刻整理为正式场景卡 |
+| **会话首次 Write/Edit 后端业务源码**（路径含 `lib/features/{module}/backend(v\d+)?/**/*.dart` 或 `lib/common/backend_infra/(daos\|services)/**/*.dart`，非测试文件，非 ≤1 文件 ∧ ≤20 行的小改） | hook `check-backend-kg-readiness.js` PreToolUse 兜底（v1.28 起默认 warn 模式 exit 0 + stderr 提示，`TEAM_STANDARDS_BACKEND_KG_HOOK=block` 升级硬阻断、=off 关闭）；transcript 内 0 次 Read `**/knowledge-graph/00_index.md` 或 `**/knowledge-graph/scenarios/*.md` | 立即停止 Edit，先 Read 项目对应 `knowledge-graph/00_index.md` 按关键词反查命中场景卡再继续；命中场景卡也读完后才回到原 Edit |
 
 > **常见误判反例（已发生过的踩坑）**：
 > - ❌ "用户只是问云端逻辑，没让我建图谱，所以不用触发" → **错**，问询场景必触发并候选沉淀
@@ -51,6 +52,7 @@ description: "Use BEFORE answering single-service backend questions about table 
 > - ❌ "技术难点（子进程 / 并发 / 性能）不是表关系，所以不归本 skill" → **错**，本 skill v1.21 起范围已扩到项目级技术难点；用户反复疑问的技术陷阱必须沉淀
 > - ❌ "用户没显式说'记到知识图谱'，所以不用沉淀" → **错**，会话同主题反复疑问 ≥3 轮即自动触发，无需用户提醒；事后才记容易丢上下文
 > - ❌ "技术难点等下次会话再说" → **错**，当场记录，错过即流程违反；会话结束后重新还原难点上下文成本极高
+> - ❌ "改 bug 直接 grep + Read 源码就够了，不需要先读图谱" → **错**，v1.28 起 `check-backend-kg-readiness.js` 在 PreToolUse 兜底提示；非小改的后端业务源码 Edit 前未读过 `knowledge-graph/00_index.md` 或场景卡即 hook 告警；图谱里的金额口径 / 状态判定 / SQL 指纹 / 原子能力索引能省去 grep 重复发明的轮次
 
 ## 调查对象与图谱归属路由
 
