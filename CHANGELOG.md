@@ -4,6 +4,23 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.28.2] - 2026-05-15
+
+**`backend-knowledge-graph-required` 升级：`ddl-baseline.md` 成为涉及 DB 操作项目的硬必需。**
+
+### Changed
+- `skills/backend-knowledge-graph-required/SKILL.md`：
+  - Tier 1 起步树新增 `ddl-baseline.md`，标注涉及 DB 操作项目硬必需（不是可选）
+  - BLOCKING 强触发清单新增"项目存在持久层代码但 `ddl-baseline.md` 缺失即必须先 dump 再写 SQL"一条
+  - 编码前必读列表把 `ddl-baseline.md` 提到第 1 位，其余顺移
+  - 新增独立小节「DDL 基线（涉及 DB 操作的项目硬必需）」，覆盖：Why（ORM 实体类只展示子集 + 难一站式速查 + 迁移后可能漂移 + 凭记忆易踩坑）/ 触发条件矩阵 / 标准路径与命名（不拆 `ddl/{table}.md`）/ 5 个 DB 引擎 dump 命令模板（SQLite / PostgreSQL / MySQL / MSSQL / Oracle）/ 文档结构骨架 / 维护时机（schema 迁移后立即重新 dump）/ 与 `tables/{table}.md` 关系（DDL 是源、tables 卡是注解）/ hook 集成（白名单已含 ddl-baseline.md）
+- `CLAUDE.md`：主 Skill 索引表 `backend-knowledge-graph-required` 行描述新增"DDL 基线"段；关键词补 `DDL 基线 / ddl-baseline / CREATE TABLE / sqlite_master / pg_dump / mysqldump / 字段名速查`
+
+### Motivation
+- korepos-refund 案例验证：`order_transaction` 无 `order_id`、`bill` 无 `order_id`、`orders.pay_amount` 不含 tip 等 schema 事实反复踩坑，靠 grep `lib/common/services/database/tables/*.dart` 不够顺手；本次实测 `ddl-baseline.md` 70KB 单文件一次 Read 拿到 84 张表 + 48 索引全貌，效率提升明显
+- 把"涉及 DB 项目必须有 DDL 基线"从项目级 memory 升级到 plugin 级硬约束——所有团队成员的所有项目都受益，不只 korepos
+- 与 `check-backend-kg-readiness.js` hook（v1.28 引入、v1.28.1 字面量白名单加 ddl-baseline.md）协同：skill 文档定规则、hook 实施兜底
+
 ## [1.28.1] - 2026-05-15
 
 **`check-backend-kg-readiness.js` 字面量白名单扩展：`knowledge-graph/ddl-baseline.md` 也算"已读图谱"。**

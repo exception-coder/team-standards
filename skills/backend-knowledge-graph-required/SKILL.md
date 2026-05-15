@@ -41,7 +41,8 @@ description: "Use BEFORE answering single-service backend questions about table 
 | 后端代码变更 | 新增/修改 API、Service、DAO、SQL、表、枚举、状态机、事务边界、MQ、外部依赖 | 同步更新对应卡片或候选池 |
 | **同一技术主题反复疑问 ≥3 轮**（项目级技术难点） | 用户在同一会话中对同一技术点重复提问 / 验证 / 担忧 ≥3 次；或出现回归性措辞："为什么...还" / "怎么又..." / "上次说..." / "是不是...占用了" / "现在又卡了"；或修复后 ≥2 轮验证性追问 | 答题同一回合**自动追加候选**到 `_candidates.md`，分类标记 `技术难点`；超过 5 轮反复或用户显式提示"这是核心点"时主动起 `scenarios/` 场景卡 |
 | **AI 完成涉及子进程 / 并发 / 性能 / 资源边界的代码改动** | 修复 transferTo 阻塞、Semaphore 限流、孤儿进程清理、缓存键策略、超时回收、磁盘/CPU 争夺等"非业务技术陷阱" | 编码后必候选记录；用户提示"这是难点要登记"时立刻整理为正式场景卡 |
-| **会话首次 Write/Edit 后端业务源码**（路径含 `lib/features/{module}/backend(v\d+)?/**/*.dart` 或 `lib/common/backend_infra/(daos\|services)/**/*.dart`，非测试文件，非 ≤1 文件 ∧ ≤20 行的小改） | hook `check-backend-kg-readiness.js` PreToolUse 兜底（v1.28 起默认 warn 模式 exit 0 + stderr 提示，`TEAM_STANDARDS_BACKEND_KG_HOOK=block` 升级硬阻断、=off 关闭）；transcript 内 0 次 Read `**/knowledge-graph/00_index.md` 或 `**/knowledge-graph/scenarios/*.md` | 立即停止 Edit，先 Read 项目对应 `knowledge-graph/00_index.md` 按关键词反查命中场景卡再继续；命中场景卡也读完后才回到原 Edit |
+| **会话首次 Write/Edit 后端业务源码**（路径含 `lib/features/{module}/backend(v\d+)?/**/*.dart` 或 `lib/common/backend_infra/(daos\|services)/**/*.dart`，非测试文件，非 ≤1 文件 ∧ ≤20 行的小改） | hook `check-backend-kg-readiness.js` PreToolUse 兜底（v1.28 起默认 warn 模式 exit 0 + stderr 提示，`TEAM_STANDARDS_BACKEND_KG_HOOK=block` 升级硬阻断、=off 关闭）；transcript 内 0 次 Read `**/knowledge-graph/00_index.md` 或 `**/knowledge-graph/scenarios/*.md` 或 `**/knowledge-graph/ddl-baseline.md` | 立即停止 Edit，先 Read 项目对应 `knowledge-graph/00_index.md` 按关键词反查命中场景卡再继续；命中场景卡也读完后才回到原 Edit |
+| **即将写 SQL / 改 DAO / Mapper / Repository / Drift customSelect / Prisma raw query / JPA @Query**，但项目 `knowledge-graph/ddl-baseline.md` 不存在 | 项目存在持久层代码（grep `customSelect` / `@Query` / `@Repository` / `prisma.client` / `mysql.createConnection` / `pg.Client` 等任一命中），但用户目录 + 项目 docs 两处的 `knowledge-graph/ddl-baseline.md` 都查不到 | **先 dump DDL 基线再写 SQL**——按项目 DB 引擎选 dump 命令（详见下方「DDL 基线」节），把 schema 全景落到 `knowledge-graph/ddl-baseline.md`；不要凭 ORM 实体类反推 schema（实体类只展示子集，DEFAULT/INDEX/CHECK 等 schema 元信息容易丢失） |
 
 > **常见误判反例（已发生过的踩坑）**：
 > - ❌ "用户只是问云端逻辑，没让我建图谱，所以不用触发" → **错**，问询场景必触发并候选沉淀
@@ -118,7 +119,7 @@ SQL 图谱不追求保存一堆一次性 SQL 字符串，而是归档“业务�
 
 ### Tier 1 — 起步（必须，最小可用）
 
-新建图谱时只需要这两个文件即可投入使用：
+新建图谱时只需要这几个文件即可投入使用：
 
 ```text
 {命名空间根}/knowledge-graph/
@@ -126,7 +127,14 @@ SQL 图谱不追求保存一堆一次性 SQL 字符串，而是归档“业务�
   scenarios/{业务场景}.md            # 一图一表的场景小卡（一图一表是底线）
   _candidates.md                     # 候选沉淀池（未代码验证的会话事实）
   _sql_candidates.md                 # SQL / 查询逻辑候选池（未正式合并的查询指纹）
+  ddl-baseline.md                    # ⭐ DDL 基线（涉及任何 DB 表读写的项目必有）
 ```
+
+**`ddl-baseline.md` 是涉及 DB 操作项目的硬必需，不是可选。** 详见下方「DDL 基线」专节——
+凡是项目里有 SQL / DAO / Mapper / Repository / Drift table / Prisma schema / JPA Entity 等
+持久层代码，都必须配套有一份从**真实 schema 源**（sqlite_master / pg_dump / mysqldump 等）
+dump 出来的 DDL 全景，让 AI 编写 SQL 前能一站式速查字段名 / 类型 / 默认值 / 索引，
+避免凭记忆写出错误字段名引发的连环 bug。
 
 每张场景小卡至少包含：
 
@@ -198,20 +206,101 @@ SQL 图谱同样按渐进方式建立：
 
 **SQL 候选不可长期散落。** 当用户要求“整理 / 归档 / 完善 SQL”时，必须先读取 `_sql_candidates.md`、`09_sql_query_index.md`、命中的 `sql-queries/` 与表卡，然后去重合并，更新正式索引和场景卡。
 
+### DDL 基线（涉及 DB 操作的项目硬必需）
+
+**核心约定**：凡是项目里有任何持久层代码（SQL / DAO / Mapper / Repository / Drift table / Prisma schema / JPA Entity 等），知识图谱**必须**配套一份 `knowledge-graph/ddl-baseline.md`，作为 SQL 编写、字段语义、索引信息的权威源。
+
+**Why（为什么是 DDL 而不是 ORM 实体类）**：
+
+- **ORM 实体类只展示子集**：Drift `Table` / JPA `@Entity` / Prisma `model` 通常只声明列名 + 类型，`DEFAULT` 值、`NULL` 约束、复合索引、CHECK 约束、FOREIGN KEY 行为等 schema 元信息容易遗漏或脱节
+- **靠 grep ORM 类难以一站式速查**：项目里 80 张表分散在 80 个文件，写一次 SQL 要跳 N 次；一份 DDL dump 是 70KB 单文件，AI 一次 Read 就拿到全景
+- **DB 迁移后 ORM 与真实 schema 可能漂移**：DDL 直接从 DB 引擎的 schema 系统表（sqlite_master / pg_catalog / information_schema）dump，是**事实**而非**意图**
+- **避免凭记忆写字段名引发的连环 bug**：本规则的诞生背景就是 korepos-refund 反复出现"`order_transaction` 表无 `order_id` 字段"等踩坑案例
+
+**触发条件**：
+
+| 项目特征 | 是否需要 ddl-baseline.md |
+|---|---|
+| 项目有任何 `customSelect` / 裸 SQL 字符串 | 需要 |
+| 项目用 ORM 但 service 偶尔写 raw query | 需要 |
+| 项目纯 ORM、所有查询走 typed query builder | 强烈推荐（仍能从 DDL 看到索引、默认值、约束） |
+| 项目无 DB（如纯前端 / 纯计算服务） | 不需要 |
+
+**标准路径与命名**：
+
+```text
+{命名空间根}/knowledge-graph/ddl-baseline.md
+```
+
+不要拆 `ddl/{table}.md`——分散后失去"一次 Read 拿全景"的核心价值。表多到一份文件不便读时，可在文档内按业务域分章节，但单文件原则不变。
+
+**dump 命令模板（按 DB 引擎）**：
+
+| DB 引擎 | dump 命令 |
+|---|---|
+| SQLite | `python -c "import sqlite3; con=sqlite3.connect('path/to.db'); [print(r[0]+';\n') for r in con.execute(\"SELECT sql FROM sqlite_master WHERE sql IS NOT NULL AND name NOT LIKE 'sqlite_%' ORDER BY tbl_name\").fetchall()]"` 或 `sqlite3 path/to.db .schema` |
+| PostgreSQL | `pg_dump --schema-only --no-owner --no-privileges $DATABASE_URL` |
+| MySQL | `mysqldump --no-data --skip-add-drop-table --compact $DATABASE > schema.sql` |
+| MSSQL | `sqlcmd -S server -d db -Q "..." -E -o schema.sql`（按需写脚本） |
+| Oracle | `expdp ... CONTENT=METADATA_ONLY` 或 SQL Developer 导出 schema |
+
+如果项目用 Drift / TypeORM / Prisma / Diesel 等 **schema-as-code** 框架，原则上 source of truth 是 framework 文件——但仍然要 dump 一份**真实 DB 实例**（dev 或 test 环境）的 schema 作为 ddl-baseline，因为 framework 文件不展示 schema 历史迁移叠加后的真实形态。
+
+**文档结构要求**：
+
+```markdown
+# DDL 基线 · {项目名} {DB 类型} schema
+
+> 用途：编写 SQL / 改 DAO / 设计接口前 **必读** 的权威 schema 源。
+> 数据源：{真实 DB 路径 / 连接信息（脱敏）}，按 {sqlite_master / pg_dump / mysqldump} 实时 dump。
+> 表数量：{N} 张表 + {M} 个索引
+> 更新时机：项目 schema 迁移后重新 dump（脚本见文末「维护脚本」段）
+>
+> **强约束**：编写任何 SQL 前必须先读本文档对应表段——确认字段名 / 类型 / 默认值 / 索引；
+> 不要凭记忆写表/字段名。
+
+## 表清单（按字母序 / 按业务域）
+... TOC 链接 ...
+
+## {table-name}
+
+\`\`\`sql
+CREATE TABLE ... ;
+CREATE INDEX ... ON ... ;
+\`\`\`
+
+## 维护脚本
+
+\`\`\`bash
+{dump 命令}
+\`\`\`
+```
+
+**维护时机**：
+
+- **schema 迁移上线后**（新增表 / 删除列 / 改索引 / 改 DEFAULT 等）必须立即重新 dump，否则 AI 编码时按过期 DDL 写 SQL 会爆 `no such column`
+- 与 `tables/{table}.md`（业务语义注解卡，Tier 2）的关系：**DDL 是源，tables 卡是注解**——tables/{table}.md 引用 DDL 中相应字段并补业务含义、读写能力、状态语义等，禁止重复抄一份 CREATE TABLE
+- 推荐把 dump 脚本放在用户本机 `~/scripts/` 或 IDE workspace 根目录（**不入 git 仓库**），避免脚本里硬编码 DB 连接信息泄漏
+
+**hook 集成**：
+
+`check-backend-kg-readiness.js` PreToolUse hook（v1.28 起默认启用）的"已读图谱"字面量白名单包含 `knowledge-graph/ddl-baseline.md`——AI 写 SQL 前 Read 一次 DDL 基线即满足 hook 兜底条件。
+
 ## 后端接口开发强制闭环
 
 ### 编码前：表逻辑回顾
 
 开始分析或实现后端接口前，只要本次涉及数据库读写、状态判定、订单/退款/支付等业务对象，必须先按顺序回顾：
 
-1. `07_table_logic_index.md`：按业务对象/场景反查表关系和判定规则
-2. `08_atomic_capability_index.md`：按业务关键词反查可复用原子能力
-3. `09_sql_query_index.md`：按业务关键词 / 表名 / DAO 方法反查已有 SQL 查询逻辑
-4. 命中的 `table-logic/{scenario}.md`
-5. 命中的 `atomic-capabilities/{capability}.md`
-6. 命中的 `sql-queries/{business-scenario}.md`
-7. 相关 `tables/{table-name}.md`、`flows/{flow-name}.md`、`enums/{enum-name}.md`
-8. 最后才读 DAO/Mapper/Service 代码
+1. **`ddl-baseline.md`**：按目标表名直接定位 CREATE TABLE / INDEX，确认字段名 / 类型 / 默认值 / 索引（涉及 DB 操作的项目此项跳不过）
+2. `07_table_logic_index.md`：按业务对象/场景反查表关系和判定规则
+3. `08_atomic_capability_index.md`：按业务关键词反查可复用原子能力
+4. `09_sql_query_index.md`：按业务关键词 / 表名 / DAO 方法反查已有 SQL 查询逻辑
+5. 命中的 `table-logic/{scenario}.md`
+6. 命中的 `atomic-capabilities/{capability}.md`
+7. 命中的 `sql-queries/{business-scenario}.md`
+8. 相关 `tables/{table-name}.md`、`flows/{flow-name}.md`、`enums/{enum-name}.md`
+9. 最后才读 DAO/Mapper/Service 代码
 
 若上述文件不存在，应在设计/编码过程中创建用户目录候选记录，不得因为“还没建图谱”就跳过沉淀。
 
