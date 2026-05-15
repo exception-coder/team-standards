@@ -4,6 +4,18 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.28.1] - 2026-05-15
+
+**`check-backend-kg-readiness.js` 字面量白名单扩展：`knowledge-graph/ddl-baseline.md` 也算"已读图谱"。**
+
+### Changed
+- `hooks/check-backend-kg-readiness.js` — `hasReadKnowledgeGraph` 增加 `knowledge-graph/ddl-baseline.md` 字面量识别（Linux/Windows 双路径），AI 直接 Read DDL 基线也满足兜底，不必额外读 `00_index.md`
+- `hooks/tests/check-backend-kg-readiness.test.js` — 新增 1 例覆盖（11/11 通过）
+
+### Motivation
+- 同步 `korepos-refund` 项目落盘 `knowledge-graph/ddl-baseline.md`（84 张表 + 48 索引，`korepos.db` sqlite_master 实时 dump）作为 SQL 编写权威源
+- 实际工作流：写 SQL 时直接读 DDL 比读索引再跳转更顺手；hook 兜底逻辑应该承认这条工作流，而不是把所有读取都强制经 `00_index.md`
+
 ## [1.28.0] - 2026-05-15
 
 **新增第四道 PreToolUse hook `check-backend-kg-readiness.js`，兜底 `backend-knowledge-graph-required` skill 的"编码前必读图谱"约束。**

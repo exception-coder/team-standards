@@ -212,3 +212,32 @@ test('命中 backendv2 路径（refund 模块惯用结构）', () => {
     cleanup(dir, transcript);
   }
 });
+
+test('放行：已读过 knowledge-graph/ddl-baseline.md（DDL 基线也算已读图谱）', () => {
+  const dir = makeRepo({ files: 'large' });
+  // 自建 transcript 写入 ddl-baseline.md 字面量
+  const tmp = path.join(os.tmpdir(), `transcript-ddl-${Date.now()}-${Math.random()}.jsonl`);
+  fs.writeFileSync(
+    tmp,
+    JSON.stringify({
+      type: 'tool_use',
+      name: 'Read',
+      input: { file_path: '/Users/x/Documents/ai-docs/proj/knowledge-graph/ddl-baseline.md' },
+    }) + '\n'
+  );
+  try {
+    const { code, stderr } = runHook(
+      {
+        tool_name: 'Edit',
+        tool_input: { file_path: 'lib/common/backend_infra/daos/refund_eligibility_dao.dart' },
+        cwd: dir,
+        transcript_path: tmp,
+      },
+      { TEAM_STANDARDS_BACKEND_KG_HOOK: 'block' }
+    );
+    assert.equal(code, 0);
+    assert.equal(stderr, '');
+  } finally {
+    cleanup(dir, tmp);
+  }
+});

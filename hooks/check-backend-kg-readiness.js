@@ -20,8 +20,9 @@
 //   TEAM_STANDARDS_KG_TRIVIAL_LINES（默认 20，insertions + deletions）
 //
 // transcript 中出现以下任一字面量即视为"读过知识图谱"：
-//   - knowledge-graph/00_index.md
-//   - knowledge-graph/scenarios
+//   - knowledge-graph/00_index.md（索引入口）
+//   - knowledge-graph/scenarios（任一场景小卡）
+//   - knowledge-graph/ddl-baseline.md（DDL 基线；写 SQL/DAO 前最常读的资产）
 // （Windows 反斜杠路径同时识别）
 // =============================================================
 
@@ -142,6 +143,8 @@ function hasReadKnowledgeGraph(transcriptPath) {
     content.includes('knowledge-graph/00_index.md') ||
     content.includes('knowledge-graph\\\\00_index.md') ||
     content.includes('knowledge-graph/scenarios') ||
-    content.includes('knowledge-graph\\\\scenarios')
+    content.includes('knowledge-graph\\\\scenarios') ||
+    content.includes('knowledge-graph/ddl-baseline.md') ||
+    content.includes('knowledge-graph\\\\ddl-baseline.md')
   );
 }
