@@ -242,7 +242,7 @@ v1.26 起 **`check-design-doc.js` hook 默认启用**（[hooks/hooks.json](hooks
 - `doc-index-required` — Phase-A 写前查重 + Phase-B 写完登记（用户目录 / 项目 docs 等同）
 
 ### ③ 架构与编码（实施时）
-- `architecture-ddd-lite-fullstack` — DDD-lite 分层 + Feature 模块 + 每分支一 focused service + 跨分支编排 + 横切关注点豁免 + 命名 taxonomy + 聚合边界（**Java / Python / Dart 三栈一致适用**）
+- `architecture-ddd-lite-fullstack` — DDD-lite 分层 + Feature 模块 + 每分支一 focused service + **函数级业务场景分流（分支差异即拆分）** + 跨分支编排 + 横切关注点豁免 + 命名 taxonomy + 聚合边界（**Java / Python / Dart 三栈一致适用**）
 - `coding-standards-common` — 跨语言通用 7 条铁律 + 注释三档（沟通语言一票否决）
 - `java-coding-standards` — Java 独占条款（Javadoc / Integer 比较 / SLF4J / HashMap 容量等）
 - `korepos-backend-service` — Flutter backend 强约束（一接口一 service / wire DTO 注解 / 字段类型禁 dynamic）

@@ -22,7 +22,7 @@ description: "Use before writing or reviewing any business code in Java (Spring 
 - **触发与门禁** → [触发时机](#触发时机) / [编码前检查清单](#编码前检查清单) / [输出要求](#输出要求)
 - **架构分层** → [标准分层模型](#标准分层模型) / [各层职责](#各层职责)
 - **项目组织** → [Feature 模块化结构](#feature-模块化结构) / [原子能力沉淀](#原子能力沉淀) / [聚合边界与事务一致性](#聚合边界与事务一致性) / [结构质量门禁](#结构质量门禁)
-- **Service 形态铁律** → [Service 业务动作扩展铁律](#service-业务动作扩展铁律每个业务分支一个-focused-service任何新方法都不进-god-service) / [跨分支编排](#跨分支编排同一回合调用-2-个-focused-service-时的归属) / [横切关注点不计入 god service 判定](#横切关注点不计入-god-service-判定aop--拦截器--事务声明的豁免)
+- **Service 形态铁律** → [Service 业务动作扩展铁律](#service-业务动作扩展铁律每个业务分支一个-focused-service任何新方法都不进-god-service) / [函数级业务场景分流](#函数级业务场景分流分支差异即拆分不只是-service-级函数级也要拆) / [跨分支编排](#跨分支编排同一回合调用-2-个-focused-service-时的归属) / [横切关注点不计入 god service 判定](#横切关注点不计入-god-service-判定aop--拦截器--事务声明的豁免)
 - **技术栈约束** → [前端约束](#前端约束) / [Flutter 约束](#flutter-约束) / [Java 后端约束](#java-后端约束) / [Python 后端约束](#python-后端约束) / [Dart 后端约束](#dart-后端约束)
 - **命名规范** → [服务命名 taxonomy](#服务命名-taxonomyservice--usecase--handler--orchestrator)
 
@@ -269,8 +269,20 @@ RefundService
 
 1. **新代码落点**：扩展功能时新代码放新结构暴露 public 方法，旧代码只 +1 行调用——不在旧文件就地堆叠
 2. **Service 业务动作扩展**：每个业务分支一个 focused service，**god service 零业务方法**，任何新 public 方法都不进 god service
-3. **跨分支编排**：同一回合调用 ≥2 个 focused service 时（O1-O4 条件）必须落到独立 Orchestrator / Saga，不进 focused service 内部
-4. **横切关注点豁免**：日志/审计/权限/事务/metrics/缓存/限流走 AOP/拦截器/注解统一注入，focused service 内部不重复实现；横切实现类不算 god service
+3. **函数级业务场景分流**：函数内按业务类型 if-else / switch 分流 ≥2 个分支时，先判定分支差异本质——同业务定位拆函数内私有方法（阶梯 1），不同业务定位升级到 service 级拆分（阶梯 2）。**判定锚点是「业务定位」而非「代码相似度」**——长得像但业务定位不同就要拆
+4. **跨分支编排**：同一回合调用 ≥2 个 focused service 时（O1-O4 条件）必须落到独立 Orchestrator / Saga，不进 focused service 内部
+5. **横切关注点豁免**：日志/审计/权限/事务/metrics/缓存/限流走 AOP/拦截器/注解统一注入，focused service 内部不重复实现；横切实现类不算 god service
+
+### 函数级业务场景分流（分支差异即拆分，详见子文档）
+
+> 上一条「Service 业务动作扩展」管 **service 粒度**；本条管「函数粒度 → service 粒度」之间的判定阶梯——函数内出现按业务类型 if-else / switch 堆叠 ≥2 分支时，**先判定分支差异本质**：
+>
+> - **阶梯 1（同业务定位）**：分支共享同一状态机 / 校验 / 补偿 / 团队 → 抽 `_handleTypeA()` / `_handleTypeB()` 私有方法，主方法只做分流派发
+> - **阶梯 2（不同业务定位）**：分支差异本质是不同业务实体（独立状态机 / 独立 PRD 模块 / 独立团队）→ 升级到 service 级拆分，按上一条「Service 业务动作扩展铁律」建 `AService` / `BService1`，共享逻辑沉到原子能力层
+>
+> **判定锚点是「业务定位」而非「代码相似度」**——长得像但业务定位不同就是阶梯 2；业务定位相同即使代码差异较大也是阶梯 1。
+>
+> 详细判定锚点表（PRD 视角 / 状态机 / 下游 / 校验 / 补偿 / 团队 6 个信号）+ Java + Dart 双示例 + 1-100 期反惯性话术清单见 [rules/structure-quality-gates.md § 函数级业务场景分流](./rules/structure-quality-gates.md#函数级业务场景分流分支差异即拆分不只是-service-级函数级也要拆)。
 
 ---
 

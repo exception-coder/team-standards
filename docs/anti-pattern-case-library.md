@@ -158,6 +158,27 @@
 - **正确做法**:`catch` 必须处理或显式往上抛;日志带完整堆栈 + 现场参数。
 - **关联 skill**:`coding-standards-common` §6「异常不静默」
 
+### C4. 函数内按业务类型 if-else 堆叠业务分流
+
+- **现象**:同一 public 方法体内用 `if orderType == A then ... else if orderType == B then ...` 堆叠多种业务类型的处理逻辑,两种业务的校验 / 状态机 / 下游 / 补偿都黏在一起。1-100 期(成熟项目扩展迭代期)特别高发——加新订单类型时阻力最小的方式就是"在已有方法里 +一个 else if",但这会让两种业务定位的逻辑互相波及,变更无法独立测试。
+- **根因**:AI 默认偏好"在既有容器里继续装",与 service 级 god service 反模式(A2 / A3)同源,但表现在函数内部。`coding-standards-common §2 函数原子`只管 80 行 / 4 参数 / 3 嵌套硬阈值,语义维度上"按业务类型堆叠"在 v1.26.2 之前完全未覆盖,AI 没有规则可援引来拒绝这种写法。
+- **反例**(Java):
+  ```java
+  class OrderService {
+      public void handle(OrderRequest req) {
+          if (req.type == OrderType.NORMAL) { /* 40 行 */ }
+          else if (req.type == OrderType.PRESALE) { /* 50 行,独立状态机 */ }  // ❌ 业务定位已经不同
+      }
+  }
+  ```
+- **反例**(Dart - korepos 场景):handler 内按 `itemType` 分流堂食 / 外卖,每个分支 50+ 行,触达通知和包装策略完全不同——业务定位是两类独立动作,不该共享一个 handler 方法。
+- **正确做法**:先用「业务定位 vs 代码相似度判定锚点表」判分支差异本质(PRD 视角 / 状态机 / 下游 / 校验 / 补偿 / 团队 6 个信号,命中 ≥3 个倾向阶梯 2)。
+  - 同业务定位(同状态机 / 同补偿)→ **阶梯 1**:抽 `_handleTypeA()` / `_handleTypeB()` 私有方法,主方法只做派发。
+  - 不同业务定位 → **阶梯 2**:升级 service 级,建 `NormalOrderService` / `PresaleOrderService`,共享逻辑沉到原子能力层。
+  - **判定锚点是业务定位而非代码相似度**——长得像但业务定位不同就要拆。
+- **关联 skill**:`architecture-ddd-lite-fullstack` 「函数级业务场景分流」节、`coding-standards-common §2.5`
+- **历史 commit**:1.26.3 引入(本案例是 service 级 god service 反模式 A2 / A3 在函数粒度的下钻)
+
 ---
 
 ## D. 流程反模式

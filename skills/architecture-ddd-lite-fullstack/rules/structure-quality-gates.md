@@ -181,6 +181,141 @@ class OrderService {
 - `coding-standards-common §2 函数原子`(80 行硬阈值)在方法粒度限制单一方法体积;本节在 service 粒度限制每个 service 只服务一个业务分支。两者**正交**。
 - `korepos-backend-service` 的"一接口一 service"是 Flutter backend 侧的强约束;本节是它在 Java/Spring + 通用全栈侧的对应规则,本质同向:**业务分支隔离 + god service 只做 delegate 入口**。
 
+### 函数级业务场景分流:分支差异即拆分(不只是 service 级,函数级也要拆)
+
+> **核心一句话**:函数内出现 `if orderType == A then ... else if orderType == B then ...` 这种「按业务类型 / 枚举值分流」的 ≥2 分支时,**先判定分支差异的本质,再决定拆到哪一级**——同业务定位拆函数内私有方法(阶梯 1),不同业务定位升级到 service 级(阶梯 2)。
+>
+> 上一节「Service 业务动作扩展铁律」管 **service 粒度**:每个业务分支一个 focused service。本节管**函数粒度 → service 粒度的判定阶梯**——AI 在 1-100 期最容易在已有 service 的某个 public 方法里"加个 else if 就好",这种「函数级堆叠」会让两种业务定位的逻辑黏死,未来变更相互波及、无法独立测试。
+
+**核心原则**:函数内出现按业务类型 ≥2 分支时,**禁止在同一 public 方法体内堆叠所有分支的处理逻辑**。先判定分支差异本质,再决定拆分阶梯。
+
+**两级拆分阶梯**(明确不要跳到最重的方案,也不要图省事停在最轻的):
+
+| 阶梯 | 触发条件 | 拆分动作 | 落点 |
+|------|---------|---------|------|
+| **阶梯 1(函数级)** | 函数内按业务类型 if-else / switch 分流 ≥2 个分支,**但分支共享同一业务定位**(例如 `refund` 的全额 / 部分变种,共享同一状态机和补偿) | 抽 `_handleTypeA()` / `_handleTypeB()` 私有方法,主方法只做分流派发;或重构成参数化的单一方法 | 同一 service 内 |
+| **阶梯 2(service 级)** | 分支差异本质是**不同业务定位**——A 订单 vs B 订单是 PRD / 业务概念上的不同业务实体,只是部分技术流程相似 | 升级到 service 级,按上一节「Service 业务动作扩展铁律」拆 `AService` / `BService1` | 不同 service(每个分支自己的 focused service) |
+
+**业务定位 vs 代码相似度——判定锚点表**(命中 ≥3 个倾向阶梯 2 → 升级 service 级):
+
+| 信号 | 阶梯 1 倾向(同业务定位) | 阶梯 2 倾向(不同业务定位) |
+|------|-------------------------|---------------------------|
+| PRD / 用户视角 | 同一动作的参数化变体 | 用户视角下是两种不同事 |
+| 状态机 | 共享同一状态机和状态转换 | 各自有独立状态机 |
+| 下游依赖 | 共享同一下游集合 | 引入新表 / 新外部依赖 |
+| 校验 / 幂等键语义 | 完全相同或仅参数差 | 校验规则 / 幂等键语义不同 |
+| 失败补偿 | 同一套补偿路径 | 各自独立的补偿语义 |
+| 团队所属 | 同一团队同一迭代维护 | 不同团队 / 不同迭代单独演进 |
+
+**判定准绳**:只看代码相似度("两段代码长得像")**不是**判定依据——长得像但业务定位不同就是阶梯 2;反过来,业务定位相同即使代码差异较大也归阶梯 1(参数化抽公共方法即可)。
+
+**1-100 期反惯性提醒**:成熟项目扩展期 AI 最容易犯的错——看到 `OrderService.handleOrder()` 已经存在,加 B 订单时在里面 `else if (type == B)` 就完事了,而不是建 `BOrderService`。
+
+**口诀**:写第一行前先答——"这是同一种事的不同形态,还是两种不同的事?"是后者就升级到 service 级,哪怕复用部分逻辑(共享部分沉到原子能力层,而不是塞进同一 public 方法)。
+
+**Java 示例(一个反例 + 阶梯 1 + 阶梯 2)**:
+
+```java
+// ❌ 反例:函数内按业务类型堆叠 ≥2 分支
+class OrderService {
+    public void handle(OrderRequest req) {
+        if (req.type == OrderType.NORMAL) {
+            // 40 行:校验 + 占库存 + 支付 + 发货
+        } else if (req.type == OrderType.PRESALE) {
+            // 50 行:校验(含定金)+ 锁库存 + 分期支付 + 延期发货
+        }
+    }
+}
+```
+
+**阶梯 1 重构**(若两种订单共享同一业务定位,只是流程参数差):
+
+```java
+// ✅ 阶梯 1:同 service 内拆私有方法,主方法只派发
+class OrderService {
+    public void handle(OrderRequest req) {
+        switch (req.type) {
+            case NORMAL  -> _handleNormal(req);
+            case PRESALE -> _handlePresale(req);
+        }
+    }
+    private void _handleNormal(OrderRequest req)  { /* 40 行 */ }
+    private void _handlePresale(OrderRequest req) { /* 50 行 */ }
+}
+```
+
+**阶梯 2 重构**(若预售是独立业务定位——独立状态机 / 独立 PRD 模块 / 独立团队):
+
+```java
+// ✅ 阶梯 2:升级到 service 级,每个业务定位一个 focused service
+class NormalOrderService  { public void handle(NormalOrderRequest req)  { /* 40 行 */ } }
+class PresaleOrderService { public void handle(PresaleOrderRequest req) { /* 50 行 */ } }
+
+// 调用方按订单类型注入对应 service;或保留 OrderService 作为路由器,内部只 1 行 delegate:
+class OrderService {
+    public void handle(OrderRequest req) {
+        switch (req.type) {
+            case NORMAL  -> normalOrderService.handle(req.asNormal());     // 1 行 delegate
+            case PRESALE -> presaleOrderService.handle(req.asPresale());   // 1 行 delegate
+        }
+        // 禁止在 OrderService 内写任何业务逻辑——它只能做派发
+    }
+}
+```
+
+**Dart 示例(对照 korepos 后端典型场景:handler 内按订单类型分流)**:
+
+```dart
+// ❌ 反例:handler 内按 itemType 堆叠堂食 / 外卖,业务定位完全不同
+class OrderHandler {
+  Future<Response> execute(OrderRequest req) async {
+    if (req.itemType == ItemType.dineIn) {
+      // 50 行:堂食流程(桌号绑定 + 厨房工单 + 桌台计费)
+    } else if (req.itemType == ItemType.takeout) {
+      // 60 行:外卖流程(配送员调度 + 打包工单 + 配送费计算)
+      // 触达通知和包装策略完全不同
+    }
+  }
+}
+```
+
+**阶梯 2 重构**(堂食 / 外卖在业务定位上是两类独立动作,触达 / 工单 / 计费规则都各自独立):
+
+```dart
+// ✅ 阶梯 2:拆独立 service,共享逻辑沉到原子能力层
+class DineInOrderService {
+  Future<void> execute(DineInOrderRequest req) async { /* 堂食业务 */ }
+}
+class TakeoutOrderService {
+  Future<void> execute(TakeoutOrderRequest req) async { /* 外卖业务 */ }
+}
+
+// 共享的"金额计算 / 库存扣减"沉到 common/backend_infra/services/ 原子能力层,
+// 与 korepos-backend-service 的「跨 feature 业务原子能力层」规则对齐——
+// 而不是塞进同一个 handler 方法用 if-else 区分
+```
+
+**常见自我说服话术 → 一律视为违规**(与上一节 god service 自我说服话术清单同模式,函数级新增):
+
+- "只是多一个 if 分支,不用拆" —— 错,业务定位不同即使一个分支也要拆
+- "B 流程 80% 和 A 一样,复用最方便就是写在一起" —— 错,80% 相似是代码视角;PRD 视角是两种动作就要拆,共享部分沉原子能力
+- "拆 service 太大动静,先放一起以后再说" —— 与 god service "先加进来,以后再拆"同源,**这次扩展就是迁出契机**
+- "都是订单嘛,本来就该在 OrderService 处理" —— 错,"都是订单"是技术分类(同一聚合根),不等于"同一业务定位"
+- "新写一个 service 文件审 PR 的人会觉得过度设计" —— 函数内堆叠会让下一次扩展更难拒绝,审阅成本是当下省 5 分钟 vs 半年后改起来 5 天
+
+**自检三连问**(写第一行前必须答):
+
+1. **"我要加的代码处理的是同一种业务的形态 / 参数差,还是另一种业务?"** —— 用上面判定锚点表过一遍
+2. **"若是另一种业务,它有独立的状态机 / 校验 / 补偿 / 团队吗?"** —— 命中 ≥3 个 → 阶梯 2,新建 focused service
+3. **"共享的部分能不能沉到原子能力层而不是塞进同一 public 方法?"** —— 能就升级到 service 级;共享逻辑走 `common/backend_infra/services/` 或等价原子能力目录,不进任一 focused service 内部
+
+**与既有规则的关系**:
+
+- 通用「新代码落点决策」(上一节)兜底所有"扩展旧代码"场景。
+- 「Service 业务动作扩展铁律」(上一节)管 **service 粒度**的拆分(每业务分支一 focused service)。
+- **本节**管「函数粒度 → service 粒度」之间的判定阶梯——函数内出现 ≥2 业务类型分流时先用本节判定,是同业务定位则函数内拆私有方法(阶梯 1),是不同业务定位则升级到 Service 业务动作扩展铁律的 service 级拆分(阶梯 2)。
+- `coding-standards-common §2 函数原子`(80 行硬阈值)从**代码量**约束;`coding-standards-common §2.5 业务场景分流拆分`(本次新增)从**业务语义**约束。两者叠加:先按业务场景拆,再看每个分支是否还需要按代码量拆。
+
 ### 跨分支编排(同一回合调用 ≥2 个 focused service 时的归属)
 
 > 一旦"focused service per branch"落实,新的问题就来了:用户点一个按钮"批准并退款",对应 cancel + refund 两个分支需要在同一事务 / 同一回合内顺序执行——这段编排代码**不能**写在 `RefundService` 里(它就该只管退款分支),也**不能**写在 `CancelService` 里,更**不能**留在 Controller / UI 里。它有自己的归属。

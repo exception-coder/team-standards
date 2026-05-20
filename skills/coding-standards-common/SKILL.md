@@ -32,6 +32,16 @@ description: Use when writing, reviewing, or modifying source code in any langua
 - 一个文件一个公开类型(语言惯例允许时)
 - 构造函数禁写业务逻辑;getter/setter 不写副作用
 
+### 2.5 业务场景分流拆分(高内聚 / 低耦合的函数粒度落点)
+
+> §2 的 80 行硬阈值从**代码量**约束;本条从**业务语义**约束。两者叠加:先按业务场景拆,再看每个分支是否还需要按代码量拆。1-100 期扩展既有 service 时最常违反——加新业务类型时阻力最小的方式是"在已有方法里 +一个 else if",但这会让两种业务定位的逻辑黏死,未来变更相互波及、无法独立测试。
+
+- 函数内按业务类型 / 枚举值 if-else / switch 分流 ≥2 个分支时,**禁止在同一 public 方法体内堆叠**所有分支的处理逻辑
+- 分支共享同一业务定位(同一状态机 / 同一校验 / 同一下游 / 同一补偿)→ **阶梯 1**:抽 `_handleTypeA()` / `_handleTypeB()` 私有方法,主方法只做分流派发
+- 分支差异本质是不同业务定位(不同业务实体 / 独立状态机 / 不同 PRD 模块 / 不同团队)→ **阶梯 2**:升级到 service 级拆分,详见 `architecture-ddd-lite-fullstack` 「函数级业务场景分流」节
+- **判定锚点是「业务定位」而非「代码相似度」**——长得像但业务定位不同就要拆;业务定位相同即使代码差异较大也归阶梯 1
+- 共享逻辑沉到原子能力层(`common/services/` / `common/backend_infra/services/` 等),**不要**塞进同一 public 方法用 if-else 区分
+
 ---
 
 ## 3. 层次分明 / 单向依赖
@@ -192,6 +202,7 @@ description: Use when writing, reviewing, or modifying source code in any langua
 
 - [ ] 命名是否表意?有没有拼音 / 类型填鸭 / 抽象的 `data / info / temp`?
 - [ ] 函数有没有超过 80 行?有没有 ≥4 个参数?嵌套是否 ≤3 层?
+- [ ] 函数内有没有用 if-else / switch 按业务类型堆叠 ≥2 个分支?是 → 用「业务定位 vs 代码相似度」判定:同业务定位拆私有方法(阶梯 1),不同业务定位升级 service 级(阶梯 2)
 - [ ] 层次方向对不对?UI / Controller 有没有直接 SQL / HTTP?同层有没有互调?
 - [ ] 业务数字 / 协议码 / DB 字段值 是否全部命名常量或枚举?
 - [ ] 类有 1–3 行 doc?方法有 1–2 行 doc + 参数/返回/异常?核心代码块有 1 行注释?有没有变更历史 / 注释代码 / 流水账?

@@ -18,6 +18,7 @@
 | 报告 Bug / 描述异常 / 请求分析根因 | bug / OOM / NPE / 异常 / 排查 | `bug-doc-required` → `design-doc-required`(修复方案) | `pre-implementation-code-orientation`(改代码前) | — |
 | 用户提出具体方案/参考代码并要求实施 | 按这个思路实施 / 参考现有代码改 / 按这个回复改 | `solution-review-required`(必先于 design-doc) | `design-doc-required`(确认后) | — |
 | 写新接口前涉及表读写 / 状态判定 / 金额聚合 | 加接口 / 写 service / 写 DAO | `korepos-backend-service`(若 korepos) 或 `architecture-ddd-lite-fullstack`(通用) | `backend-knowledge-graph-required`(读图谱) + `coding-standards-common` | — |
+| 函数内按业务类型 if-else / switch 堆叠 ≥2 分支 | if-else 堆叠业务类型 / switch orderType / 不同订单类型同函数处理 / 函数内分流 / A 订单 B 订单同方法 | `architecture-ddd-lite-fullstack`(函数级业务场景分流节,判定阶梯 1/2) | `coding-standards-common §2.5`(通用兜底提醒) | — |
 | 改 Flutter 代码 | Flutter / .dart / 退款 UI / pos | (后端) `korepos-backend-service` 或 (前端) `architecture-ddd-lite-fullstack` | `arch-lint`(编码后) + `coding-standards-common` | — |
 | 写源码 Edit/Write | .java / .dart / .ts / .py / .kt 任一 | `design-doc-required`(若未触发) → `pre-implementation-code-orientation` → `architecture-ddd-lite-fullstack` | `coding-standards-common`(任何源码必经) + 语言专属 | `bug-doc-required`(无 bug 报告) |
 | 提交 commit | git commit / 提交 / push | `git-commit-standards`(大改 hook 强制) | `daily-work-log`(会话末) | — |
@@ -35,8 +36,8 @@
 | 方案审视 / 现有代码参考 / 反迎合 / 更优建议 | `solution-review-required` | 必先于 design-doc |
 | 实施前定位 / 开始写代码 / 读哪些文件 | `pre-implementation-code-orientation` | 文档→代码桥梁 |
 | 文档输出路径 / docs / ai-docs / Phase-A / Phase-B / 查重 | `doc-index-required` | 所有 .md Edit 前必经 |
-| 分层 / DDD / Feature 模块 / 原子能力 / 单向依赖 | `architecture-ddd-lite-fullstack` | 通用架构门禁 |
-| 命名 / 函数原子 / 80 行 / 注释三档 / 单一职责 / DRY | `coding-standards-common` | 任何源码必经 |
+| 分层 / DDD / Feature 模块 / 原子能力 / 单向依赖 / 函数级业务分流 / 业务定位判定 / 阶梯 1 / 阶梯 2 / if-else 堆叠业务类型 | `architecture-ddd-lite-fullstack` | 通用架构门禁 |
+| 命名 / 函数原子 / 80 行 / 注释三档 / 单一职责 / DRY / 业务场景分流 | `coding-standards-common` | 任何源码必经 |
 | Java / Javadoc / Integer 比较 / HashMap 容量 / SLF4J | `java-coding-standards` | Java 独占 |
 | 后端接口 / endpoint / shelf / handler / 加 endpoint | `korepos-backend-service` | korepos 项目专属 |
 | bug 修复 / 对齐云端 / 删冗余 / 函数头复盘禁令 | `bugfix-coding-style` | 与编码 skill 叠加 |
