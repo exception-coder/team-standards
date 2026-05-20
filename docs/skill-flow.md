@@ -40,6 +40,7 @@
 | `bugfix-coding-style` | team-standards | bug 修复 / 任何源码改动的注释规范（v1.17 起方向反转）：禁止变更历史/日期标记/PR 引用/注释保留旧代码进入源码；源码只描述当前正确逻辑，变更原因归 git log / commit body；函数头只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块写短 WHY 注释 |
 | `glossary-required` | team-standards | 业务术语会话级强制登记;PRD / 设计 / 对话出现未登记的业务领域名词时自动候选追加;用户与 AI 同义词错位时主动对齐到规范术语;候选池 `{USER_DOCUMENTS}/ai-docs/{project}/glossary/_candidates.md`、正式版 `docs/knowledge-graph/glossary.md`;与 init-project-docs 的批量初始化术语表分工互补 |
 | `reverse-index-required` | team-standards | 反向影响索引强制维护(4 类:状态/字段/事件/API);冷启动 `hooks/scan-reverse-index.js` 扫描 Java/Dart/TS 枚举 + SQL 字面量产出 states 初版;增量维护规则:变更枚举 / 字段 / 事件 / API 同回合必须回写反向索引;与 backend-knowledge-graph-required 互补(正向 vs 反向)、与 cross-project-locator 边界明确(单服务内 vs 跨项目调用方) |
+| `reset-kpos-local-state` | team-standards | 用户以自然语言要求重置 / 清空 / 删除 kpos / korepos 本地状态（shared_preferences 或 korepos.db）时路由到 `/reset-kpos-local` slash command 执行;只识别 + 路由,不自行 `Remove-Item` / `rm`;严格不触发场景:代码内删除 / git commit 回滚 / 删源码文件 / `flutter clean` |
 
 ---
 

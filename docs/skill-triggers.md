@@ -56,6 +56,7 @@
 | 初始化项目文档 / 生成知识图谱 / 4 阶段 | `init-project-docs` | 一次性入口 |
 | 项目画像 / project profile / 10 维度 | `generate-project-profile` | 独立扫描 |
 | team-standards 自身变更决策 / 新增 / 删除 skill / 链路反转 | `dev-log` | 仅 team-standards 仓库 |
+| 重置 kpos 本地 / 清空 shared_preferences / 删 korepos.db / 重置本地环境 / reset local state | `reset-kpos-local-state` | 语义识别后路由 `/reset-kpos-local` slash command;仅 kpos·korepos 上下文 |
 
 ## 互斥与同回合不重叠规则
 

@@ -271,6 +271,9 @@ v1.26 起 **`check-design-doc.js` hook 默认启用**（[hooks/hooks.json](hooks
 ### ⑧ plugin 自身维护
 - `dev-log` — team-standards 决策型变更记录长期背景
 
+### ⑨ 工具与命令路由
+- `reset-kpos-local-state` — 用户要求"重置 kpos 本地 / 清空 shared_preferences / 删 korepos.db"等语义时路由到 `/reset-kpos-local` slash command 执行（本 skill 只识别 + 路由，不自行删除）
+
 ## 设计文档模板
 
 模版分两档，根据改动规模选择，由 `design-doc-required` 第一·七步硬清单兜底判定。
