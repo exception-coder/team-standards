@@ -27,7 +27,7 @@ Do NOT write any implementation code (Edit/Write .java, .ts, .py, etc.) until BO
 
 ```mermaid
 flowchart TD
-    S0(["收到开发任务"]) --> S0A{"docs/00_project_overview.md 存在?"}
+    S0(["收到开发任务"]) --> S0A{"ai-docs/{project}/00_project_overview.md 存在?"}
     S0A -->|"是"| S0B["读取 00_project_overview.md\n获取项目全局索引"]
     S0A -->|"否"| S0SKIP["跳过预热\n兼容无知识图谱的项目"]
     S0B --> S0C["根据 AI 上下文路由表\n按任务类型加载必读文档"]
@@ -38,7 +38,7 @@ flowchart TD
 
 ### 执行规则
 
-1. 检查项目 `docs/00_project_overview.md` 是否存在
+1. 检查用户目录知识库 `{USER_DOCUMENTS}/ai-docs/{project}/00_project_overview.md` 是否存在（知识图谱由 `init-project-docs` 统一生成在用户目录，不再在项目 `docs/`）
 2. **若存在**：
    - 读取该文件（约 3KB），获取项目概要 + 文档导航 + AI 上下文路由表
    - 根据路由表中的「按任务类型加载」，读取当前任务对应的**必读文档**（通常 2-3 份）

@@ -62,18 +62,20 @@
 
 ## 文档导航（AI 快速定位）
 
+> 以下均为本文件同目录下的兄弟文件（相对引用，不带 `docs/` 前缀）。
+
 | 我想了解… | 读这个文件 |
 |---|---|
-| 系统分层和架构边界 | `docs/01_architecture_overview.md` |
-| 所有模块一览 | `docs/02_module_map.md` |
-| 某个业务的完整流程 | `docs/03_business_flow_map.md` |
-| 数据库表结构 | `docs/04_data_model_map.md` |
-| 后端 API 接口 | `docs/05_api_map.md` |
-| 页面/接口/表对应关系 | `docs/06_frontend_backend_mapping.md` |
-| 业务术语含义 | `docs/07_glossary.md` |
-| 架构红线和禁止规则 | `docs/08_constraints_and_rules.md` |
-| 当前重构进度 | `docs/09_refactor_plan.md` |
-| 最近改了什么 | `docs/10_change_log.md` |
+| 系统分层和架构边界 | `01_architecture_overview.md` |
+| 所有模块一览 | `02_module_map.md` |
+| 某个业务的完整流程 | `03_business_flow_map.md` |
+| 数据库表结构 | `04_data_model_map.md` |
+| 后端 API 接口 | `05_api_map.md` |
+| 页面/接口/表对应关系 | `06_frontend_backend_mapping.md` |
+| 业务术语含义 | `07_glossary.md` |
+| 架构红线和禁止规则 | `08_constraints_and_rules.md` |
+| 当前重构进度 | `09_refactor_plan.md` |
+| 最近改了什么 | `10_change_log.md` |
 
 ---
 

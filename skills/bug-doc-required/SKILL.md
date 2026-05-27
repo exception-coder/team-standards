@@ -15,7 +15,7 @@ description: "You MUST invoke this skill the moment a user reports a bug, descri
 
 **在开始 Bug 分析之前，先加载项目知识图谱上下文，快速定位受影响的模块和架构约束。**
 
-1. 检查项目 `docs/00_project_overview.md` 是否存在
+1. 检查用户目录知识库 `{USER_DOCUMENTS}/ai-docs/{project}/00_project_overview.md` 是否存在（知识图谱由 `init-project-docs` 统一生成在用户目录，不再在项目 `docs/`）
 2. **若存在**：
    - 读取该文件，获取项目全局索引 + AI 上下文路由表
    - 按路由表「Bug 修复」行加载：`08_constraints_and_rules` + `modules/{受影响模块}.md`

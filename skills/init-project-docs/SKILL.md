@@ -29,6 +29,22 @@ description: "当用户要求「初始化项目文档」「生成知识图谱」
 
 ---
 
+## 输出根目录（统一到用户目录知识库）
+
+**本 skill 生成的全部知识图谱文档默认写入用户目录知识库，不再写入项目 `docs/`，避免污染源项目仓库。** 与 `design-doc-required` / `bug-doc-required` / `business-logic-orientation` 的默认输出根保持一致。
+
+| 项 | 值 |
+|---|---|
+| 输出根 `{KG_ROOT}` | `{USER_DOCUMENTS}/ai-docs/{project}/` |
+| 与 design / bug / orientation 的关系 | 同一个 `ai-docs/{project}/` 知识库下平级共存（`design/`、`bug/`、`orientation/`、`work-log/` 等是兄弟目录） |
+| 项目 `docs/` | **不写入**。知识图谱不再随项目仓库分发，避免污染源项目 |
+
+下文所有路径中的 `{KG_ROOT}/` 一律指 `{USER_DOCUMENTS}/ai-docs/{project}/`。**知识图谱文档之间互相引用一律使用相对文件名**（如 `01_architecture_overview.md`、`modules/{module}.md`），不写 `docs/` 前缀，使整套文档与所在根解耦。
+
+> **兼容历史项目：** 若某项目此前已把知识图谱生成在 `docs/`，由用户自行迁移到 `{KG_ROOT}/`；本 skill 默认只读写 `{KG_ROOT}/`。
+
+---
+
 ## 执行流程
 
 ```mermaid
@@ -66,9 +82,9 @@ flowchart TD
 
 | 文档 | 路径 | 模板 |
 |---|---|---|
-| 项目概要 | `docs/00_project_overview.md` | `templates/00_project_overview.md` |
-| 架构总览 | `docs/01_architecture_overview.md` | `templates/01_architecture_overview.md` |
-| 架构约束 | `docs/08_constraints_and_rules.md` | `templates/08_constraints_and_rules.md` |
+| 项目概要 | `{KG_ROOT}/00_project_overview.md` | `templates/00_project_overview.md` |
+| 架构总览 | `{KG_ROOT}/01_architecture_overview.md` | `templates/01_architecture_overview.md` |
+| 架构约束 | `{KG_ROOT}/08_constraints_and_rules.md` | `templates/08_constraints_and_rules.md` |
 
 ### 项目概要（00）章节
 
@@ -114,14 +130,14 @@ flowchart TD
 
 | 文档 | 路径 | 模板 |
 |---|---|---|
-| 模块地图 | `docs/02_module_map.md` | `templates/02_module_map.md` |
-| 数据模型 | `docs/04_data_model_map.md` | `templates/04_data_model_map.md` |
-| API 总表 | `docs/05_api_map.md` | `templates/05_api_map.md` |
-| 前后端映射 | `docs/06_frontend_backend_mapping.md` | `templates/06_frontend_backend_mapping.md` |
+| 模块地图 | `{KG_ROOT}/02_module_map.md` | `templates/02_module_map.md` |
+| 数据模型 | `{KG_ROOT}/04_data_model_map.md` | `templates/04_data_model_map.md` |
+| API 总表 | `{KG_ROOT}/05_api_map.md` | `templates/05_api_map.md` |
+| 前后端映射 | `{KG_ROOT}/06_frontend_backend_mapping.md` | `templates/06_frontend_backend_mapping.md` |
 
 ### 开发参考手册
 
-同时生成 `docs/development-reference.md`（参考 `development-reference-template.md`），包含：
+同时生成 `{KG_ROOT}/development-reference.md`（参考 `development-reference-template.md`），包含：
 1. **业务域全景** — 按域列出能力边界
 2. **新增需求决策指南** — 代码放哪层的决策表
 3. **Controller 端点全表** — 完整端点清单
@@ -145,10 +161,10 @@ flowchart TD
 
 | 文档 | 路径 | 模板 | 说明 |
 |---|---|---|---|
-| 业务流程 | `docs/03_business_flow_map.md` | `templates/03_business_flow_map.md` | 核心业务流程清单和概要 |
-| 术语表 | `docs/07_glossary.md` | `templates/07_glossary.md` | 业务术语定义 |
-| 重构计划 | `docs/09_refactor_plan.md` | `templates/09_refactor_plan.md` | 重构路线和进度跟踪 |
-| 变更记录 | `docs/10_change_log.md` | `templates/10_change_log.md` | ADR 风格变更记录 |
+| 业务流程 | `{KG_ROOT}/03_business_flow_map.md` | `templates/03_business_flow_map.md` | 核心业务流程清单和概要 |
+| 术语表 | `{KG_ROOT}/07_glossary.md` | `templates/07_glossary.md` | 业务术语定义 |
+| 重构计划 | `{KG_ROOT}/09_refactor_plan.md` | `templates/09_refactor_plan.md` | 重构路线和进度跟踪 |
+| 变更记录 | `{KG_ROOT}/10_change_log.md` | `templates/10_change_log.md` | ADR 风格变更记录 |
 
 ### 自动模式行为
 
@@ -170,15 +186,15 @@ flowchart TD
 
 ### 前置条件
 
-Phase 1-2 已完成（需要 `docs/02_module_map.md` 中的模块清单）。
+Phase 1-2 已完成（需要 `{KG_ROOT}/02_module_map.md` 中的模块清单）。
 
 ### 生成文档
 
 #### 模块文档
 
-为 `docs/02_module_map.md` 中的每个模块生成深度文档：
+为 `{KG_ROOT}/02_module_map.md` 中的每个模块生成深度文档：
 
-路径：`docs/modules/{module}.md`
+路径：`{KG_ROOT}/modules/{module}.md`
 模板：`templates/module_template.md`
 
 每份模块文档包含 10 节：
@@ -197,9 +213,9 @@ Phase 1-2 已完成（需要 `docs/02_module_map.md` 中的模块清单）。
 
 | 项目类型 | 技能卡 | 路径 | 模板 |
 |---|---|---|---|
-| Flutter | Flutter 技能卡 | `docs/skills/flutter_skill.md` | `templates/flutter_skill.md` |
-| Vue | Vue 技能卡 | `docs/skills/vue_skill.md` | `templates/vue_skill.md` |
-| Spring Cloud/Boot | Spring Cloud 技能卡 | `docs/skills/springcloud_skill.md` | `templates/springcloud_skill.md` |
+| Flutter | Flutter 技能卡 | `{KG_ROOT}/skills/flutter_skill.md` | `templates/flutter_skill.md` |
+| Vue | Vue 技能卡 | `{KG_ROOT}/skills/vue_skill.md` | `templates/vue_skill.md` |
+| Spring Cloud/Boot | Spring Cloud 技能卡 | `{KG_ROOT}/skills/springcloud_skill.md` | `templates/springcloud_skill.md` |
 
 技能卡包含：分层职责、命名规范、AI 代码生成规则、当前重构状态。
 
@@ -218,10 +234,10 @@ Phase 1-2 已完成（需要 `docs/02_module_map.md` 中的模块清单）。
 
 ## 文档存储结构
 
-生成完成后，项目 `docs/` 目录结构如下：
+生成完成后，用户目录知识库 `{KG_ROOT}/`（= `{USER_DOCUMENTS}/ai-docs/{project}/`）结构如下：
 
 ```
-docs/
+{KG_ROOT}/                          ← {USER_DOCUMENTS}/ai-docs/{project}/
 ├── 00_project_overview.md         ← AI 入口（Phase 1）
 ├── 01_architecture_overview.md    ← 系统分层（Phase 1）
 ├── 02_module_map.md               ← 模块一览（Phase 2）

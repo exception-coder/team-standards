@@ -21,8 +21,10 @@ description: "当检测到项目结构变更（新增 Controller/Service/模块/
 
 ## 前置条件
 
-项目 `docs/` 目录下已存在知识图谱文档（通过 `init-project-docs` 生成）。
-若 `docs/00_project_overview.md` 不存在，提示用户先运行 `init-project-docs`。
+用户目录知识库 `{KG_ROOT}/`（= `{USER_DOCUMENTS}/ai-docs/{project}/`）下已存在知识图谱文档（通过 `init-project-docs` 生成）。
+若 `{KG_ROOT}/00_project_overview.md` 不存在，提示用户先运行 `init-project-docs`。
+
+> 知识图谱统一存放在用户目录知识库，不再写入项目 `docs/`。下文 `{KG_ROOT}/` 一律指 `{USER_DOCUMENTS}/ai-docs/{project}/`。
 
 ---
 
@@ -30,7 +32,7 @@ description: "当检测到项目结构变更（新增 Controller/Service/模块/
 
 ```mermaid
 flowchart TD
-    A([收到更新指令]) --> B[读取 docs/00_project_overview.md 获取当前文档状态]
+    A([收到更新指令]) --> B["读取 {KG_ROOT}/00_project_overview.md 获取当前文档状态"]
     B --> C[扫描代码结构 - 与文档对比]
     C --> D[生成差异报告]
     D --> E{用户选择模式}
@@ -47,7 +49,7 @@ flowchart TD
 ### 检测项 1：模块变更
 
 **扫描**：Controller/Service 包结构（Java）或 features/ 目录（Flutter）
-**对比**：`docs/02_module_map.md`
+**对比**：`{KG_ROOT}/02_module_map.md`
 **触发更新条件**：
 - 新增了模块（包/目录）但文档未记录
 - 文档记录的模块在代码中已不存在
@@ -56,7 +58,7 @@ flowchart TD
 ### 检测项 2：API 变更
 
 **扫描**：Controller 层的 `@RequestMapping` 等注解
-**对比**：`docs/05_api_map.md`
+**对比**：`{KG_ROOT}/05_api_map.md`
 **触发更新条件**：
 - 新增了 API 端点但文档未记录
 - 已有端点的路径/方法/参数发生变化
@@ -65,7 +67,7 @@ flowchart TD
 ### 检测项 3：数据模型变更
 
 **扫描**：Entity/Model 类、Mapper XML、建表语句
-**对比**：`docs/04_data_model_map.md`
+**对比**：`{KG_ROOT}/04_data_model_map.md`
 **触发更新条件**：
 - 新增了数据表/实体但文档未记录
 - 已有表新增或删除了字段
@@ -74,7 +76,7 @@ flowchart TD
 ### 检测项 4：前后端映射变更
 
 **扫描**：综合 Controller + 前端页面/路由
-**对比**：`docs/06_frontend_backend_mapping.md`
+**对比**：`{KG_ROOT}/06_frontend_backend_mapping.md`
 **触发更新条件**：
 - 新页面引用了已有接口
 - 接口被新的页面使用
@@ -82,7 +84,7 @@ flowchart TD
 ### 检测项 5：架构约束一致性
 
 **扫描**：项目实际的分层结构和依赖关系
-**对比**：`docs/08_constraints_and_rules.md`
+**对比**：`{KG_ROOT}/08_constraints_and_rules.md`
 **触发更新条件**：
 - 项目采用了新的架构模式
 - 命名规范发生变化
@@ -142,5 +144,5 @@ flowchart TD
 ## 与其他 Skill 的关系
 
 - **不触发** `design-doc-required`（本 skill 属于文档维护类，非开发类）
-- 更新 `docs/` 下文件后，自动触发 `doc-index-required` Phase-B 更新索引
+- 更新 `{KG_ROOT}/` 下文件后，自动触发 `doc-index-required` Phase-B 更新索引
 - 可被 `init-project-docs` 的后续维护阶段调用
