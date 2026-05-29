@@ -356,8 +356,18 @@ description: 触发时机描述   # 明确说明何时 MUST 调用
 | 不兼容的结构变更（目录重组、Skill 重命名） | Major（首位） | `1.2.0` → `2.0.0` |
 
 **发版检查清单（每次 push 前逐项确认）：**
-1. `.claude-plugin/plugin.json` 的 `version` 已按上表递增
-2. `.claude-plugin/marketplace.json` 中对应插件的 `version` 已同步递增（两处必须一致，插件系统以 marketplace.json 为基准判断是否有更新）
+1. **三处 manifest 版本号同步递增且完全一致**——`.claude-plugin/plugin.json`、`.claude-plugin/marketplace.json`（对应插件）、`.codex-plugin/plugin.json`。三处缺一不可：CI `version-sync-check`（`scripts/check-version-sync.js`）对**三处**强校验，任一不一致即失败；插件系统以 marketplace.json 为基准判断是否有更新。**易漏点：`.codex-plugin/plugin.json` 常被忘记，务必一并升。**
+2. **若本次改动了 `CLAUDE.md`，必须运行 `node scripts/sync-agents.js` 重新生成 `AGENTS.md`**——`AGENTS.md` 由 `CLAUDE.md` 派生，无任何 git hook 自动同步，纯靠人工；漏跑则 CI `agents-sync-check`（`scripts/sync-agents.js --check`）失败。
 3. 本文件 Skill 索引表已同步（新增/修改/删除）
 4. `docs/skill-flow.md` 已同步（直接更新,不再建文件式快照）
 5. README.md 的「包含的 Skills」表已同步（如有新增 Skill）
+
+**push 前本地一次性自检全部 5 道 CI 闸门**（全部 exit 0 才提交，退出码勿被 `tail`/管道吞掉）：
+
+```bash
+(cd hooks && npm test) && \
+node scripts/sync-agents.js --check && \
+node scripts/check-cross-refs.js && \
+node scripts/check-version-sync.js && \
+node scripts/audit-skills.js --warnings --ci
+```

@@ -165,7 +165,7 @@ team-standards 插件源码仓库自动收尾场景在 commit 成功后继续执
 git push
 ```
 
-push 前必须确认 `.claude-plugin/plugin.json`、`.claude-plugin/marketplace.json` 版本一致；Codex 分发场景同时确认 `.codex-plugin/plugin.json` 已按变更类型递增。该版本号递增要求只适用于 team-standards 插件源码仓库，禁止在业务项目中套用。
+push 前必须确认**三处 manifest 版本号完全一致**——`.claude-plugin/plugin.json`、`.claude-plugin/marketplace.json`、`.codex-plugin/plugin.json`，三处缺一不可（CI `version-sync-check` 对三处强校验，`.codex-plugin/plugin.json` 是常见漏升点）。若本次改动含 `CLAUDE.md`，push 前还须运行 `node scripts/sync-agents.js` 重新生成 `AGENTS.md`（CI `agents-sync-check` 强校验，无 hook 自动同步）。该版本号递增与同步要求只适用于 team-standards 插件源码仓库，禁止在业务项目中套用。
 
 ---
 
