@@ -1,5 +1,5 @@
 {
-  "_comment": "默认启用四道 PreToolUse hook（跨平台 Node 脚本，无需用户区分平台）：(1) check-git-commit-skill 拦截 Bash `git commit` 中的大改未走 skill 的情况；(2) check-dto-annotation 拦截 Flutter wire DTO 用 @freezed / 裸 @JsonSerializable() 的违规；(3) check-design-doc 拦截源码 Edit/Write 但项目缺设计文档的情况；(4) check-backend-kg-readiness 检查 Write/Edit 后端业务源码前是否读过项目知识图谱（默认 warn 模式 exit 0 + stderr 提示；TEAM_STANDARDS_BACKEND_KG_HOOK=block 升级硬阻断、=off 关闭）。",
+  "_comment": "默认启用五道 PreToolUse hook（跨平台 Node 脚本，无需用户区分平台）：(1) check-git-commit-skill 拦截 Bash `git commit` 中的大改未走 skill 的情况；(2) check-dto-annotation 拦截 Flutter wire DTO 用 @freezed / 裸 @JsonSerializable() 的违规；(3) check-design-doc 拦截源码 Edit/Write 但项目缺设计文档的情况；(4) check-backend-kg-readiness 检查 Write/Edit 后端业务源码前是否读过项目知识图谱（默认 warn 模式 exit 0 + stderr 提示；TEAM_STANDARDS_BACKEND_KG_HOOK=block 升级硬阻断、=off 关闭）；(5) check-comment-density 扫描源码 Write/Edit/MultiEdit 新增内容里命中 coding-standards-common §5.4 注释红线的注释（变更标记 / 日期 / 工单号 / 带元信息分节线 / 版本流水措辞 + 超长注释块；默认 warn 模式 exit 0 + stderr 提示；TEAM_STANDARDS_COMMENT_HOOK=block 升级硬阻断、=off 关闭，TEAM_STANDARDS_COMMENT_MAX_BLOCK 调注释块行数阈值）。",
   "hooks": {
     "PreToolUse": [
       {
@@ -28,6 +28,11 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/check-backend-kg-readiness.js\"",
+            "async": false
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/check-comment-density.js\"",
             "async": false
           }
         ]

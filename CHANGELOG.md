@@ -4,6 +4,22 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.29.0] - 2026-05-29
+
+**新增第五道 PreToolUse hook `check-comment-density.js`：为 `coding-standards-common` §5.4 注释红线提供机械兜底。**
+
+### Added
+- `hooks/check-comment-density.js` — 源码 Write/Edit/MultiEdit 前扫本次**新增内容**的注释，命中 §5.4 红线即 stderr 提示（默认 warn）。抓客观无歧义项：变更标记（`[BUGFIX]` / `[DEPRECATED]` / `[ADDED]`...）、注释里的日期、工单·PR·Issue 号、带个人或日期的 TODO、带元信息的分节线、版本流水措辞，外加连续注释块超阈值（`TEAM_STANDARDS_COMMENT_MAX_BLOCK` 默认 6）的软提醒。去字符串字面量判定注释避免 `http://` / 字符串里 `[FIXED]` 误判；ISO/RFC/UTF 等技术标准前缀排除避免误判工单号。`TEAM_STANDARDS_COMMENT_HOOK=block` 升级硬阻断、=off 关闭。
+- `hooks/tests/check-comment-density.test.js` — 23 例端到端覆盖（各红线命中 + 干净放行 + 误报边界 + warn/block/off + Write/Edit/MultiEdit + Python `#` 注释）。
+
+### Changed
+- `hooks/hooks.json` — Write|Edit|MultiEdit 链新增第五道 hook，`_comment` 更新为「五道」。
+- `skills/coding-standards-common/SKILL.md` §5.4.1 — 补「机械兜底」说明：hook 只抓客观项，prose 式实现史 / 私有方法契约史仍靠规则 + 评审，不能因「hook 没报」放行。
+- `CLAUDE.md` 辅助资源表新增 `check-comment-density.js` 行；`AGENTS.md` 同步重生成。
+
+### Motivation
+- 实战暴露：注释红线（§5.4）此前只在 skill 文档里，纯靠模型自觉触发 `coding-standards-common`，会话漏触发时变更历史 / 多行 prose 仍写进源码。新增 hook 把「客观无歧义」的红线做成机械兜底，与 skill 形成「文档定规则 + hook 实施兜底」的双层防护（同 `check-backend-kg-readiness` 模式）。判定有品味成分的部分（prose 史、私有方法契约史）仍留给 skill + 评审，故默认 warn 而非 block，便于评估误报率。
+
 ## [1.28.2] - 2026-05-15
 
 **`backend-knowledge-graph-required` 升级：`ddl-baseline.md` 成为涉及 DB 操作项目的硬必需。**

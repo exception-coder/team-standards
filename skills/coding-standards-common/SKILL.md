@@ -154,6 +154,8 @@ description: Use when writing, reviewing, or modifying source code in any langua
 
 > **判定准绳**:删掉这条注释,下一个改这段代码的人会不会犯错?会则保留(短句),不会则删。
 
+> **机械兜底(v1.29 起)**:`hooks/check-comment-density.js`(PreToolUse Write/Edit/MultiEdit,默认 warn)扫本次新增内容的注释,命中变更标记 / 日期 / 工单号 / 带元信息分节线 / 版本流水措辞 + 超长注释块时 stderr 提示。hook 只抓客观无歧义项,prose 式实现史 / 私有方法契约史仍靠本节规则 + 评审判断,不能因"hook 没报"就放行。`TEAM_STANDARDS_COMMENT_HOOK=block` 升级硬阻断、=off 关闭。
+
 ### 5.5 修改代码时同步清理过期注释 / 历史版本说明 / 废话注释
 
 > 立场:**改了逻辑就要校对周边注释**。过期注释比没有注释更糟——它会主动误导下一个读你代码的人;历史版本说明 / 废话注释会污染文件、消耗后续阅读者的注意力。**改到哪,清到哪**。
