@@ -61,8 +61,11 @@ process.stdin.on('end', () => {
     process.exit(0);
   }
 
-  // JSONL transcript 是 compact JSON，无内嵌空白；字面量 includes() 比正则在 MB 级文件上快数倍
-  if (content.includes('"skill":"team-standards:git-commit-standards"')) {
+  // Skill 触发时 transcript 既可能记完全限定名 "team-standards:git-commit-standards"，
+  // 也可能记裸名 "git-commit-standards"（取决于用户/模型用哪种写法调 Skill 工具）；两者都算已调用。
+  // 先用裸名字面量 includes() 快速预筛（MB 级文件远快于正则），命中后再确认 skill 键边界。
+  if (content.includes('git-commit-standards')
+      && /"skill":"(?:team-standards:)?git-commit-standards"/.test(content)) {
     process.exit(0);
   }
 

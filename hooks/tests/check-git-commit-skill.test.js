@@ -63,7 +63,8 @@ function makeTranscript(opts = {}) {
       JSON.stringify({
         type: 'tool_use',
         name: 'Skill',
-        input: { skill: 'team-standards:git-commit-standards' },
+        // 默认完全限定名；测裸名场景时传 opts.skillName 覆盖
+        input: { skill: opts.skillName || 'team-standards:git-commit-standards' },
       })
     );
   } else {
@@ -141,6 +142,22 @@ test('阻断：大改 git commit 但 transcript 无 skill 调用', () => {
 test('放行：大改 git commit 且 transcript 已含 skill 调用', () => {
   const dir = makeRepo({ files: 'large' });
   const transcript = makeTranscript({ hasSkillCall: true });
+  try {
+    const { code } = runHook({
+      tool_name: 'Bash',
+      tool_input: { command: 'git commit -m big' },
+      cwd: dir,
+      transcript_path: transcript,
+    });
+    assert.equal(code, 0);
+  } finally {
+    cleanup(dir, transcript);
+  }
+});
+
+test('放行：大改 git commit 且 transcript 含裸名 skill 调用(无 team-standards: 前缀)', () => {
+  const dir = makeRepo({ files: 'large' });
+  const transcript = makeTranscript({ hasSkillCall: true, skillName: 'git-commit-standards' });
   try {
     const { code } = runHook({
       tool_name: 'Bash',
