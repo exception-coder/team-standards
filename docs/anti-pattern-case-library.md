@@ -64,6 +64,7 @@
 - **现象**:AI 修 bug 时在函数头加 `// [BUGFIX 2026-05-12] 修复退款金额计算错误,原来用 amount 现在用 amount - tax`。
 - **根因**:AI 训练数据里有大量"代码注释包含变更历史"的样本,默认习得这种模式。
 - **反例**:函数头出现 `[REWRITTEN 日期]`、`[DEPRECATED]`、`[ADDED v1.2]`、设计文档第几节引用、旧实现 1/2/3 步骤等。
+  - **真实案例 2026-05-29(korepos hotfix)**:AI 给新增的 `migrateToVersion15` 函数写了 11 行 doc comment 讲"v10 失败 / v14 漏补 / refund_confirm_service catch-all 兜底 / UI 弹退款失败",本应在 commit body 承载的全链路 RCA 叙事被塞进了源码注释。用户纠正后简化为 1 行 `/// 退款依赖字段/表兜底:补 ...`。**违规链路根因**:AI 没自动触发 `bugfix-coding-style` / `coding-standards-common`(CLAUDE.md 已声明 bug 修复 / 任何源码改动**必须**触发),沿袭了 `refund_confirm_service.dart` 里满地的 `// [ADDED 2026-04-28]` / `// [MODIFIED v11]` 旧风格(v1.17 之前的写法)。
 - **正确做法**:源码只描述**当前正确**逻辑,变更原因 / 旧实现写进 commit body 或 design doc / bug doc;复杂逻辑用 1-2 行 WHY 注释解释 "why this code now",不写 "how we got here"。
 - **关联 skill**:`bugfix-coding-style`、`coding-standards-common` §5.4
 - **历史 commit**:`9e12fc1`(方向反转)
