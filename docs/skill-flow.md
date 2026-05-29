@@ -37,7 +37,7 @@
 | `coding-violation-log` | team-standards | 用户纠正 AI 编码错误时登记违规；编码前回顾已登记记录防重犯（嵌入编码链路，java-coding-standards 之前） |
 | `project-docs-update` | team-standards | 项目代码结构变更后同步知识图谱文档（检测差异 + 自动/确认更新） |
 | `arch-lint` | team-standards | Flutter 架构违规检测（5 条分层规则，全量/轻量两种模式） |
-| `bugfix-coding-style` | team-standards | bug 修复 / 任何源码改动的注释规范（v1.17 起方向反转）：禁止变更历史/日期标记/PR 引用/注释保留旧代码进入源码；源码只描述当前正确逻辑，变更原因归 git log / commit body；函数头只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块写短 WHY 注释 |
+| `bugfix-coding-style` | team-standards | bug 修复 / 任何源码改动期的应用层指引（v1.28.8 起注释红线单一来源化）：**注释禁令统一收口到 `coding-standards-common` §5.4 + §5.4.1，本 skill 不再独立定义红线表**。只承担 bug 修复期独有内容：v1.17 方向反转的历史背景、推荐写法 dart 代码示例、摆放位置示例、适用范围矩阵、遇到存量 `[DEPRECATED]` / `[ADDED]` 注释顺手清理的边界、红色警告对照表 |
 | `glossary-required` | team-standards | 业务术语会话级强制登记;PRD / 设计 / 对话出现未登记的业务领域名词时自动候选追加;用户与 AI 同义词错位时主动对齐到规范术语;候选池 `{USER_DOCUMENTS}/ai-docs/{project}/glossary/_candidates.md`、正式版 `docs/knowledge-graph/glossary.md`;与 init-project-docs 的批量初始化术语表分工互补 |
 | `reverse-index-required` | team-standards | 反向影响索引强制维护(4 类:状态/字段/事件/API);冷启动 `hooks/scan-reverse-index.js` 扫描 Java/Dart/TS 枚举 + SQL 字面量产出 states 初版;增量维护规则:变更枚举 / 字段 / 事件 / API 同回合必须回写反向索引;与 backend-knowledge-graph-required 互补(正向 vs 反向)、与 cross-project-locator 边界明确(单服务内 vs 跨项目调用方) |
 | `reset-kpos-local-state` | team-standards | 用户以自然语言要求重置 / 清空 / 删除 kpos / korepos 本地状态（shared_preferences 或 korepos.db）时路由到 `/reset-kpos-local` slash command 执行;只识别 + 路由,不自行 `Remove-Item` / `rm`;严格不触发场景:代码内删除 / git commit 回滚 / 删源码文件 / `flutter clean` |
@@ -299,9 +299,9 @@ flowchart LR
 | Phase 3-4 的自动模式和确认模式怎么选? | 自动模式：AI 尽力推断后生成，标注"需人工校验"，适合快速产出初稿。确认模式：逐份展示等用户确认，适合对准确度要求高的场景。 |
 | Step 0 知识图谱预热是什么? | 在 design-doc-required / bug-doc-required 执行前，先读 `00_project_overview.md` 获取全局索引，再按 AI 上下文路由表加载当前任务类型对应的 2-3 份文档。避免全量扫码，按需获取上下文。 |
 | 什么时候走「轻量修订」而不是新建快照? | 设计文档已存在 + 改动通过 design-doc-required 第四·五步硬清单（不新增接口/字段/类、不改方法签名、单文件 ≤30 行净变更、性质属修正/对齐/删冗余/修 bug）。Git 管理下必要时更新 current 文档，变更说明写 commit body；任一项 ❌ 进入需求变更处理。 |
-| 轻量修订期间代码怎么写? | 必须遵循 `bugfix-coding-style`（v1.17 起反转）：直接改写或新增，**禁止**在源码中保留 `[DEPRECATED]` / `[ADDED]` / `[BUGFIX 日期]` 等变更日志标记，**禁止**注释保留旧代码段。源码只描述当前正确逻辑，变更原因写进 commit message body；函数/类 doc comment 只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块附近写 1-2 行 WHY 注释。 |
-| 函数上能不能写一大段旧实现问题和新实现步骤? | 不能。`[REWRITTEN 日期]`、旧实现缺陷、新实现 1/2/3 步、设计文档第几节、未来版本计划都不应堆在函数头。当前职责写短 doc comment，复杂步骤在对应代码块附近用短 WHY 注释说明。 |
-| `bugfix-coding-style` 和 `coding-violation-log` 有什么区别? | bugfix-coding-style 是**主动规则**（写代码时必须遵循的注释规范，核心规则是"禁变更日志、函数头不堆复盘、复杂逻辑局部短 WHY"），coding-violation-log 是**反应式登记**（用户纠错后记录到违规表防重犯）。前者管"怎么写"，后者管"错过的别再错"。 |
+| 轻量修订期间代码怎么写? | 注释红线遵循 **`coding-standards-common` §5.4 + §5.4.1（v1.28.8 起注释红线单一来源化到 common）**：直接改写或新增，**禁止**在源码中保留 `[DEPRECATED]` / `[ADDED]` / `[BUGFIX 日期]` / `[REWRITTEN]` / section divider 带日期等变更日志标记，**禁止**注释保留旧代码段。源码只描述当前正确逻辑，变更原因写进 commit message body；函数/类 doc comment 只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块附近写 1-2 行 WHY 注释。`bugfix-coding-style` 承担应用层指引（推荐写法 dart 示例、摆放位置、适用范围、旧标记顺手清理）。 |
+| 函数上能不能写一大段旧实现问题和新实现步骤? | 不能。`[REWRITTEN 日期]`、旧实现缺陷、新实现 1/2/3 步、设计文档第几节、未来版本计划都不应堆在函数头（规则源：`coding-standards-common` §5.4 + §5.4.1 字面反例对照表）。私有方法的 dartdoc 更不能堆"前端契约 / 早期版本曾要求 / 现已统一为"的契约演变史——私有方法不是公开接口，函数名 + 1 行职责就够；契约迁移属于 commit body / bug doc。代码块上方的行内 WHY 注释硬阈值 1 行，超过 1 行就该删或拆。 |
+| `bugfix-coding-style` 和 `coding-violation-log` 有什么区别? | bugfix-coding-style v1.28.8 起是**应用层指引**（注释红线收口到 `coding-standards-common` §5.4 + §5.4.1，本 skill 承担 bug 修复期推荐写法 dart 示例 / 摆放位置 / 旧标记顺手清理边界 / 红色警告对照表），coding-violation-log 是**反应式登记**（用户纠错后记录到违规表防重犯）。前者管"怎么写得对"，后者管"错过的别再错"。 |
 | 项目没有知识图谱时 Step 0 怎么办? | 自动跳过。Step 0 检测用户目录知识库 `{USER_DOCUMENTS}/ai-docs/{project}/00_project_overview.md` 不存在时直接进入后续流程，完全向后兼容（知识图谱由 init-project-docs 统一生成在用户目录，不再在项目 `docs/`）。 |
 | 什么时候走「轻量模版」? | 命中第一·七步全部 9 项硬清单（不新增表/字段/对外契约/类 ≥3、不跨服务、不引入新中间件、不重设状态机、改动可由「核心流程图 + 规则表 + 失败行为表」描述）。任一 ❌ 升级到完整模版。已有架构内的单接口新增/调整、接口自身流程或库表读写流程描述就是典型轻量场景。 |
 | 轻量模版需要 coding.md 吗? | **不需要**。核心流程图 + 规则表 + 失败行为表已经覆盖编码所需的最小信息。第四步（生成 coding.md）和第六步（同步 coding.md）只对完整模版生效，轻量分支跳过。 |

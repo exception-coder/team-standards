@@ -1,6 +1,6 @@
 ---
 name: bugfix-coding-style
-description: "Use when applying any bug fix, alignment correction, redundant-code removal, OR adding missing logic to align with upstream/cloud during integration/联调 phase. Trigger when: (1) design-doc-required has routed the change to 「第四·五步：轻量修订流水」 branch, (2) user describes the change as 'fix bug', 'align with cloud/upstream', 'add missing piece', '修 bug', '对齐云端', '删冗余', '修正实现', '改回正确逻辑', '补上漏掉的逻辑', '补缺漏', or (3) about to Edit/Write source code with intent of replacing existing erroneous logic OR adding alignment code that was missed in previous iterations. Forbids in-source change-log comments, commented-out legacy code, and oversized function header narratives; requires concise current-behavior comments and local WHY comments near complex blocks."
+description: "Use when applying any bug fix, alignment correction, redundant-code removal, OR adding missing logic to align with upstream/cloud during integration/联调 phase. Trigger when: (1) design-doc-required has routed the change to 「第四·五步：轻量修订流水」 branch, (2) user describes the change as 'fix bug', 'align with cloud/upstream', 'add missing piece', '修 bug', '对齐云端', '删冗余', '修正实现', '改回正确逻辑', '补上漏掉的逻辑', '补缺漏', or (3) about to Edit/Write source code with intent of replacing existing erroneous logic OR adding alignment code that was missed in previous iterations. **注释红线不在本 skill 定义** — 唯一规则源是 coding-standards-common §5.4 + §5.4.1(common 触发顺序早于本 skill,不会漏)。本 skill 只承担 bug 修复期独有的应用层指引:v1.17 方向反转的历史背景、推荐写法 dart 代码示例、摆放位置、适用范围矩阵、遇到存量 [DEPRECATED]/[ADDED] 注释顺手清理的边界、红色警告对照表。"
 ---
 
 # Bug 修复 / 联调期编码风格
@@ -27,19 +27,13 @@ description: "Use when applying any bug fix, alignment correction, redundant-cod
 | 跨端联调时直接指原代码作凭据 | 联调结论应沉淀到 bug 文档 / 设计文档，不应靠源码注释当临时白板 |
 | 让代码"留下故事" | 故事归 git history。源码每多一行噪声注释，下个读者多一份认知负担 |
 
-## 红线（任何情况下都不得出现在源码中）
+## 红线(单一来源:`coding-standards-common` §5.4 + §5.4.1)
 
-| 反例 | 原因 |
-|------|------|
-| `// [BUGFIX 2026-04-30] 旧实现用 transaction_no 反查...` | 变更日期/原因属于 git log，不属于代码 |
-| `// [DEPRECATED 2026-04-25] 这段以前是 X，现在改成 Y` | 完全属于 commit message |
-| `// [ADDED 2026-04-25] 对齐云端 RefundServiceImpl#handleX（L1063-1070）` | 对齐依据应放方法 doc comment 的"对齐云端"段（不带日期），或写进设计/bug 文档 |
-| 大段被 `//` 注释的旧代码 | 增加噪声、容易腐烂、git 已经留底 |
-| `// 详见 v6 调整流水 2026-04-25 条目` | 引用易失效；让读者跳到外部文档才能理解的代码不合格 |
-| `// PR #1234 / Issue #56 / Linear ticket KP-789` | 同上 |
-| `// TODO(zhangkai 2026-04): 这里以后再优化` | 带个人/日期的 TODO 也是噪声；要 TODO 就匿名写"待优化原因"，但更应该开任务 |
-| `// [REWRITTEN 2026-04-28] 按 xxx 重写...` 后接旧实现问题、新实现步骤、未来版本计划 | 这是变更流水 + 设计文档摘要，应该写进 commit body / 设计文档；源码只保留当前行为和必要 WHY |
-| 函数头连续十几行说明"旧实现忽略 A/B/C、新实现第 1/2/3 步、理论上一定完成、v1.1 计划" | 函数头注释过载。当前职责写在 doc comment，步骤说明拆到对应代码块附近 |
+> **本 skill 不再独立定义注释红线。** 跨语言通用 + bug 修复 / 联调 / 删冗余 / 重构 / 新功能 / 任何源码改动的注释禁令以 [`coding-standards-common`](../coding-standards-common/SKILL.md) **§5.4 列项清单 + §5.4.1 字面反例对照表**为**唯一来源**。
+>
+> 触发顺序里 `coding-standards-common` 早就先于 `bugfix-coding-style` 必走(见 `CLAUDE.md` 「核心调用顺序」§11 → §10),不会漏读;以后新增注释反模式**只改 common 一处**,避免双地维护漂移。
+>
+> 本 skill 只保留下方 **bug 修复期独有**的应用层指引:历史背景(为什么 v1.17 方向反转)、推荐写法 dart 代码示例、摆放位置示例、适用范围矩阵、**遇到存量 `[DEPRECATED]` / `[ADDED]` 注释顺手清理的边界**、与其他 skill 的协作、红色警告对照表。
 
 ## 推荐写法（WHY 注释只放有当下价值的）
 
