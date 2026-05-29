@@ -29,6 +29,7 @@
 | **写 korepos / korepos-refund 后端接口**（shelf endpoint / handler / service / DAO / request-response DTO，路径含 `lib/features/{module}/backend/`）；用户说「加接口 / 加 endpoint / 写 backend 服务 / 实现服务端 / 按 UI 对接手册实现接口」 | `korepos-backend-service` |
 | 项目代码结构变更后需要同步文档 | `project-docs-update` |
 | Flutter 代码架构违规检查 | `arch-lint` |
+| **用户主动要求清理存量注释**（「清理这个文件/类的注释」「删掉 vN 新增等版本变更注释」「注释太多帮我精简」「clean up comments」） | `comment-cleanup`（红线规则源仍是 `coding-standards-common` §5.4，本 skill 只执行存量批量清理） |
 | **跨项目定位 / 排查 / 调用链追踪（涉及 ≥2 个 kpay POS 生态工程）** | `cross-project-locator`（查询模式） |
 | **即将写同时提到 ≥2 个 kpay POS 工程名的 markdown（对照 / 流程 / 数据流）** | `cross-project-locator`（登记模式） |
 | **PRD / 需求 / 设计 / 对话中出现 ≥1 个业务领域名词（订单 / 账单 / 退款 / 分摊 / 流水 / 快照 / 对账 等）且本项目术语表未登记**；用户与 AI 对同一名词使用了不同字面（「退货」vs「退款」、「分摊」vs「分配」）；AI 完成代码调查发现 ≥1 个业务术语 ↔ 代码命名映射；用户说「补术语 / 整理术语表 / 维护 glossary」；即将 Write/Edit 描述业务场景 / 业务流程 / 业务规则的 .md 含未登记术语 | `glossary-required` |
@@ -48,7 +49,7 @@
 
 ## Skill 分类导航
 
-> 24 个 skill 按使用阶段分 8 组，遇到具体任务先按组检索而不是遍历全表。每个 skill 详细描述见下方「Skill 索引」。
+> 25 个 skill 按使用阶段分 8 组，遇到具体任务先按组检索而不是遍历全表。每个 skill 详细描述见下方「Skill 索引」。
 
 | 阶段 / 类别 | 包含 Skill | 用途速记 |
 |---|---|---|
@@ -57,7 +58,7 @@
 | **③ 架构与编码门禁（实施时）** | `architecture-ddd-lite-fullstack` / `coding-standards-common` / `java-coding-standards` / `korepos-backend-service` / `bugfix-coding-style` | 分层 + 每分支一 focused service / 命名 + 函数原子 + 注释三档 / Java 独占条款 / Flutter backend 强约束 / bug 修复注释规范 |
 | **④ 提交与日志（收尾时）** | `git-commit-standards` / `daily-work-log` | 规范 commit；业务项目源码改动后按 bug/功能分类沉淀工作日志 |
 | **⑤ 知识图谱（沉淀时）** | `backend-knowledge-graph-required` / `reverse-index-required` / `glossary-required` / `cross-project-locator` | 正向单服务图谱（表 / SQL / 状态机 / 原子能力 / 技术难点）/ 反向影响索引（枚举 / 字段 / 事件 / API）/ 业务术语登记 / 跨项目拓扑 |
-| **⑥ 质量回路（持续）** | `coding-violation-log` / `arch-lint` / `markdown-writing-standards` / `project-docs-update` | 编码违规登记防重犯 / Flutter 架构 lint / Mermaid 语法 + 目录复核 / 项目结构变更后同步文档 |
+| **⑥ 质量回路（持续）** | `coding-violation-log` / `arch-lint` / `comment-cleanup` / `markdown-writing-standards` / `project-docs-update` | 编码违规登记防重犯 / Flutter 架构 lint / 存量注释批量清理（对齐 §5.4）/ Mermaid 语法 + 目录复核 / 项目结构变更后同步文档 |
 | **⑦ 项目初始化（一次性）** | `init-project-docs` / `generate-project-profile` | 4 阶段渐进式构建知识图谱 / 生成 AI Agent 消费的 10 维度项目画像 |
 | **⑧ plugin 自身维护** | `dev-log` | 仅 team-standards 决策型变更记录长期背景 |
 
@@ -211,6 +212,7 @@
 | `bugfix-coding-style` | `skills/bugfix-coding-style/` | **v1.28.8 起注释红线单一来源化**：禁令统一收口到 `coding-standards-common` §5.4 + §5.4.1（跨语言、跨场景通用，bug 修复 / 联调 / 删冗余 / 重构 / 新功能全适用；common 触发顺序早于本 skill 不会漏读；新增反例只改 common 一处避免双地漂移）。本 skill 不再独立定义红线表，只承担 bug 修复期独有的应用层指引：**v1.17 方向反转的历史背景**（为什么禁源码内变更历史 / `[BUGFIX]` / `[DEPRECATED]` / `[ADDED]` 等标记）、**推荐写法 dart 代码示例**、**摆放位置示例**、**适用范围矩阵**、**遇到存量 `[DEPRECATED]` / `[ADDED]` 注释顺手清理的边界**、**红色警告对照表**。复杂逻辑代码块附近的 1-2 行 WHY 注释要求仍归 common §5.3 | bug修复、对齐云端、删冗余、补缺漏、bugfix style、v1.17 方向反转历史、推荐写法 dart 示例、摆放位置、适用范围矩阵、存量 [DEPRECATED]/[ADDED] 顺手清理、红色警告、规则源指向 common §5.4 |
 | `project-docs-update` | `skills/project-docs-update/` | 知识图谱持续维护：检测代码结构变更（新增 Controller/Service/模块/数据表/API）与 docs/ 文档的差异，生成差异报告并执行更新；支持自动/确认模式 | 更新项目文档、同步知识图谱、文档过时、update project docs、sync knowledge graph |
 | `arch-lint` | `skills/arch-lint/` | Flutter 架构违规检测：5 条规则（presentation 层禁 SQL/HTTP、domain 层禁技术框架、金额禁 double、DAO 不可被 presentation 直接调用）；全量检查 + 轻量自动检查两种模式 | 架构检查、arch lint、检测违规、分层违规、Flutter 架构 |
+| `comment-cleanup` | `skills/comment-cleanup/` | 存量注释批量清理：用户主动要求对已写好的文件/类/模块成批清理违反注释红线的存量注释（`vN 新增` 版本标记 / `[BUGFIX]` 等变更日志标记 / 历史叙事 prose / 私有方法契约史 / 废话 / 死代码注释），多语言（按扩展名识别 `//` `/* */` `///` `#` `--` `<!-- -->`）；红线规则**单一来源引用 `coding-standards-common` §5.4 + §5.4.1**，本 skill 不重定义，只承担范围圈定 / 分类决策（删·改写·保留·待定）/ 安全边界（只动注释不动逻辑、待定项必问、不扩范围）/ 提交纪律（单独 commit、不夹带逻辑、message 不罗列）；与 §5.5「改到哪清到哪」顺手清理、`check-comment-density.js` hook 写入新内容拦截互补——本 skill 是用户主动发起的存量批量对齐 | 清理注释、精简注释、删历史注释、删版本变更注释、vN 新增注释、注释太多、clean up comments、存量注释、批量清理、多语言注释、单一来源 §5.4 |
 | `markdown-writing-standards` | `skills/markdown-writing-standards/` | Markdown 编写规范：Mermaid 图表语法（致命错误清单、各图类型骨架、自检清单）、表格、代码块、标题结构、目录结构复核（TOC Review — 分类混杂/重复/层级断层/交叉引用失效/快速导航判断） | Mermaid、mermaid、图表、流程图、时序图、mindmap、状态图、markdown、表格规范、目录结构、TOC、章节重构、目录复核 |
 | `business-logic-orientation` | `skills/business-logic-orientation/` | 重构/复写/迁移前业务逻辑现状梳理：按场景维度产出 3 图（时序图/流程图/泳道图）+ 知识图谱 + 核心代码索引 + AI 速查索引；后端附加表操作矩阵和状态扭转明细；**v1.20 起默认输出路径** `{USER_DOCUMENTS}/ai-docs/{project}/orientation/{模块名}/{模块名}-现状梳理.md`（不带日期，始终更新最新现状），由 `doc-index-required` Phase-A/B 管控 | 现状梳理、业务逻辑、重构前分析、知识图谱、逻辑梳理、场景分析、调用链分析、AI索引、orientation |
 | `cross-project-locator` | `skills/cross-project-locator/` | kpay POS 生态跨项目业务拓扑定位与登记：查询模式（按业务域/工程名路由到 `kpay-pos-topology/` 下 mapping 或 flows）+ 登记模式（拦截跨项目 markdown 的错误落盘位置，强制写入 `kpay-pos-topology/`）；路由入口是 `kpay-pos-topology/CLAUDE.md` § 查找索引表 | 跨项目、调用链、链路、定位、追踪、end-to-end、前后端追踪、korepos、bff、order-manage、接口对照、映射 |

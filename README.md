@@ -1,6 +1,6 @@
 # team-standards
 
-> **30 秒 TL;DR**:Claude Code 插件,把"AI 协作开发"从"凭运气"变成"按流程"——24 个 skill + 3 个 hook 强制执行从需求分析 → 设计文档 → 代码定位 → 架构门禁 → 编码规范 → 提交规范 → 知识沉淀的完整链路。让 AI 改代码前先想清楚,改完后留下可追溯的痕迹。
+> **30 秒 TL;DR**:Claude Code 插件,把"AI 协作开发"从"凭运气"变成"按流程"——25 个 skill + 5 个 hook 强制执行从需求分析 → 设计文档 → 代码定位 → 架构门禁 → 编码规范 → 提交规范 → 知识沉淀的完整链路。让 AI 改代码前先想清楚,改完后留下可追溯的痕迹。
 
 **它解决什么问题:**
 - AI 一上来就改代码,绕过设计 / 不查既有 / 不沉淀 → 强制 `design-doc-required` + `pre-implementation-code-orientation` 门禁
@@ -262,6 +262,7 @@ v1.26 起 **`check-design-doc.js` hook 默认启用**（[hooks/hooks.json](hooks
 ### ⑥ 质量回路
 - `coding-violation-log` — 编码违规登记 + 编码前回顾防重犯
 - `arch-lint` — Flutter 架构违规检测（5 类）
+- `comment-cleanup` — 存量注释批量清理（用户主动发起，多语言，红线规则单一引用 `coding-standards-common` §5.4）
 - `markdown-writing-standards` — Mermaid 语法 + 表格 + 目录复核
 - `project-docs-update` — 项目结构变更后同步知识图谱文档
 

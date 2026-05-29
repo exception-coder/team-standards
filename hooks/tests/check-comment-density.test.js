@@ -169,6 +169,28 @@ test('Python 文件：# 注释也识别', () => {
   assert.match(stderr, /change-marker/);
 });
 
+test('命中：版本标记 vN 新增', () => {
+  const { stderr } = runHook(edit('lib/a.dart', '/// 退款订单 id（v13 新增，可空）\nint x = 1;\n'));
+  assert.match(stderr, /version-flow/);
+});
+
+test('命中：版本标记 vN 起', () => {
+  const { stderr } = runHook(edit('lib/a.dart', '/// v14 起新登记必须显式传入\nint x = 1;\n'));
+  assert.match(stderr, /version-flow/);
+});
+
+test('命中：版本标记 vN 及以前', () => {
+  const { stderr } = runHook(edit('lib/a.dart', '/// v12 及以前已登记的历史行为 NULL\nint x = 1;\n'));
+  assert.match(stderr, /version-flow/);
+});
+
+test('不误报：vN 协议/IPv6 等非版本标记', () => {
+  const r1 = runHook(edit('lib/a.dart', '// 支持 v3 协议解析\nfinal x = 1;\n'));
+  assert.equal(r1.code, 0); assert.equal(r1.stderr, '');
+  const r2 = runHook(edit('lib/a.dart', '// IPv6 上线后启用\nfinal x = 1;\n'));
+  assert.equal(r2.code, 0); assert.equal(r2.stderr, '');
+});
+
 test('放行：非 JSON stdin 不崩溃', () => {
   const res = spawnSync('node', [HOOK], { input: 'not json', encoding: 'utf8' });
   assert.equal(res.status, 0);

@@ -4,6 +4,20 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.30.0] - 2026-05-29
+
+**新增 `comment-cleanup` skill：用户主动发起的存量注释批量清理；hook 补 `vN 新增` 类版本标记。**
+
+### Added
+- `skills/comment-cleanup/SKILL.md` — 用户要求「清理这个文件/类的注释 / 删 vN 新增等版本变更注释 / 注释太多帮我精简 / clean up comments」时触发，对**存量**文件/类/模块成批清理违反注释红线的注释。多语言（按扩展名识别 `//` `/* */` `///` `#` `--` `<!-- -->`）。红线规则**单一来源引用 `coding-standards-common` §5.4 + §5.4.1**，本 skill 只承担：范围圈定、分类决策（删 / 改写 / 保留 / 待定）、安全边界（只动注释不动逻辑、待定项必问、不扩范围）、提交纪律（单独 commit、不夹带逻辑、message 不罗列）。与 §5.5「改到哪清到哪」顺手清理、`check-comment-density` hook 写入新内容拦截互补——本 skill 抓 regex 抓不到的 prose 实现史 / 私有方法契约史，靠语义判断。
+
+### Changed
+- `hooks/check-comment-density.js` — version-flow 正则补 `新增 / 引入 / 上线 / 移除 / 删除 / 废弃 / 弃用 / 起 / 及以前 / 及以后`，修复 `v13 新增` / `v14 起` / `v12 及以前` 这类最常见中文版本标记此前漏抓的问题；测试 23 → 27 例（含 `v3 协议` / `IPv6 上线` 不误报）。
+- `CLAUDE.md`（触发表 + 分类导航 ⑥ + Skill 索引表，skill 计数 24 → 25）/ `docs/skill-flow.md`（Skill 总览 + FAQ 新增「三套注释机制分工」）/ `README.md`（Skills 列表 + TL;DR 计数）/ `AGENTS.md`（重生成）同步登记新 skill。
+
+### Motivation
+- v1.29.0 落地 `check-comment-density` 后暴露两件事：(1) hook 只能 warn**新写入**内容，对**存量**满是 `vN 新增` 的老文件无能为力；(2) §5.5 只规定「改到哪清到哪」+「大量历史垃圾单独开 PR」，但没有执行这条「单独清理」的标准流程。`comment-cleanup` 补上这个 workflow：用户主动发起、语义判断（覆盖 regex 抓不到的 prose 史）、只动注释不动逻辑、单独提交。同时把 hook 漏抓的 `vN 新增` 顺带补上，让写入侧 warn 也更完整。
+
 ## [1.29.0] - 2026-05-29
 
 **新增第五道 PreToolUse hook `check-comment-density.js`：为 `coding-standards-common` §5.4 注释红线提供机械兜底。**

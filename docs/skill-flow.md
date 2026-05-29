@@ -37,6 +37,7 @@
 | `coding-violation-log` | team-standards | 用户纠正 AI 编码错误时登记违规；编码前回顾已登记记录防重犯（嵌入编码链路，java-coding-standards 之前） |
 | `project-docs-update` | team-standards | 项目代码结构变更后同步知识图谱文档（检测差异 + 自动/确认更新） |
 | `arch-lint` | team-standards | Flutter 架构违规检测（5 条分层规则，全量/轻量两种模式） |
+| `comment-cleanup` | team-standards | 用户主动要求时对**存量**文件/类/模块成批清理违反注释红线的注释（`vN 新增` 版本标记 / `[BUGFIX]` 等变更日志 / 历史叙事 prose / 私有方法契约史 / 废话 / 死代码），多语言；红线规则单一来源引用 `coding-standards-common` §5.4 + §5.4.1，本 skill 只管范围圈定 / 分类决策 / 安全边界 / 提交纪律。与 §5.5 顺手清理、`check-comment-density.js` hook 写入拦截互补 |
 | `bugfix-coding-style` | team-standards | bug 修复 / 任何源码改动期的应用层指引（v1.28.8 起注释红线单一来源化）：**注释禁令统一收口到 `coding-standards-common` §5.4 + §5.4.1，本 skill 不再独立定义红线表**。只承担 bug 修复期独有内容：v1.17 方向反转的历史背景、推荐写法 dart 代码示例、摆放位置示例、适用范围矩阵、遇到存量 `[DEPRECATED]` / `[ADDED]` 注释顺手清理的边界、红色警告对照表 |
 | `glossary-required` | team-standards | 业务术语会话级强制登记;PRD / 设计 / 对话出现未登记的业务领域名词时自动候选追加;用户与 AI 同义词错位时主动对齐到规范术语;候选池 `{USER_DOCUMENTS}/ai-docs/{project}/glossary/_candidates.md`、正式版 `docs/knowledge-graph/glossary.md`;与 init-project-docs 的批量初始化术语表分工互补 |
 | `reverse-index-required` | team-standards | 反向影响索引强制维护(4 类:状态/字段/事件/API);冷启动 `hooks/scan-reverse-index.js` 扫描 Java/Dart/TS 枚举 + SQL 字面量产出 states 初版;增量维护规则:变更枚举 / 字段 / 事件 / API 同回合必须回写反向索引;与 backend-knowledge-graph-required 互补(正向 vs 反向)、与 cross-project-locator 边界明确(单服务内 vs 跨项目调用方) |
@@ -302,6 +303,7 @@ flowchart LR
 | 轻量修订期间代码怎么写? | 注释红线遵循 **`coding-standards-common` §5.4 + §5.4.1（v1.28.8 起注释红线单一来源化到 common）**：直接改写或新增，**禁止**在源码中保留 `[DEPRECATED]` / `[ADDED]` / `[BUGFIX 日期]` / `[REWRITTEN]` / section divider 带日期等变更日志标记，**禁止**注释保留旧代码段。源码只描述当前正确逻辑，变更原因写进 commit message body；函数/类 doc comment 只写当前职责、输入输出语义、不变式和误用风险，复杂逻辑在对应代码块附近写 1-2 行 WHY 注释。`bugfix-coding-style` 承担应用层指引（推荐写法 dart 示例、摆放位置、适用范围、旧标记顺手清理）。 |
 | 函数上能不能写一大段旧实现问题和新实现步骤? | 不能。`[REWRITTEN 日期]`、旧实现缺陷、新实现 1/2/3 步、设计文档第几节、未来版本计划都不应堆在函数头（规则源：`coding-standards-common` §5.4 + §5.4.1 字面反例对照表）。私有方法的 dartdoc 更不能堆"前端契约 / 早期版本曾要求 / 现已统一为"的契约演变史——私有方法不是公开接口，函数名 + 1 行职责就够；契约迁移属于 commit body / bug doc。代码块上方的行内 WHY 注释硬阈值 1 行，超过 1 行就该删或拆。 |
 | `bugfix-coding-style` 和 `coding-violation-log` 有什么区别? | bugfix-coding-style v1.28.8 起是**应用层指引**（注释红线收口到 `coding-standards-common` §5.4 + §5.4.1，本 skill 承担 bug 修复期推荐写法 dart 示例 / 摆放位置 / 旧标记顺手清理边界 / 红色警告对照表），coding-violation-log 是**反应式登记**（用户纠错后记录到违规表防重犯）。前者管"怎么写得对"，后者管"错过的别再错"。 |
+| 注释红线有三套机制（§5.5 / hook / comment-cleanup），分别管什么? | **同一份红线（`coding-standards-common` §5.4 + §5.4.1），三个触发面**：§5.5「改到哪清到哪」——改逻辑时顺手清被覆盖到的方法/块；`check-comment-density.js` hook——写入**新内容**（Write/Edit）时 warn 抓机械红线（变更标记/日期/工单号/`vN 新增`/超长块）；`comment-cleanup` skill——用户**主动要求**对**存量**文件/类/模块成批清理（regex 抓不到的 prose 史 / 契约史靠它的语义判断）。规则不重复定义，全部引用 §5.4。 |
 | 项目没有知识图谱时 Step 0 怎么办? | 自动跳过。Step 0 检测用户目录知识库 `{USER_DOCUMENTS}/ai-docs/{project}/00_project_overview.md` 不存在时直接进入后续流程，完全向后兼容（知识图谱由 init-project-docs 统一生成在用户目录，不再在项目 `docs/`）。 |
 | 什么时候走「轻量模版」? | 命中第一·七步全部 9 项硬清单（不新增表/字段/对外契约/类 ≥3、不跨服务、不引入新中间件、不重设状态机、改动可由「核心流程图 + 规则表 + 失败行为表」描述）。任一 ❌ 升级到完整模版。已有架构内的单接口新增/调整、接口自身流程或库表读写流程描述就是典型轻量场景。 |
 | 轻量模版需要 coding.md 吗? | **不需要**。核心流程图 + 规则表 + 失败行为表已经覆盖编码所需的最小信息。第四步（生成 coding.md）和第六步（同步 coding.md）只对完整模版生效，轻量分支跳过。 |
