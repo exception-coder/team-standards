@@ -163,3 +163,124 @@ test('阻断：MultiEdit 改动源码且无设计文档', () => {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+// v1.28.7 修复 monorepo / Maven 多模块场景 ---------------------------------
+
+test('放行：Maven 多模块 — .git 在仓根，深层 pom.xml 不应被当作项目根', () => {
+  const root = mkTmpProject('maven-multi');
+  try {
+    // 仓根：.git + docs/design/
+    fs.mkdirSync(path.join(root, '.git'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'docs', 'design'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'docs', 'design', 'overview.md'), '# Design');
+    // 子模块：tools/tool-treesize/pom.xml + 源码
+    fs.mkdirSync(path.join(root, 'tools', 'tool-treesize', 'src', 'main', 'java'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'tools', 'tool-treesize', 'pom.xml'), '<project/>');
+
+    const { code, stderr } = runHook({
+      tool_name: 'Edit',
+      tool_input: {
+        file_path: path.join(root, 'tools', 'tool-treesize', 'src', 'main', 'java', 'Foo.java'),
+      },
+      cwd: path.join(root, 'tools', 'tool-treesize'),
+    });
+    assert.equal(code, 0, `应放行，但被拦：${stderr}`);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('放行：monorepo 前端子包 — .git 在仓根，frontend/package.json 不应被当作项目根', () => {
+  const root = mkTmpProject('monorepo-fe');
+  try {
+    fs.mkdirSync(path.join(root, '.git'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'docs', 'design'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'docs', 'design', 'spec.md'), '# Design');
+    fs.mkdirSync(path.join(root, 'frontend', 'src'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'frontend', 'package.json'), '{}');
+
+    const { code, stderr } = runHook({
+      tool_name: 'Write',
+      tool_input: {
+        file_path: path.join(root, 'frontend', 'src', 'App.tsx'),
+        content: 'export default function App(){}',
+      },
+      cwd: path.join(root, 'frontend'),
+    });
+    assert.equal(code, 0, `应放行，但被拦：${stderr}`);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('放行：.team-standards-project.json#aiDocsProject 覆盖 ai-docs 子目录名', () => {
+  const root = mkTmpProject('repo-rename');
+  // 模拟 ai-docs 目录
+  const aiDocsHome = fs.mkdtempSync(path.join(os.tmpdir(), 'home-'));
+  try {
+    fs.mkdirSync(path.join(root, '.git'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(root, '.team-standards-project.json'),
+      JSON.stringify({ aiDocsProject: 'kai-toolbox' }),
+    );
+    // 设计文档在 <home>/Documents/ai-docs/kai-toolbox/design 下，但 git 仓名不是 kai-toolbox
+    const docsDir = path.join(aiDocsHome, 'Documents', 'ai-docs', 'kai-toolbox', 'design', 'feature');
+    fs.mkdirSync(docsDir, { recursive: true });
+    fs.writeFileSync(path.join(docsDir, 'spec.md'), '# Spec');
+
+    const { code, stderr } = runHook(
+      {
+        tool_name: 'Edit',
+        tool_input: { file_path: path.join(root, 'src', 'main.ts') },
+        cwd: root,
+      },
+      // 覆盖 home 目录
+      process.platform === 'win32' ? { USERPROFILE: aiDocsHome } : { HOME: aiDocsHome },
+    );
+    assert.equal(code, 0, `应放行，但被拦：${stderr}`);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+    fs.rmSync(aiDocsHome, { recursive: true, force: true });
+  }
+});
+
+test('阻断：无 .git 时回退到第一个构建文件标记（向后兼容）', () => {
+  const root = mkTmpProject('no-git');
+  try {
+    // 不创建 .git，只有 pom.xml
+    fs.writeFileSync(path.join(root, 'pom.xml'), '<project/>');
+    fs.mkdirSync(path.join(root, 'src'), { recursive: true });
+
+    const { code, stderr } = runHook({
+      tool_name: 'Write',
+      tool_input: { file_path: path.join(root, 'src', 'Foo.java'), content: 'class Foo{}' },
+      cwd: root,
+    });
+    assert.equal(code, 2);
+    // 错误信息应包含 root（说明回退到 pom.xml 这一级，而不是更深或更浅）
+    assert.ok(stderr.includes(root), `stderr 应提到推断项目根 ${root}，实际：${stderr}`);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('放行：.team-standards-project.json 损坏时不应崩溃，退回 basename 行为', () => {
+  const root = mkTmpProject('broken-override');
+  try {
+    fs.mkdirSync(path.join(root, '.git'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'docs', 'design'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'docs', 'design', 'x.md'), '# x');
+    fs.writeFileSync(path.join(root, '.team-standards-project.json'), '{not valid json');
+    fs.mkdirSync(path.join(root, 'lib'), { recursive: true });
+
+    const { code } = runHook({
+      tool_name: 'Write',
+      tool_input: { file_path: path.join(root, 'lib', 'main.dart'), content: '' },
+      cwd: root,
+    });
+    assert.equal(code, 0);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

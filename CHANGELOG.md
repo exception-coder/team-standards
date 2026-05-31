@@ -4,6 +4,18 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.30.3] - 2026-05-31
+
+**`check-design-doc` hook 修复 monorepo / Maven 多模块项目根错判。**
+
+### Changed
+- `hooks/check-design-doc.js` 项目根识别策略调整：**优先全程向上找 `.git`**（git 仓库根），命中即返回；未找到时再回退到第一个构建文件标记（pom.xml / package.json / pubspec.yaml 等）。修复深层子模块的 pom.xml / package.json 被当作项目根的问题——以前在 `kai-toolbox/tools/tool-treesize/src/.../Foo.java` 上 Edit 会被识别为项目 `tool-treesize`，去找 `ai-docs/tool-treesize/design`，永远拦截；现在正确识别为仓根 `kai-toolbox`，去找 `ai-docs/kai-toolbox/design`。
+- 新增 `.team-standards-project.json` 项目级覆盖文件：根目录放置 `{"aiDocsProject": "<name>"}` 可覆盖 ai-docs 子目录名，解决「git 仓名 ≠ ai-docs 子目录名」（如仓库叫 my-tools 但文档集中放在 ai-docs/kai-toolbox/ 下）。损坏 JSON 不崩溃，安静退回 `path.basename(projectRoot)`。
+- `hooks/tests/check-design-doc.test.js` 新增 5 例：Maven 多模块、monorepo 前端子包、`.team-standards-project.json` 覆盖、无 `.git` 时回退构建文件标记的向后兼容、损坏 JSON 不崩溃。总用例 10 → 15，全 PASS。
+
+### Motivation
+- 实战暴露：Maven 多模块 + 文档集中放 `~/Documents/ai-docs/<repo-name>/design/` 的项目（典型布局：kai-toolbox 仓内多个 Java 子工具 + 一个前端包），每次写源码都被 hook 误拦——因为旧实现按构建文件标记找根，子模块的 `pom.xml` 总比根的 `.git` 先命中，把 `tool-treesize` 当成项目名找文档，必然落空。`.git` 优先 + 显式 `.team-standards-project.json` 覆盖两手解决：99% 情况自动适配（git 仓根即项目根），剩余 1% 通过覆盖文件显式声明。
+
 ## [1.30.0] - 2026-05-29
 
 **新增 `comment-cleanup` skill：用户主动发起的存量注释批量清理；hook 补 `vN 新增` 类版本标记。**
