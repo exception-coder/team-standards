@@ -249,6 +249,11 @@ v1.26 起 **`check-design-doc.js` hook 默认启用**（[hooks/hooks.json](hooks
 - `korepos-backend-service` — Flutter backend 强约束（一接口一 service / wire DTO 注解 / 字段类型禁 dynamic）
 - `bugfix-coding-style` — 源码只描述当前逻辑，禁变更日志注释 / 函数头复盘
 
+> **想调整注释规范改哪里**（注释规则跨语言统一，不按语言各写一套）：
+> - **唯一规则源 = `skills/coding-standards-common/SKILL.md §5`** —— §5.1-5.3 三档 + §5.1.5 字段档 + §5.2.1 职责边界注释 + §5.4/§5.4.1 红线与反例 + 放置原则 + §5.0 注释语言。**对 Java / Dart / TS / Python / Kotlin / Go 一视同仁**，调注释规范只改这一处。
+> - **语言专属只补 doc 注释语法**：`java-coding-standards`（Javadoc）、`korepos-backend-service`（dartdoc 细则）。非 Java/Dart 语言无需单独条款，直接套 §5 + 自身 doc 语法（TSDoc / docstring）。
+> - **机械兜底阈值**（连续注释块行数等）改 `hooks/check-comment-density.js`；**存量批量清理流程**在 `comment-cleanup`（只引用 §5，不重定义）。
+
 ### ④ 提交与日志
 - `git-commit-standards` — 规范 commit（type 前缀 + 中文 body + diff 分析，hook 按改动大小放行）
 - `daily-work-log` — 业务项目源码改动后按 Bug / 功能分类沉淀工作日志
