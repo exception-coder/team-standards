@@ -46,7 +46,7 @@ description: "Use when writing or modifying korepos / korepos-refund backend-sid
 | 角色 | 文件路径 | 关键看点 |
 |---|---|---|
 | Endpoint 枚举 | `lib/features/refund/backendv2/endpoint/refund_v2_endpoint.dart#L10`（`confirmRefund('/confirm/refund/transaction')`） | 一行一个 endpoint，路径与方法名 camel→snake 对齐 |
-| Request DTO | `lib/features/refund/backendv2/dto/request/confirm_refund_request.dart` | 字段级 dartdoc 写明业务含义 / 取值来源 / 默认值语义；新增字段附 [ADDED YYYY-MM-DD vN] 来源标注；**目录例外**：confirm_refund 走的是 backendv2 历史 dto 路径，**新接口的 request 必须放 `features/{module}/common/models/request/`**（详见 [rules/dto-and-acl.md § Step 2](./rules/dto-and-acl.md#step-2request-dto)） |
+| Request DTO | `lib/features/refund/backendv2/dto/request/confirm_refund_request.dart` | 字段级 dartdoc 写明业务含义 / 取值来源 / 默认值语义（**禁带 `[ADDED]` / 日期 / 版本标记**，变更历史归 git / design doc，见 coding-standards-common §5.4）；**目录例外**：confirm_refund 走的是 backendv2 历史 dto 路径，**新接口的 request 必须放 `features/{module}/common/models/request/`**（详见 [rules/dto-and-acl.md § Step 2](./rules/dto-and-acl.md#step-2request-dto)） |
 | Response DTO | `lib/features/refund/backendv2/dto/response/confirm_refund_response.dart` | 主响应类 + 嵌套 freezed 类（`KposRefundTransactionInfo` / `KposCancelTransactionInfo` / `KPayOnlineRefundResultInfo`）的拆分粒度；同样**目录例外**——新接口走 `common/models/response/` |
 | Service | `lib/features/refund/backendv2/service/refund_confirm_service.dart` | 构造器注入 `BackendInfra` + 多个原子 DAO + 子 service；service 内只调 DAO 方法、不接触任何 SQL（详见 [rules/step5-service.md § 强制规则](./rules/step5-service.md#强制规则)） |
 | DAO 注入与调用 | 同上 service 文件的 `@riverpod` 工厂 + 构造器 | DAO 通过 `ref.read(xxxDaoProvider)` 在工厂层注入，service 类持 `final XxxDao _dao` |

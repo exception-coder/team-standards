@@ -201,7 +201,7 @@ class ConfirmRefundRequest with _$ConfirmRefundRequest {
 }
 ```
 
-**写法要点**：每个字段必有 dartdoc 说明业务含义、取值来源、默认值语义；新增字段在类级 dartdoc 末尾标 `[ADDED YYYY-MM-DD vN]`（详见 SKILL.md §1 版本号节）；列表字段在构造器层用 `@Default(<T>[])` 兜底；可选字段在 dartdoc 写明 null 含义。
+**写法要点**：每个字段必有 dartdoc 说明业务含义、取值来源、默认值语义（**禁带 `[ADDED]` / 日期 / 版本标记**，变更历史归 git / design doc，见 coding-standards-common §5.4）；列表字段在构造器层用 `@Default(<T>[])` 兜底；可选字段在 dartdoc 写明 null 含义。
 
 ### 文件 ③ — Response DTO
 

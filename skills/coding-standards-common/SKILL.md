@@ -5,7 +5,7 @@ description: Use when writing, reviewing, or modifying source code in any langua
 
 # 通用编码规范(跨语言)
 
-> 适用于一切源码语言。语言专属规则(如 `java-coding-standards` 的阿里黄山版独占条款、`korepos-backend-service` 的 Flutter backend 规则)在此基础上叠加,不重复。
+> 适用于一切源码语言。语言专属规则(如 `java-coding-standards` 的阿里黄山版独占条款、`dart-coding-standards` 的 Effective Dart·dartdoc 独占条款、`korepos-backend-service` 的 Flutter backend 规则)在此基础上叠加,不重复。
 >
 > 触发链路:`coding-standards-common`(通用) → `{language}-coding-standards`(语言专属)。任何源码 Edit/Write 前先满足本 skill 的 7 条铁律,再走语言专属。
 
