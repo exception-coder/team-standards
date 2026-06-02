@@ -162,6 +162,7 @@ Future<void> registerRefundSuccess(RefundOrder order) async {}
 - 业务规则的长篇科普(超过 3 行) → 进 design doc 或 bug doc
 - **私有方法 / 内部 helper 的多段 dartdoc**(超过 2 行讲"前端契约 / 上下游字段 / 旧契约 vs 新契约 / 跨方法不变式")→ 私有方法不是公开接口,函数名 + 1 行职责就够;契约描述只属于公开接口
 - **行内 WHY 注释超过 1 行**(代码块上方堆 3-5 行讲"另一分支怎么算 / UI 入口不走本分支 / 与某表字段口径对齐")→ 压成 1 行,或彻底删掉让 commit body / bug doc 自承载
+- **宿主语言里内嵌的 SQL 字符串内部不写 `--` 注释**(drift `customSelect` / JDBC / MyBatis 拼接 SQL / 任何字符串字面量里的 SQL):SQL 经常被复制调试、拼接、压缩、日志输出,内嵌 `--` 是噪声,还让 DAO 读起来像"SQL 文档"。口径说明放到 `customSelect`(或等价调用)**之前的宿主语言注释**(Dart `///`·`//` / Java `//`),且遵守行内 WHY ≤1 行。注:`check-comment-density.js` 会先剥离字符串字面量再判定,**抓不到 SQL 串里的 `--`**,这条靠本规则 + 评审 + `comment-cleanup`
 - **扩展 / 维护指南**("新增 X 类型时第 1/2/3 步怎么做" / "以后接入 Y 时改这里")→ 属于维护文档 / design doc,**不是当前代码契约**,源码里删或迁移
 - **方法头逐条复述代码已直观表达的逻辑**(把分支条件、状态码映射、fallback 一条条写一遍,而下面代码本身就很直观)→ 代码自解释的别用注释翻译一遍;压成 1-2 行讲**算法意图 + 兜底规则**即可
 
@@ -191,6 +192,7 @@ Future<void> registerRefundSuccess(RefundOrder order) async {}
 | `CancelRefundPlanner` 注释"新增订单类型时第 1/2/3 步怎么做" | 扩展 / 维护指南 ≠ 当前代码契约,进维护文档 / design doc,源码删 |
 | `RefundTxSnapshot` 类头已解释 payAmount/tipAmount,字段上再逐个解释一遍 | 类头与字段重复(§5.1.5)。类头讲整体口径,字段只补非自解释点,同一信息不写两遍 |
 | 函数体内连续多段讲"反结 / 金额维度 / 失败信号 / retry 冲正"(占函数大半篇幅) | 函数体大段流水账违反 §5 放置原则 + §5.3。有价值的 WHY 压成少量核心规则行内注释,复杂背景移 design doc / 业务文档 |
+| `customSelect` 的 SQL 字符串里堆 7 行 `-- tip_amount 在联合支付时...`/`-- 复制写到 orders 上...`/`-- 与 bill.tip_amount 同口径...`(refund_products_dao.dart) | 内嵌 SQL 不写 `--` 注释。压成 1 行放到 `customSelect` 之前的 Dart 注释:`// 联单 tip 是整桌快照,取 MAX 避免兄弟桌重复累加`,SQL 串本身保持干净 |
 
 > **判定准绳**:删掉这条注释,下一个改这段代码的人会不会犯错?会则保留(短句),不会则删。
 
