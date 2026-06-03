@@ -17,9 +17,9 @@
 | 重构 / 复写 / 迁移前需要梳理现状 | 重构前分析 / orientation / 现状梳理 / 业务逻辑 | `business-logic-orientation` | `backend-knowledge-graph-required`(若涉及后端) | — |
 | 报告 Bug / 描述异常 / 请求分析根因 | bug / OOM / NPE / 异常 / 排查 | `bug-doc-required` → `design-doc-required`(修复方案) | `pre-implementation-code-orientation`(改代码前) | — |
 | 用户提出具体方案/参考代码并要求实施 | 按这个思路实施 / 参考现有代码改 / 按这个回复改 | `solution-review-required`(必先于 design-doc) | `design-doc-required`(确认后) | — |
-| 写新接口前涉及表读写 / 状态判定 / 金额聚合 | 加接口 / 写 service / 写 DAO | `korepos-backend-service`(若 korepos) 或 `architecture-ddd-lite-fullstack`(通用) | `backend-knowledge-graph-required`(读图谱) + `coding-standards-common` | — |
+| 写新接口前涉及表读写 / 状态判定 / 金额聚合 | 加接口 / 写 service / 写 DAO | korepos-backend-service(若 korepos,已迁至 kpay-daily-plugin) 或 `architecture-ddd-lite-fullstack`(通用) | `backend-knowledge-graph-required`(读图谱) + `coding-standards-common` | — |
 | 函数内按业务类型 if-else / switch 堆叠 ≥2 分支 | if-else 堆叠业务类型 / switch orderType / 不同订单类型同函数处理 / 函数内分流 / A 订单 B 订单同方法 | `architecture-ddd-lite-fullstack`(函数级业务场景分流节,判定阶梯 1/2) | `coding-standards-common §2.5`(通用兜底提醒) | — |
-| 改 Flutter 代码 | Flutter / .dart / 退款 UI / pos | (后端) `korepos-backend-service` 或 (前端) `architecture-ddd-lite-fullstack` | `arch-lint`(编码后) + `coding-standards-common` | — |
+| 改 Flutter 代码 | Flutter / .dart / 退款 UI / pos | (后端) korepos-backend-service(已迁至 kpay-daily-plugin) 或 (前端) `architecture-ddd-lite-fullstack` | `arch-lint`(编码后) + `coding-standards-common` | — |
 | 写源码 Edit/Write | .java / .dart / .ts / .py / .kt 任一 | `design-doc-required`(若未触发) → `pre-implementation-code-orientation` → `architecture-ddd-lite-fullstack` | `coding-standards-common`(任何源码必经) + 语言专属 | `bug-doc-required`(无 bug 报告) |
 | 提交 commit | git commit / 提交 / push | `git-commit-standards`(大改 hook 强制) | `daily-work-log`(会话末) | — |
 | 业务项目源码改动后 | (任何源码 Edit/Write 完毕) | `daily-work-log`(批处理 / 会话末) | `dev-log`(仅 team-standards 自身) | — |
@@ -39,7 +39,7 @@
 | 分层 / DDD / Feature 模块 / 原子能力 / 单向依赖 / 函数级业务分流 / 业务定位判定 / 阶梯 1 / 阶梯 2 / if-else 堆叠业务类型 | `architecture-ddd-lite-fullstack` | 通用架构门禁 |
 | 命名 / 函数原子 / 80 行 / 注释三档 / 单一职责 / DRY / 业务场景分流 | `coding-standards-common` | 任何源码必经 |
 | Java / Javadoc / Integer 比较 / HashMap 容量 / SLF4J | `java-coding-standards` | Java 独占 |
-| 后端接口 / endpoint / shelf / handler / 加 endpoint | `korepos-backend-service` | korepos 项目专属 |
+| 后端接口 / endpoint / shelf / handler / 加 endpoint | korepos-backend-service（已迁至 kpay-daily-plugin） | korepos 项目专属，本插件不再承载 |
 | bug 修复 / 对齐云端 / 删冗余 / 函数头复盘禁令 | `bugfix-coding-style` | 与编码 skill 叠加 |
 | commit / git / push / type 前缀 / 中文 body | `git-commit-standards` | hook 兜底大改 |
 | 工作日志 / 工时 / daily-log / 业务项目记录 | `daily-work-log` | 业务项目改动后 |
@@ -56,7 +56,6 @@
 | 初始化项目文档 / 生成知识图谱 / 4 阶段 | `init-project-docs` | 一次性入口 |
 | 项目画像 / project profile / 10 维度 | `generate-project-profile` | 独立扫描 |
 | team-standards 自身变更决策 / 新增 / 删除 skill / 链路反转 | `dev-log` | 仅 team-standards 仓库 |
-| 重置 kpos 本地 / 清空 shared_preferences / 删 korepos.db / 重置本地环境 / reset local state | `reset-kpos-local-state` | 语义识别后路由 `/reset-kpos-local` slash command;仅 kpos·korepos 上下文 |
 
 ## 互斥与同回合不重叠规则
 
@@ -67,7 +66,6 @@
 | `backend-knowledge-graph-required`(正向) vs `reverse-index-required`(反向) | 正向: 这个枚举有什么值 / 这张表有什么字段; 反向: 这个枚举值在哪里被判断 / 这个字段在哪里被读写; 两者文件不同, 同回合可同时触发但不重复维护同一条事实 |
 | `daily-work-log` vs `dev-log` | daily-work-log 作用于业务项目; dev-log 作用于 team-standards 插件源码仓库; 不重叠 |
 | `business-logic-orientation` vs `pre-implementation-code-orientation` | orientation 是重构前**梳理现状** (产出独立文档); pre-implementation 是基于**已写好的 design 文档**定位代码; 不混用 |
-| `architecture-ddd-lite-fullstack` vs `korepos-backend-service` | architecture 在前 (通用分层规则); korepos 在后 (项目专属约束叠加); 写后端时两者都触发 |
 | `coding-standards-common` vs `java-coding-standards` | common 先 (跨语言 7 条铁律); Java 后 (独占条款); 两者叠加不替代 |
 | `bugfix-coding-style` vs `coding-standards-common` | bugfix 关注注释 / 历史痕迹清理; common 关注命名 / 函数原子 / 注释三档; 两者叠加 |
 | `bug-doc-required` vs `design-doc-required` | bug 修复链路两者都必走; bug 文档负责分析根因, design 文档负责实施方案 |

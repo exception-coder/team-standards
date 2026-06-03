@@ -28,7 +28,7 @@
 | `architecture-ddd-lite-fullstack` | team-standards | 编写或审查 Java / React / Vue / Flutter 业务代码前；在实施前代码定位后，先判断 Feature、分层、单向依赖、原子能力与结构质量（清晰、易维护、低耦合、高内聚）；含 **函数级业务场景分流**（阶梯 1 私有方法 / 阶梯 2 升级 service，判定锚点是「业务定位」而非「代码相似度」） |
 | `coding-standards-common` | team-standards | 编写/修改任何源码语言（Java / TS / JS / Dart / Python / Kotlin / Go 等）前；通用 7 条铁律 + 注释三档（+ 字段可选档）+ 注释放置原则（注释只落在类/字段/方法声明上，函数体内除 §5.3 六类核心块外不写，靠拆函数+命名表达）；先于具体语言 skill 触发 |
 | `java-coding-standards` | team-standards | 编写或修改任何 Java 代码时（自动应用，通用条款 delegate 到 coding-standards-common） |
-| `dart-coding-standards` | team-standards | 编写或修改任何 Dart / Flutter 代码时（自动应用，dartdoc `///` 独占条款，通用条款 delegate 到 coding-standards-common；korepos backend 接口再叠加 korepos-backend-service） |
+| `dart-coding-standards` | team-standards | 编写或修改任何 Dart / Flutter 代码时（自动应用，dartdoc `///` 独占条款，通用条款 delegate 到 coding-standards-common；korepos backend 接口再叠加 kpay-daily-plugin 的 korepos-backend-service） |
 | `git-commit-standards` | team-standards | 大改 git commit 之前（>2 文件 / >30 行 / 含新增/重命名/删除文件）；**v1.18.1 起 hook 按改动大小放行**：`hooks/check-git-commit-skill.js` 看 staged diff，≤2 文件 ∧ ≤30 行 ∧ 仅 `M` 修改时直接放行（让模型自行写 commit message），其它情况未调用本 skill 时直接 exit 2 阻断；阈值可用 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 调整；git push 不门禁；仅在当前仓库就是 team-standards 插件源码仓库且插件自身变更完成后自动 stage、commit、push |
 | `dev-log` | team-standards | 对 team-standards 做决策型变更后：新增/删除 Skill、触发时机或核心行为变化、规则方向反转、跨 Skill 链路变化、重大团队原则沉淀；普通小改只写 commit body |
 | `markdown-writing-standards` | team-standards | 生成或修改包含 Mermaid 图表的 Markdown 内容；完成 Markdown 文件的结构性写入/重组后做目录复核（自动应用，与 java-coding-standards 同级） |
@@ -42,7 +42,6 @@
 | `bugfix-coding-style` | team-standards | bug 修复 / 任何源码改动期的应用层指引（v1.28.8 起注释红线单一来源化）：**注释禁令统一收口到 `coding-standards-common` §5.4 + §5.4.1，本 skill 不再独立定义红线表**。只承担 bug 修复期独有内容：v1.17 方向反转的历史背景、推荐写法 dart 代码示例、摆放位置示例、适用范围矩阵、遇到存量 `[DEPRECATED]` / `[ADDED]` 注释顺手清理的边界、红色警告对照表 |
 | `glossary-required` | team-standards | 业务术语会话级强制登记;PRD / 设计 / 对话出现未登记的业务领域名词时自动候选追加;用户与 AI 同义词错位时主动对齐到规范术语;候选池 `{USER_DOCUMENTS}/ai-docs/{project}/glossary/_candidates.md`、正式版 `docs/knowledge-graph/glossary.md`;与 init-project-docs 的批量初始化术语表分工互补 |
 | `reverse-index-required` | team-standards | 反向影响索引强制维护(4 类:状态/字段/事件/API);冷启动 `hooks/scan-reverse-index.js` 扫描 Java/Dart/TS 枚举 + SQL 字面量产出 states 初版;增量维护规则:变更枚举 / 字段 / 事件 / API 同回合必须回写反向索引;与 backend-knowledge-graph-required 互补(正向 vs 反向)、与 cross-project-locator 边界明确(单服务内 vs 跨项目调用方) |
-| `reset-kpos-local-state` | team-standards | 用户以自然语言要求重置 / 清空 / 删除 kpos / korepos 本地状态（shared_preferences 或 korepos.db）时路由到 `/reset-kpos-local` slash command 执行;只识别 + 路由,不自行 `Remove-Item` / `rm`;严格不触发场景:代码内删除 / git commit 回滚 / 删源码文件 / `flutter clean` |
 
 ---
 
@@ -295,7 +294,7 @@ flowchart LR
 | architecture-ddd-lite-fullstack 什么时候调? | 设计文档和代码定位完成后、第一行业务源码改动前。它是默认架构门禁：先判断 Feature、Presentation/Application/Domain/Repository/Infrastructure 分层、调用方向、原子能力和结构质量（清晰、易维护、低耦合、高内聚），再写代码。 |
 | 什么时候必须把 if-else 分支拆成独立 service，什么时候在函数内拆私有方法就够了？(v1.26.3) | 判定锚点是「业务定位」而非「代码相似度」。共享同一状态机/校验/补偿/团队 → 函数内拆私有方法即可（**阶梯 1**：`_handleTypeA()` / `_handleTypeB()` 私有方法，主方法只分流派发）；分支差异本质是不同业务定位（独立状态机/独立 PRD 模块/独立团队，命中 ≥3 个判定信号） → 升级到 service 级（**阶梯 2**：建 `AService` / `BService1`，共享逻辑沉到原子能力层）。1-100 期成熟项目扩展期最易违反——AI 看到 `OrderService.handle()` 已存在就习惯性加 `else if (type == B)`，结果两种业务定位逻辑黏死。详见 `architecture-ddd-lite-fullstack` 「函数级业务场景分流」节、`coding-standards-common §2.5`、`anti-pattern-case-library C4`。 |
 | architecture-ddd-lite-fullstack 和 java-coding-standards 的区别? | architecture-ddd-lite-fullstack 管**代码放哪一层、依赖方向、业务能力怎么复用、结构是否清晰易维护且低耦合高内聚**；java-coding-standards 管 **Java 代码质量**（命名、格式、异常、集合、日志等）。先分层和结构设计，再写具体语言代码。 |
-| coding-standards-common 和 java-coding-standards 的区别? | coding-standards-common 是**跨语言通用底**（命名表意、函数原子 80 行、层次分明、零魔法值、注释三档、异常不静默、DRY rule of 3），适用一切源码语言；java-coding-standards 是 **Java 独占条款**（Javadoc 语法、Integer 比较、SimpleDateFormat、SLF4J、HashMap 容量、@Override、关系库 SQL 规范等）。触发顺序：common 先（任何源码语言都要走） → 具体语言 skill 后（叠加独占条款）。新写 TS/Python/Kotlin/Go 时只走 common，新写 Java 走 common + java，新写 Dart 走 common + dart（korepos backend 接口再叠加 korepos-backend-service）。 |
+| coding-standards-common 和 java-coding-standards 的区别? | coding-standards-common 是**跨语言通用底**（命名表意、函数原子 80 行、层次分明、零魔法值、注释三档、异常不静默、DRY rule of 3），适用一切源码语言；java-coding-standards 是 **Java 独占条款**（Javadoc 语法、Integer 比较、SimpleDateFormat、SLF4J、HashMap 容量、@Override、关系库 SQL 规范等）。触发顺序：common 先（任何源码语言都要走） → 具体语言 skill 后（叠加独占条款）。新写 TS/Python/Kotlin/Go 时只走 common，新写 Java 走 common + java，新写 Dart 走 common + dart（korepos backend 接口再叠加 kpay-daily-plugin 的 korepos-backend-service）。 |
 | 注释到底要写多少? | 三档铁律：类 1-3 行（业务职责 + 所属层 + 关键协作）、方法 1-2 行 + 参数/返回/异常项（业务意图，不是重复方法名）、核心代码块 1 行（业务规则 / 技术决策 / 魔法数字 / 容错降级 / TODO）。**禁止**：注释掉的旧代码、变更历史/日期/PR 号、段落式设计史、重复函数名的废话、无原因 TODO。简要原则：写不下就说明你想塞实现细节，那部分应该进 design doc 而不是源码。 |
 | arch-lint 和 java-coding-standards 的区别? | arch-lint 检测 **Flutter 架构分层**违规（presentation 层写 SQL 等跨层问题），java-coding-standards 检测 **Java 代码**质量（命名/格式/异常处理等）。一个管分层，一个管编码。 |
 | Phase 3-4 的自动模式和确认模式怎么选? | 自动模式：AI 尽力推断后生成，标注"需人工校验"，适合快速产出初稿。确认模式：逐份展示等用户确认，适合对准确度要求高的场景。 |

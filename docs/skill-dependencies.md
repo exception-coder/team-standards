@@ -55,7 +55,7 @@ bugfix-coding-style              ← bug / 删冗余 / 对齐云端场景
             ↓
 coding-standards-common          ← 强制门禁(无例外)
             ↓
-{language}-coding-standards 或 korepos-backend-service
+{language}-coding-standards（korepos backend 接口的 korepos-backend-service 已迁至 kpay-daily-plugin）
             ↓
 markdown-writing-standards       ← 仅含 Mermaid 时
             ↓
@@ -67,7 +67,6 @@ arch-lint                        ← Flutter 代码异步触发
 | `architecture-ddd-lite-fullstack` | 通常 `pre-implementation-code-orientation` 已完成 | `coding-standards-common` | — |
 | `coding-standards-common` | `architecture-ddd-lite-fullstack` | `{language}-coding-standards` | `bugfix-coding-style`(bug 修复时叠加) |
 | `java-coding-standards` | `coding-standards-common` | — | 通用部分 delegate 到 common,不替代 |
-| `korepos-backend-service` | `coding-standards-common` + `architecture-ddd-lite-fullstack` | `arch-lint`(写完 Flutter 代码后) | — |
 | `bugfix-coding-style` | 仅 bug 修复 / 删冗余场景 | `coding-standards-common` 继续 | 注释方向与 `coding-standards-common` 注释三档对齐 |
 | `arch-lint` | Flutter 代码改动 | `coding-violation-log`(若 lint 命中违规) | — |
 | `coding-violation-log`(回顾) | 项目存在 coding-violations.md | (无,纯读) | — |

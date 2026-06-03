@@ -130,11 +130,11 @@
 
 ### B4. 把多个 SKILL/规则塞到一个 god skill 里
 
-- **现象**:`korepos-backend-service` 单 skill 2373 行,远超其它 skill 平均 350 行;新规则不停往里加,后续维护越来越难。
+- **现象**:korepos-backend-service(已迁至 kpay-daily-plugin)单 skill 曾达 2373 行,远超其它 skill 平均 350 行;新规则不停往里加,后续维护越来越难。
 - **根因**:遇到"项目专属的复杂规则集"时,默认全塞进单个 skill 文件,不考虑拆分模板 / 拆 step 子文档。
 - **反例**:`skills/korepos-backend-service/SKILL.md` 包含 Step 1(编辑前自检)+ Step 2(service 实现)+ Step 3(DAO/DTO)+ 各类强约束,全部在一个文件里。
 - **正确做法**:按 step 或主题拆 sub-SKILL.md 或拆模板文件,主 SKILL.md 只做路由 / 索引。**注**:本案例当前作为"已知技术债",项目专用 skill 的 trade-off 是可接受的;非项目专用 skill 严禁这样组织。
-- **关联 skill**:`korepos-backend-service`(本案例)
+- **关联 skill**:korepos-backend-service(已迁至 kpay-daily-plugin;本案例)
 - **历史 commit**:plugin 评审 H5(用户明确保留)
 
 ---

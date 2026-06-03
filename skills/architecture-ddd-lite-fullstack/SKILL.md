@@ -446,7 +446,7 @@ Infrastructure(Drift / sqflite / dio / Serverpod db)
 |-----------|-------------|---------|------|
 | 传统 Spring Boot / 主流 Java 后端 | Spring Boot / Spring Cloud | **`XxxService`** | 与 `@Service` 注解 + Spring 教科书 + 团队既有命名一致 |
 | Python Web 后端(主流) | FastAPI / Django / Flask | **`XxxService`** | Python 社区主流命名(FastAPI 文档、cosmic-python 等),与 Java 跨栈一致 |
-| Dart 后端(跨端 + Flutter backend) | Serverpod / Shelf / `korepos-backend-service` | **`XxxService`**(与 `korepos-backend-service` 对齐) | 已有 skill 强约束 + Flutter 社区主流 |
+| Dart 后端(跨端 + Flutter backend) | Serverpod / Shelf / korepos-backend-service(kpay-daily-plugin) | **`XxxService`**(与 kpay-daily-plugin 的 korepos-backend-service 对齐) | 已有强约束 + Flutter 社区主流 |
 | TypeScript 后端 | NestJS / tRPC | **`XxxService`** | NestJS `@Injectable()` 标准命名 |
 | CQRS / 命令-查询分离 / EventSourcing | Axon(Java) / MediatR(.NET) / cqrs(Python) | **`XxxCommandHandler`**(写)/ **`XxxQueryHandler`**(读) | CQRS 教科书命名 |
 | Clean Architecture / Hexagonal / 强调用例 | 跨语言通用 | **`XxxUseCase`** / **`XxxInteractor`** | Robert Martin 命名,与 Use Case Driven Design 一致 |
