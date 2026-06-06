@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: run hook tests
-        working-directory: hooks
+        working-directory: plugins/team-standards/hooks
         run: npm test
 
   agents-sync-check:

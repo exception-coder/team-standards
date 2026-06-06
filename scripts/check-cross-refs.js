@@ -19,7 +19,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const SKILLS_DIR = path.join(ROOT, 'skills');
+const SKILLS_DIR = path.join(ROOT, 'plugins', 'team-standards', 'skills');
 const VERBOSE = process.argv.includes('--verbose');
 
 function listSkills() {

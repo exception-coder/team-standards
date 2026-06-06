@@ -4,6 +4,21 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.33.0] - 2026-06-07
+
+**支持 Codex 插件市场:仓库重构为「marketplace 根 + 子目录单插件」布局,同一仓库双端(Claude Code + Codex)可装可更新。**
+
+### Changed
+- **目录重构**:插件载荷(`skills/`、`hooks/`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`)收进 `plugins/team-standards/` 子目录;仓库根保留 marketplace 清单与 CI/docs。原「根即插件」(`source: "./"`)只有 Claude 认,Codex `plugin add` 会整目录拷贝、要求插件自包含于子目录。
+- `.claude-plugin/marketplace.json`:`source` 由 `"./"` 改为 `"./plugins/team-standards"`。
+- **新增 `.agents/plugins/marketplace.json`**:Codex 市场清单,枚举 `team-standards` 插件指向同一子目录。
+- CI 脚本基准路径同步:`check-version-sync` / `check-cross-refs` / `audit-skills` 指向 `plugins/team-standards/`(`sync-agents` 不变,CLAUDE.md/AGENTS.md 留根)。
+
+### Motivation
+- Codex(`@openai/codex-sdk` / `codex plugin marketplace`)与 Claude Code 的插件市场模型不同:Codex 要求每个插件位于市场下的独立子目录且自包含。为让同一 GitHub 仓库同时供两端 `marketplace update/upgrade` + `install/add`,采用通用的「monorepo marketplace + 子目录插件」标准布局。
+- **对 Claude 端用户**:下次 `claude plugin marketplace update team-standards` + `install` 会从新子目录路径重装,透明无感。
+- **Codex 端**:`codex plugin marketplace add owner/repo` + `plugin add team-standards@team-standards` 即可安装,`marketplace upgrade` + `plugin add` 更新。
+
 ## [1.30.3] - 2026-05-31
 
 **`check-design-doc` hook 修复 monorepo / Maven 多模块项目根错判。**
