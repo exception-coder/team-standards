@@ -21,6 +21,7 @@
 | **大改 git commit 之前**（>2 文件 或 >30 行 或 含新增/重命名/删除文件）；小改（≤2 文件 ∧ ≤30 行 ∧ 仅 `M` 修改）直接写 commit message 即可，hook 自动放行；git push 不门禁 | `git-commit-standards` |
 | 编写或审查 Java 代码 | `java-coding-standards` |
 | 编写或审查 Dart / Flutter 代码 | `dart-coding-standards`（korepos / korepos-refund 的 backend 接口代码再叠加 kpay-daily-plugin 插件的 korepos-backend-service skill） |
+| **编写或修改接 LLM / 做 agent 的代码**（import langchain4j / spring-ai / openai / anthropic 等 SDK；定义 `@Tool` / AiService；拼 prompt；解析 LLM 输出） | `llm-agent-coding-standards`（叠加在 `coding-standards-common` 之上：确定性优先 / LLM 输出当不可信 / 枚举输出 / 约定 SSOT / 工具描述契约 / 循环兜底） |
 | 生成或修改包含 Mermaid 图表的 Markdown 内容；或完成 Markdown 文件的结构性写入/重组（新增/删除/重命名 ##、### 章节，或章节移动/合并） | `markdown-writing-standards` |
 | 重构/复写/迁移前需要理解现有业务逻辑 | `business-logic-orientation` |
 | **即将 Write/Edit 任何描述后端表关系/ER/SQL/状态扭转/业务流程→表 CRUD 的 .md（无论路径，包括 `ai-docs/`、`work-log/`、`scenarios/`）**；用户问表关系、字段来源、业务怎么查、SQL 怎么写/完善、退款/账单/流水/分摊怎么算等表关系/SQL/状态/原子能力问题；AI 完成后端代码调查发现可复用事实或 SQL 查询逻辑；后端接口/服务开发前涉及表读写、SQL、状态判定、订单/退款/支付等业务逻辑；存在 `docs/knowledge-graph/backend/`；要求生成/更新后端知识图谱、全景 ER、SQL 归档或查询逻辑索引；**或同一会话同一技术主题（含子进程编排 / 并发 / 性能 / 资源争夺 / 外部依赖等非业务技术陷阱）用户反复疑问 ≥3 轮、出现回归性措辞（"为什么...还" / "怎么又..." / "上次说..." / "现在又卡了"）、修复后 ≥2 轮验证追问** | `backend-knowledge-graph-required` |
@@ -49,13 +50,13 @@
 
 ## Skill 分类导航
 
-> 25 个 skill 按使用阶段分 8 组，遇到具体任务先按组检索而不是遍历全表。每个 skill 详细描述见下方「Skill 索引」。
+> 26 个 skill 按使用阶段分 8 组，遇到具体任务先按组检索而不是遍历全表。每个 skill 详细描述见下方「Skill 索引」。
 
 | 阶段 / 类别 | 包含 Skill | 用途速记 |
 |---|---|---|
 | **① 方案 / 需求分析（动手前最先触发）** | `solution-review-required` / `design-doc-required` / `bug-doc-required` / `business-logic-orientation` | 把"用户想做什么"和"实际怎么做"分离；产出设计文档 / bug 文档 / 现状梳理文档 |
 | **② 实施前定位（文档写完、动手前）** | `pre-implementation-code-orientation` / `doc-index-required` | 精准 Read 关键代码坐标；文档输出路径 / Phase-A 查重 |
-| **③ 架构与编码门禁（实施时）** | `architecture-ddd-lite-fullstack` / `coding-standards-common` / `java-coding-standards` / `dart-coding-standards` / `bugfix-coding-style` | 分层 + 每分支一 focused service / 命名 + 函数原子 + 注释三档 / Java 独占条款 / Dart·dartdoc 独占条款 / bug 修复注释规范（korepos backend 接口强约束已迁至 kpay-daily-plugin 的 korepos-backend-service skill） |
+| **③ 架构与编码门禁（实施时）** | `architecture-ddd-lite-fullstack` / `coding-standards-common` / `java-coding-standards` / `dart-coding-standards` / `llm-agent-coding-standards` / `bugfix-coding-style` | 分层 + 每分支一 focused service / 命名 + 函数原子 + 注释三档 / Java 独占条款 / Dart·dartdoc 独占条款 / **LLM·Agent 集成独占条款** / bug 修复注释规范（korepos backend 接口强约束已迁至 kpay-daily-plugin 的 korepos-backend-service skill） |
 | **④ 提交与日志（收尾时）** | `git-commit-standards` / `daily-work-log` | 规范 commit；业务项目源码改动后按 bug/功能分类沉淀工作日志 |
 | **⑤ 知识图谱（沉淀时）** | `backend-knowledge-graph-required` / `reverse-index-required` / `glossary-required` / `cross-project-locator` | 正向单服务图谱（表 / SQL / 状态机 / 原子能力 / 技术难点）/ 反向影响索引（枚举 / 字段 / 事件 / API）/ 业务术语登记 / 跨项目拓扑 |
 | **⑥ 质量回路（持续）** | `coding-violation-log` / `arch-lint` / `comment-cleanup` / `markdown-writing-standards` / `project-docs-update` | 编码违规登记防重犯 / Flutter 架构 lint / 存量注释批量清理（对齐 §5.4）/ Mermaid 语法 + 目录复核 / 项目结构变更后同步文档 |
@@ -151,6 +152,8 @@
             ↓
 [第 12 步] java-coding-standards / dart-coding-standards ← 按语言叠加（korepos backend 接口的 korepos-backend-service 已迁至 kpay-daily-plugin）
             ↓
+[第 12.5 步] llm-agent-coding-standards     ← 仅接 LLM / 做 agent 的代码（叠加在 common + 语言 skill 之上）
+            ↓
 [第 13 步] markdown-writing-standards       ← 仅写 Mermaid / 结构性改 markdown 时
             ↓
 [第 14 步] cross-project-locator            ← 仅 ≥2 个 kpay POS 工程命中时
@@ -179,6 +182,7 @@
 | `business-logic-orientation` vs `pre-implementation-code-orientation` | orientation 是重构前的现状梳理(产出独立文档),pre-implementation 是基于已写好的 design 文档定位代码 |
 | `coding-standards-common` vs `java-coding-standards` | common 先(跨语言 7 条铁律),Java 后(独占条款);两者叠加不替代 |
 | `coding-standards-common` vs `dart-coding-standards` | common 先(跨语言),Dart 后(dartdoc 独占);两者叠加不替代 |
+| `coding-standards-common` / 语言 skill vs `llm-agent-coding-standards` | common + 语言 skill 先,LLM skill 最后叠加(集成独占:确定性优先 / 输出当不可信 / 枚举输出 / 约定 SSOT / 工具描述契约 / 循环兜底);仅"接 LLM"代码才触发,叠加不替代 |
 | `bugfix-coding-style` vs `coding-standards-common` | **v1.28.8 起注释红线单一来源化到 common §5.4 + §5.4.1**;bugfix-coding-style 不再独立定义注释禁令,只承担 bug 修复期独有的应用层指引(v1.17 方向反转的历史背景 / 推荐写法 dart 示例 / 摆放位置 / 适用范围 / 旧 `[DEPRECATED]` / `[ADDED]` 标记顺手清理边界 / 红色警告);两者叠加不重复 |
 | `git-commit-standards` 触发后又来一次小改 commit | hook 按改动大小判定:小改放行不再过 skill;大改才强制走 |
 | `daily-work-log` vs `dev-log` | daily-work-log 记业务项目改动;dev-log 仅 team-standards 自身决策;不重叠 |
@@ -202,6 +206,7 @@
 | `coding-standards-common` | `skills/coding-standards-common/` | **跨语言通用编码铁律 7 条 + 注释三档**：命名表意 / 函数原子（80 行硬阈值 + ≤4 参数 + ≤3 嵌套）/ 层次分明（单向依赖 + UI 禁直 SQL/HTTP）/ 零魔法值（DB 字段值与协议码强制枚举）/ **注释三档 + 字段可选档**（类 1-3 行 + 方法 1-2 行 + 核心块 1 行 + 字段一行可选，禁变更日志 / 禁注释代码 / TODO 必带原因负责人）+ **注释放置原则总纲**（注释只落在类/字段/方法声明上；函数体内除 §5.3 六类核心块外不写注释，靠拆函数+命名表达；每档一句话讲清，多余删）+ **§5.2.1 职责边界注释**（仅限原子能力方法 / 领域服务公开类的「职责·不负责」契约清单，每条≤1 行、≤8 条，普通 DTO/Widget/工具类不用）+ **TODO 格式 `TODO(负责人): 原因`**（负责人+原因必填、禁日期）+ **§5.0 注释语言 = 当前会话沟通语言（沟通语言一票否决）**（用户用中文沟通即写中文注释，用户用英文即写英文；**无存量文件豁免**——不沿袭原文件语言，短期内单文件中英混杂可接受、待后续重构统一；唯一能覆盖默认的合法路径是用户在本会话明确要求特定语言）/ 异常不静默 / DRY rule of 3。任何源码 Edit/Write 前先满足本 skill 再走语言专属（java-coding-standards / dart-coding-standards 等；korepos backend 接口的 korepos-backend-service 已迁至 kpay-daily-plugin） | 通用编码、跨语言、命名、函数原子、80 行、嵌套、层次分明、单向依赖、零魔法值、注释三档、字段级注释、注释放置原则、函数体保持干净、声明位置注释、类注释职责边界、类头字段去重、扩展指南禁令、方法头复述代码禁令、注释密度信号、职责边界注释、原子能力契约注释、TODO 格式负责人原因、注释语言、沟通语言、中文注释、英文注释、异常、DRY、rule of 3、业务场景分流拆分、§2.5、§5.0.0 写注释 3 秒自检、§5.4 注释禁令单一来源、§5.4.1 字面反例对照表、私有方法 dartdoc 禁堆契约史、行内 WHY 硬阈值 1 行、section divider 禁令、内嵌 SQL 禁 -- 注释、SQL 口径迁外层宿主注释、旁路场景影响面归 design doc |
 | `java-coding-standards` | `skills/java-coding-standards/` | **阿里黄山版 Java 独占条款**（通用 7 条见 coding-standards-common）：Java 命名补充（POJO 布尔禁 is 前缀 / 接口方法禁 public）、Java 代码格式（大括号 / 120 字符）、Javadoc 语法、OOP（Integer == / BigDecimal / StringBuilder / @Override）、集合（Arrays.asList / Iterator / HashMap 容量 / entrySet）、并发（线程池 / SimpleDateFormat / ThreadLocal remove）、SLF4J 日志、关系库 SQL 规范、Java 安全（PreparedStatement） | Java、Javadoc、Integer 比较、BigDecimal、StringBuilder、HashMap 容量、SLF4J、SimpleDateFormat、ThreadLocal、@Override、阿里黄山版 |
 | `dart-coding-standards` | `skills/dart-coding-standards/` | **Effective Dart 独占条款**（通用 7 条 + 注释三档见 coding-standards-common）：文档注释用 dartdoc `///`（不用 `//`）、首句独立摘要、引用标识符用 `[]`、注解之上；不用 Javadoc 的 `@param`/`@return`/`@throws`（用散文 + `[参数名]`）；私有成员 dartdoc 从简禁堆契约史；Flutter Widget 注释讲展示什么/何时变化；TODO `TODO(负责人): 原因` 禁日期；金额禁 `double`。任何 Dart 源码 Edit/Write 先满足 coding-standards-common 再走本 skill；korepos backend 接口再叠加 kpay-daily-plugin 插件的 korepos-backend-service skill | Dart、Flutter、dartdoc、`///` 文档注释、首句摘要、`[]` 引用、Widget 注释、私有 dartdoc 从简、不用 @param、金额禁 double、Effective Dart |
+| `llm-agent-coding-standards` | `skills/llm-agent-coding-standards/` | **LLM / Agent 集成编码独占条款**（通用 7 条见 coding-standards-common）：确定性优先（能代码算/查/校验的不给 LLM）/ LLM 输出当不可信入参（解析后校验+归一化+失败降级，绝不丢数据）/ 模糊→结构化用受控枚举（枚举输出不穷举输入，禁 contains 追无限说法）/ 约定单一来源（枚举含义/状态映射只存一处，prompt 与工具注解不复读）/ 工具描述是运行时契约（@Tool·参数 description 是模型选工具依据、load-bearing，工具集小而精）/ Agent 循环必须兜底（maxToolCallingRoundTrips 防死循环、工具异常可读、每步可观测）/ 上下文由代码注入（带时区当前时间等）。任何接 LLM/做 agent 的源码 Edit/Write 先满足 coding-standards-common 再走本 skill | LLM、Agent、langchain4j、spring-ai、function calling、@Tool、AiService、确定性优先、deterministic-first、LLM 输出不可信、结构化输出校验、受控枚举、枚举输出、约定 SSOT、工具描述契约、tool description、maxToolCallingRoundTrips、循环兜底、上下文注入 |
 | `doc-index-required` | `skills/doc-index-required/` | AI 生成 Markdown 默认写入用户 Documents 下的 `ai-docs/{project}/{type}/{topic}/{filename}`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；**v1.20 起用户目录知识库与项目 `docs/` 索引体系等同**，写文档前必须 Phase-A 读 INDEX 查重，写完必须 Phase-B 登记；`work-log/`（日期型日志）和 `knowledge-graph/`（自有 `00_index.md`）走自管模式；终版由用户自行上传或明确指定 `docs/` 路径后写入项目目录 | 文档、docs、写文档、索引、输出路径、用户目录、Documents、ai-docs、知识库、Phase-A、Phase-B、终版文档 |
 | `backend-knowledge-graph-required` | `skills/backend-knowledge-graph-required/` | 后端单服务知识图谱 + **项目级技术难点图谱**（v1.21 扩展）+ **DDL 基线**（v1.28.2 升级）：(1) 业务图谱按项目沉淀领域能力、原子能力、流程、表、全景 ER、SQL 查询逻辑、表关系、枚举、状态判定、API、外部依赖与代码坐标；(2) 技术难点图谱沉淀子进程编排、并发模型、性能瓶颈、资源争夺、外部依赖、JVM 进程生命周期、缓存键策略、超时回收等非业务技术陷阱；(3) **`ddl-baseline.md` 是涉及 DB 操作项目的硬必需** —— 从真实 DB 引擎 sqlite_master / pg_dump / mysqldump 实时 dump 的完整 CREATE TABLE / INDEX，作为 SQL 编写权威源；编码前必读对应表段，禁止凭记忆写字段名；schema 迁移后必须重新 dump；即将 Write/Edit 后端表关系/ER/SQL 文档必须先经本 skill；会话中提到业务、表、字段来源、SQL、DAO/Mapper 查询逻辑时必须自动归档 SQL 指纹到 `_sql_candidates.md`，整理时合并到 `09_sql_query_index.md` / `sql-queries/` / `02_data_model_map.md`；**长对话识别**——同一技术主题用户反复疑问 ≥3 轮 / 出现回归性措辞 / 修复后 ≥2 轮验证追问，自动追加 `分类: 技术难点` 候选记录，无需用户显式提醒；后端接口开发前回顾 ddl-baseline、表逻辑索引、原子能力索引和 SQL 查询索引，优先复用已有表逻辑、SQL 和原子能力；编码后将 DAO/SQL、订单/退款/支付状态判定、金额聚合、表状态变更同步到正式图谱或用户目录候选池 | 后端、接口开发、知识图谱、单服务、DDL 基线、ddl-baseline、CREATE TABLE、sqlite_master、pg_dump、mysqldump、字段名速查、全景ER、ER图、SQL归档、查询逻辑、SQL指纹、SQL索引、表逻辑、表关系、订单状态、部分退、退款判定、原子能力、DAO、Mapper、SQL、枚举、状态流转、候选沉淀、API、Service、技术难点、长对话识别、子进程、并发、性能、资源争夺、外部依赖、回归性措辞、反复疑问、验证追问 |
 | `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；核心流程必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）；根因必须用表格；**v1.20 起默认输出路径** `{USER_DOCUMENTS}/ai-docs/{project}/bug/{模块名}/{bug名称}/{bug名称}.md`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期；用户目录知识库与项目 `docs/bug/` 索引等同，必须执行 Phase-A/B）；模块名必须与同根下 `design/{模块名}/` 完全一致，无对应 design 模块时退化为一级扁平 `bug/{bug名称}/`；目录与文件名使用**中文**命名 | bug、缺陷、问题分析、bug文档、OOM、异常、模块分组、中文命名、用户目录、Documents、ai-docs、Phase-A、Phase-B |

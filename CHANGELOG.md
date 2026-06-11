@@ -4,6 +4,19 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.34.0] - 2026-06-12
+
+**新增 `llm-agent-coding-standards` skill（LLM/Agent 集成编码铁律）；`coding-standards-common` §7 补强「知识 vs 逻辑」DRY 二分 + §7.5 外部 API 核验。**
+
+### Added
+- `skills/llm-agent-coding-standards/SKILL.md` — 编写/修改"接 LLM 或做 agent"的代码时触发（import langchain4j / spring-ai / openai / anthropic；定义 `@Tool` / AiService；拼 prompt；解析 LLM 输出），叠加在 `coding-standards-common` 之上。7 条独占铁律：① 确定性优先（能代码算/查/校验的不给 LLM）② LLM 输出当不可信入参（解析后校验+归一化+失败降级）③ 模糊→结构化用受控枚举（枚举输出不穷举输入，禁 contains 追无限说法）④ 约定单一来源（枚举含义/状态映射只存一处，prompt 与工具注解不复读）⑤ 工具描述是运行时契约（@Tool·参数 description 是模型选工具依据、load-bearing，工具集小而精）⑥ Agent 循环必须兜底（maxToolCallingRoundTrips 防死循环、工具异常可读、每步可观测）⑦ 上下文由代码注入（带时区当前时间等）。
+
+### Changed
+- `coding-standards-common` §7：从「DRY but rule of 3」改为「先分知识还是逻辑」——**知识/约定/常量/契约**第一次出现就单一来源（SSOT），**逻辑/代码结构**才走 rule of 3（两处容忍、三处再抽）；纠正把 DRY 误读为"消灭重复代码"或"两处才算重复、约定也容忍复制"。新增 §7.5「外部 API / 不熟悉的库先核验不臆造」（用前查文档/源码/javap，不凭记忆拼方法名 import）。自检清单同步两条。
+
+### Motivation
+- 实战暴露：在 kai-toolbox AI 秘书（LangChain4j + 本地 Ollama）开发中反复踩到几类"接 LLM"特有的编码反模式——让 LLM 算时区/金额而不校验、用 `contains` 穷举中文时间说法（打地鼠）、把同一映射约定抄进 prompt+多个工具注解、凭记忆写不存在的 API。这些都不在传统 7 铁律覆盖范围内。其中"知识 SSOT vs 逻辑 rule-of-3"是语言无关的通用准则（归 common），"确定性优先/枚举输出/工具描述契约"等是 LLM 集成独占（归新 skill）。
+
 ## [1.33.0] - 2026-06-07
 
 **支持 Codex 插件市场:仓库重构为「marketplace 根 + 子目录单插件」布局,同一仓库双端(Claude Code + Codex)可装可更新。**

@@ -247,6 +247,7 @@ v1.26 起 **`check-design-doc.js` hook 默认启用**（[hooks/hooks.json](hooks
 - `coding-standards-common` — 跨语言通用 7 条铁律 + 注释三档（沟通语言一票否决）
 - `java-coding-standards` — Java 独占条款（Javadoc / Integer 比较 / SLF4J / HashMap 容量等）
 - `dart-coding-standards` — Dart 独占条款（dartdoc `///` / 首句摘要 / `[]` 引用 / 不用 @param / 金额禁 double）
+- `llm-agent-coding-standards` — LLM / Agent 集成独占条款（确定性优先 / LLM 输出当不可信入参 / 模糊→结构化用受控枚举 / 约定 SSOT / 工具描述是运行时契约 / Agent 循环兜底 / 上下文代码注入）；叠加在 `coding-standards-common` 之上
 - `bugfix-coding-style` — 源码只描述当前逻辑，禁变更日志注释 / 函数头复盘
 - _（korepos backend 接口强约束 `korepos-backend-service` 已迁至 **kpay-daily-plugin** 插件，连同 `reset-kpos-local-state` 与 wire DTO 注解 hook 一并搬走）_
 
