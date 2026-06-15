@@ -42,9 +42,9 @@ test('放行：干净注释（当前职责 1 行 WHY）', () => {
   assert.equal(stderr, '');
 });
 
-test('命中：变更标记 [BUGFIX]', () => {
+test('命中：变更标记 [BUGFIX]（默认 block → exit 2）', () => {
   const { code, stderr } = runHook(edit('lib/a.dart', '// [BUGFIX] 旧实现用 transaction_no 反查\nfinal x = 1;\n'));
-  assert.equal(code, 0); // 默认 warn
+  assert.equal(code, 2); // 默认 block，客观红线硬阻断
   assert.match(stderr, /change-marker/);
   assert.match(stderr, /§5\.4/);
 });
@@ -96,6 +96,28 @@ test('命中：超长注释块（> 默认 6 行）', () => {
   const block = Array.from({ length: 8 }, (_, i) => `// 第 ${i} 行说明`).join('\n') + '\nfinal x = 1;\n';
   const { stderr } = runHook(edit('lib/a.dart', block));
   assert.match(stderr, /long-block/);
+});
+
+test('默认 block：long-block 单独命中只提示不阻断（exit 0）', () => {
+  const block = Array.from({ length: 8 }, (_, i) => `// 第 ${i} 行说明`).join('\n') + '\nfinal x = 1;\n';
+  const { code, stderr } = runHook(edit('lib/a.dart', block));
+  assert.equal(code, 0); // long-block 是软规则，公开 API 长 dartdoc 不应被硬阻断
+  assert.match(stderr, /long-block/);
+});
+
+test('默认 block：客观红线（工单号）→ exit 2', () => {
+  const { code, stderr } = runHook(edit('lib/a.dart', '// 见 KP-789 需求\nfinal x = 1;\n'));
+  assert.equal(code, 2);
+  assert.match(stderr, /ticket-code/);
+});
+
+test('warn 模式降级：客观红线命中仅提示（exit 0）', () => {
+  const { code, stderr } = runHook(
+    edit('lib/a.dart', '// [ADDED 2026-04-25] 对齐云端\nfinal x = 1;\n'),
+    { TEAM_STANDARDS_COMMENT_HOOK: 'warn' }
+  );
+  assert.equal(code, 0);
+  assert.match(stderr, /change-marker/);
 });
 
 test('放行：注释块未超阈值（5 行 ≤ 6）', () => {

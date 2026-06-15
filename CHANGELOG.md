@@ -4,7 +4,19 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
-## [1.34.0] - 2026-06-12
+## [1.35.0] - 2026-06-15
+
+**注释红线机械兜底 `check-comment-density` 默认从 `warn` 反转为 `block`——客观红线（工单号/日期/变更标记/分节线/版本流水）命中即 exit 2 硬阻断，护栏在插件里统一做死，安装者无需各自配 settings。**
+
+### Changed
+- `hooks/check-comment-density.js`：默认模式 `warn` → `block`。命中客观红线即 `exit 2` 阻断 Write/Edit/MultiEdit；`long-block`（连续注释块超阈值）保留为**启发式软规则只提示不阻断**，避免误伤公开 API 的长 dartdoc。降级路径 `TEAM_STANDARDS_COMMENT_HOOK=warn`（仅提示）/ `=off`（关闭）。
+- 同步文档：`coding-standards-common` §5.4 机械兜底注、`hooks/hooks.json` `_comment`、CLAUDE.md / AGENTS.md / README.md 辅助资源表。
+
+### Motivation
+- 实战暴露：某 Java 项目里模型写出 `// PM-IT-2607 6.6 dye factory delivery time`（工单号 + 英文注释），同时违反 §5.4（禁工单号）与 §5.0（注释用沟通语言）。插件规则本就禁止，hook 也能命中 `ticket-code`，但默认 `warn` 模式只提示不阻断，模型遂照样落盘。
+- 团队诉求：护栏应在通用插件里统一约束，而非让每人在各自项目 settings 里写一套。故把默认值反转为 `block`，让"装了插件即强制"。`long-block` 因属启发式、易误伤合法长文档，单独留在只提示档。
+
+
 
 **新增 `llm-agent-coding-standards` skill（LLM/Agent 集成编码铁律）；`coding-standards-common` §7 补强「知识 vs 逻辑」DRY 二分 + §7.5 外部 API 核验。**
 

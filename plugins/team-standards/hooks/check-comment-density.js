@@ -4,9 +4,10 @@
 //   扫描本次「新增内容」里的注释，命中 coding-standards-common §5.4
 //   注释红线时提醒。规则源是 §5.4，本 hook 只做机械兜底。
 //
-// 默认 warn 模式：不阻断，仅 stderr 提示（试用期评估误报率）。
-// TEAM_STANDARDS_COMMENT_HOOK=block → 硬阻断（exit 2）
-// TEAM_STANDARDS_COMMENT_HOOK=off   → 完全跳过
+// 默认 block 模式：命中客观红线（变更标记/日期/工单号/分节线/版本流水）即硬阻断（exit 2）。
+//   long-block（连续注释块超阈值）是启发式软规则，只提示不阻断——避免误伤公开 API 的长 dartdoc。
+// TEAM_STANDARDS_COMMENT_HOOK=warn → 仅 stderr 提示，不阻断（exit 0）
+// TEAM_STANDARDS_COMMENT_HOOK=off  → 完全跳过
 //
 // 抓的是「客观无歧义」的红线（误报极低）：
 //   - 变更标记 [BUGFIX]/[DEPRECATED]/[ADDED]/[REWRITTEN]/[MODIFIED]/[FIX]/[FIXED]...
@@ -27,7 +28,7 @@
 // 阈值可调：TEAM_STANDARDS_COMMENT_MAX_BLOCK（默认 6，连续注释块行数上限）
 // =============================================================
 
-const MODE = (process.env.TEAM_STANDARDS_COMMENT_HOOK || 'warn').toLowerCase();
+const MODE = (process.env.TEAM_STANDARDS_COMMENT_HOOK || 'block').toLowerCase();
 if (MODE === 'off') process.exit(0);
 
 const MAX_BLOCK = parseInt(process.env.TEAM_STANDARDS_COMMENT_MAX_BLOCK || '6', 10);
@@ -119,10 +120,12 @@ process.stdin.on('end', () => {
   }
   lines.push('  红线规则源：skills/coding-standards-common/SKILL.md §5.4 / §5.4.1');
   lines.push('  处置：变更历史/标记/日期进 git commit body 或 design/bug doc；行内 WHY 压成 1 行；私有方法 1 行职责即可。');
-  lines.push('  旁路：TEAM_STANDARDS_COMMENT_HOOK=off 关闭 / =block 升级硬阻断；TEAM_STANDARDS_COMMENT_MAX_BLOCK 调注释块行数阈值。');
+  lines.push('  旁路：TEAM_STANDARDS_COMMENT_HOOK=warn 仅提示 / =off 关闭；TEAM_STANDARDS_COMMENT_MAX_BLOCK 调注释块行数阈值。');
 
+  // long-block 是启发式软规则（公开 API 长 dartdoc 易误伤），只提示不阻断；其余客观红线在 block 模式下硬阻断。
+  const hasHardFinding = findings.some((f) => f.id !== 'long-block');
   process.stderr.write(lines.join('\n') + '\n');
-  process.exit(MODE === 'block' ? 2 : 0);
+  process.exit(MODE === 'block' && hasHardFinding ? 2 : 0);
 });
 
 function extractAddedText(tool, input) {
