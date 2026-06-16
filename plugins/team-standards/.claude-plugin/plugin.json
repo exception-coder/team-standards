@@ -1,13 +1,13 @@
 {
   "name": "team-standards",
   "description": "团队开发规范插件：Java 编码规范（阿里黄山版）+ 功能设计文档强制约束",
-  "version": "1.35.0",
+  "version": "1.35.1",
   "author": {
     "name": "张凯",
     "email": ""
   },
-  "homepage": "https://gitlab.kpay-group.com/zhangk/kpay-team-standards",
-  "repository": "https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git",
+  "homepage": "https://gitee.com/wyoooni/team-standards",
+  "repository": "https://gitee.com/wyoooni/team-standards.git",
   "license": "MIT",
   "keywords": [
     "java",

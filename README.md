@@ -58,7 +58,7 @@ Claude: (触发 git-commit-standards 五步流程) 生成规范 commit
 
 | 仓库 | 地址 | 说明 |
 |------|------|------|
-| GitLab（主仓） | `https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git` | 日常维护与分发 |
+| Gitee（主仓） | `https://gitee.com/wyoooni/team-standards.git` | 日常维护与分发 |
 | GitHub（镜像） | `https://github.com/exception-coder/team-standards` | 仅作镜像备份 |
 
 ## 项目结构
@@ -166,13 +166,13 @@ CI(GitHub Actions)在 push / PR 时自动跑(v1.26.2 起 5 个 job):
 
 在 Claude Code 中依次执行以下三步：
 
-**第一步：注册 marketplace（指向 GitLab 仓库）**
+**第一步：注册 marketplace（指向 Gitee 仓库）**
 
 ```
-/plugin marketplace add https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
+/plugin marketplace add https://gitee.com/wyoooni/team-standards.git
 ```
 
-> 此命令会将 GitLab 仓库克隆到本地插件缓存目录，无需手动 `git clone`。
+> 此命令会将 Gitee 仓库克隆到本地插件缓存目录，无需手动 `git clone`。
 
 **第二步：安装插件**
 
@@ -195,7 +195,7 @@ CI(GitHub Actions)在 push / PR 时自动跑(v1.26.2 起 5 个 job):
 如果已手动克隆仓库到本地，也可以用本地路径注册：
 
 ```bash
-git clone https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
+git clone https://gitee.com/wyoooni/team-standards.git
 ```
 
 ```

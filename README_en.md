@@ -46,10 +46,10 @@ PRs welcome for full English translation of SKILL.md bodies if your team needs i
 
 In Claude Code, run these three steps:
 
-**Step 1: Register the marketplace** (pointing at the GitLab mirror)
+**Step 1: Register the marketplace** (pointing at the Gitee repository)
 
 ```
-/plugin marketplace add https://gitlab.kpay-group.com/zhangk/kpay-team-standards.git
+/plugin marketplace add https://gitee.com/wyoooni/team-standards.git
 ```
 
 **Step 2: Install the plugin**
