@@ -4,6 +4,20 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.37.0] - 2026-06-17
+
+**新增第 6 道 PreToolUse hook `check-commit-no-ai-signature`——`git commit` 落盘前机械拦截「AI 工具署名」，把 git-commit-standards 的"禁止 AI 署名"从 SKILL 层规则升级为不可绕过的机械红线。**
+
+### Added
+- `hooks/check-commit-no-ai-signature.js`：PreToolUse（Bash）。扫描 `git commit` 提交信息（`-m` 内联 / heredoc / `-F` 文件），命中 `Co-Authored-By:` 指向 AI、`noreply@anthropic.com`、机器人 emoji、`Generated with/by <AI>` 等署名即 `exit 2` 阻断。**与改动大小、是否走 skill 无关**——专防小改不走 git-commit-standards skill 时、宿主/IDE 默认指令擅自追加签名。默认 `block`，`TEAM_STANDARDS_AI_SIGNATURE_HOOK=warn` 仅提示、`=off` 关闭。正文里普通提及 "claude" 不误伤（仅匹配 trailer 形态 / 机器邮箱 / emoji）。
+- `hooks/hooks.json`：注册到 `Bash` 组（现 Bash 2 道 + Write 4 道）。
+
+### Changed
+- `git-commit-standards`：「何时进入本 skill」补一条——禁止 AI 署名现由 `check-commit-no-ai-signature.js` 机械兜底，不再仅靠 skill 自觉。
+
+### Motivation
+- 实战暴露：宿主默认指令要求每条 commit 追加 `Co-Authored-By: Claude`，小改动不触发 git-commit-standards 完整流程时该签名被默认带上，违反 team-standards「Author 只填真实提交者」红线。规则早有（§Author/§Red Flags），但只是 SKILL 层自觉、缺机械强制。故加 hook 在 commit 层兜底。
+
 ## [1.36.0] - 2026-06-17
 
 **新增第 5 道 PreToolUse hook `check-sql-ddl-readiness`——写/改任何带 SQL 的文件前，强制本会话已读 `knowledge-graph/ddl-baseline.md`；语言无关、不豁免小改，补 `check-backend-kg-readiness` 只覆盖 Dart 路径的洞。**
