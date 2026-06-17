@@ -42,7 +42,8 @@ description: "Use BEFORE answering single-service backend questions about table 
 | **同一技术主题反复疑问 ≥3 轮**（项目级技术难点） | 用户在同一会话中对同一技术点重复提问 / 验证 / 担忧 ≥3 次；或出现回归性措辞："为什么...还" / "怎么又..." / "上次说..." / "是不是...占用了" / "现在又卡了"；或修复后 ≥2 轮验证性追问 | 答题同一回合**自动追加候选**到 `_candidates.md`，分类标记 `技术难点`；超过 5 轮反复或用户显式提示"这是核心点"时主动起 `scenarios/` 场景卡 |
 | **AI 完成涉及子进程 / 并发 / 性能 / 资源边界的代码改动** | 修复 transferTo 阻塞、Semaphore 限流、孤儿进程清理、缓存键策略、超时回收、磁盘/CPU 争夺等"非业务技术陷阱" | 编码后必候选记录；用户提示"这是难点要登记"时立刻整理为正式场景卡 |
 | **会话首次 Write/Edit 后端业务源码**（路径含 `lib/features/{module}/backend(v\d+)?/**/*.dart` 或 `lib/common/backend_infra/(daos\|services)/**/*.dart`，非测试文件，非 ≤1 文件 ∧ ≤20 行的小改） | hook `check-backend-kg-readiness.js` PreToolUse 兜底（v1.28 起默认 warn 模式 exit 0 + stderr 提示，`TEAM_STANDARDS_BACKEND_KG_HOOK=block` 升级硬阻断、=off 关闭）；transcript 内 0 次 Read `**/knowledge-graph/00_index.md` 或 `**/knowledge-graph/scenarios/*.md` 或 `**/knowledge-graph/ddl-baseline.md` | 立即停止 Edit，先 Read 项目对应 `knowledge-graph/00_index.md` 按关键词反查命中场景卡再继续；命中场景卡也读完后才回到原 Edit |
-| **即将写 SQL / 改 DAO / Mapper / Repository / Drift customSelect / Prisma raw query / JPA @Query**，但项目 `knowledge-graph/ddl-baseline.md` 不存在 | 项目存在持久层代码（grep `customSelect` / `@Query` / `@Repository` / `prisma.client` / `mysql.createConnection` / `pg.Client` 等任一命中），但用户目录 + 项目 docs 两处的 `knowledge-graph/ddl-baseline.md` 都查不到 | **先 dump DDL 基线再写 SQL**——按项目 DB 引擎选 dump 命令（详见下方「DDL 基线」节），把 schema 全景落到 `knowledge-graph/ddl-baseline.md`；不要凭 ORM 实体类反推 schema（实体类只展示子集，DEFAULT/INDEX/CHECK 等 schema 元信息容易丢失） |
+| **即将写 SQL / 改 DAO / Mapper / Repository / Drift customSelect / Prisma raw query / JPA @Query / iBatis·MyBatis SqlMap XML**，但项目 `knowledge-graph/ddl-baseline.md` 不存在 | 项目存在持久层代码（grep 任一命中：`customSelect` / `@Query` / `@Repository` / `@Mapper` / `prisma.client` / `mysql.createConnection` / `pg.Client`；iBatis/MyBatis 的 `<select`/`<insert`/`<update`/`<sqlMap`/`<mapper` 或 `*Mapper.xml`/`*Dao.xml`/`maps/*.xml`；Java/Kotlin 的 `*Dao.java`/`*Mapper.java`/`*Repository.*`；`.sql` 文件），但用户目录 + 项目 docs 两处的 `knowledge-graph/ddl-baseline.md` 都查不到 | **先 dump DDL 基线再写 SQL**——按项目 DB 引擎选 dump 命令（详见下方「DDL 基线」节；Oracle 用 `expdp ... CONTENT=METADATA_ONLY` 或查 `ALL_TAB_COLUMNS`/`ALL_CONSTRAINTS`），把 schema 全景落到 `knowledge-graph/ddl-baseline.md`；不要凭 ORM 实体类 / model POJO 反推 schema（只展示子集，DEFAULT/INDEX/CHECK/可空 等元信息容易丢失） |
+| **即将写/改任何带 SQL 的文件**（iBatis/MyBatis XML、`.sql`、`*Dao`/`*Mapper`/`*Repository`、含裸 SQL 或 ORM raw query 的源码），**无论改动大小**（1 行字段名改动也算） | hook `check-sql-ddl-readiness.js` PreToolUse 兜底（默认 warn 模式 exit 0 + stderr 提示，`TEAM_STANDARDS_SQL_DDL_HOOK=block` 升级硬阻断、=off 关闭）；transcript 内 0 次 Read `**/knowledge-graph/ddl-baseline.md` | **改前必先 Read `ddl-baseline.md`**，按目标表名核对字段名/类型/默认值/索引，再 Read 命中的 `scenarios/*.md` 确认取数口径（如某时间字段取 `makedate` 还是 `checkdate`），然后才动 SQL；未核对 DDL 凭记忆写字段名 = 流程违反，是 `no such column` / 取错字段口径 类连环 bug 的根因 |
 
 > **常见误判反例（已发生过的踩坑）**：
 > - ❌ "用户只是问云端逻辑，没让我建图谱，所以不用触发" → **错**，问询场景必触发并候选沉淀
@@ -234,6 +235,15 @@ SQL 图谱同样按渐进方式建立：
 
 不要拆 `ddl/{table}.md`——分散后失去"一次 Read 拿全景"的核心价值。表多到一份文件不便读时，可在文档内按业务域分章节，但单文件原则不变。
 
+**权威源 = 团队集中知识库，不是个人 ai-docs、也不是各业务项目自己的 docs/（避免每人/每项目各一份漂移）**：
+
+- 本团队集中库 = **`project-domain-knowledge` 仓**（domain-knowledge MCP 生态，owner 统一维护、全员同步）。单项目实现知识放其**实现知识区 `knowledge/{project}/impl/`**：
+  - 全量 `ddl-baseline.md` = **不带 `id` 的仓库资产**（不入 MCP 索引，按表名 grep），随仓分发；
+  - 小导引/查询卡（带 `id`，`module: impl`，`type: reference|sql`）入 MCP 索引，`search("DDL"/表名)` 可命中。
+- 个人 `{USER_DOCUMENTS}/ai-docs/{项目}/knowledge-graph/` 只作**草稿/候选**；dump 或更正后**必须 promote 到集中库 `impl/`**，并在 ai-docs 标注"以集中库为准"。
+- ❌ 反例（已踩坑）：把 dump 出的真实 DDL 只留个人 ai-docs（或只塞进某业务项目自己的 docs/）就收工 → 各存一份、随时间漂移、彼此矛盾，正是"专人集中维护"要消灭的。
+- 退化场景：团队没有集中 PDK 仓时，才退回项目自带 `docs/knowledge-graph/`。
+
 **dump 命令模板（按 DB 引擎）**：
 
 | DB 引擎 | dump 命令 |
@@ -284,7 +294,10 @@ CREATE INDEX ... ON ... ;
 
 **hook 集成**：
 
-`check-backend-kg-readiness.js` PreToolUse hook（v1.28 起默认启用）的"已读图谱"字面量白名单包含 `knowledge-graph/ddl-baseline.md`——AI 写 SQL 前 Read 一次 DDL 基线即满足 hook 兜底条件。
+两道 PreToolUse hook 协同兜底：
+
+- `check-backend-kg-readiness.js`（默认启用）的"已读图谱"字面量白名单包含 `knowledge-graph/ddl-baseline.md`——但它只匹配 **Dart/Flutter 后端路径**（`lib/features/**/backend/**/*.dart`）且豁免 ≤20 行小改，对 Java/iBatis、`.sql` 等不触发。
+- `check-sql-ddl-readiness.js`（默认启用，**语言无关**）补这个洞：在写/改**任何带 SQL 的文件**（iBatis/MyBatis XML、`.sql`、`*Dao`/`*Mapper`/`*Repository`、含裸 SQL/ORM raw query 的源码）之前，检查本会话是否 Read 过 `ddl-baseline.md`；**不豁免小改**（1 行 SQL 字段名改动也拦）。AI 写 SQL 前 Read 一次 DDL 基线即满足。`TEAM_STANDARDS_SQL_DDL_HOOK=block|warn|off` 调档。
 
 ## 后端接口开发强制闭环
 

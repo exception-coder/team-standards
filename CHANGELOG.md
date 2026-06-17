@@ -4,6 +4,20 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.36.0] - 2026-06-17
+
+**新增第 5 道 PreToolUse hook `check-sql-ddl-readiness`——写/改任何带 SQL 的文件前，强制本会话已读 `knowledge-graph/ddl-baseline.md`；语言无关、不豁免小改，补 `check-backend-kg-readiness` 只覆盖 Dart 路径的洞。**
+
+### Added
+- `hooks/check-sql-ddl-readiness.js`：PreToolUse（Write/Edit/MultiEdit）。按「文件是否承载 SQL」判定（iBatis/MyBatis SqlMap XML、`.sql`、`*Dao`/`*Mapper`/`*Repository`、含裸 SQL 或 ORM raw query 的源码），命中且本会话未 Read 过 `ddl-baseline.md` 即 stderr 提示。默认 `warn`，`TEAM_STANDARDS_SQL_DDL_HOOK=block` 升级硬阻断、`=off` 关闭。**不豁免小改**——1 行字段名改动也拦。
+- `hooks/hooks.json`：注册新 hook 到 `Write|Edit|MultiEdit` 组。
+
+### Changed
+- `backend-knowledge-graph-required`：BLOCKING 触发清单的「写 SQL 前缺 DDL 基线」一行，信号扩到 **iBatis/MyBatis SqlMap XML、Java/Kotlin `*Dao`/`*Mapper`/`*Repository`、`.sql`、Oracle**（原仅 Dart/Prisma/JPA 系）；新增一行「即将写/改任何带 SQL 的文件，无论改动大小 → 改前必先 Read `ddl-baseline.md` 核对字段、再看场景卡确认取数口径」。「hook 集成」节补 `check-sql-ddl-readiness.js` 说明。
+
+### Motivation
+- 实战暴露：Yoooni（Java + Struts + iBatis + Oracle）改打版进度 SQL 时，把「染厂收胚时间」误取 `tdate`，绕了多轮才修回知识库早已记载的 `transfer.checkdate`。根因有二：① 既有 `check-backend-kg-readiness` 路径白名单是 Dart 专用，对 iBatis XML / `.sql` 完全不触发；② 它豁免 ≤20 行小改，而字段口径错误恰是 1 行改动。故新增语言无关、不豁免小改的 SQL→DDL 前置校验，并为涉 DB 项目落地 `ddl-baseline.md` 作为字段级权威源。
+
 ## [1.35.0] - 2026-06-15
 
 **注释红线机械兜底 `check-comment-density` 默认从 `warn` 反转为 `block`——客观红线（工单号/日期/变更标记/分节线/版本流水）命中即 exit 2 硬阻断，护栏在插件里统一做死，安装者无需各自配 settings。**
