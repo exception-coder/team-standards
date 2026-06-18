@@ -4,6 +4,15 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.38.0] - 2026-06-18
+
+**warn 档 hook 命中时本地登记事件（hook-event-logging），为"某条规则要不要从 warn 升 block / 同事最常踩哪条"提供数据支撑。**
+
+### Added
+- `hooks/event-log.js`：best-effort 本地登记 helper，把命中事件追加到 `~/.kai-toolbox/hook-events.jsonl`（仅用 node 内置 `fs/os/path`）。设计红线：**只写本地、绝不在 hook 热路径里做网络 IO**；全程 try/catch，**登记失败绝不影响放行/拦截判定**。
+- `check-sql-ddl-readiness.js`（`rule: sql-ddl`）、`check-backend-kg-readiness.js`（`rule: backend-kg`）命中时调用 `logHookEvent`，记录 `ts/user/host/plugin/hook/rule/mode/tool/file`（`mode` 区分 warn / block）。
+- `docs/design/hook-event-logging.md`：设计说明。下游"同步到 `\\IT01` 共享 + 周报统计"在 `yoooni-daily-plugin`，本插件不感知公司内网基础设施（解耦）。
+
 ## [1.37.0] - 2026-06-17
 
 **新增第 6 道 PreToolUse hook `check-commit-no-ai-signature`——`git commit` 落盘前机械拦截「AI 工具署名」，把 git-commit-standards 的"禁止 AI 署名"从 SKILL 层规则升级为不可绕过的机械红线。**

@@ -28,6 +28,7 @@
 
 const fs = require('fs');
 const { execSync } = require('child_process');
+const { logHookEvent } = require('./event-log');
 
 const MODE = (process.env.TEAM_STANDARDS_BACKEND_KG_HOOK || 'warn').toLowerCase();
 if (MODE === 'off') process.exit(0);
@@ -82,6 +83,7 @@ process.stdin.on('end', () => {
     '        skill `backend-knowledge-graph-required` 要求编码前必读。\n' +
     '  旁路：TEAM_STANDARDS_BACKEND_KG_HOOK=off 关闭 / =block 升级硬阻断。\n';
 
+  logHookEvent({ plugin: 'team-standards', hook: 'check-backend-kg-readiness', rule: 'backend-kg', mode: MODE, tool: toolName, file: targetPath });
   process.stderr.write(msg);
   process.exit(MODE === 'block' ? 2 : 0);
 });

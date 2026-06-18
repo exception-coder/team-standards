@@ -30,6 +30,7 @@
 // =============================================================
 
 const fs = require('fs');
+const { logHookEvent } = require('./event-log');
 
 const MODE = (process.env.TEAM_STANDARDS_SQL_DDL_HOOK || 'warn').toLowerCase();
 if (MODE === 'off') process.exit(0);
@@ -92,6 +93,7 @@ process.stdin.on('end', () => {
     '  原因：不核对 DDL 凭记忆写字段名，是 no such column / 取错字段口径 类连环 bug 的根因。\n' +
     '  旁路：TEAM_STANDARDS_SQL_DDL_HOOK=off 关闭 / =block 升级硬阻断。\n';
 
+  logHookEvent({ plugin: 'team-standards', hook: 'check-sql-ddl-readiness', rule: 'sql-ddl', mode: MODE, tool: toolName, file: targetPath });
   process.stderr.write(msg);
   process.exit(MODE === 'block' ? 2 : 0);
 });
