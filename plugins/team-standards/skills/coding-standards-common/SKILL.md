@@ -284,6 +284,19 @@ Future<void> registerRefundSuccess(RefundOrder order) async {}
 - **能力清单来源(单一)**:项目公共能力清单见该项目 coding-profile(`project-coding-profiles` 插件)下的 `common-capabilities.md`(前后端公共能力 + 优先复用 Top 清单 + 编码前自检)。**编码前必读**;无该文件的项目,先在其 profile 补一份。
 - **强制与清单落在项目侧,纪律落在这里**:具体「有什么」(清单)和「机械拦截」(如 `check-frontend-controls.js` 拦原生弹框)由各项目 coding-profile 承担;本条只定义跨项目通用纪律「先查、优先复用、禁造轮子 / 禁原生替代」。
 
+### 7.7 新增全局注册名:先查重,别假设唯一(AI 易错)
+
+> §7.5 讲「外部 API 先核验」,§7.6 讲「公共能力先复用」,本条讲「全局注册名先查重」——三条同属「动手前先查项目里已有的」。AI 反复违规行为:新建一个带框架注册语义的标识符时,只盯着自己这个类 / 文件,默认这个名字全局唯一,撞名了往往到启动期 / 运行期才暴露,白费往返。
+
+- **下手前先在注册范围内查重名**,凡是会进**某个全局命名空间**的标识符都适用:
+  - Spring bean 名(`@Component` 系默认 = 简单类名,详见 `java-coding-standards §11`)
+  - HTTP 路由 / `@RequestMapping` 路径、消息队列 topic / 事件名
+  - DI token、`@Qualifier` 名、配置项 key、feature flag key
+  - DB 表名 / 迁移文件名(migration name)、定时任务名、i18n / 文案 key
+- **判定顺序**:要新增一个注册名 → 先在其注册范围内搜同名 → 无冲突再写;可能冲突 → 显式赋唯一限定名(模块前缀 / 命名空间),别靠「应该不会撞吧」蒙混。
+- **别假设唯一**:多模块共用 base package、同一 component-scan / 同一路由表 / 同一事件总线时,「不同包 / 不同模块」**不等于**「名字不同」。撞名常常成对出现(一个撞了,配套的兄弟类大概率也撞),一并核对。
+- 框架专属的默认命名规则与机械细节落在语言 skill(如 `java-coding-standards §11` 的 Spring bean 命名);本条只定义跨语言通用纪律「新增全局名先查重」。
+
 ---
 
 ## 与语言专属 skill 的关系
@@ -315,3 +328,4 @@ Future<void> registerRefundSuccess(RefundOrder order) async {}
 - [ ] 重复的是**知识/约定/常量**(→ 第一次出现就单一来源)还是**逻辑**(→ 数到三再抽)?有没有把同一约定在多处 / prompt / 注解里复写?有没有过早抽象 / dead code 留作"以后用"?
 - [ ] 写新功能前是否先查过项目公共能力清单(coding-profile 的 `common-capabilities.md`)?有没有重复造轮子 / 用原生实现替代已有公共封装(§7.6)?
 - [ ] 用到的**外部 / 不熟悉 API** 是不是先核验签名再写、没凭记忆臆造方法名 / import?
+- [ ] 新增的**全局注册名**(Spring bean / 路由 / 事件名 / DI token / 配置 key / 表名 / 迁移名)是否在注册范围内查过重名,没假设唯一(§7.7)?

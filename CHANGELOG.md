@@ -4,6 +4,17 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.38.1] - 2026-06-19
+
+**补「新增全局注册名先查重」AI 易错规则——`java-coding-standards` 新增 Spring 节治 bean 默认同名冲突,`coding-standards-common §7.7` 抽出跨语言通用原则。**
+
+### Added
+- `java-coding-standards`：新增 `§11 Spring / 依赖注入`。讲清 `@Component`/`@Service`/`@Controller` 默认 bean 名 = 简单类名首字母小写；多模块共用 base package、同一 component-scan 下两个同简单类名的类会撞默认 bean 名 → 启动期 `ConflictingBeanDefinitionException`。规则：新增此类注解前先在扫描范围查重名，可能撞车则显式赋模块限定名；注入按类型不按名，改名才安全；同名常成对出现需一并核对。配 1 个代码示例 + 1 行违规快查表。
+- `coding-standards-common`：新增 `§7.7 新增全局注册名:先查重,别假设唯一(AI 易错)`，与 §7.5（外部 API 先核验）、§7.6（公共能力先复用）并列为「动手前先查已有的」三件套。覆盖 bean 名 / 路由 / 事件名 / DI token / 配置 key / 表名 / 迁移名等全局命名空间；自检清单同步加一条。
+
+### Motivation
+- 实战暴露：kai-toolbox 拉取新模块后启动失败——`tool-ai-chat` 与 `tool-claude-chat` 两个并存工具同处 `com.exceptioncoder.toolbox`，各有 `AttachmentController` / `AttachmentStorageService`，默认 bean 名都成了 `attachmentController` / `attachmentStorageService`，触发 `ConflictingBeanDefinitionException`。根因是写新 bean 时只看自己这个类、默认名字全局唯一、不查重名。该模式 AI 反复犯，故落规范：具体机械细节进 Java 专属节，跨语言通用纪律抽到 common §7.7。
+
 ## [1.38.0] - 2026-06-18
 
 **warn 档 hook 命中时本地登记事件（hook-event-logging），为"某条规则要不要从 warn 升 block / 同事最常踩哪条"提供数据支撑。**

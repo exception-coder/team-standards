@@ -145,6 +145,26 @@ public class ConcurrencyController {
 
 ---
 
+## 11. Spring / 依赖注入(Java 专属)
+
+> AI 反复违规行为:新建 `@Service` / `@Controller` 时只顾自己这个类,不查同扫描范围内是否已有同简单类名的 bean,直接埋下启动期 `ConflictingBeanDefinitionException`。本节专治这类「不查重名」。通用原则(任何全局注册名先查重)见 `coding-standards-common §7.7`。
+
+- **默认 bean 名 = 简单类名首字母小写**:`@Component` / `@Service` / `@Controller` / `@Repository` 不显式指定名字时,bean 名就是简单类名首字母小写(`AttachmentController` → `attachmentController`)。
+- **同名冲突会让应用起不来**:多模块共用同一 base package、被同一次 `@ComponentScan` 扫描时,两个不同包下的同简单类名类会生成**相同默认 bean 名** → 启动期抛 `ConflictingBeanDefinitionException`,应用直接启动失败(不是运行期才暴露)。
+- **新增 `@Component` 系注解的类前,先查重名**:在同一扫描范围内搜一下是否已存在同简单类名的 bean(尤其 `XxxController` / `XxxService` / `XxxStorageService` 这类高频撞名)。可能撞车 → 显式赋**模块限定名**:`@Service("aiChatAttachmentStorageService")` / `@RestController("claudeChatAttachmentController")`。
+- **注入按类型,不按名**:依赖注入优先构造器注入、按类型装配;避免按字符串名引用(`@Qualifier("xxx")` / `applicationContext.getBean("xxx")`)。无按名引用时,改 bean 名不影响装配,查重名/改名都安全。
+- **同一对象的同名常成对出现**:`XxxController` 撞了,配套的 `XxxService` / `XxxStorageService` 大概率紧随其后一起撞,一并核对、别只改报错那一个。
+
+```java
+// ai-chat 与 claude-chat 两模块同处 com.exceptioncoder.toolbox,各有一个 AttachmentController
+// 默认 bean 名都是 attachmentController → ConflictingBeanDefinitionException
+@RestController("aiChatAttachmentController")      // 显式模块限定名,消除撞名
+@RequestMapping("/api/ai-chat/attachments")
+public class AttachmentController { }
+```
+
+---
+
 ## 违规示例快查
 
 | 错误写法 | 正确写法 |
@@ -159,3 +179,4 @@ public class ConcurrencyController {
 | `static SimpleDateFormat sdf = ...` | `DateTimeFormatter.ofPattern(...)` |
 | `new HashMap<>()` 然后塞 1000 条 | `new HashMap<>(1334)` |
 | `// 这是个 user 类` | `/** 用户聚合根,负责... */` |
+| 两模块各写裸 `@Service class AttachmentStorageService`(默认 bean 名撞车) | `@Service("aiChatAttachmentStorageService")` 显式模块限定名 |
