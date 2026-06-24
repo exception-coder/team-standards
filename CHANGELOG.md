@@ -4,6 +4,17 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.41.0] - 2026-06-24
+
+**`prompt-signal-capture` 采集精化：降噪 + 去重 + 优先级——让"反推知识缺口"的原始信号更干净。**
+
+### Changed
+- `hooks/prompt-signal-capture.js`：
+  - **命令/运维降噪**：slash 开头、"更新套件 / 安装公司工具"、`/doctor` 等 → `kind:"command"`，**直接不登记**（试用数据里这类噪声大量挤占 `other` 桶）。
+  - **连续去重**：sidecar `.prompt-signal-last` 比对上一条 `project+text`，相同即跳过（根除"更新套件"刷屏式重复）。
+  - **优先级**：新增 `priority` 字段（`high+`=纠正+紧跟编辑 / `high`=纠正 / `medium`=疑问 / `low`=其它），供聚合层先看高价值。
+- 边界不变：采集层仍只做机械启发式；"精准提取业务缺口"由 `yoooni-daily-plugin` 的 `yoooni-hook-report` 周报 LLM 规整完成。详见 `docs/design/prompt-signal-capture.md` §v1.41。
+
 ## [1.38.1] - 2026-06-19
 
 **补「新增全局注册名先查重」AI 易错规则——`java-coding-standards` 新增 Spring 节治 bean 默认同名冲突,`coding-standards-common §7.7` 抽出跨语言通用原则。**

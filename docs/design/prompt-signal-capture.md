@@ -90,8 +90,9 @@ SessionStart 每日                  → update-team-tools 兜底整体推
 | `ts` | ISO8601 时间戳 |
 | `user` / `host` | `os.userInfo().username` / `os.hostname()` |
 | `project` | 由 cwd 推断的项目名 |
-| `kind` | 粗分类：`question` / `correction` / `other` |
+| `kind` | 粗分类：`correction` / `question` / `other`（`command` 运维类直接丢弃、不登记） |
 | `markers` | 命中的启发式标记词 |
+| `priority` | `high+`(纠正+紧跟编辑) / `high`(纠正) / `medium`(疑问) / `low`(其它)——供聚合层排序 |
 | `afterEdit` | 是否紧跟一次 Edit/Write（纠正信号增强） |
 | `text` | prompt 原文（受上行开关约束） |
 
@@ -112,3 +113,13 @@ SessionStart 每日                  → update-team-tools 兜底整体推
 
 - team-standards **只负责产生本地事件**，不感知 `\\IT01`、不在 hook 里做网络同步——与公司内网基础设施解耦。
 - 同步与聚合由 `yoooni-daily-plugin` 承接（`update-team-tools` + 周报 skill）。
+
+## v1.41 采集精化（降噪 + 去重 + 优先级）
+
+试用数据显示 `kind:"other"` 桶里混入大量噪声（slash 命令、"更新套件 / 安装公司工具"、`/doctor` 等运维指令，及连续重复 prompt），淹没真正的纠正/疑问信号。本版在**采集层**加三道：
+
+1. **命令/运维降噪**：`COMMAND_RE` 命中（`/` 开头、套件安装更新、`/doctor` 等）→ `kind:"command"`、**直接不登记**（对"反推知识缺口"零价值）。
+2. **连续去重**：sidecar `.prompt-signal-last` 存上一条 `project+text` 指纹，相同则跳过（根除"更新套件"刷屏式重复）。
+3. **优先级标注**：新增 `priority`（`high+`/`high`/`medium`/`low`），其中**纠正 + 紧跟编辑(afterEdit) = `high+`** 最强信号，供聚合层先看高价值。
+
+> 边界不变：采集层仍只做机械启发式（降噪是"删确定噪声"，不是"判定业务问题"）；**"精准提取业务缺口"由聚合层 LLM 规整完成**（见 `yoooni-hook-report` 周报）。
