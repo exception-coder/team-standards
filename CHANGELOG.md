@@ -4,6 +4,15 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.42.0] - 2026-06-24
+
+**新增第 9 道 PreToolUse hook `check-ai-doc-location`——机械拦住"AI 文档写进业务项目 docs/"，强制落到用户 `ai-docs/{project}/`。**
+
+### Added
+- `hooks/check-ai-doc-location.js`：Write 新建 `.md` 落到业务/应用项目仓 `docs/` 时 `exit 2` 拦下，回灌正确的 `ai-docs/{project}/` 路径让 AI 改写过去——给 `doc-index-required`（skill、建议级）补一道机械闸（此前项目 docs/ 与 ai-docs/ 被当等价、无力量纠偏，AI 反复图省事落项目 docs/）。
+  - 只拦**新建**(Write)；Edit/MultiEdit 改已有放行。豁免：**插件源码仓**（有 `.claude-plugin`/`.codex-plugin`/`.agents` 标记，其 `docs/design`·`docs/dev-log` 是随仓发布的产品文档）、`ai-docs/` 路径、`INDEX.md`/`00_index.md`、已存在文件。
+  - 默认 `block`；`TEAM_STANDARDS_DOC_LOCATION_HOOK=warn` 仅提示、`=off` 关闭（用户明确要写项目 docs 时本次绕过）。
+
 ## [1.41.0] - 2026-06-24
 
 **`prompt-signal-capture` 采集精化：降噪 + 去重 + 优先级——让"反推知识缺口"的原始信号更干净。**
