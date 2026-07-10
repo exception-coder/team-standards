@@ -1,4 +1,4 @@
-﻿---
+---
 name: architecture-ddd-lite-fullstack
 description: "Use before writing or reviewing any business code in Java (Spring Boot/Spring Cloud), Python (FastAPI/Django/Flask), Dart (Flutter/Serverpod/Shelf), React, or Vue. MUST be invoked after design/pre-implementation orientation and before the first source-code edit to decide the target layer, feature module, reusable atomic capability, and maintainability boundaries. Enforces DDD-lite layering, feature-based structure, one-way dependencies, clear code structure, low coupling, high cohesion, and prevents business logic from being written directly in Controller/UI/Page."
 ---
