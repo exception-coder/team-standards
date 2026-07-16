@@ -275,7 +275,7 @@ v1.26 起 **`check-design-doc.js` hook 默认启用**（[hooks/hooks.json](hooks
 - `project-docs-update` — 项目结构变更后同步知识图谱文档
 
 ### ⑦ 项目初始化（一次性）
-- `init-project-docs` — 4 阶段渐进式构建知识图谱
+- `init-project-docs` — 4 阶段渐进式构建知识图谱；Graphify 按宿主能力选择 AST、宿主代理或 CLI 后端，语义降级前必须说明缺口
 - `generate-project-profile` — 生成 AI Agent 消费的 10 维度项目画像
 
 ### ⑧ plugin 自身维护

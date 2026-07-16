@@ -41,10 +41,49 @@ OpenSpec 等变更规格描述“准备怎么改”，不替代上述当前实�
 ### 2. 构建代码事实层
 
 1. 检查项目是否已有 Graphify 配置、命令或产物。
-2. Graphify 可用时，按其当前安装版本支持的命令对项目根执行完整构建；不要猜测不受支持的参数。
-3. 验证生成结果可读取，并至少覆盖模块、依赖、API 和数据访问中的可识别部分。
-4. Graphify 不可用或构建失败时，记录原因，降级为确定性代码扫描；不得中断整个初始化，也不得把 AI 猜测伪装成 Graphify 事实。
-5. 不把原始 `graph.json`、HTML 或整份生成报告复制进 Markdown 知识库。
+2. 读取当前已安装 Graphify skill 的完整说明，并按当前安装版本探测实际支持的命令；不要凭记忆拼接参数，也不要把独立 CLI 的行为等同于宿主 skill 编排。
+3. 先检测语料类型：纯代码语料只执行本地 AST，不需要 LLM API Key；仅当存在文档、PDF 或图片时才需要语义提取能力。
+4. 按下方“Graphify 执行路由”选择完整构建路径。不得因为未发现 API Key 就直接执行 `--code-only`。
+5. 验证生成结果可读取，并至少覆盖模块、依赖、API 和数据访问中的可识别部分。
+6. Graphify 结构提取不可用或完整构建失败时，记录每次尝试和失败原因，再降级为确定性代码扫描；不得中断整个初始化，也不得把 AI 猜测伪装成 Graphify 事实。
+7. 不把原始 `graph.json`、HTML 或整份生成报告复制进 Markdown 知识库。
+
+### 2.1 Graphify 执行路由
+
+按顺序执行，命中可用路径后停止继续探测：
+
+| 优先级 | 条件 | 执行策略 | 是否需要用户确认 |
+|---:|---|---|---|
+| 1 | 语料只有代码 | 使用 Graphify 本地 AST 完整建立结构事实层 | 否 |
+| 2 | 当前宿主已加载 Graphify skill，且支持宿主代理或子代理 | 严格按 Graphify skill 编排；代码走 AST，非代码语义由当前宿主会话处理 | 否 |
+| 3 | 独立 CLI 场景，`claude` CLI 可执行且登录态可用 | 查询当前 Graphify 版本是否支持 Claude CLI 后端；支持时显式选择该后端 | 否 |
+| 4 | 独立 CLI 场景，已存在 Graphify 支持的 API Key 或本地后端 | 使用已配置后端；不得要求用户重复提供当前环境已有的凭据 | 否 |
+| 5 | 存在非代码语料，但所有语义后端均不可用 | 说明将跳过的文件类型和知识缺口，询问是否接受代码结构索引 | 是 |
+| 6 | Graphify 未安装、结构提取报错或输出不可验证 | 使用 `rg`、构建文件和语言 AST 等确定性扫描生成 fallback 事实层 | 否，但必须报告降级 |
+
+宿主判定以实际能力为准，不仅看产品名称：
+
+- **Claude Code**：优先使用 Graphify skill 的宿主编排；只有明确走独立 CLI 时才尝试 Claude CLI 后端。Claude Code 订阅登录态不等于 `ANTHROPIC_API_KEY`。
+- **Codex**：优先使用 Graphify skill；需要非代码语义提取时由当前宿主代理能力处理，不把 Codex 会话误判为 Claude API Key。
+- **普通终端或脚本**：没有宿主代理能力，只能选择 Graphify 当前版本实际支持的 CLI 后端，或进入有损降级。
+
+禁止以下行为：
+
+- 看到“缺少 LLM API Key”后立刻执行 `--code-only`。
+- 在纯代码项目中要求任何 LLM API Key。
+- 未检查 `claude` CLI 和对应后端支持情况，就断言 Claude Code 引擎不可用。
+- Graphify 失败后无记录地改用 AI 自由扫描。
+
+### 2.2 降级规则
+
+降级分为两类，禁止混淆：
+
+| 降级类型 | 适用条件 | 结果边界 |
+|---|---|---|
+| 语义降级 | AST 可用，但非代码语义后端不可用 | 保留代码结构事实；跳过文档、PDF、图片语义，必须先取得用户确认 |
+| 工具降级 | Graphify 不可用或结构结果无法验证 | 改用确定性扫描；生成内容标记为 `fallback`，不得声称来自 Graphify |
+
+每次初始化都把路由结果写入 `generated/graphify-metadata.json`：记录宿主、语料类型、尝试过的后端、失败原因、最终模式和被跳过的文件类型。禁止记录 API Key 值、登录令牌或其他凭据。
 
 ### 3. 写入生成投影
 
@@ -70,6 +109,11 @@ generated/
   "source_commit": "git-sha",
   "generated_at": "ISO-8601",
   "generation_mode": "graphify-or-fallback",
+  "host": "claude-code-or-codex-or-terminal",
+  "corpus_mode": "code-only-or-mixed",
+  "backend_attempts": [],
+  "fallback_reason": null,
+  "skipped_content_types": [],
   "verified": false
 }
 ```
