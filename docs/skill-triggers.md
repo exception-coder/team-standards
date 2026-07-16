@@ -53,7 +53,7 @@
 | 现状梳理 / orientation / 重构前分析 / 业务逻辑梳理 | `business-logic-orientation` | 重构/迁移前 |
 | 跨项目同名异叫法 (项目 A 叫订单, 项目 B 叫 Order) | `cross-project-locator/shared-glossary.md` | 不进单项目 glossary |
 | 通用编程概念 (线程 / 缓存 / 事务 / 子进程) | `backend-knowledge-graph-required`(技术难点) | 不进 glossary |
-| 初始化项目文档 / 生成知识图谱 / 4 阶段 | `init-project-docs` | 一次性入口 |
+| 初始化当前项目文档 / 生成知识图谱 / Graphify | `init-project-docs` | 一次性入口；出现“知识图谱”时不得路由到入职/SVN 初始化 |
 | 项目画像 / project profile / 10 维度 | `generate-project-profile` | 独立扫描 |
 | team-standards 自身变更决策 / 新增 / 删除 skill / 链路反转 | `dev-log` | 仅 team-standards 仓库 |
 
@@ -65,6 +65,7 @@
 | `glossary-required` vs `cross-project-locator/shared-glossary.md` | 单项目术语 → glossary; 跨项目同名异叫法对照 → cross-project; 不交叉 |
 | `backend-knowledge-graph-required`(正向) vs `reverse-index-required`(反向) | 正向: 这个枚举有什么值 / 这张表有什么字段; 反向: 这个枚举值在哪里被判断 / 这个字段在哪里被读写; 两者文件不同, 同回合可同时触发但不重复维护同一条事实 |
 | `daily-work-log` vs `dev-log` | daily-work-log 作用于业务项目; dev-log 作用于 team-standards 插件源码仓库; 不重叠 |
+| `init-project-docs` vs `yoooni-onboard-init` | 当前代码项目文档/知识图谱/Graphify → init-project-docs；新员工入职且明确 SVN/公司项目文档 → yoooni-onboard-init；泛化“初始化”先澄清，不得先读写凭据 |
 | `business-logic-orientation` vs `pre-implementation-code-orientation` | orientation 是重构前**梳理现状** (产出独立文档); pre-implementation 是基于**已写好的 design 文档**定位代码; 不混用 |
 | `coding-standards-common` vs `java-coding-standards` | common 先 (跨语言 7 条铁律); Java 后 (独占条款); 两者叠加不替代 |
 | `bugfix-coding-style` vs `coding-standards-common` | bugfix 关注注释 / 历史痕迹清理; common 关注命名 / 函数原子 / 注释三档; 两者叠加 |
