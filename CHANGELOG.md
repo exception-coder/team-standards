@@ -4,6 +4,16 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.44.0] - 2026-08-02
+
+**提交信息门禁从“只拦 AI 署名”升级为“强制完整变更说明”，保证 Git 历史可供后续人工与 AI 回归改动意图。**
+
+### Changed
+- `check-commit-no-ai-signature.js`：所有可读取消息的非交互式 `git commit` 必须包含标题、中文正文和 `Author: 姓名 <邮箱>`；缺项默认 `exit 2`，并继续拦截 AI 署名。
+- 新增 `TEAM_STANDARDS_COMMIT_MESSAGE_HOOK=warn|off` 开关；旧 `TEAM_STANDARDS_AI_SIGNATURE_HOOK` 保持兼容。
+- `git-commit-standards` 消除“小改只需一句消息”的歧义：小改仅跳过五步工作流，不再豁免完整提交格式。
+- 增加内联 `-m`、`-F` 文件、缺正文、缺 Author、英文正文、AI 署名和 warn 模式测试。
+
 ## [1.42.0] - 2026-06-24
 
 **新增第 9 道 PreToolUse hook `check-ai-doc-location`——机械拦住"AI 文档写进业务项目 docs/"，强制落到用户 `ai-docs/{project}/`。**
