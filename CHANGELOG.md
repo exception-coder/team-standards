@@ -4,6 +4,18 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.45.0] - 2026-08-04
+
+**提交工作流从“遗漏后拦截”前移为“提交前主动填写”，确保 Codex、Claude Code 都先生成标题和中文正文。**
+
+### Added
+- 新增 `build-commit-message.js`：接收 AI 根据当前会话整理的标题和正文，校验中文说明，读取真实 Git 用户，并在 Git 目录生成 UTF-8 提交消息文件。
+- 增加生成内容、非法正文和 Git 消息文件落盘测试。
+
+### Changed
+- `git-commit-standards` 改为所有提交请求必触发；执行 `git commit` 前必须先生成完整消息文件，再统一通过 `git commit -F` 提交。
+- 保留 PreToolUse Hook 作为结构与 AI 署名兜底，不让 Hook 根据 diff 猜测业务原因。
+
 ## [1.44.0] - 2026-08-02
 
 **提交信息门禁从“只拦 AI 署名”升级为“强制完整变更说明”，保证 Git 历史可供后续人工与 AI 回归改动意图。**
