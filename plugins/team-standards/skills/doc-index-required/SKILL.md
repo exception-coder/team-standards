@@ -1,6 +1,6 @@
 ---
 name: doc-index-required
-description: "MUST invoke before creating/writing/editing/moving/renaming ANY AI-generated Markdown — both user knowledge base `{USER_DOCUMENTS}/ai-docs/{project}/` and project `docs/` (v1.20+ 两处索引体系等同)。Phase-A 写前查重 INDEX,Phase-B 写完登记。豁免:索引文件本身(INDEX.md / 00_index.md)、`work-log/` 日期型日志、纯文案不动结构的编辑。详细 Phase-A/B 流程与例外条件见 SKILL.md body。Applies to ALL working directories."
+description: "Use before creating or structurally changing AI-generated Markdown in a project docs tree or user knowledge base. Performs index deduplication before writing and registration afterward; index files, dated work logs, and non-structural wording edits are exempt."
 ---
 
 # 文档索引优先原则

@@ -1,6 +1,6 @@
 ---
 name: glossary-required
-description: "Use BEFORE answering questions using domain business terms (订单/账单/退款/分摊/流水/快照/对账 等) AND BEFORE Write/Edit any .md that introduces/relies on business terms. 5 BLOCKING triggers (PRD 含未登记词 / 用户与 AI 同义词错位 / 调查发现新术语 / 用户要求整理 / 场景文档含未登记词) — full list in SKILL.md body. Scope: 业务领域术语 ↔ 代码命名 ↔ 同义词 三方映射;通用技术词汇归 `backend-knowledge-graph-required` 的「技术难点」。与 `init-project-docs/templates/07_glossary.md` 互补——本 skill 会话级日常补登轻量五栏,init 负责项目初始化批量。"
+description: "Use when business-domain terms are missing, ambiguous, inconsistent with code names, or explicitly need glossary maintenance; applies to domain terms in requirements, discussion, and Markdown."
 ---
 
 # 业务术语强制登记

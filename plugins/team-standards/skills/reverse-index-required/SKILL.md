@@ -1,6 +1,6 @@
 ---
 name: reverse-index-required
-description: "Use BEFORE answering impact-analysis questions (加这个状态会破坏哪些旧逻辑 / 字段哪里在用 / 事件订阅清单 / API 谁在调) AND BEFORE Write/Edit枚举/状态机/字段/事件 payload/API endpoint 定义类源码。维护 4 类反向索引（states / fields / events / apis）。冷启动用 `hooks/scan-reverse-index.js` 一次性扫描，后续增量。详细 5 类 BLOCKING 触发条件与边界（与 backend-knowledge-graph-required 正向图谱 / cross-project-locator 跨项目调用方互补）见 SKILL.md body 的「触发时机」节。"
+description: "Use for impact analysis of states, fields, events, or APIs, and before changing their definitions. Maintains reverse indexes for callers, readers, writers, subscribers, and decision points."
 ---
 
 # 反向影响索引强制维护

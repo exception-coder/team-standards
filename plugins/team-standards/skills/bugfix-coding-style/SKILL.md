@@ -1,6 +1,6 @@
 ---
 name: bugfix-coding-style
-description: "Use when applying any bug fix, alignment correction, redundant-code removal, OR adding missing logic to align with upstream/cloud during integration/联调 phase. Trigger when: (1) design-doc-required has routed the change to 「第四·五步：轻量修订流水」 branch, (2) user describes the change as 'fix bug', 'align with cloud/upstream', 'add missing piece', '修 bug', '对齐云端', '删冗余', '修正实现', '改回正确逻辑', '补上漏掉的逻辑', '补缺漏', or (3) about to Edit/Write source code with intent of replacing existing erroneous logic OR adding alignment code that was missed in previous iterations. **注释红线不在本 skill 定义** — 唯一规则源是 coding-standards-common §5.4 + §5.4.1(common 触发顺序早于本 skill,不会漏)。本 skill 只承担 bug 修复期独有的应用层指引:v1.17 方向反转的历史背景、推荐写法 dart 代码示例、摆放位置、适用范围矩阵、遇到存量 [DEPRECATED]/[ADDED] 注释顺手清理的边界、红色警告对照表。"
+description: "Use when fixing incorrect behavior, aligning with upstream or cloud logic, removing redundant code, or adding logic missed during integration."
 ---
 
 # Bug 修复 / 联调期编码风格

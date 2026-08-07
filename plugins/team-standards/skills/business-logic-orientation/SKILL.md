@@ -1,6 +1,6 @@
 ---
 name: business-logic-orientation
-description: "You MUST invoke this skill when a user wants to analyze, document, or understand existing business logic for the purpose of refactoring, rewriting, migration, or regression review. Trigger phrases include: 'analyze current implementation', 'document existing logic', 'I need to understand how X works before refactoring', 'create a knowledge graph for this module', 'map out the business flow', 'help me understand the codebase for refactoring', 'generate a logic orientation doc', 'I want to refactor X, first help me understand it'. Invoke BEFORE any refactoring design or code changes. Pairs with doc-index-required and design-doc-required."
+description: "Use to analyze or document existing business logic before refactoring, rewriting, migration, regression review, or creation of a module logic-orientation document."
 ---
 
 # 业务逻辑现状梳理规范

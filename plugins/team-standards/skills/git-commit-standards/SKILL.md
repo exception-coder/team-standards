@@ -1,6 +1,6 @@
 ---
 name: git-commit-standards
-description: Use whenever the user asks to commit code or generate a commit message. Before invoking git commit, proactively compose a complete title and Chinese body from the current session, then use this skill's message builder to add the real Git Author and write a UTF-8 message file. Non-trivial diffs (>2 files, >30 net lines, or new/renamed/deleted files) also require the five-step review workflow. Automatic stage/commit/push applies ONLY to the team-standards plugin source repository, never to business projects that merely install this plugin.
+description: Use when the user asks to commit changes or generate a commit message. Applies the team message format and expanded review for non-trivial diffs; automatic commit and push are limited to the team-standards source repository.
 ---
 
 # Git 提交规范

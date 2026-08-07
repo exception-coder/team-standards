@@ -2,6 +2,8 @@
 
 > 本文档梳理 team-standards 各 skill 的触发时机、调用关系及两条主链路,用于解决"该调哪个 skill、顺序是什么"的疑惑。
 >
+> **上下文加载原则：** 四个高频大 Skill 的主 `SKILL.md` 只保留触发、硬门禁和核心流程；目录、模板、框架差异与示例通过同目录 `references/` 按需读取。
+>
 > **变更历史**:由 git log 承担,本文不再在头部累加变更摘要,也不保留文件式快照(v21.1 删除快照、v21.2 删除头部 changelog 段)。需要查某次改动的背景,执行 `git log --follow docs/skill-flow.md` 找 commit,提交说明里写为什么改;需要某历史版本的全文,`git show <sha>:docs/skill-flow.md`。
 
 ---

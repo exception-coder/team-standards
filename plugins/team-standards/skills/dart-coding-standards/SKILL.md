@@ -1,6 +1,6 @@
 ---
 name: dart-coding-standards
-description: Use when writing, reviewing, or modifying any Dart / Flutter code. You MUST follow these mandatory rules at all times. Apply automatically without being asked. 通用条款见 coding-standards-common；本文件仅列 Dart 独占规则（Effective Dart 文档注释 dartdoc 语法 + Dart 专属约定）。korepos / korepos-refund 的 backend 接口代码在本文件之上再叠加 korepos-backend-service。
+description: Use when writing, reviewing, or modifying Dart or Flutter code. Covers Dart-specific naming, dartdoc, formatting, null safety, and language conventions.
 ---
 
 # Dart 编码规范（Effective Dart·Dart 专属强制项）

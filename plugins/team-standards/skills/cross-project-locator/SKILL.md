@@ -1,6 +1,6 @@
 ---
 name: cross-project-locator
-description: "Use to (1) locate code/behavior across ≥2 projects in the kpay POS ecosystem (korepos, korepos-refund, BFF, order-manage, commodity, store-operation-manage, report, price-calc-sdk, pos-config-ts), and (2) register cross-project topology into `kpay-pos-topology/`. MUST trigger when user traces call chains across ≥2 of these projects, mentions ≥2 project names in one question, or is about to Write/Edit markdown referencing ≥2 project names. DO NOT route cross-project mapping/flow into Claude memory, individual project's docs/, or team-standards — only into `kpay-pos-topology/`. Single entry point for cross-project topology knowledge. Detailed trigger phrases and ecosystem project list in SKILL.md body."
+description: "Use to trace code, behavior, or call chains across at least two kpay POS projects, or to register cross-project mappings in the shared topology knowledge base."
 ---
 
 # cross-project-locator — 跨项目业务拓扑定位与登记

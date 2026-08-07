@@ -1,6 +1,6 @@
 ---
 name: java-coding-standards
-description: Use when writing, reviewing, or modifying any Java code. You MUST follow these mandatory rules at all times. Apply automatically without being asked. 通用条款见 coding-standards-common；本文件仅列 Java 独占规则（阿里巴巴黄山版强制项的 Java 专属部分）。
+description: Use when writing, reviewing, or modifying Java code. Covers Java-specific rules derived from the Alibaba Huangshan guidelines and complements the common coding standards.
 ---
 
 # Java 编码规范（阿里巴巴黄山版·Java 专属强制项）

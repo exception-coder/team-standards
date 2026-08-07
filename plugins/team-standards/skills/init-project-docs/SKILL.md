@@ -1,6 +1,6 @@
 ---
 name: init-project-docs
-description: "初始化当前代码项目的文档和知识图谱。用户要求初始化项目文档、生成或构建知识图谱、分析当前项目能力或架构、生成开发参考文档，或首次把 Graphify 接入当前项目知识库时使用；当请求同时包含“项目文档”和“知识图谱”时优先使用本 skill。优先用 Graphify 建立可再生代码事实层。不要用于新员工入职、SVN checkout 或拉取 Yoooni 公司项目文档，这些属于 yoooni-onboard-init。"
+description: "用于初始化当前代码项目的文档、知识图谱、架构能力说明或 Graphify 事实层；不用于新员工入职、SVN checkout 或拉取 Yoooni 公司文档。"
 ---
 
 # 初始化项目文档与知识图谱

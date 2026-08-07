@@ -1,6 +1,6 @@
 ---
 name: llm-agent-coding-standards
-description: Use when writing or modifying code that integrates an LLM or builds an agent —— imports langchain4j / spring-ai / openai / anthropic 等 SDK；定义 @Tool / AiService / function-calling 工具；拼装 prompt；解析 LLM 输出。在 coding-standards-common 之上叠加的 LLM/Agent 集成编码铁律：确定性优先、LLM 输出当不可信入参、模糊→结构化用受控枚举、约定单一来源、工具描述是运行时契约、Agent 循环必须兜底、上下文由代码注入。MUST 自动触发，先满足 coding-standards-common 再走本 skill。
+description: Use when code integrates LLM SDKs, agents, prompts, tools or function calling, structured model output, or agent loops. Covers trust boundaries, deterministic contracts, and loop safeguards.
 ---
 
 # LLM / Agent 集成编码规范

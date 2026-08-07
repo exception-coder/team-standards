@@ -238,6 +238,14 @@
 | `skills/design-doc-required/template.md` | design-doc-required | 8 节方案/接口设计文档模板（核心逻辑、编码落点、风险点，超出轻量范围时使用） |
 | `skills/design-doc-required/coding-template.md` | design-doc-required | 7 节精简编码摘要模板（仅完整模版需要） |
 | `skills/design-doc-required/lightweight-template.md` | design-doc-required | 7 节接口级轻量模版（单接口自身流程 / 库表读写流程；无需配套 coding.md） |
+| `skills/design-doc-required/references/classification.md` | design-doc-required | 极简 / 轻量 / 完整档位与模板选择 |
+| `skills/design-doc-required/references/document-workflow.md` | design-doc-required | 设计文档查找、命名、更新与编码摘要流程 |
+| `skills/backend-knowledge-graph-required/references/storage-and-routing.md` | backend-knowledge-graph-required | 图谱归属、渐进目录与读取路由 |
+| `skills/backend-knowledge-graph-required/references/update-workflow.md` | backend-knowledge-graph-required | 编码闭环、候选沉淀与 SQL 归档 |
+| `skills/architecture-ddd-lite-fullstack/references/layers-and-boundaries.md` | architecture-ddd-lite-fullstack | 分层职责、feature、聚合与原子能力边界 |
+| `skills/architecture-ddd-lite-fullstack/references/framework-rules.md` | architecture-ddd-lite-fullstack | 各技术栈落地规则 |
+| `skills/coding-standards-common/references/comments.md` | coding-standards-common | 注释三档、禁止项与触及范围清理规则 |
+| `skills/coding-standards-common/references/implementation-checks.md` | coding-standards-common | 复用、外部契约、全局名称与异常检查 |
 | `hooks/check-design-doc.js` | design-doc-required（兜底） | **项目级设计文档存在性兜底** — Node 跨平台（**v1.26 起默认启用**，PreToolUse Write/Edit/MultiEdit）：仅对源码扩展名触发（`.dart` / `.java` / `.kt` / `.ts` / `.py` / `.go` 等），跳过 `.md` / `.json` / 测试 / Dockerfile；在项目 `docs/design/` 或用户目录 `~/Documents/ai-docs/{project}/design/`、`~/ai-docs/{project}/design/` 任一位置找到 `.md` 即放行；只兜底"项目里存在任何设计文档"，**不强校验"本次需求对应文档"**——后者由 `design-doc-required` skill 承担；环境变量 `TEAM_STANDARDS_DESIGN_DOC_HOOK=off` 一次性禁用 |
 | `hooks/check-git-commit-skill.js` | git-commit-standards | git commit 前按 staged diff 大小判定的拦截脚本 — Node 跨平台（**默认启用**，小改放行 / 大改强制 skill；git push 不拦截） |
 | `hooks/check-backend-kg-readiness.js` | backend-knowledge-graph-required（兜底） | **后端业务源码 Edit 前的知识图谱阅读检查** — Node 跨平台（**v1.28 起默认启用 warn 模式**，PreToolUse Write/Edit/MultiEdit）：路径白名单 `lib/features/{module}/backend(v\d+)?/**/*.dart` 与 `lib/common/backend_infra/(daos\|services)/**/*.dart`（测试文件 `_test.dart` / `test/` 跳过）；小改豁免阈值 ≤1 文件 ∧ ≤20 行（`TEAM_STANDARDS_KG_TRIVIAL_FILES` / `TEAM_STANDARDS_KG_TRIVIAL_LINES` 可调）；扫 transcript 内 Read `**/knowledge-graph/00_index.md` 或 `**/knowledge-graph/scenarios/*.md` 字面量命中即放行；默认 `warn` 模式 exit 0 + stderr 提示，`TEAM_STANDARDS_BACKEND_KG_HOOK=block` 升级硬阻断、=off 关闭 |

@@ -1,6 +1,6 @@
 ---
 name: markdown-writing-standards
-description: "Use when writing, reviewing, or modifying any Markdown content that contains Mermaid diagrams, complex tables, or structured documentation. You MUST follow these mandatory rules at all times. Apply automatically without being asked. TRIGGER when: generating mermaid code blocks, writing design docs, writing bug docs, creating any .md file with diagrams or structured content; ALSO TRIGGER after completing any structural edit to a Markdown file (新增/删除/重命名 ## 或 ### 章节，或章节移动/合并/重组) to perform TOC review and detect duplicate/scattered/uncategorized sections before marking the file as done."
+description: "Use when Markdown contains Mermaid, complex tables, or structured documentation, and after structural edits that add, remove, rename, move, merge, or reorganize sections."
 ---
 
 # Markdown 编写规范

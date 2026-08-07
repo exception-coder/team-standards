@@ -1,6 +1,6 @@
 ---
 name: solution-review-required
-description: "Use this skill the moment a user proposes a concrete idea, implementation approach, architecture direction, refactor plan, asks Codex to implement a specific solution, or implies that existing code should be copied as the reference pattern. MUST run before design-doc-required planning or code changes when the user's wording contains an assumed solution. Forces Codex to separate the user's real goal from the proposed implementation, evaluate existing-code quality, risks and alternatives, then recommend the best path instead of blindly following the user or copying weak legacy code."
+description: "Use when a user proposes a concrete implementation, architecture, refactor, directory strategy, or existing-code pattern and asks Codex to follow it. Separates the goal from the proposed solution and evaluates risks and alternatives."
 ---
 
 # 方案审视与更优建议

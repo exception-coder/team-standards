@@ -1,6 +1,6 @@
 ---
 name: bug-doc-required
-description: "You MUST invoke this skill the moment a user reports a bug, describes an error/exception, asks you to investigate or analyze a problem, or mentions writing a bug analysis document. Trigger phrases include: 'there is a bug', 'this is broken', 'why is X happening', 'investigate this issue', 'analyze the root cause', 'we have an OOM/NPE/timeout', 'help me debug'. Invoke BEFORE starting any investigation, root cause analysis, or creating any file under docs/bug/. Pairs with doc-index-required — always invoke that skill too."
+description: "Use when a user reports a bug, error, exception, timeout, or broken behavior; asks for investigation or root-cause analysis; or requests a bug-analysis document."
 ---
 
 # Bug 分析文档强制规范

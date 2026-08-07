@@ -1,6 +1,6 @@
 ---
 name: dev-log
-description: "Use only for decision-level team-standards changes: adding/removing a Skill, changing a Skill's trigger timing or core behavior, reversing a rule direction, introducing a new template/workflow, changing cross-skill flow structure, or recording a multi-step design decision whose rationale may not be obvious from git history. Do NOT use for ordinary wording tweaks, README/index synchronization, version bumps, typo fixes, or small iterative rule clarifications when the git commit body can carry the rationale."
+description: "Use for decision-level team-standards changes such as adding or removing Skills, changing triggers or core behavior, reversing rules, or changing cross-Skill workflows; not for routine wording or version updates."
 ---
 
 # 开发日志记录规范
