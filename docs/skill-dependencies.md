@@ -22,6 +22,8 @@ glossary-required ─────────────────recommends-
                                                     │
 backend-knowledge-graph-required ──recommends-after─┤
                                                     │
+domain-spec-mining-required ──────recommends-after─┤
+                                                    │
 reverse-index-required ────────────recommends-after─┤
                                                     ↓
                                             design-doc-required
@@ -85,6 +87,7 @@ arch-lint                        ← Flutter 代码异步触发
 | Skill | 前置 | 后置 | 互补 |
 |-------|------|------|------|
 | `backend-knowledge-graph-required` | 后端表 / SQL / 状态 / 原子能力相关 | 编码后回写图谱或候选池 | `reverse-index-required`(影响面分析) |
+| `domain-spec-mining-required` | 状态/关联闭环需求且已有规格缺失或冲突 | `design-doc-required` | `backend-knowledge-graph-required`(事实层) + `reverse-index-required`(影响面) |
 | `reverse-index-required` | 改枚举 / 字段 / 事件 / API | 同回合回写反向索引 | `backend-knowledge-graph-required`(正向 vs 反向) |
 | `glossary-required` | PRD / 设计 / 对话含未登记业务术语 | — | `init-project-docs`(批量初始化 07_glossary.md) |
 | `cross-project-locator` | ≥2 个 kpay POS 工程命中 | — | 与单服务图谱互斥(单服务归 backend-kg) |

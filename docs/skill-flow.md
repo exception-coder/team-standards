@@ -25,6 +25,7 @@
 | `design-doc-required` | team-standards | 写任何实现代码前，或被要求提供修复方案/实施方案时（新功能和 bug 修复均适用）；**任何源码 Edit/Write 请求（含「根据文档改代码」「帮我改一下」等）也必须先触发**；文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、编码落点和风险点；图表遵循最小图原则；Git 管理下默认维护稳定/current 文档，历史由 commit body 承担 |
 | `doc-index-required` | team-standards | **(辅助)** 创建任何 Markdown 文档前先确定输出路径；AI 生成 Markdown 默认写用户 Documents 下的 `ai-docs/{project}/{type}/{topic}/{filename}`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；**v1.20 起用户目录知识库与项目 `docs/` 索引体系等同**，写文档前必须 Phase-A 读 INDEX 查重，写完必须 Phase-B 登记；`work-log/`（日期型）和 `knowledge-graph/`（自有 `00_index.md`）走自管模式 |
 | `backend-knowledge-graph-required` | team-standards | 后端接口/服务开发前读取后端图谱，重点回顾表逻辑索引、原子能力索引和 SQL 查询索引；会话中提到业务、表、字段来源、SQL/DAO/Mapper 查询逻辑时自动沉淀 SQL 指纹；生成/更新全景 ER、SQL 查询卡、表逻辑和原子能力；编码后同步 DAO/SQL、表关系、订单/退款/支付状态判定、金额聚合、原子能力复用 |
+| `domain-spec-mining-required` | team-standards | 订单、库存、标签、审核、取消、退货、调拨或占用等状态/关联需求在既有规格缺失、不完整或冲突时触发；复用 Graphify、DDL、反向索引与运行证据生成对象关系、状态迁移、不变量、闭环和冲突候选，编码前补齐终态、关联解除、失败/幂等、数据库断言和下一动作 |
 | `bug-doc-required` | team-standards | 编写 bug 分析文档时；完成后必须继续调用 design-doc-required 写修复实施方案 |
 | `pre-implementation-code-orientation` | team-standards | 文档写完后、开始实施代码前（含「帮我修改代码」「改代码」等直接编码请求） |
 | `architecture-ddd-lite-fullstack` | team-standards | 编写或审查 Java / React / Vue / Flutter 业务代码前；在实施前代码定位后，先判断 Feature、分层、单向依赖、原子能力与结构质量（清晰、易维护、低耦合、高内聚）；含 **函数级业务场景分流**（阶梯 1 私有方法 / 阶梯 2 升级 service，判定锚点是「业务定位」而非「代码相似度」） |
@@ -66,6 +67,7 @@ flowchart TD
     %% 文档层
     DOP["doc-index-required\n文档输出路径规则\n默认用户目录 ai-docs"]
     BKG["backend-knowledge-graph-required\n后端单服务图谱\n表逻辑/原子能力/流程/枚举"]
+    DSM["domain-spec-mining-required\n对象中心证据规格挖掘\n状态/不变量/闭环/冲突候选"]
     DDR["design-doc-required\n检查或创建设计文档\n（新功能 / bug 修复均适用）"]
     MWS["markdown-writing-standards\nMermaid 语法自检 + 目录复核"]
 
@@ -101,6 +103,10 @@ flowchart TD
     E3 --> GLO --> CTX --> BKG --> DOP --> BDR
     E4 --> SRR --> BLO --> GLO --> CTX --> BKG --> DOP --> DDR
     E5 --> IPD
+
+    %% 规格缺失或证据冲突时，在设计前补对象闭环合同
+    BKG -. "状态或关联闭环命中" .-> DSM
+    DSM --> DOP
 
     %% 反向索引 - 与 backend-knowledge-graph 平级,影响面分析时必查
     BKG -. "影响面分析时" .-> RIDX
@@ -267,6 +273,8 @@ flowchart LR
 | 用户没问更优方案时，AI 要主动提吗? | 要。`solution-review-required` 的核心职责就是反迎合：当用户方案或现有代码惯性存在明显风险时，必须主动指出问题，并给出更简单、更安全或更可维护的建议。 |
 | 后端知识图谱会因为会话里反复提到就自动更新吗? | 会自动记录到用户目录候选池，避免遗漏；但不会把未验证猜测直接写入正式图谱。代码/DDL/枚举/API 契约验证过，或本次后端代码变更影响 DAO/SQL、表关系、状态判定、金额聚合、原子能力时，必须同步正式图谱或候选池。 |
 | backend-knowledge-graph-required 管哪些范围? | 管后端单服务。沉淀领域能力、原子能力、流程、全景 ER、SQL 查询逻辑、表逻辑、表关系、枚举、状态判定、API、外部依赖和代码坐标；前端 UI、跨项目拓扑不放进这个 skill。 |
+| domain-spec-mining-required 和后端知识图谱有什么区别? | 后端知识图谱登记已知事实和可复用能力；规格挖掘把代码、DDL、日志、历史数据等证据按业务对象重组，发现状态迁移、不变量、闭环和冲突候选。候选不能自动变成业务真理，owner 评审后最多先进入 draft。 |
+| 哪些需求必须验证下一动作? | 所有改变业务对象状态或关联的需求。当前接口、按钮或审核成功后，还要验证数据库终态与至少一个下游动作，例如库存恢复后能再次配货或调拨。 |
 | 后端接口开发前要看哪些图谱? | 先看 `07_table_logic_index.md`、`08_atomic_capability_index.md` 和 `09_sql_query_index.md`，再看命中的 `table-logic/{scenario}.md`、`atomic-capabilities/{capability}.md`、`sql-queries/{scenario}.md`、表卡、流程卡、枚举卡，最后才读 DAO/Service 代码。 |
 | 会话里提到 SQL 或业务查询逻辑要怎么处理? | 必须同回合追加到 `_sql_candidates.md`，记录业务问题、SQL 指纹、参数、返回字段、涉及表、join/where/group by/order by 语义、状态枚举、原子能力和代码坐标；用户要求整理时合并到 `09_sql_query_index.md`、`sql-queries/` 和全景 ER。 |
 | “完善 SQL”时能直接新写一条吗? | 不能默认新写。先查 `09_sql_query_index.md` 和 `sql-queries/`，命中相似 SQL 时按 SQL 指纹合并为同一查询能力的变体，只补必要的 join/where/group by/order by，并回写图谱。 |

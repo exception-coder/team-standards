@@ -14,9 +14,8 @@
 ## 闭环全景
 
 ```
-UserPromptSubmit hook(sync, 微秒)  → 启发式打标，只写本地 jsonl
-Stop hook(async, 单飞)            → 推 \\IT01（默认开，self-healing）
-SessionStart 每日                  → update-team-tools 兜底整体推
+UserPromptSubmit hook(sync, 微秒)  → 启发式打标、脱敏截断，只写本地 jsonl
+SessionStart 每日                  → 显式 opt-in 后由 update-team-tools 推送
             │
             ▼
 周报 skill（人工按需 / 每周提醒，离线，读 \\IT01）
@@ -36,7 +35,8 @@ SessionStart 每日                  → update-team-tools 兜底整体推
 - **机械启发式打标，不做 LLM 判定**：采集层只打粗标签（见下），精确分簇留给离线聚合的 LLM。
   - 纠正标记：`不对 / 不能 / 应该 / 错了 / 改一下 / 别这样 / 方向反了` 等。
   - 疑问标记：`怎么 / 为什么 / 在哪 / 能不能 / ?` + 命中业务术语。
-  - 上下文：`cwd → project`、是否**紧跟在一次 Edit/Write 之后**（纠正信号更强）。
+  - 上下文：只保存由 `cwd` 派生的 `project`，不保存完整 `cwd` / session / user / host；保留是否**紧跟在一次 Edit/Write/apply_patch 之后**（纠正信号更强）。
+- **数据最小化**：默认只登记疑问与纠正，`other` 仅在 `TEAM_STANDARDS_PROMPT_SIGNAL=all` 时登记；文本先屏蔽常见令牌、密码、Cookie、私钥、邮箱和手机号，再截断到 1000 字符。
 - **不引第三方依赖**：只用 node 内置 `fs/os/path`。
 
 ### 文件命名（一人一机一文件，根除写冲突）
@@ -49,52 +49,37 @@ SessionStart 每日                  → update-team-tools 兜底整体推
 
 每台机器只写、只推自己的文件 → 共享上「一文件一属主」→ 同步用**整文件覆盖拷贝**即天然幂等、不跨机交错写坏（沿用 `hook-events-*.jsonl` 的招）。单人文件涨起来后按月切片：`...-<host>-YYYYMM.jsonl`。
 
-### 同步层（Stop async hook，单飞 + 尾随）
+### 同步层（SessionStart / 计划任务）
 
-- **时机**：
-  - ❌ 不在 UserPromptSubmit（输入热路径 + 信号刚写）。
-  - ✅ **Stop（回合结束）为主**：本回合信号已落盘，又不在输入热路径上。
-  - ✅ **SessionStart 每日**兜底：`update-team-tools` 整体补推。
-- **单飞机制**（实现「上一次同步完才开下一次」）：
-  ```
-  Stop hook(async) ── 请求同步 ──┐
-                                 ▼
-              抢 ~/.kai-toolbox/.prompt-signals-sync.lock (O_EXCL 原子创建)
-                 ├─ 抢到 → 整文件覆盖推 \\IT01
-                 │           └─ 完成前看 dirty 标记：有→再跑一轮(尾随)；无→释放锁退出
-                 └─ 没抢到 → 只写 dirty 标记后立即退出（请求被合并）
-  ```
-  - **单飞**：同一时刻只一个进程动 `\\IT01`，杜绝并发覆盖同一文件。
-  - **请求合并 + 尾随**：回合密集时塌缩成「正在跑的 + 末尾再跑一次」，保证最后写入也被推上去，不无限排队。
-  - **崩溃自愈**：锁带 pid + 时间戳，超阈值（如 5 分钟）视为陈旧锁直接抢占。
-  - **best-effort**：`\\IT01` 不可达即静默释放锁退出，等下个 Stop 或每日刷新再推；本地是唯一源头，不丢。
-- **单向**：只 local → 共享，绝不回拉。
+- 不在 UserPromptSubmit 热路径做网络 IO。
+- `yoooni-daily-plugin/scripts/update-team-tools.ps1` 随日常更新周期执行整文件覆盖同步。
+- 只有 `YOOONI_PROMPT_SIGNAL_UPLOAD=on` 时才执行上传；未设置、空值或其它值均只留本地。
+- `\\IT01` 不可达时 best-effort 跳过；同步始终为 local → 共享单向。
 
 ### 隐私闸
 
 | 闸 | 默认 | 说明 |
 |----|------|------|
-| 采集开关 | 开 | `TEAM_STANDARDS_PROMPT_SIGNAL=off` 完全不写本地 |
-| 上行开关 | **开** | 默认随每日刷新推 `\\IT01`；可单独关闭只留本地 |
+| 采集开关 | 开 | 默认只采集疑问/纠正且先脱敏；`=all` 才含其它任务，`=off` 完全不写本地 |
+| 上行开关 | **关** | `YOOONI_PROMPT_SIGNAL_UPLOAD=on` 才随每日刷新推 `\\IT01` |
 
-> 注：prompt 原文比 hook 命中标签更敏感，团队已决定上行默认开；保留关闭闸作为个人/团队级 kill switch。
+> prompt 文本比 hook 命中标签更敏感，因此本地保存与跨机上传采用两个独立开关，上传必须显式同意。
 
 ## 事件 schema（一行一条 JSON，草案）
 
 ```json
-{"ts":"2026-06-24T07:30:00.000Z","user":"zhang","host":"ZHANGK","project":"korepos","kind":"correction","markers":["不对","应该"],"afterEdit":true,"text":"不对，application 层不能直接 new infrastructure 的类，应该走接口"}
+{"ts":"2026-06-24T07:30:00.000Z","project":"korepos","kind":"correction","markers":["不对"],"priority":"high+","afterEdit":true,"text":"不对，application 层不能直接 new infrastructure 的类，应该走接口"}
 ```
 
 | 字段 | 含义 |
 |---|---|
 | `ts` | ISO8601 时间戳 |
-| `user` / `host` | `os.userInfo().username` / `os.hostname()` |
 | `project` | 由 cwd 推断的项目名 |
-| `kind` | 粗分类：`correction` / `question` / `other`（`command` 运维类直接丢弃、不登记） |
+| `kind` | 粗分类：`correction` / `question`；`other` 默认不登记，`command` 始终丢弃 |
 | `markers` | 命中的启发式标记词 |
 | `priority` | `high+`(纠正+紧跟编辑) / `high`(纠正) / `medium`(疑问) / `low`(其它)——供聚合层排序 |
 | `afterEdit` | 是否紧跟一次 Edit/Write（纠正信号增强） |
-| `text` | prompt 原文（受上行开关约束） |
+| `text` | 脱敏并截断后的 prompt，最大 1000 字符 |
 
 ## 聚合层（周报 skill）
 

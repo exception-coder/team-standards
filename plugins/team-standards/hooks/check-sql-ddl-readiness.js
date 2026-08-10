@@ -31,6 +31,7 @@
 
 const fs = require('fs');
 const { logHookEvent } = require('./event-log');
+const { normalizeChanges } = require('./change-input');
 
 const MODE = (process.env.TEAM_STANDARDS_SQL_DDL_HOOK || 'warn').toLowerCase();
 if (MODE === 'off') process.exit(0);
@@ -70,22 +71,21 @@ process.stdin.on('end', () => {
   try { payload = JSON.parse(raw); } catch (e) { process.exit(0); }
 
   const toolName = payload.tool_name;
-  if (toolName !== 'Write' && toolName !== 'Edit' && toolName !== 'MultiEdit') process.exit(0);
-
-  const input = payload.tool_input || {};
-  const targetPath = typeof input.file_path === 'string' ? input.file_path : '';
-  if (!targetPath) process.exit(0);
-
-  if (TEST_FILE_PATTERNS.some((r) => r.test(targetPath))) process.exit(0);
-
-  const editedText = collectEditedText(input);
-  if (!isSqlBearing(targetPath, editedText)) process.exit(0);
+  const targetPaths = normalizeChanges(payload)
+    .filter((change) => {
+      if (change.operation === 'delete') return false;
+      if (TEST_FILE_PATTERNS.some((r) => r.test(change.filePath))) return false;
+      const editedText = `${change.addedText}\n${change.removedText}`.slice(0, 20000);
+      return isSqlBearing(change.filePath, editedText);
+    })
+    .map((change) => change.filePath);
+  if (targetPaths.length === 0) process.exit(0);
 
   if (hasReadDdlBaseline(payload.transcript_path)) process.exit(0);
 
   const msg =
     '[team-standards] 即将写/改 SQL / Mapper，但本会话尚未读过项目 DDL 基线。\n' +
-    `  目标文件：${targetPath}\n` +
+    `  目标文件：${targetPaths.join('、')}\n` +
     '  改 SQL 前必做（backend-knowledge-graph-required 规范）：\n' +
     '    1) Read DDL 基线（集中库 project-domain-knowledge 的 knowledge/{project}/impl/ddl-baseline.md，或项目 knowledge-graph/ddl-baseline.md），按目标表名核对字段名 / 类型 / 默认值 / 索引；\n' +
     '    2) 若该文件不存在 → 先 dump DDL 基线再写 SQL（Oracle 可查 ALL_TAB_COLUMNS / expdp METADATA_ONLY）；\n' +
@@ -93,24 +93,12 @@ process.stdin.on('end', () => {
     '  原因：不核对 DDL 凭记忆写字段名，是 no such column / 取错字段口径 类连环 bug 的根因。\n' +
     '  旁路：TEAM_STANDARDS_SQL_DDL_HOOK=off 关闭 / =block 升级硬阻断。\n';
 
-  logHookEvent({ plugin: 'team-standards', hook: 'check-sql-ddl-readiness', rule: 'sql-ddl', mode: MODE, tool: toolName, file: targetPath });
+  for (const targetPath of targetPaths) {
+    logHookEvent({ plugin: 'team-standards', hook: 'check-sql-ddl-readiness', rule: 'sql-ddl', mode: MODE, tool: toolName, file: targetPath });
+  }
   process.stderr.write(msg);
   process.exit(MODE === 'block' ? 2 : 0);
 });
-
-function collectEditedText(input) {
-  const parts = [];
-  if (typeof input.content === 'string') parts.push(input.content);
-  if (typeof input.new_string === 'string') parts.push(input.new_string);
-  if (typeof input.old_string === 'string') parts.push(input.old_string);
-  if (Array.isArray(input.edits)) {
-    for (const e of input.edits) {
-      if (e && typeof e.new_string === 'string') parts.push(e.new_string);
-      if (e && typeof e.old_string === 'string') parts.push(e.old_string);
-    }
-  }
-  return parts.join('\n').slice(0, 20000);
-}
 
 function isSqlBearing(filePath, text) {
   if (SQL_PATH_PATTERNS.some((r) => r.test(filePath))) return true;

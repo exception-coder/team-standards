@@ -30,6 +30,7 @@
 
 const MODE = (process.env.TEAM_STANDARDS_COMMENT_HOOK || 'block').toLowerCase();
 if (MODE === 'off') process.exit(0);
+const { normalizeChanges } = require('./change-input');
 
 const MAX_BLOCK = parseInt(process.env.TEAM_STANDARDS_COMMENT_MAX_BLOCK || '6', 10);
 
@@ -97,45 +98,33 @@ process.stdin.on('end', () => {
   let payload;
   try { payload = JSON.parse(raw); } catch (e) { process.exit(0); }
 
-  const tool = payload.tool_name;
-  if (tool !== 'Write' && tool !== 'Edit' && tool !== 'MultiEdit') process.exit(0);
-
-  const input = payload.tool_input || {};
-  const filePath = input.file_path;
-  if (typeof filePath !== 'string' || !SOURCE_EXT.test(filePath)) process.exit(0);
-
-  const added = extractAddedText(tool, input);
-  if (!added) process.exit(0);
-
-  const findings = scan(added, filePath);
-  if (findings.length === 0) process.exit(0);
+  const matches = [];
+  for (const change of normalizeChanges(payload)) {
+    if (change.operation === 'delete' || !SOURCE_EXT.test(change.filePath) || !change.addedText) continue;
+    const findings = scan(change.addedText, change.filePath);
+    if (findings.length > 0) matches.push({ filePath: change.filePath, findings });
+  }
+  if (matches.length === 0) process.exit(0);
 
   const lines = [
     '[team-standards] 本次新增内容的注释疑似命中 coding-standards-common §5.4 注释红线：',
-    `  文件：${filePath}`,
   ];
-  for (const f of findings) {
-    lines.push(`  - [${f.id}] ${f.desc}`);
-    if (f.sample) lines.push(`      行内样例：${f.sample}`);
+  for (const match of matches) {
+    lines.push(`  文件：${match.filePath}`);
+    for (const f of match.findings) {
+      lines.push(`  - [${f.id}] ${f.desc}`);
+      if (f.sample) lines.push(`      行内样例：${f.sample}`);
+    }
   }
   lines.push('  红线规则源：skills/coding-standards-common/SKILL.md §5.4 / §5.4.1');
   lines.push('  处置：变更历史/标记/日期进 git commit body 或 design/bug doc；行内 WHY 压成 1 行；私有方法 1 行职责即可。');
   lines.push('  旁路：TEAM_STANDARDS_COMMENT_HOOK=warn 仅提示 / =off 关闭；TEAM_STANDARDS_COMMENT_MAX_BLOCK 调注释块行数阈值。');
 
   // long-block 是启发式软规则（公开 API 长 dartdoc 易误伤），只提示不阻断；其余客观红线在 block 模式下硬阻断。
-  const hasHardFinding = findings.some((f) => f.id !== 'long-block');
+  const hasHardFinding = matches.some((match) => match.findings.some((f) => f.id !== 'long-block'));
   process.stderr.write(lines.join('\n') + '\n');
   process.exit(MODE === 'block' && hasHardFinding ? 2 : 0);
 });
-
-function extractAddedText(tool, input) {
-  if (tool === 'Write') return typeof input.content === 'string' ? input.content : '';
-  if (tool === 'Edit') return typeof input.new_string === 'string' ? input.new_string : '';
-  if (tool === 'MultiEdit' && Array.isArray(input.edits)) {
-    return input.edits.map((e) => (e && typeof e.new_string === 'string' ? e.new_string : '')).join('\n');
-  }
-  return '';
-}
 
 // 返回去重后的命中规则列表 + 注释块超长
 function scan(text, filePath) {

@@ -20,6 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { normalizeChanges } = require('./change-input');
 
 const MODE = (process.env.TEAM_STANDARDS_DOC_LOCATION_HOOK || 'block').toLowerCase();
 if (MODE === 'off') process.exit(0);
@@ -64,26 +65,25 @@ process.stdin.on('end', () => {
   let payload;
   try { payload = JSON.parse(raw); } catch (_) { process.exit(0); }
 
-  if (payload.tool_name !== 'Write') process.exit(0);             // 只拦新建；改已有放行
-  const fp = payload.tool_input && payload.tool_input.file_path;
-  if (typeof fp !== 'string' || !fp) process.exit(0);
-  if (!/\.(md|markdown)$/i.test(fp)) process.exit(0);
+  for (const change of normalizeChanges(payload)) {
+    if (change.operation !== 'add') continue;                    // 只拦新建；改已有放行
+    const fp = change.filePath;
+    if (!/\.(md|markdown)$/i.test(fp)) continue;
 
-  const norm = fp.replace(/\\/g, '/');
-  if (/\/ai-docs\//i.test(norm)) process.exit(0);                 // 已在 ai-docs：放行
-  if (!/\/docs\//i.test(norm)) process.exit(0);                   // 不在 docs/：不归本 hook 管
-  if (/^(INDEX|00_index)\.md$/i.test(path.basename(fp))) process.exit(0);
-  try { if (fs.existsSync(fp)) process.exit(0); } catch (_) { /* 视作新建继续 */ }
+    const norm = fp.replace(/\\/g, '/');
+    if (/\/ai-docs\//i.test(norm)) continue;                     // 已在 ai-docs：放行
+    if (!/\/docs\//i.test(norm)) continue;                       // 不在 docs/：不归本 hook 管
+    if (/^(INDEX|00_index)\.md$/i.test(path.basename(fp))) continue;
 
-  const root = findGitRoot(path.dirname(fp));
-  if (isPluginRepo(root)) process.exit(0);                        // 插件源码仓 docs/ 是发布物：豁免
+    const root = findGitRoot(path.dirname(fp));
+    if (isPluginRepo(root)) continue;                             // 插件源码仓 docs/ 是发布物：豁免
 
-  const project = resolveProjectName(root);
-  const home = os.homedir();
-  const docsBase = home ? path.join(home, 'Documents', 'ai-docs', project) : `~/Documents/ai-docs/${project}`;
-  const suggested = path.join(docsBase, 'design', path.basename(fp));
+    const project = resolveProjectName(root);
+    const home = os.homedir();
+    const docsBase = home ? path.join(home, 'Documents', 'ai-docs', project) : `~/Documents/ai-docs/${project}`;
+    const suggested = path.join(docsBase, 'design', path.basename(fp));
 
-  process.stderr.write(
+    process.stderr.write(
 `[team-standards] AI 文档默认不写进业务/应用项目仓的 docs/，应落到用户知识库 ai-docs/{project}/。
 
 目标(被拦)：${fp}
@@ -94,5 +94,7 @@ process.stdin.on('end', () => {
 为什么：保持业务仓干净；AI 生成的设计/分析/现状/知识图谱统一沉淀到个人 ai-docs 知识库，后续异步汇聚到团队共享。
 旁路：用户明确要求写项目 docs → 设 TEAM_STANDARDS_DOC_LOCATION_HOOK=off 本次绕过；或先走 doc-index-required 确认归属。
 `);
-  process.exit(MODE === 'block' ? 2 : 0);
+    process.exit(MODE === 'block' ? 2 : 0);
+  }
+  process.exit(0);
 });

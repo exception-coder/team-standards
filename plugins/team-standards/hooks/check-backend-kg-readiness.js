@@ -29,6 +29,7 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
 const { logHookEvent } = require('./event-log');
+const { normalizeChanges } = require('./change-input');
 
 const MODE = (process.env.TEAM_STANDARDS_BACKEND_KG_HOOK || 'warn').toLowerCase();
 if (MODE === 'off') process.exit(0);
@@ -59,14 +60,10 @@ process.stdin.on('end', () => {
   }
 
   const toolName = payload.tool_name;
-  if (toolName !== 'Write' && toolName !== 'Edit' && toolName !== 'MultiEdit') {
-    process.exit(0);
-  }
-
-  const targetPath = extractTargetPath(payload);
-  if (!targetPath) process.exit(0);
-
-  if (!isBackendBusinessSource(targetPath)) process.exit(0);
+  const targetPaths = normalizeChanges(payload)
+    .filter((change) => change.operation !== 'delete' && isBackendBusinessSource(change.filePath))
+    .map((change) => change.filePath);
+  if (targetPaths.length === 0) process.exit(0);
 
   if (isTrivialChange(payload.cwd || process.cwd())) process.exit(0);
 
@@ -74,7 +71,7 @@ process.stdin.on('end', () => {
 
   const msg =
     '[team-standards] 即将 Write/Edit 后端业务源码，但本会话尚未读过项目知识图谱。\n' +
-    `  目标文件：${targetPath}\n` +
+    `  目标文件：${targetPaths.join('、')}\n` +
     '  建议先 Read 任一项再继续：\n' +
     '    - {USER_DOCUMENTS}/ai-docs/{project}/knowledge-graph/00_index.md（按关键词反查命中场景卡）\n' +
     '    - {项目根}/docs/knowledge-graph/backend/00_index.md（正式图谱，若已存在）\n' +
@@ -83,17 +80,12 @@ process.stdin.on('end', () => {
     '        skill `backend-knowledge-graph-required` 要求编码前必读。\n' +
     '  旁路：TEAM_STANDARDS_BACKEND_KG_HOOK=off 关闭 / =block 升级硬阻断。\n';
 
-  logHookEvent({ plugin: 'team-standards', hook: 'check-backend-kg-readiness', rule: 'backend-kg', mode: MODE, tool: toolName, file: targetPath });
+  for (const targetPath of targetPaths) {
+    logHookEvent({ plugin: 'team-standards', hook: 'check-backend-kg-readiness', rule: 'backend-kg', mode: MODE, tool: toolName, file: targetPath });
+  }
   process.stderr.write(msg);
   process.exit(MODE === 'block' ? 2 : 0);
 });
-
-function extractTargetPath(payload) {
-  const input = payload.tool_input || {};
-  // Write / Edit 都有 file_path；MultiEdit 也有 file_path（同一文件多 edits）
-  if (typeof input.file_path === 'string') return input.file_path;
-  return null;
-}
 
 function isBackendBusinessSource(filePath) {
   if (TEST_FILE_PATTERNS.some((r) => r.test(filePath))) return false;
@@ -102,11 +94,12 @@ function isBackendBusinessSource(filePath) {
 
 function isTrivialChange(cwd) {
   // 没有 git 仓库 / 未 stage 时按"非小改"处理（让 hook 提示一次）
+  const gitOptions = { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] };
   let nameStatus;
   try {
-    nameStatus = execSync('git diff --name-status', { cwd, encoding: 'utf8' }).trim()
+    nameStatus = execSync('git diff --name-status', gitOptions).trim()
       + '\n'
-      + execSync('git diff --staged --name-status', { cwd, encoding: 'utf8' }).trim();
+      + execSync('git diff --staged --name-status', gitOptions).trim();
   } catch (e) {
     return false;
   }
@@ -116,8 +109,8 @@ function isTrivialChange(cwd) {
 
   let shortstat;
   try {
-    const unstaged = execSync('git diff --shortstat', { cwd, encoding: 'utf8' }).trim();
-    const staged = execSync('git diff --staged --shortstat', { cwd, encoding: 'utf8' }).trim();
+    const unstaged = execSync('git diff --shortstat', gitOptions).trim();
+    const staged = execSync('git diff --staged --shortstat', gitOptions).trim();
     shortstat = unstaged + ' ' + staged;
   } catch (e) {
     return false;

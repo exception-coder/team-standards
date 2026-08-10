@@ -43,6 +43,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { normalizeChanges } = require('./change-input');
 
 if ((process.env.TEAM_STANDARDS_DESIGN_DOC_HOOK || '').toLowerCase() === 'off') {
   process.exit(0);
@@ -58,7 +59,7 @@ const SOURCE_EXTS = new Set([
 ]);
 
 const TEST_PATH_PATTERNS = [
-  /[\/](test|tests|__tests__|spec)[\/]/i,
+  /[\\/](test|tests|__tests__|spec)[\\/]/i,
   /(_test|\.test|\.spec)\.[a-z]+$/i,
 ];
 
@@ -80,32 +81,20 @@ process.stdin.on('end', () => {
     process.exit(0);
   }
 
-  const toolName = payload.tool_name;
-  if (toolName !== 'Write' && toolName !== 'Edit' && toolName !== 'MultiEdit') {
-    process.exit(0);
-  }
+  const changes = normalizeChanges(payload).filter((change) => (
+    change.operation !== 'delete' &&
+    isSourceFile(change.filePath) &&
+    !isTestOrConfigFile(change.filePath)
+  ));
 
-  const filePath = payload.tool_input && payload.tool_input.file_path;
-  if (!filePath || typeof filePath !== 'string') {
-    process.exit(0);
-  }
+  for (const change of changes) {
+    const filePath = change.filePath;
+    const projectRoot = findProjectRoot(filePath) || payload.cwd || process.cwd();
+    const projectName = resolveProjectName(projectRoot);
+    if (hasDesignDoc(projectRoot, projectName)) continue;
 
-  if (!isSourceFile(filePath)) {
-    process.exit(0);
-  }
-  if (isTestOrConfigFile(filePath)) {
-    process.exit(0);
-  }
-
-  const projectRoot = findProjectRoot(filePath) || payload.cwd || process.cwd();
-  const projectName = resolveProjectName(projectRoot);
-
-  if (hasDesignDoc(projectRoot, projectName)) {
-    process.exit(0);
-  }
-
-  const overridden = projectName !== path.basename(projectRoot);
-  process.stderr.write(
+    const overridden = projectName !== path.basename(projectRoot);
+    process.stderr.write(
 `[team-standards] 即将编辑源码文件，但未检测到设计文档。
 
 目标文件：${filePath}
@@ -128,7 +117,9 @@ ai-docs 子目录名：${projectName}${overridden ? '（来自 .team-standards-p
 
 模板：参考 skills/design-doc-required/{lightweight-template.md, template.md}
 `);
-  process.exit(2);
+    process.exit(2);
+  }
+  process.exit(0);
 });
 
 /**

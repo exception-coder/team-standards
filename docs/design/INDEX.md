@@ -5,3 +5,9 @@
 - 文件：`skill-context-slimming/skill-context-slimming-current.md`
 - 摘要：压缩两个团队插件的 Skill 常驻描述，并将超大 Skill 改为渐进披露结构。
 - 大纲：目标 / 范围 / 非目标 / 兼容策略 / 验证
+
+## Codex 插件可靠性加固
+
+- 文件：`codex-plugin-reliability-hardening/codex-plugin-reliability-hardening-current.md`
+- 摘要：统一 Claude Code 与 Codex Hook 输入契约，收紧安全默认值，并建立隔离安装、共享契约、性能预算和可重复发布闭环。
+- 大纲：目标与边界 / 整体架构 / 模块职责 / 核心规则 / 第一轮实施结果 / 第二轮架构 / 安全边界 / 验收标准 / 第二轮实施结果

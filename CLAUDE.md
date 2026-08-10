@@ -25,6 +25,7 @@
 | 生成或修改包含 Mermaid 图表的 Markdown 内容；或完成 Markdown 文件的结构性写入/重组（新增/删除/重命名 ##、### 章节，或章节移动/合并） | `markdown-writing-standards` |
 | 重构/复写/迁移前需要理解现有业务逻辑 | `business-logic-orientation` |
 | **即将 Write/Edit 任何描述后端表关系/ER/SQL/状态扭转/业务流程→表 CRUD 的 .md（无论路径，包括 `ai-docs/`、`work-log/`、`scenarios/`）**；用户问表关系、字段来源、业务怎么查、SQL 怎么写/完善、退款/账单/流水/分摊怎么算等表关系/SQL/状态/原子能力问题；AI 完成后端代码调查发现可复用事实或 SQL 查询逻辑；后端接口/服务开发前涉及表读写、SQL、状态判定、订单/退款/支付等业务逻辑；存在 `docs/knowledge-graph/backend/`；要求生成/更新后端知识图谱、全景 ER、SQL 归档或查询逻辑索引；**或同一会话同一技术主题（含子进程编排 / 并发 / 性能 / 资源争夺 / 外部依赖等非业务技术陷阱）用户反复疑问 ≥3 轮、出现回归性措辞（"为什么...还" / "怎么又..." / "上次说..." / "现在又卡了"）、修复后 ≥2 轮验证追问** | `backend-knowledge-graph-required` |
+| **订单、库存、标签、审核、取消、退货、调拨、占用等需求会改变业务对象状态或关联，且已有领域规格缺失、不完整或与代码/运行证据冲突；或用户要求从遗留代码、DDL、日志、历史数据生成领域模型、状态机、不变量、可执行规格并验证下一业务动作** | `domain-spec-mining-required` |
 | **用户纠正了 AI 的编码写法（分层违规、命名错误等）** | `coding-violation-log` |
 | **开始编写代码前（若项目存在 coding-violations.md）** | `coding-violation-log`（回顾模式） |
 | **bug 修复 / 对齐云端 / 删冗余 / 任何源码改动** | `bugfix-coding-style`（源码只描述当前逻辑；禁变更日志注释；函数头不堆历史/设计摘要；复杂逻辑在对应代码块写短 WHY） |
@@ -42,7 +43,7 @@
 
 **核心原则：** 触发时机是用户表达意图的那一刻，而不是开始动手的那一刻。收到需求就触发 `design-doc-required`，不要等到真的要写代码时才触发。
 
-**兜底规则：** 若 Claude 即将对源码文件（`.java`、`.dart`、`.ts`、`.py`、`.kt` 等）执行 Edit/Write 操作，但当前会话尚未完成 `design-doc-required` 检查，必须立即停止并先触发该 skill。不存在「任务太简单可以跳过」的例外（Bug 修复、纯重构等合法例外在 skill 内部判断）。
+**兜底规则：** 若 Claude 即将对源码文件（`.java`、`.dart`、`.ts`、`.py`、`.kt` 等）执行 Edit/Write 操作，必须先按 S/M/L 表完成设计档位检查。只有完整满足 S 档硬条件时，才可记录“极简跳过”并不生成设计文档；不得凭主观判断以“任务简单”为由跳过。Bug 修复、纯重构等其它例外仍由 `design-doc-required` 内部判断。
 
 **team-standards 收尾规则（仅限本插件源码仓库）：** 只有当当前 git 仓库就是 `team-standards` / `kpay-team-standards` 插件源码仓库，且变更对象是 `skills/`、`hooks/`、`.claude-plugin/`、`.codex-plugin/`、`AGENTS.md`、`CLAUDE.md`、`README.md`、`docs/skill-flow*`、`docs/dev-log/` 等插件自身文件时，才允许自动执行 `git status`、`git add -A`、`git commit`、`git push` 和插件版本号递增。业务项目即使安装了本 plugin，也绝不触发该自动收尾；业务项目提交仍按普通 `git-commit-standards` 流程等待用户确认。
 
@@ -50,7 +51,7 @@
 
 ## Skill 分类导航
 
-> 26 个 skill 按使用阶段分 8 组，遇到具体任务先按组检索而不是遍历全表。每个 skill 详细描述见下方「Skill 索引」。
+> 27 个 skill 按使用阶段分 8 组，遇到具体任务先按组检索而不是遍历全表。每个 skill 详细描述见下方「Skill 索引」。
 
 | 阶段 / 类别 | 包含 Skill | 用途速记 |
 |---|---|---|
@@ -58,7 +59,7 @@
 | **② 实施前定位（文档写完、动手前）** | `pre-implementation-code-orientation` / `doc-index-required` | 精准 Read 关键代码坐标；文档输出路径 / Phase-A 查重 |
 | **③ 架构与编码门禁（实施时）** | `architecture-ddd-lite-fullstack` / `coding-standards-common` / `java-coding-standards` / `dart-coding-standards` / `llm-agent-coding-standards` / `bugfix-coding-style` | 分层 + 每分支一 focused service / 命名 + 函数原子 + 注释三档 / Java 独占条款 / Dart·dartdoc 独占条款 / **LLM·Agent 集成独占条款** / bug 修复注释规范（korepos backend 接口强约束已迁至 kpay-daily-plugin 的 korepos-backend-service skill） |
 | **④ 提交与日志（收尾时）** | `git-commit-standards` / `daily-work-log` | 规范 commit；业务项目源码改动后按 bug/功能分类沉淀工作日志 |
-| **⑤ 知识图谱（沉淀时）** | `backend-knowledge-graph-required` / `reverse-index-required` / `glossary-required` / `cross-project-locator` | 正向单服务图谱（表 / SQL / 状态机 / 原子能力 / 技术难点）/ 反向影响索引（枚举 / 字段 / 事件 / API）/ 业务术语登记 / 跨项目拓扑 |
+| **⑤ 知识图谱（沉淀时）** | `backend-knowledge-graph-required` / `domain-spec-mining-required` / `reverse-index-required` / `glossary-required` / `cross-project-locator` | 正向单服务图谱 / 对象中心证据规格挖掘 / 反向影响索引 / 业务术语登记 / 跨项目拓扑 |
 | **⑥ 质量回路（持续）** | `coding-violation-log` / `arch-lint` / `comment-cleanup` / `markdown-writing-standards` / `project-docs-update` | 编码违规登记防重犯 / Flutter 架构 lint / 存量注释批量清理（对齐 §5.4）/ Mermaid 语法 + 目录复核 / 项目结构变更后同步文档 |
 | **⑦ 项目初始化（一次性）** | `init-project-docs` / `generate-project-profile` | 4 阶段渐进式构建知识图谱 / 生成 AI Agent 消费的 10 维度项目画像 |
 | **⑧ plugin 自身维护** | `dev-log` | 仅 team-standards 决策型变更记录长期背景 |
@@ -131,6 +132,8 @@
 [第 1 步] glossary-required               ← PRD/对话含未登记业务术语时(否则跳过)
             ↓
 [第 2 步] backend-knowledge-graph-required ← 后端表/SQL/状态/原子能力相关时(否则跳过)
+            ↓
+[第 2.5 步] domain-spec-mining-required   ← 状态/关联闭环且规格缺失或冲突时(否则跳过)
             ↓
 [第 3 步] reverse-index-required           ← 影响面分析 / 改枚举/字段/事件/API 时(否则跳过)
             ↓
@@ -209,6 +212,7 @@
 | `llm-agent-coding-standards` | `skills/llm-agent-coding-standards/` | **LLM / Agent 集成编码独占条款**（通用 7 条见 coding-standards-common）：确定性优先（能代码算/查/校验的不给 LLM）/ LLM 输出当不可信入参（解析后校验+归一化+失败降级，绝不丢数据）/ 模糊→结构化用受控枚举（枚举输出不穷举输入，禁 contains 追无限说法）/ 约定单一来源（枚举含义/状态映射只存一处，prompt 与工具注解不复读）/ 工具描述是运行时契约（@Tool·参数 description 是模型选工具依据、load-bearing，工具集小而精）/ Agent 循环必须兜底（maxToolCallingRoundTrips 防死循环、工具异常可读、每步可观测）/ 上下文由代码注入（带时区当前时间等）。任何接 LLM/做 agent 的源码 Edit/Write 先满足 coding-standards-common 再走本 skill | LLM、Agent、langchain4j、spring-ai、function calling、@Tool、AiService、确定性优先、deterministic-first、LLM 输出不可信、结构化输出校验、受控枚举、枚举输出、约定 SSOT、工具描述契约、tool description、maxToolCallingRoundTrips、循环兜底、上下文注入 |
 | `doc-index-required` | `skills/doc-index-required/` | AI 生成 Markdown 默认写入用户 Documents 下的 `ai-docs/{project}/{type}/{topic}/{filename}`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；**v1.20 起用户目录知识库与项目 `docs/` 索引体系等同**，写文档前必须 Phase-A 读 INDEX 查重，写完必须 Phase-B 登记；`work-log/`（日期型日志）和 `knowledge-graph/`（自有 `00_index.md`）走自管模式；终版由用户自行上传或明确指定 `docs/` 路径后写入项目目录 | 文档、docs、写文档、索引、输出路径、用户目录、Documents、ai-docs、知识库、Phase-A、Phase-B、终版文档 |
 | `backend-knowledge-graph-required` | `skills/backend-knowledge-graph-required/` | 后端单服务知识图谱 + **项目级技术难点图谱**（v1.21 扩展）+ **DDL 基线**（v1.28.2 升级）：(1) 业务图谱按项目沉淀领域能力、原子能力、流程、表、全景 ER、SQL 查询逻辑、表关系、枚举、状态判定、API、外部依赖与代码坐标；(2) 技术难点图谱沉淀子进程编排、并发模型、性能瓶颈、资源争夺、外部依赖、JVM 进程生命周期、缓存键策略、超时回收等非业务技术陷阱；(3) **`ddl-baseline.md` 是涉及 DB 操作项目的硬必需** —— 从真实 DB 引擎 sqlite_master / pg_dump / mysqldump 实时 dump 的完整 CREATE TABLE / INDEX，作为 SQL 编写权威源；编码前必读对应表段，禁止凭记忆写字段名；schema 迁移后必须重新 dump；即将 Write/Edit 后端表关系/ER/SQL 文档必须先经本 skill；会话中提到业务、表、字段来源、SQL、DAO/Mapper 查询逻辑时必须自动归档 SQL 指纹到 `_sql_candidates.md`，整理时合并到 `09_sql_query_index.md` / `sql-queries/` / `02_data_model_map.md`；**长对话识别**——同一技术主题用户反复疑问 ≥3 轮 / 出现回归性措辞 / 修复后 ≥2 轮验证追问，自动追加 `分类: 技术难点` 候选记录，无需用户显式提醒；后端接口开发前回顾 ddl-baseline、表逻辑索引、原子能力索引和 SQL 查询索引，优先复用已有表逻辑、SQL 和原子能力；编码后将 DAO/SQL、订单/退款/支付状态判定、金额聚合、表状态变更同步到正式图谱或用户目录候选池 | 后端、接口开发、知识图谱、单服务、DDL 基线、ddl-baseline、CREATE TABLE、sqlite_master、pg_dump、mysqldump、字段名速查、全景ER、ER图、SQL归档、查询逻辑、SQL指纹、SQL索引、表逻辑、表关系、订单状态、部分退、退款判定、原子能力、DAO、Mapper、SQL、枚举、状态流转、候选沉淀、API、Service、技术难点、长对话识别、子进程、并发、性能、资源争夺、外部依赖、回归性措辞、反复疑问、验证追问 |
+| `domain-spec-mining-required` | `skills/domain-spec-mining-required/` | 对象中心、证据驱动的领域规格挖掘门禁：复用 Graphify 静态图、DDL、反向索引和运行记录，通过 project-domain-knowledge 的 `spec-mining` CLI 生成 OCEL 2.0、领域关系、状态迁移、不变量、闭环与冲突候选；严格区分 observed/inferred/candidate/confirmed，自动晋升上限为 draft；状态类需求编码前必须交付对象终态、关联解除、失败/幂等、数据库断言和下一业务动作 | 规格挖掘、Specification Mining、对象中心、OCEL、领域模型提取、状态机发现、不变量、业务闭环、下一动作、遗留系统、运行证据、候选规格 |
 | `bug-doc-required` | `skills/bug-doc-required/` | 编写 bug 分析文档前强制规范章节结构；核心流程必须包含 3 类 Mermaid 图（时序图、流程图、泳道图）；根因必须用表格；**v1.20 起默认输出路径** `{USER_DOCUMENTS}/ai-docs/{project}/bug/{模块名}/{bug名称}/{bug名称}.md`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期；用户目录知识库与项目 `docs/bug/` 索引等同，必须执行 Phase-A/B）；模块名必须与同根下 `design/{模块名}/` 完全一致，无对应 design 模块时退化为一级扁平 `bug/{bug名称}/`；目录与文件名使用**中文**命名 | bug、缺陷、问题分析、bug文档、OOM、异常、模块分组、中文命名、用户目录、Documents、ai-docs、Phase-A、Phase-B |
 | `pre-implementation-code-orientation` | `skills/pre-implementation-code-orientation/` | 实施前从 bug/设计文档的代码坐标表精准 Read 关键文件，禁止重新扫描 | 实施前、开始写代码、修复前、开发前、代码定位 |
 | `dev-log` | `skills/dev-log/` | team-standards 决策型变更日志：仅记录新增/删除 Skill、触发时机或核心行为变化、规则方向反转、跨 Skill 链路变化、重大团队原则沉淀；普通小改、措辞同步、版本号递增默认由 git commit body 记录，不再写 dev-log | 开发日志、决策记录、重大规则、触发链路、规则方向反转、skill 修改、发版记录 |

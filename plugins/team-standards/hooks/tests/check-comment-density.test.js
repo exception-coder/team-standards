@@ -186,6 +186,29 @@ test('MultiEdit 工具：扫所有 edits 的 new_string', () => {
   assert.match(stderr, /ticket-code/);
 });
 
+test('Codex apply_patch：检查多文件补丁中的后续危险文件', () => {
+  const { code, stderr } = runHook({
+    tool_name: 'apply_patch',
+    cwd: process.cwd(),
+    tool_input: {
+      command: [
+        '*** Begin Patch',
+        '*** Update File: lib/clean.dart',
+        '@@',
+        '+final clean = true;',
+        '*** Update File: lib/risky.dart',
+        '@@',
+        '+// [BUGFIX] 不应静默放行',
+        '+final risky = true;',
+        '*** End Patch',
+      ].join('\n'),
+    },
+  });
+  assert.equal(code, 2);
+  assert.match(stderr, /risky\.dart/);
+  assert.match(stderr, /change-marker/);
+});
+
 test('Python 文件：# 注释也识别', () => {
   const { stderr } = runHook(edit('a.py', '# [DEPRECATED] old impl\nx = 1\n'));
   assert.match(stderr, /change-marker/);

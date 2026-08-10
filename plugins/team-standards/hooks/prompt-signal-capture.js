@@ -15,15 +15,21 @@
 //   - 绝不写 stdout：UserPromptSubmit 的 stdout 会被当作上下文注入 prompt。
 //   - 绝不 exit 非 0：非 0 会拦截/干扰用户输入。永远 exit 0。
 //
+// 安全默认值：只登记 question / correction，文本先脱敏再截断到 1000 字符；
+//   不记录 cwd / session / user / host。TEAM_STANDARDS_PROMPT_SIGNAL=all 才登记其它任务。
 // 旁路：TEAM_STANDARDS_PROMPT_SIGNAL=off 完全关闭（不写本地）。
-//   注：上行到 \\IT01 默认开，但归 yoooni-daily-plugin 控制，与本 hook 无关。
+//   注：上行到 \\IT01 仅在显式设置 YOOONI_PROMPT_SIGNAL_UPLOAD=on 后启用，
+//   归 yoooni-daily-plugin 控制，与本 hook 无关。
 // =============================================================
 
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-if ((process.env.TEAM_STANDARDS_PROMPT_SIGNAL || 'on').toLowerCase() === 'off') process.exit(0);
+const SIGNAL_MODE = (process.env.TEAM_STANDARDS_PROMPT_SIGNAL || 'on').toLowerCase();
+if (SIGNAL_MODE === 'off') process.exit(0);
+
+const MAX_PROMPT_CHARS = 1000;
 
 // 命令/运维类（slash、套件安装更新、/doctor 等）：纯噪声，对"反推知识缺口"零价值，不登记。
 const COMMAND_RE = /(^\s*\/|\/doctor|reported by[^\n]*doctor|更新[^\n]{0,12}(套件|团队工具|插件|mcp)|安装[^\n]{0,8}(公司|团队|插件|工具)|一键安装|刷新[^\n]{0,6}插件|启动\s*yoooni)/i;
@@ -40,6 +46,22 @@ function classify(text) {
   const ques = text.match(QUESTION_RE);
   if (ques) return { kind: 'question', markers: [ques[1] || ques[0]], priority: 'medium' };
   return { kind: 'other', markers: [], priority: 'low' };
+}
+
+// 保存前做 best-effort 脱敏。先限制扫描窗口，再屏蔽常见凭据与个人联系方式，
+// 最后截断；这样不会把大段源码、日志或密钥材料完整写进信号文件。
+function sanitizePrompt(text) {
+  let value = String(text || '').slice(0, MAX_PROMPT_CHARS * 4);
+  value = value
+    .replace(/-----BEGIN [^-\r\n]*PRIVATE KEY-----[\s\S]*?-----END [^-\r\n]*PRIVATE KEY-----/gi, '[REDACTED_PRIVATE_KEY]')
+    .replace(/\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{8,}/gi, '$1 [REDACTED]')
+    .replace(/\b(?:sk-[A-Za-z0-9_-]{16,}|github_pat_[A-Za-z0-9_]{16,}|gh[pousr]_[A-Za-z0-9]{16,}|glpat-[A-Za-z0-9_-]{16,}|AKIA[A-Z0-9]{16})\b/g, '[REDACTED_TOKEN]')
+    .replace(/((?:password|passwd|pwd|token|api[_-]?key|secret|client[_-]?secret|cookie|session[_-]?id)\s*["']?\s*[:=]\s*)(["']?)([^"'\s,;&}]+)\2/gi, '$1[REDACTED]')
+    .replace(/(https?:\/\/[^\s:@/]+:)[^\s@/]+@/gi, '$1[REDACTED]@')
+    .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, '[REDACTED_EMAIL]')
+    .replace(/(^|\D)1[3-9]\d{9}(?!\d)/g, '$1[REDACTED_PHONE]');
+  if (value.length > MAX_PROMPT_CHARS) value = value.slice(0, MAX_PROMPT_CHARS) + '…[TRUNCATED]';
+  return value;
 }
 
 // 连续重复去重：与上一条登记内容(同 project+text)相同则跳过。
@@ -72,7 +94,7 @@ function detectAfterEdit(transcriptPath) {
       if (!msg || msg.role !== 'assistant') continue;
       const content = Array.isArray(msg.content) ? msg.content : [];
       const edited = content.some(
-        (c) => c && c.type === 'tool_use' && /^(Edit|Write|MultiEdit)$/.test(c.name)
+        (c) => c && c.type === 'tool_use' && /^(Edit|Write|MultiEdit|apply_patch)$/.test(c.name)
       );
       return edited; // 最近一条 assistant 回合是否含编辑
     }
@@ -96,10 +118,14 @@ process.stdin.on('end', () => {
 
     const { kind, markers, priority } = classify(text);
     if (priority === 'skip') process.exit(0);            // 命令/运维类噪声：不登记
+    if (kind === 'other' && SIGNAL_MODE !== 'all') process.exit(0); // 默认仅保留疑问/纠正
 
-    const dir = path.join(os.homedir(), '.kai-toolbox');
+    const sanitizedText = sanitizePrompt(text);
+    if (!sanitizedText.trim()) process.exit(0);
+
+    const dir = process.env.TEAM_STANDARDS_PROMPT_SIGNAL_DIR || path.join(os.homedir(), '.kai-toolbox');
     fs.mkdirSync(dir, { recursive: true });
-    if (isDuplicate(dir, project, text)) process.exit(0);   // 连续重复：不登记
+    if (isDuplicate(dir, project, sanitizedText)) process.exit(0); // sidecar 也不落原始 prompt
 
     const afterEdit = detectAfterEdit(payload.transcript_path);
     const effPriority = (kind === 'correction' && afterEdit) ? 'high+' : priority;  // 纠正+紧跟编辑=最强信号
@@ -110,16 +136,12 @@ process.stdin.on('end', () => {
     );
     const record = {
       ts: new Date().toISOString(),
-      user: os.userInfo().username,
-      host: os.hostname(),
       project,
-      cwd,
       kind,
       markers,
       priority: effPriority,
       afterEdit,
-      session: payload.session_id || null,
-      text,
+      text: sanitizedText,
     };
     fs.appendFileSync(file, JSON.stringify(record) + '\n');
   } catch (_) {

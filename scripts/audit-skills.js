@@ -21,7 +21,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const SKILLS_DIR = path.join(ROOT, 'plugins', 'team-standards', 'skills');
@@ -47,8 +47,9 @@ function listSkills() {
 function getDescriptionLength(skillName) {
   const file = path.join(SKILLS_DIR, skillName, 'SKILL.md');
   const content = fs.readFileSync(file, 'utf8');
-  const m = /^description:\s*"([\s\S]+?)"\s*$/m.exec(content);
-  return m ? m[1].replace(/\s+/g, ' ').length : 0;
+  const match = /^description:\s*(?:"([^"\r\n]*)"|'([^'\r\n]*)'|([^\r\n]+))\s*$/m.exec(content);
+  const description = match ? (match[1] ?? match[2] ?? match[3] ?? '') : '';
+  return description.replace(/\s+/g, ' ').length;
 }
 
 function getLineCount(skillName) {
@@ -81,10 +82,15 @@ function countReferences(skillName, allSkills) {
 
 function getLastCommitDate(skillName) {
   try {
-    const out = execSync(
-      `git -C "${ROOT}" log -1 --format=%ad --date=short -- plugins/team-standards/skills/${skillName}/SKILL.md`,
-      { encoding: 'utf8' }
-    ).trim();
+    const out = execFileSync('git', [
+      '-c', `safe.directory=${ROOT}`,
+      '-C', ROOT,
+      'log', '-1', '--format=%ad', '--date=short', '--',
+      `plugins/team-standards/skills/${skillName}/SKILL.md`,
+    ], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
     return out || null;
   } catch (e) {
     return null;
@@ -133,8 +139,9 @@ function analyze() {
   return rows;
 }
 
-function output(rows) {
-  if (ARG_WARN_ONLY) rows = rows.filter((r) => r.warnings.length > 0);
+function output(allRows) {
+  const warnSkills = allRows.filter((r) => r.warnings.length > 0);
+  const rows = ARG_WARN_ONLY ? warnSkills : allRows;
 
   if (ARG_MD) {
     console.log('| Skill | desc | lines | refs | last commit | dev-log | warnings |');
@@ -166,9 +173,8 @@ function output(rows) {
   }
 
   // 汇总
-  const warnSkills = rows.filter((r) => r.warnings.length > 0);
   console.log('-'.repeat(120));
-  console.log(`总计: ${rows.length} skill,其中 ${warnSkills.length} 个有警告。`);
+  console.log(`总计: ${allRows.length} skill,其中 ${warnSkills.length} 个有警告。`);
   if (warnSkills.length > 0) {
     console.log('建议关注的 skill:', warnSkills.map((r) => r.name).join(', '));
   }
