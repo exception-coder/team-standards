@@ -13,6 +13,7 @@ description: "Use before writing or reviewing business code in Java, Python, Dar
 
 - 需要判断层职责、feature 结构、聚合或事务边界时，读取 [references/layers-and-boundaries.md](references/layers-and-boundaries.md)。
 - 根据技术栈，只读取 [references/framework-rules.md](references/framework-rules.md) 中对应章节。
+- 扩展既有 Service、Controller、Page、Widget，新增跨 feature 调用，或目标文件已呈现多职责、巨型文件、跨分支编排迹象时，**必须**读取 [rules/structure-quality-gates.md](rules/structure-quality-gates.md)。该文件是 focused service、跨 feature 公开边界和旧骨架增量治理的硬规则源。
 
 ## 基本依赖方向
 
@@ -47,6 +48,15 @@ Domain 不依赖 UI、Controller、数据库实现、HTTP 客户端或框架适�
 - 不以 `Util`、`CommonService`、`Manager` 掩盖不清晰职责。
 - 不为了形式完整创建没有行为的层或空抽象。
 - 不在一个 Service 中混合互不相关的业务动作。
+- 后端工具模块默认不得直接依赖另一个工具模块；复用通过平台能力、稳定契约或 SPI。
+- 前端 feature 不得 import 另一个 feature 的内部组件、hook、store 或 API；跨 feature 只允许引用对方明确声明的 `public-api`。
+- `common` 只接收稳定、无业务归属的运行时能力，不因“多个地方会用”就收纳业务 feature。
+
+## 可执行门禁
+
+- Skill 负责判定语义边界；项目应使用 ArchUnit、Maven Enforcer、ESLint `no-restricted-imports` 或等价检查把客观规则纳入 CI。
+- 插件的 `check-architecture-boundaries` Hook 对新增的工具模块依赖和前端跨 feature 内部引用执行机械兜底，并对继续膨胀的巨型源码文件给出软提醒。
+- 机械检查未覆盖不代表架构合法；涉及职责、业务归属和聚合边界的判断仍以本 Skill 为准。
 
 ## 输出
 

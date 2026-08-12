@@ -11,6 +11,7 @@
  *   - 被其它 SKILL.md / CLAUDE.md / docs 引用的次数(impact / fan-in)
  *   - 最近 commit 日期(过旧可能 stale)
  *   - dev-log 中出现次数(决策密度)
+ *   - rules / references Markdown 是否能从 SKILL.md 的链接图到达
  *
  * 用法:
  *   node scripts/audit-skills.js                # 输出全表 + 警告(exit 0)
@@ -110,6 +111,45 @@ function countDevLogMentions(skillName) {
   return count;
 }
 
+function findUnreachableResources(skillName) {
+  const skillDir = path.join(SKILLS_DIR, skillName);
+  const entry = path.join(skillDir, 'SKILL.md');
+  const reachable = new Set();
+  const queue = [entry];
+
+  while (queue.length > 0) {
+    const file = queue.shift();
+    const key = path.normalize(file);
+    if (reachable.has(key) || !fs.existsSync(file)) continue;
+    reachable.add(key);
+
+    const content = fs.readFileSync(file, 'utf8');
+    const links = content.matchAll(/\[[^\]]*\]\(([^)#]+\.md)(?:#[^)]+)?\)/g);
+    for (const match of links) {
+      const target = path.resolve(path.dirname(file), decodeURIComponent(match[1]));
+      if (target.startsWith(`${skillDir}${path.sep}`)) queue.push(target);
+    }
+  }
+
+  const resources = [];
+  for (const subdir of ['rules', 'references']) {
+    const root = path.join(skillDir, subdir);
+    if (!fs.existsSync(root)) continue;
+    collectMarkdown(root, resources);
+  }
+  return resources
+    .filter((file) => !reachable.has(path.normalize(file)))
+    .map((file) => path.relative(skillDir, file).replace(/\\/g, '/'));
+}
+
+function collectMarkdown(directory, output) {
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) collectMarkdown(fullPath, output);
+    else if (entry.isFile() && entry.name.endsWith('.md')) output.push(fullPath);
+  }
+}
+
 function daysSince(dateStr) {
   if (!dateStr) return Infinity;
   const d = new Date(dateStr);
@@ -126,6 +166,7 @@ function analyze() {
     const lastCommit = getLastCommitDate(name);
     const stale = daysSince(lastCommit) > TH_STALE_DAYS;
     const devLogMentions = countDevLogMentions(name);
+    const unreachableResources = findUnreachableResources(name);
 
     const warnings = [];
     if (descLen > TH_DESC_WARN) warnings.push(`description 过长(${descLen} > ${TH_DESC_WARN})`);
@@ -133,6 +174,9 @@ function analyze() {
     else if (lines > TH_SKILL_WARN) warnings.push(`SKILL.md 过大(${lines} > ${TH_SKILL_WARN})`);
     if (stale) warnings.push(`stale: 最近一次改动 ${lastCommit || '未知'}`);
     if (refs === 0) warnings.push(`零引用: 无其它 skill / 文档引用本 skill,可能孤立`);
+    if (unreachableResources.length > 0) {
+      warnings.push(`渐进读取不可达: ${unreachableResources.join(', ')}`);
+    }
 
     rows.push({ name, descLen, lines, refs, lastCommit: lastCommit || '?', devLogMentions, warnings });
   }

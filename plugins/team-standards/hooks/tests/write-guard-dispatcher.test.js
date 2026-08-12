@@ -12,6 +12,7 @@ function run(payload, env = {}) {
     env: {
       ...process.env,
       TEAM_STANDARDS_DESIGN_DOC_HOOK: 'off',
+      TEAM_STANDARDS_ARCH_BOUNDARY_HOOK: 'off',
       TEAM_STANDARDS_BACKEND_KG_HOOK: 'off',
       TEAM_STANDARDS_SQL_DDL_HOOK: 'off',
       TEAM_STANDARDS_DOC_LOCATION_HOOK: 'off',

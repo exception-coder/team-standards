@@ -7,6 +7,7 @@ const { recordHookMetric } = require('./hook-metrics');
 const CHILD_TIMEOUT_MS = 15000;
 const GUARDS = [
   { script: 'check-design-doc.js', env: 'TEAM_STANDARDS_DESIGN_DOC_HOOK' },
+  { script: 'check-architecture-boundaries.js', env: 'TEAM_STANDARDS_ARCH_BOUNDARY_HOOK' },
   { script: 'check-backend-kg-readiness.js', env: 'TEAM_STANDARDS_BACKEND_KG_HOOK' },
   { script: 'check-comment-density.js', env: 'TEAM_STANDARDS_COMMENT_HOOK' },
   { script: 'check-sql-ddl-readiness.js', env: 'TEAM_STANDARDS_SQL_DDL_HOOK' },

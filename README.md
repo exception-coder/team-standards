@@ -51,7 +51,7 @@ flowchart TD
     VERIFY --> COMMIT["提交规范、工作日志与知识回写"]
 
     WRITE["Write / Edit / MultiEdit / apply_patch"] --> DISPATCHER["write-guard-dispatcher"]
-    DISPATCHER --> GUARDS["设计文档、后端知识、注释、DDL、文档路径守卫"]
+    DISPATCHER --> GUARDS["设计文档、架构边界、后端知识、注释、DDL、文档路径守卫"]
     GUARDS --> IMPLEMENT
 ```
 
@@ -59,7 +59,7 @@ flowchart TD
 
 - **软判断与硬门禁分离**：Skill 能处理上下文和例外，Hook 只拦截客观、可机械判断的红线。
 - **跨客户端统一输入**：`change-input.js` 将 Claude 写入事件与 Codex `apply_patch` 归一为 Change 列表。
-- **单进程并发守卫**：`write-guard-dispatcher.js` 并发运行五条写入规则，并保持稳定输出顺序。
+- **单进程并发守卫**：`write-guard-dispatcher.js` 并发运行六条写入规则，并保持稳定输出顺序。
 - **风险分档**：S/M/L 三档让小改轻量通过，状态机、字段、接口和跨模块改动进入完整链路。
 - **证据驱动闭环**：状态/关联类需求不以接口成功为终点，而以业务对象终态和下一动作成功为验收标准。
 
@@ -118,7 +118,7 @@ Hook 不替代 Skill，而是在工具写入和提交边界提供最后一道机
 |---|---|---|
 | `Bash` | `check-git-commit-skill.js` | 小改自动放行，大改要求完成提交规范流程 |
 | `Bash` | `check-commit-no-ai-signature.js` | 阻止 AI 署名或不合规提交信息进入历史 |
-| `Write/Edit/MultiEdit` | `write-guard-dispatcher.js` | 统一并发运行五条写入守卫 |
+| `Write/Edit/MultiEdit` | `write-guard-dispatcher.js` | 统一并发运行六条写入守卫（含模块架构边界检查） |
 | `UserPromptSubmit` | `prompt-signal-capture.js` | 本地记录脱敏后的疑问和纠正信号 |
 | `UserPromptSubmit` | `check-plugin-version-stale.js` | 提醒本地插件版本落后 |
 

@@ -13,6 +13,7 @@ description: "Use for single-service backend questions or Markdown about table r
 
 - 需要确定图谱归属、目录层级或读取顺序时，读取 [references/storage-and-routing.md](references/storage-and-routing.md)。
 - 需要进行接口开发闭环、候选沉淀或 SQL 归档时，读取 [references/update-workflow.md](references/update-workflow.md)。
+- 需要创建或更新正式表、SQL、原子能力、能力、流程、枚举卡片时，读取 [rules/card-templates.md](rules/card-templates.md) 中对应模板。
 
 ## 核心流程
 

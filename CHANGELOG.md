@@ -4,6 +4,20 @@
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。
 
+## [1.50.0] - 2026-08-11
+
+**修复 Skill 上下文瘦身造成的硬规则失联，并把模块边界从原则声明升级为写入期机械门禁。**
+
+### Added
+
+- 新增 `check-architecture-boundaries`，阻断新增工具模块直连和前端跨 feature 内部引用，对巨型文件继续增长提供软提醒。
+- Skill audit 增加 `rules/`、`references/` 从主入口链接图可达性检查。
+
+### Changed
+
+- 架构 Skill 恢复结构质量门禁的强制渐进读取路由，明确工具模块、feature `public-api` 和 common 准入红线。
+- 通用编码规范恢复 80 行函数阈值及业务路径、Bug 回归测试底线。
+
 ## [1.49.0] - 2026-08-09
 
 **新增对象中心、证据驱动的领域规格挖掘门禁，把业务终态和下一动作纳入编码完成标准。**

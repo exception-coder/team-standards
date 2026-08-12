@@ -18,6 +18,7 @@ description: "Use when a user presents a new requirement, feature, refactor, fea
 - 需要判断档位、模板类型或合法例外时，读取 [references/classification.md](references/classification.md)。
 - 需要查找、新建、更新设计文档或生成编码摘要时，读取 [references/document-workflow.md](references/document-workflow.md)。
 - 只有任务涉及具体文档模板时，读取同目录的 `lightweight-template.md`、`template.md`、`template-tech.md`、`api-template.md` 或 `coding-template.md`。
+- 设计中需要 Mermaid 图或需要判断应画哪类图时，读取 [rules/mermaid-requirements.md](rules/mermaid-requirements.md)，并叠加 `markdown-writing-standards` 的语法规则。
 
 ## 执行流程
 
