@@ -202,3 +202,5 @@ node scripts/release-team-tools.mjs --workspace .. --out <empty-temp-dir> --plug
 发布前必须同步 `.claude-plugin/plugin.json`、`.claude-plugin/marketplace.json` 和 `.codex-plugin/plugin.json` 的版本。修改 `CLAUDE.md` 后必须重新生成 `AGENTS.md`；修改 Skill 触发链路后同步更新 [docs/skill-flow.md](docs/skill-flow.md)。
 
 仅修改仓库 README 不需要重新安装插件；插件运行内容或 manifest 变化后才需要递增版本并重新加载。
+
+CI 会比较 Git 基线：Skill、运行时 Hook、命令、Agent、App 或 MCP 载荷变化而版本未递增时阻断；测试、benchmark、README、docs 和纯发布脚本不触发发版。

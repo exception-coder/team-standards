@@ -166,6 +166,8 @@ git push
 
 push 前必须确认**三处 manifest 版本号完全一致**——`.claude-plugin/plugin.json`、`.claude-plugin/marketplace.json`、`.codex-plugin/plugin.json`，三处缺一不可（CI `version-sync-check` 对三处强校验，`.codex-plugin/plugin.json` 是常见漏升点）。若本次改动含 `CLAUDE.md`，push 前还须运行 `node scripts/sync-agents.js` 重新生成 `AGENTS.md`（CI `agents-sync-check` 强校验，无 hook 自动同步）。该版本号递增与同步要求只适用于 team-standards 插件源码仓库，禁止在业务项目中套用。
 
+Plugin 版本递增按**运行载荷**判定：`skills/`、运行时 `hooks/`、`commands/`、`agents/`、`apps/` 或 `mcp/` 变化时必须递增三处 manifest；README、docs、测试、benchmark 和纯发布脚本变化不触发。MCP 引擎的 `src/`、工具 schema、依赖锁或构建契约变化时必须递增 `package.json` 并同步 server info；知识 Markdown 变化不升引擎版本，刷新 catalog 后调用 `reload_knowledge`。
+
 ---
 
 ## Red Flags

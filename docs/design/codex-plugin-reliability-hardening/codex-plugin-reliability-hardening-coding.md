@@ -109,3 +109,9 @@ Metric {
 - 安全：DPAPI、迁移、脱敏、非法域名/端口、保留期、锁恢复。
 - 性能：默认不落指标、显式最小化落盘、并发相对顺序基线不回退。
 - 发布：成功产物、版本不一致失败、镜像漂移失败、缺仓失败。
+
+## 11. 版本门禁编码坐标
+
+- 三个 Plugin 仓库各自提供 `scripts/check-runtime-version-bump.js`，CI 以 `HEAD^..HEAD` 检查载荷白名单和 SemVer 递增。
+- `project-domain-knowledge/scripts/check-runtime-version-bump.mjs` 同时校验 `package.json` 与 `serverInfo.version`。
+- 知识目录不属于 MCP 引擎载荷；CI 单独运行 catalog 并检查生成索引无漂移。

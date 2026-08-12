@@ -64,11 +64,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
       - name: verify .claude-plugin / .codex-plugin / marketplace versions
         run: node scripts/check-version-sync.js --verbose
+      - name: require a version bump for runtime payload changes
+        run: node scripts/check-runtime-version-bump.js --base "${{ github.event.pull_request.base.sha || 'HEAD^' }}" --target HEAD
 
   audit-skills-check:
     name: SKILL.md health (size / description / refs)

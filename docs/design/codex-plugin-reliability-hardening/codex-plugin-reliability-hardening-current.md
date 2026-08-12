@@ -241,3 +241,9 @@ flowchart LR
 - 生产日志自检已覆盖 DPAPI、旧明文迁移、严格域名与端口、脱敏、ACL 和保留期；更新器已覆盖活动、陈旧、非法 PID 锁与 abandoned Mutex。
 - `release-team-tools.mjs` 已通过成功制品和缺失工作区失败测试，可生成三个 `tar.gz`、文件清单、Git 来源信息和 SHA-256。
 - Hook 指标默认不创建文件，显式开启后只写五个批准字段；5 轮本机相对预算中，`team-standards` dispatcher/顺序中位数比值为 0.313，`project-coding-profiles` 为 0.446，均低于 0.95 门槛。
+
+## 18. 运行载荷版本门禁
+
+- 三处 manifest 相等只证明格式一致；CI 还要比较 Git 基线，运行载荷变化后版本必须严格递增。
+- Plugin 载荷白名单包括 Skill、运行时 Hook、命令、Agent、App、MCP 及项目画像；README、docs、测试、benchmark 和纯发布脚本不触发发版。
+- MCP 引擎载荷包括 `src/`、工具 schema、依赖锁和构建契约；知识 Markdown 不改变引擎版本，刷新 catalog 后调用 `reload_knowledge`。

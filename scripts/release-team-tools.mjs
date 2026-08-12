@@ -97,6 +97,9 @@ function runRepositoryTests() {
 
   run(process.execPath, ['--test'], path.join(plugins[1].pluginRoot, 'hooks'));
   run(process.execPath, ['--test'], path.join(plugins[2].pluginRoot, 'hooks'));
+  for (const plugin of plugins) {
+    run(process.execPath, [path.join(plugin.repositoryRoot, 'scripts', 'check-runtime-version-bump.js'), '--base', 'HEAD'], plugin.repositoryRoot);
+  }
 
   if (process.platform === 'win32') {
     const daily = plugins[2];
