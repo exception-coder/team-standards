@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const { buildStructuredBody, validateCommitBody } = require('./commit-message-format');
 
 function readArgument(argv, name) {
   const index = argv.indexOf(name);
@@ -17,13 +18,13 @@ function buildMessage({ title, body, name, email }) {
   const cleanTitle = (title || '').trim();
   const cleanBody = (body || '').trim();
   if (!cleanTitle) throw new Error('缺少 --title');
-  if (!cleanBody) throw new Error('缺少 --body');
-  if (!/[\u3400-\u9fff]/.test(cleanBody)) throw new Error('--body 必须包含中文变更说明');
+  const bodyError = validateCommitBody(cleanBody);
+  if (bodyError) throw new Error(`--body ${bodyError}`);
   if (!name || !email) throw new Error('缺少 Git user.name 或 user.email');
   return `${cleanTitle}\n\n${cleanBody}\n\nAuthor: ${name} <${email}>\n`;
 }
 
-function writeMessageFile({ cwd, title, body }) {
+function writeMessageFile({ cwd, title, body, change, reason, result }) {
   const name = readGitValue('user.name', cwd);
   const email = readGitValue('user.email', cwd);
   const gitDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-dir'], {
@@ -33,7 +34,8 @@ function writeMessageFile({ cwd, title, body }) {
   const outputDir = path.join(gitDir, 'team-standards');
   const outputPath = path.join(outputDir, 'COMMIT_MESSAGE');
   fs.mkdirSync(outputDir, { recursive: true });
-  fs.writeFileSync(outputPath, buildMessage({ title, body, name, email }), 'utf8');
+  const structuredBody = body || buildStructuredBody({ change, reason, result });
+  fs.writeFileSync(outputPath, buildMessage({ title, body: structuredBody, name, email }), 'utf8');
   return outputPath;
 }
 
@@ -44,6 +46,9 @@ if (require.main === module) {
       cwd,
       title: readArgument(process.argv, '--title'),
       body: readArgument(process.argv, '--body'),
+      change: readArgument(process.argv, '--change'),
+      reason: readArgument(process.argv, '--reason'),
+      result: readArgument(process.argv, '--result'),
     });
     process.stdout.write(`${outputPath}\n`);
   } catch (error) {

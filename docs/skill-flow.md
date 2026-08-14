@@ -33,7 +33,7 @@
 | `java-coding-standards` | team-standards | 编写或修改任何 Java 代码时（自动应用，通用条款 delegate 到 coding-standards-common） |
 | `dart-coding-standards` | team-standards | 编写或修改任何 Dart / Flutter 代码时（自动应用，dartdoc `///` 独占条款，通用条款 delegate 到 coding-standards-common；korepos backend 接口再叠加 kpay-daily-plugin 的 korepos-backend-service） |
 | `llm-agent-coding-standards` | team-standards | 编写/修改接 LLM 或做 agent 的代码时（import langchain4j/spring-ai/openai/anthropic；定义 @Tool/AiService；拼 prompt；解析 LLM 输出）；在 coding-standards-common + 语言 skill 之上叠加 LLM 集成独占条款（确定性优先/输出当不可信/枚举输出/约定 SSOT/工具描述契约/循环兜底/上下文注入） |
-| `git-commit-standards` | team-standards | 大改 git commit 之前（>2 文件 / >30 行 / 含新增/重命名/删除文件）；**v1.18.1 起 hook 按改动大小放行**：`hooks/check-git-commit-skill.js` 看 staged diff，≤2 文件 ∧ ≤30 行 ∧ 仅 `M` 修改时直接放行（让模型自行写 commit message），其它情况未调用本 skill 时直接 exit 2 阻断；阈值可用 `TEAM_STANDARDS_TRIVIAL_FILES` / `TEAM_STANDARDS_TRIVIAL_LINES` 调整；git push 不门禁；仅在当前仓库就是 team-standards 插件源码仓库且插件自身变更完成后自动 stage、commit、push |
+| `git-commit-standards` | team-standards | **任何 git commit 之前都触发**，包括小改、自动收尾和用户未显式要求提交；统一生成标题、`【改动】【原因】【结果】` 三段中文正文与真实 Author。`check-git-commit-skill.js` 的改动大小判断只决定是否追加五步重审，不得跳过主动正文生成；git push 不门禁；仅在当前仓库就是 team-standards 插件源码仓库且插件自身变更完成后自动 stage、commit、push |
 | `dev-log` | team-standards | 对 team-standards 做决策型变更后：新增/删除 Skill、触发时机或核心行为变化、规则方向反转、跨 Skill 链路变化、重大团队原则沉淀；普通小改只写 commit body |
 | `markdown-writing-standards` | team-standards | 生成或修改包含 Mermaid 图表的 Markdown 内容；完成 Markdown 文件的结构性写入/重组后做目录复核（自动应用，与 java-coding-standards 同级） |
 | `business-logic-orientation` | team-standards | 重构/复写/迁移前需要理解现有业务逻辑时（产出梳理文档 + AI 速查索引） |

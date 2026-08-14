@@ -7,6 +7,7 @@
 // 局限：编辑器交互式 commit（无 -m/-F）在 PreToolUse 阶段拿不到正文，本 hook 不覆盖（AI 几乎都用 -m）。
 
 const fs = require('fs');
+const { validateCommitBody } = require('../skills/git-commit-standards/scripts/commit-message-format');
 const MODE = (
   process.env.TEAM_STANDARDS_COMMIT_MESSAGE_HOOK ||
   process.env.TEAM_STANDARDS_AI_SIGNATURE_HOOK ||
@@ -44,8 +45,8 @@ function validateStructure(message) {
   const bodyLines = lines.slice(1, authorIndex >= 0 ? authorIndex : undefined)
     .filter((line) => line && !/^\$?\(?cat\s+<</i.test(line) && line !== 'EOF' && line !== ')');
 
-  if (bodyLines.length === 0) return '缺少变更说明正文';
-  if (!bodyLines.some((line) => /[\u3400-\u9fff]/.test(line))) return '变更说明正文必须包含中文';
+  const bodyError = validateCommitBody(bodyLines.join('\n'));
+  if (bodyError) return bodyError;
   if (!authorValid) return '缺少合法 Author 行（Author: 姓名 <邮箱>）';
   return null;
 }
@@ -64,8 +65,8 @@ process.stdin.on('end', () => {
   if (structureError) {
     process.stderr.write(
       '[team-standards] 提交信息结构不完整：' + structureError + '。\n' +
-      '  规则：提交信息必须包含标题、中文变更说明正文和 Author: 姓名 <邮箱>。\n' +
-      '  正文至少说明：改了什么、为什么改、影响范围；供后续人工与 AI 回归改动意图。\n' +
+      '  规则：提交信息必须包含标题、【改动】【原因】【结果】三段中文正文和 Author: 姓名 <邮箱>。\n' +
+      '  三段分别说明：代码做了什么、为什么这样做、最终解决或改善了什么。\n' +
       '  旁路：TEAM_STANDARDS_COMMIT_MESSAGE_HOOK=warn 仅提示 / =off 关闭。\n'
     );
     process.exit(MODE === 'block' ? 2 : 0);
