@@ -66,7 +66,7 @@ Choose user-scope (recommended) at install time.
 /reload-plugins
 ```
 
-## Included skills (24 total, grouped by phase)
+## Included skills (28 total, grouped by phase)
 
 See [README.md § Included Skills](README.md#包含的-skills) for the complete grouped list, or [CLAUDE.md § Skill Index](CLAUDE.md#skill-索引) for full descriptions.
 
@@ -74,7 +74,7 @@ Brief overview:
 
 - **① Requirement / design analysis** — `solution-review-required` / `design-doc-required` / `bug-doc-required` / `business-logic-orientation`
 - **② Pre-implementation orientation** — `pre-implementation-code-orientation` / `doc-index-required`
-- **③ Architecture & coding gates** — `architecture-ddd-lite-fullstack` / `coding-standards-common` / `java-coding-standards` / `bugfix-coding-style` (korepos backend rules korepos-backend-service migrated to kpay-daily-plugin)
+- **③ Architecture & coding gates** — `architecture-ddd-lite-fullstack` / `frontend-excellence` / `coding-standards-common` / `java-coding-standards` / `dart-coding-standards` / `llm-agent-coding-standards` / `bugfix-coding-style`
 - **④ Commit & log** — `git-commit-standards` / `daily-work-log`
 - **⑤ Knowledge graph** — `backend-knowledge-graph-required` / `reverse-index-required` / `glossary-required` / `cross-project-locator`
 - **⑥ Quality loop** — `coding-violation-log` / `arch-lint` / `markdown-writing-standards` / `project-docs-update`

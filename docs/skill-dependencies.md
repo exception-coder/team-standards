@@ -51,6 +51,8 @@ pre-implementation-code-orientation
             ↓
 architecture-ddd-lite-fullstack   ← 强制门禁(无例外)
             ↓
+frontend-excellence              ← 创建/重做/显著提升 Web 前端时
+            ↓
 coding-violation-log (回顾模式)   ← 项目存在违规表时
             ↓
 bugfix-coding-style              ← bug / 删冗余 / 对齐云端场景
@@ -67,6 +69,7 @@ arch-lint                        ← Flutter 代码异步触发
 | Skill | 前置 | 后置 | 互补 / 叠加 |
 |-------|------|------|------------|
 | `architecture-ddd-lite-fullstack` | 通常 `pre-implementation-code-orientation` 已完成 | `coding-standards-common` | — |
+| `frontend-excellence` | `architecture-ddd-lite-fullstack` 已确定前端 Feature 边界 | `coding-standards-common` 与实现验证 | Figma、ImageGen、浏览器或 Playwright 均按环境能力选用 |
 | `coding-standards-common` | `architecture-ddd-lite-fullstack` | `{language}-coding-standards` | `bugfix-coding-style`(bug 修复时叠加) |
 | `java-coding-standards` | `coding-standards-common` | — | 通用部分 delegate 到 common,不替代 |
 | `bugfix-coding-style` | 仅 bug 修复 / 删冗余场景 | `coding-standards-common` 继续 | 注释方向与 `coding-standards-common` 注释三档对齐 |

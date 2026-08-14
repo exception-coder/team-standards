@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Excellence"
+  short_description: "Build polished, maintainable, production-ready web interfaces"
+  default_prompt: "Use $frontend-excellence to build a polished, responsive, production-ready frontend in the current project."

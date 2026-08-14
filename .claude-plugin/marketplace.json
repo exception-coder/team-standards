@@ -8,8 +8,8 @@
   "plugins": [
     {
       "name": "team-standards",
-      "description": "Claude Code 团队开发规范插件：Java 编码规范（阿里黄山版）+ 功能设计文档强制约束 + Git 提交规范",
-      "version": "1.52.0",
+      "description": "Claude Code 团队开发规范插件：设计文档、架构与跨语言编码、产品级前端质量、Git 提交规范",
+      "version": "1.53.0",
       "source": "./plugins/team-standards",
       "author": {
         "name": "张凯",

@@ -1,7 +1,7 @@
 {
   "name": "team-standards",
-  "version": "1.52.0",
-  "description": "Team development standards plugin with Java coding rules, design-doc requirements, and workflow guidance.",
+  "version": "1.53.0",
+  "description": "Team development standards plugin with design gates, cross-language architecture rules, and production frontend quality workflows.",
   "author": {
     "name": "Zhang Kai",
     "url": "https://gitee.com/wyoooni"
@@ -14,13 +14,15 @@
     "coding-standards",
     "design-doc",
     "team-standards",
-    "developer-workflow"
+    "developer-workflow",
+    "frontend",
+    "design-system"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Team Standards",
     "shortDescription": "Shared engineering standards and documentation workflows.",
-    "longDescription": "A reusable standards plugin for engineering teams. It provides Java coding standards, design-document requirements, commit guidance, bug-analysis workflows, project-document initialization, and business-logic orientation before refactoring.",
+    "longDescription": "A reusable standards plugin for engineering teams. It provides design-document gates, cross-language architecture and coding standards, production frontend design and browser-validation workflows, commit guidance, bug analysis, and project knowledge workflows.",
     "developerName": "Zhang Kai",
     "category": "Productivity",
     "capabilities": [
@@ -32,6 +34,7 @@
     "termsOfServiceURL": "https://gitee.com/wyoooni/team-standards",
     "defaultPrompt": [
       "Draft a design doc before implementing this feature.",
+      "Build a polished, responsive frontend with a coherent design system and browser verification.",
       "Review this Java code using the team standards plugin.",
       "Map the current business logic before refactoring this module."
     ],

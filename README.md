@@ -99,7 +99,7 @@ flowchart LR
 |---|---|---|
 | 方案与需求 | `solution-review-required`、`design-doc-required`、`bug-doc-required`、`business-logic-orientation` | 先澄清目标、现状、方案和根因 |
 | 实施前定位 | `pre-implementation-code-orientation`、`doc-index-required` | 精准找到代码坐标，避免重复扫描和重复文档 |
-| 架构与编码 | `architecture-ddd-lite-fullstack`、`coding-standards-common`、`java-coding-standards`、`dart-coding-standards`、`llm-agent-coding-standards`、`bugfix-coding-style` | 控制分层、依赖、语言细节、LLM 边界和源码表达 |
+| 架构与编码 | `architecture-ddd-lite-fullstack`、`frontend-excellence`、`coding-standards-common`、`java-coding-standards`、`dart-coding-standards`、`llm-agent-coding-standards`、`bugfix-coding-style` | 控制分层、产品级前端体验、依赖、语言细节、LLM 边界和源码表达 |
 | 提交与日志 | `git-commit-standards`、`daily-work-log` | 形成可审查提交和连续工作记录 |
 | 领域知识 | `backend-knowledge-graph-required`、`domain-spec-mining-required`、`reverse-index-required`、`glossary-required`、`cross-project-locator` | 建立正向事实、对象规格、反向影响、术语和跨项目索引 |
 | 质量回路 | `coding-violation-log`、`arch-lint`、`comment-cleanup`、`markdown-writing-standards`、`project-docs-update` | 检测违规、清理存量问题并同步文档 |
@@ -172,7 +172,7 @@ team-standards/
 ├── plugins/team-standards/
 │   ├── .claude-plugin/            # Claude 插件 manifest
 │   ├── .codex-plugin/             # Codex 插件 manifest
-│   ├── skills/                    # 27 个 Skill
+│   ├── skills/                    # 28 个 Skill
 │   └── hooks/                     # 提交、写入和 Prompt 守卫
 ├── docs/                          # 流程、设计和决策记录
 ├── scripts/                       # 同步、审计、发布与工作区契约检查

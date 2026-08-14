@@ -17,6 +17,7 @@
 | 即将创建任何 Markdown 文档；或编辑 `ai-docs/{project}/` / `docs/` 下任何文件 | `doc-index-required`（v1.20 起：用户目录知识库 `ai-docs/{project}/` 与项目 `docs/` 同等执行 Phase-A/B；仅 `work-log/` 日期型日志和索引文件本身豁免） |
 | 设计文档或 Bug 文档已确认，准备开始写第一行代码 | `pre-implementation-code-orientation` |
 | **开始编写任何业务代码前（Java / React / Vue / Flutter）** | `architecture-ddd-lite-fullstack`（默认分层规则） |
+| **创建、重做或显著提升生产级 Web 前端**（React / Vue / Next.js / 仪表盘 / 门户 / 落地页 / 组件库 / 截图或 Figma 转代码） | `frontend-excellence`（设计系统、视觉美学、响应式、可访问性、完整状态与真实浏览器验收；纯后端、原生移动端、无布局影响的文案小改不触发） |
 | **开始编写或修改任何源码前（任何语言：Java / TS / JS / Dart / Python / Kotlin / Go 等）** | `coding-standards-common`（通用 7 条铁律 + 注释三档；先于具体语言 skill） |
 | **任何 git commit 之前**，包括小改、自动收尾和用户未显式要求提交；所有提交先生成标题 + `【改动】【原因】【结果】` 中文正文 + Author。改动大小只决定是否追加五步重审，不得跳过 Skill；git push 不门禁 | `git-commit-standards` |
 | 编写或审查 Java 代码 | `java-coding-standards` |
@@ -51,13 +52,13 @@
 
 ## Skill 分类导航
 
-> 27 个 skill 按使用阶段分 8 组，遇到具体任务先按组检索而不是遍历全表。每个 skill 详细描述见下方「Skill 索引」。
+> 28 个 skill 按使用阶段分 8 组，遇到具体任务先按组检索而不是遍历全表。每个 skill 详细描述见下方「Skill 索引」。
 
 | 阶段 / 类别 | 包含 Skill | 用途速记 |
 |---|---|---|
 | **① 方案 / 需求分析（动手前最先触发）** | `solution-review-required` / `design-doc-required` / `bug-doc-required` / `business-logic-orientation` | 把"用户想做什么"和"实际怎么做"分离；产出设计文档 / bug 文档 / 现状梳理文档 |
 | **② 实施前定位（文档写完、动手前）** | `pre-implementation-code-orientation` / `doc-index-required` | 精准 Read 关键代码坐标；文档输出路径 / Phase-A 查重 |
-| **③ 架构与编码门禁（实施时）** | `architecture-ddd-lite-fullstack` / `coding-standards-common` / `java-coding-standards` / `dart-coding-standards` / `llm-agent-coding-standards` / `bugfix-coding-style` | 分层 + 每分支一 focused service / 命名 + 函数原子 + 注释三档 / Java 独占条款 / Dart·dartdoc 独占条款 / **LLM·Agent 集成独占条款** / bug 修复注释规范（korepos backend 接口强约束已迁至 kpay-daily-plugin 的 korepos-backend-service skill） |
+| **③ 架构与编码门禁（实施时）** | `architecture-ddd-lite-fullstack` / `frontend-excellence` / `coding-standards-common` / `java-coding-standards` / `dart-coding-standards` / `llm-agent-coding-standards` / `bugfix-coding-style` | 分层 + 每分支一 focused service / 产品级前端设计系统与浏览器验收 / 命名 + 函数原子 + 注释三档 / Java 独占条款 / Dart·dartdoc 独占条款 / **LLM·Agent 集成独占条款** / bug 修复注释规范（korepos backend 接口强约束已迁至 kpay-daily-plugin 的 korepos-backend-service skill） |
 | **④ 提交与日志（收尾时）** | `git-commit-standards` / `daily-work-log` | 规范 commit；业务项目源码改动后按 bug/功能分类沉淀工作日志 |
 | **⑤ 知识图谱（沉淀时）** | `backend-knowledge-graph-required` / `domain-spec-mining-required` / `reverse-index-required` / `glossary-required` / `cross-project-locator` | 正向单服务图谱 / 对象中心证据规格挖掘 / 反向影响索引 / 业务术语登记 / 跨项目拓扑 |
 | **⑥ 质量回路（持续）** | `coding-violation-log` / `arch-lint` / `comment-cleanup` / `markdown-writing-standards` / `project-docs-update` | 编码违规登记防重犯 / Flutter 架构 lint / 存量注释批量清理（对齐 §5.4）/ Mermaid 语法 + 目录复核 / 项目结构变更后同步文档 |
@@ -147,6 +148,8 @@
             ↓
 [第 8 步] architecture-ddd-lite-fullstack  ← 强制门禁,改代码前必经(无例外)
             ↓
+[第 8.5 步] frontend-excellence            ← 创建/重做/显著提升 Web 前端时触发
+            ↓
 [第 9 步] coding-violation-log (回顾模式)  ← 项目存在违规表时(否则跳过)
             ↓
 [第 10 步] bugfix-coding-style              ← 仅 bug 修复 / 删冗余 / 对齐云端场景
@@ -202,6 +205,7 @@
 
 | Skill 名称 | 目录 | 覆盖范围 | 关键词 |
 |-----------|------|---------|--------|
+| `frontend-excellence` | `skills/frontend-excellence/` | 创建、重做或显著提升生产级 Web 前端时触发；在既有 Feature 分层之上，强制读取项目设计系统与数据模式，建立明确视觉方向和语义令牌，覆盖响应式、可访问性、加载/空/错/禁用等完整状态，并通过真实浏览器在移动与桌面视口完成视觉和交互验收；Figma、截图与 ImageGen 均为可选输入，不允许把可运行 mock、单文件 HTML 或编译成功当作最终交付 | 前端、Web UI、React、Vue、Next.js、仪表盘、门户、落地页、组件库、设计系统、视觉美学、响应式、可访问性、Figma 转代码、截图转代码、浏览器验收、视觉回归 |
 | `solution-review-required` | `skills/solution-review-required/` | 用户提出具体方案或要求照某个想法、回复、目录策略、架构路径、现有代码实施时，先分离真实目标与候选方案，评估现有代码是否值得参考，识别风险、替代方案和更优建议，再决定是否实施；含生产优先原则（Production First 八条 + Production/Exploration 模式判定 + 毕业检查），防止 AI 盲目照做、迎合用户或扩散低质量旧结构 | 方案审视、更优建议、想法、实施方案、不要盲从、反迎合、现有代码质量、代码惯性、风险评估、替代方案、生产优先、Production First、最小改动、向后兼容、影响面、可回滚、探索模式、创造性项目 |
 | `design-doc-required` | `skills/design-doc-required/` | 编写代码前强制要求设计文档（新功能和 bug 修复均适用）；文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、关键规则、编码落点和风险点，避免复写项目全集资料；**三档模版分级**：（1）极简跳过（合法例外）—满足极简改动硬清单（≤2 文件 ∧ ≤30 行 ∧ 透传补漏/局部修正/dead code 清理等）时完全跳过文档，git commit body 承担变更说明；（2）轻量 `lightweight-template.md`—单接口自身流程/库表读写流程；（3）完整 `template.md`—超出轻量范围的方案/接口设计；图表遵循最小图原则，能一张图讲清就只画一张；**v1.20 起默认输出路径** `{USER_DOCUMENTS}/ai-docs/{project}/design/{需求名称}/{需求名称}-current.md`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期，由 `doc-index-required` Phase-A/B 管控）；Git 管理下项目正式文档默认维护稳定/current 文档，历史由 commit body 承担，版本快照仅用于重大基线、非 Git 文档或用户明确要求；完整模版自动生成 coding-summary，轻量/极简无需 coding.md | 设计文档、需求、方案、实现前、新功能、修复方案、实施方案、bug修复、极简跳过、透传补漏、轻量模版、接口级、简明扼要、核心逻辑、风险点、最小图、场景选图、current文档、Git历史、commit body 即变更说明、ai-docs、Phase-A、Phase-B |
 | `architecture-ddd-lite-fullstack` | `skills/architecture-ddd-lite-fullstack/` | 编码前默认架构规则：DDD-lite 分层、Feature 模块化、单向依赖、原子能力沉淀；**与语言无关，三栈一致适用**——Java（Spring Boot/Spring Cloud）、Python（FastAPI/Django/Flask）、Dart（Serverpod/Shelf/koreposBackendService），以及 React/Vue/Flutter 前端；强制代码结构清晰、易维护、低耦合、高内聚，禁止 UI / Controller / Endpoint 直接写业务逻辑或访问 DB / HTTP；**新代码落点决策**（扩展现有功能时新代码必须放到新结构暴露 public 方法，旧文件只 +1 行调用，禁止在巨型方法 / 旧骨架文件里就地追加 N 行新逻辑）；**Service 业务动作扩展铁律——每个业务分支一个 focused service，任何新方法都不进 god service**：扩展既有 service 时不允许往多分支 god service（如 `OrderService` 同时承载 `refund`/`cancel`/`reject`）追加**任何** public 业务方法——新业务分支（`reverseCheckout`）→ 新建该分支的 focused service；同分支变种（`partialRefund`）→ 进该分支的 focused service（若分支仍散落在 god service 则新建并把既有方法+变种**一并迁过去**）；god service 最多保留 1 行 delegate 入口且禁止写任何业务逻辑；**跨分支编排**（同一回合调用 ≥2 个 focused service 时必须落到独立 `XxxOrchestrator` / `XxxSaga`，不进任一 focused service 内部，Controller 也不直接连续调用，O1-O4 触发条件：原子事务边界 / 顺序依赖 / 失败补偿 / 复合动作）；**横切关注点豁免**（日志/审计/权限/事务/metrics/缓存/限流走 AOP/拦截器/注解统一注入，focused service 内部不重复实现；`AuditAspect` / `LoggingInterceptor` 等横切实现类不算 god service）；**服务命名 taxonomy**（同一项目内 `XxxService` / `XxxUseCase` / `XxxCommandHandler` 三种叫法只选一种贯彻；Orchestrator / Saga 与 focused service 命名解耦；禁止 `XxxApplicationService` / `XxxManager` / `XxxHelper` 等模糊命名）；**聚合边界与事务一致性**（一个 `@Transactional` 只修改一个聚合根；跨聚合走 Domain Event / Saga；用 5 问判定 Refund 是 Order 聚合内动作还是独立聚合，模糊默认独立聚合）；**函数级业务场景分流——分支差异即拆分**（v1.26.3 新增；service 级铁律在函数粒度的下钻）：函数内按业务类型 if-else / switch 分流 ≥2 分支时,**先判定分支差异本质再决定拆分阶梯**——阶梯 1 同业务定位(共享同状态机 / 校验 / 补偿 / 团队)拆函数内私有方法 `_handleTypeA()` / `_handleTypeB()`,主方法只派发;阶梯 2 不同业务定位(独立状态机 / 独立 PRD 模块 / 独立团队)升级到 service 级,按 Service 业务动作扩展铁律拆 `AService` / `BService1`,共享逻辑沉到原子能力层;**判定锚点是「业务定位」而非「代码相似度」**——长得像但业务定位不同就要拆;1-100 期成熟项目扩展期最易违反 | DDD-lite、分层架构、Feature、原子能力、UseCase、Application、Domain、Repository、Infrastructure、结构清晰、易维护、低耦合、高内聚、前端、Flutter、Spring、新代码落点、strangler pattern、旧代码堆叠禁令、Service 业务动作扩展、新业务分支必拆、同分支变种必迁、反结账场景、partialRefund 场景、惯性追加禁令、focused sub-service、god service 零业务方法、函数级业务场景分流、阶梯 1 私有方法、阶梯 2 升级 service、业务定位判定、if-else 堆叠禁令、1-100 期反惯性、1 行 delegate 入口、跨分支编排、Orchestrator、Saga、横切关注点豁免、AOP、拦截器、服务命名 taxonomy、CommandHandler、聚合边界、事务一致性、Domain Event、聚合 5 问 |
@@ -248,6 +252,9 @@
 | `skills/backend-knowledge-graph-required/references/update-workflow.md` | backend-knowledge-graph-required | 编码闭环、候选沉淀与 SQL 归档 |
 | `skills/architecture-ddd-lite-fullstack/references/layers-and-boundaries.md` | architecture-ddd-lite-fullstack | 分层职责、feature、聚合与原子能力边界 |
 | `skills/architecture-ddd-lite-fullstack/references/framework-rules.md` | architecture-ddd-lite-fullstack | 各技术栈落地规则 |
+| `skills/frontend-excellence/references/architecture-and-state.md` | frontend-excellence | 前端目录、依赖、组件边界与状态归属规则 |
+| `skills/frontend-excellence/references/design-system-and-aesthetics.md` | frontend-excellence | 视觉方向、设计令牌、组件状态与美学反模式 |
+| `skills/frontend-excellence/references/quality-gates.md` | frontend-excellence | 响应式、可访问性、性能、浏览器验证与交付证据门禁 |
 | `skills/coding-standards-common/references/comments.md` | coding-standards-common | 注释三档、禁止项与触及范围清理规则 |
 | `skills/coding-standards-common/references/implementation-checks.md` | coding-standards-common | 复用、外部契约、全局名称与异常检查 |
 | `hooks/check-design-doc.js` | design-doc-required（兜底） | **项目级设计文档存在性兜底** — Node 跨平台（**v1.26 起默认启用**，PreToolUse Write/Edit/MultiEdit）：仅对源码扩展名触发（`.dart` / `.java` / `.kt` / `.ts` / `.py` / `.go` 等），跳过 `.md` / `.json` / 测试 / Dockerfile；在项目 `docs/design/` 或用户目录 `~/Documents/ai-docs/{project}/design/`、`~/ai-docs/{project}/design/` 任一位置找到 `.md` 即放行；只兜底"项目里存在任何设计文档"，**不强校验"本次需求对应文档"**——后者由 `design-doc-required` skill 承担；环境变量 `TEAM_STANDARDS_DESIGN_DOC_HOOK=off` 一次性禁用 |

@@ -1,5 +1,12 @@
 # team-standards / design 文档索引
 
+## Frontend Excellence Skill
+
+- 文件：`frontend-excellence/frontend-excellence-current.md`
+- 编码摘要：`frontend-excellence/frontend-excellence-coding.md`
+- 摘要：新增产品级前端工程 Skill，在既有分层规范上补齐设计系统、视觉美学、完整交互状态、响应式、可访问性与真实浏览器验收。
+- 大纲：目标与边界 / 整体架构 / 模块拆分与职责 / 关键交互 / 核心规则 / 编码落点 / 数据与依赖变更 / 风险与待确认 / 验证要点
+
 ## Skill 上下文瘦身
 
 - 文件：`skill-context-slimming/skill-context-slimming-current.md`

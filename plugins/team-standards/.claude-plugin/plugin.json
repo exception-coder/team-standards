@@ -1,7 +1,7 @@
 {
   "name": "team-standards",
-  "description": "团队开发规范插件：Java 编码规范（阿里黄山版）+ 功能设计文档强制约束",
-  "version": "1.52.0",
+  "description": "团队开发规范插件：设计文档、跨语言编码、架构边界与产品级前端工程质量",
+  "version": "1.53.0",
   "author": {
     "name": "张凯",
     "email": ""
@@ -13,6 +13,8 @@
     "java",
     "coding-standards",
     "design-doc",
-    "team-standards"
+    "team-standards",
+    "frontend",
+    "design-system"
   ]
 }
