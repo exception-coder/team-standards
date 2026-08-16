@@ -84,3 +84,14 @@ jobs:
           node-version: '20'
       - name: audit skills (fail on warnings)
         run: node scripts/audit-skills.js --warnings --ci
+
+  graphify-freshness-check:
+    name: Graphify source fingerprint is current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: verify Graphify was refreshed after source changes
+        run: node scripts/check-graphify-freshness.mjs

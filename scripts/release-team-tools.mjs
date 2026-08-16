@@ -20,9 +20,12 @@ const plugins = [
   plugin('project-coding-profiles', 'project-coding-profiles'),
   plugin('yoooni-daily-plugin', 'yoooni-daily-plugin'),
 ];
+const domainRepository = path.join(workspace, 'project-domain-knowledge');
+const topologyRepository = path.join(workspace, 'cross-project-topology');
 
 assertOutputDirectory(output);
 validateWorkspaceContracts();
+validateKnowledgeRepositories();
 
 for (const item of plugins) {
   validatePluginMetadata(item);
@@ -54,6 +57,14 @@ function plugin(repositoryName, pluginName) {
 
 function validateWorkspaceContracts() {
   run(process.execPath, [path.join(scriptDirectory, 'check-workspace-contracts.mjs'), '--workspace', workspace], workspace);
+}
+
+function validateKnowledgeRepositories() {
+  assertDirectory(domainRepository);
+  assertDirectory(path.join(domainRepository, 'knowledge'));
+  assertDirectory(path.join(topologyRepository, 'knowledge'));
+  assertFile(path.join(domainRepository, 'package.json'));
+  assertFile(path.join(domainRepository, 'scripts', 'knowledge-health.mjs'));
 }
 
 function validatePluginMetadata(item) {
@@ -97,14 +108,25 @@ function runRepositoryTests() {
 
   run(process.execPath, ['--test'], path.join(plugins[1].pluginRoot, 'hooks'));
   run(process.execPath, ['--test'], path.join(plugins[2].pluginRoot, 'hooks'));
+  run(process.execPath, ['--test', path.join(plugins[2].pluginRoot, 'scripts', 'tests', 'onboard-pipeline.test.mjs')], plugins[2].repositoryRoot);
   for (const plugin of plugins) {
     run(process.execPath, [path.join(plugin.repositoryRoot, 'scripts', 'check-runtime-version-bump.js'), '--base', 'HEAD'], plugin.repositoryRoot);
   }
 
+  runNpm(['test'], domainRepository);
+  runNpm(['run', 'smoke'], domainRepository);
+  run(process.execPath, [path.join(domainRepository, 'scripts', 'knowledge-health.mjs')], domainRepository);
+  run(process.execPath, [path.join(domainRepository, 'scripts', 'knowledge-health.mjs'), '--knowledge', path.join(topologyRepository, 'knowledge')], domainRepository);
+  run(process.execPath, [path.join(domainRepository, 'scripts', 'smoke.mjs')], domainRepository, {
+    DOMAIN_KB_DIR: path.join(topologyRepository, 'knowledge'),
+    DOMAIN_SMOKE_QUERY: 'SRM',
+  });
+
   if (process.platform === 'win32') {
     const daily = plugins[2];
-    run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(daily.pluginRoot, 'skills', 'yoooni-prod-log-query', 'query-prod-log.ps1'), '-SelfTest'], daily.repositoryRoot);
-    run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(daily.pluginRoot, 'scripts', 'tests', 'update-lock.tests.ps1')], daily.repositoryRoot);
+    const windowsPowerShellEnvironment = { PSModulePath: undefined };
+    run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(daily.pluginRoot, 'skills', 'yoooni-prod-log-query', 'query-prod-log.ps1'), '-SelfTest'], daily.repositoryRoot, windowsPowerShellEnvironment);
+    run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(daily.pluginRoot, 'scripts', 'tests', 'update-lock.tests.ps1')], daily.repositoryRoot, windowsPowerShellEnvironment);
   }
 }
 
@@ -159,9 +181,20 @@ function gitSource(repositoryRoot) {
   return { revision, dirty: Boolean(status.trim()) };
 }
 
-function run(command, args, cwd) {
+function run(command, args, cwd, environment = {}) {
   console.log(`[release] run: ${command} ${args.join(' ')}`);
-  const result = spawnSync(command, args, { cwd, encoding: 'utf8', stdio: 'inherit', timeout: commandTimeoutMs });
+  const childEnvironment = { ...process.env };
+  for (const [name, value] of Object.entries(environment)) {
+    if (value === undefined) delete childEnvironment[name];
+    else childEnvironment[name] = value;
+  }
+  const result = spawnSync(command, args, {
+    cwd,
+    encoding: 'utf8',
+    stdio: 'inherit',
+    timeout: commandTimeoutMs,
+    env: childEnvironment,
+  });
   if (result.error) fail(`${command} failed to start: ${result.error.message}`);
   if (result.status !== 0) fail(`${command} exited with ${result.status}`);
 }
@@ -182,6 +215,20 @@ function assertOutputDirectory(directory) {
 
 function assertDirectory(directory) {
   if (!fs.statSync(directory, { throwIfNoEntry: false })?.isDirectory()) fail(`required directory is missing: ${directory}`);
+}
+
+function assertFile(filePath) {
+  if (!fs.statSync(filePath, { throwIfNoEntry: false })?.isFile()) fail(`required file is missing: ${filePath}`);
+}
+
+function runNpm(args, cwd) {
+  if (process.platform !== 'win32') {
+    run('npm', args, cwd);
+    return;
+  }
+  const npmCli = process.env.npm_execpath || path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+  assertFile(npmCli);
+  run(process.execPath, [npmCli, ...args], cwd);
 }
 
 function readJson(filePath) {

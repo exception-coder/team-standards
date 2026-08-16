@@ -1,0 +1,49 @@
+name: team-tools-suite
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  release-dry-run:
+    name: Validate three plugins and two MCP knowledge domains
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: team-standards
+      - uses: actions/checkout@v4
+        with:
+          repository: exception-coder/project-coding-profiles
+          ref: main
+          path: project-coding-profiles
+      - uses: actions/checkout@v4
+        with:
+          repository: exception-coder/yoooni-daily-plugin
+          ref: master
+          path: yoooni-daily-plugin
+      - uses: actions/checkout@v4
+        with:
+          repository: exception-coder/project-domain-knowledge
+          ref: master
+          path: project-domain-knowledge
+      - uses: actions/checkout@v4
+        with:
+          repository: exception-coder/cross-project-topology
+          ref: master
+          path: cross-project-topology
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: project-domain-knowledge/package-lock.json
+      - run: npm ci
+        working-directory: project-domain-knowledge
+      - name: Run suite release validation
+        run: >-
+          node team-standards/scripts/release-team-tools.mjs
+          --workspace "$GITHUB_WORKSPACE"
+          --out "$RUNNER_TEMP/team-tools-release"
