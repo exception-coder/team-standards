@@ -9,8 +9,9 @@ Read this reference before declaring material frontend work complete. Scale the 
 3. Open the changed experience in a real browser.
 4. Inspect the primary route at a representative mobile and desktop viewport. Add tablet or dense-data widths when the product requires them.
 5. Exercise the primary interaction plus one empty, validation, permission, network, or failure path.
-6. Compare with supplied references at equivalent dimensions.
-7. Fix material hierarchy, spacing, overflow, state, and interaction defects; repeat until stable.
+6. Run [visual-review-checklist.md](visual-review-checklist.md) against the rendered page.
+7. Compare with supplied references at equivalent dimensions.
+8. Fix material hierarchy, spacing, overflow, generic-pattern, state, and interaction defects; repeat until stable.
 
 When no target sizes are supplied, use approximately 375 pixels wide for a mobile pass and 1440 pixels wide for a desktop pass, then inspect any breakpoint where composition changes.
 
@@ -38,6 +39,7 @@ When no target sizes are supplied, use approximately 375 pixels wide for a mobil
 - Loading avoids destructive layout shifts and communicates progress.
 - Empty states explain what happened and the next useful action.
 - Errors retain user context, explain recovery, and do not silently disappear.
+- Expired, invalid, and permission states do not become dead ends when a return, retry, request-access, replacement, contact, or support path exists.
 - Disabled controls communicate why when the reason is not obvious.
 - Submission prevents accidental duplication where relevant.
 - Optimistic changes can roll back cleanly.
@@ -59,6 +61,7 @@ Record:
 - routes and viewports inspected;
 - interactions and non-happy paths exercised;
 - reference comparison performed;
+- visual-review findings and intentional exceptions;
 - limitations, skipped checks, or environment blockers.
 
 Compilation alone is insufficient evidence for visual work. If the browser cannot run, report the work as implemented but visually unverified.

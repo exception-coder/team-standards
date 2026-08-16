@@ -29,7 +29,7 @@
 | `bug-doc-required` | team-standards | 编写 bug 分析文档时；完成后必须继续调用 design-doc-required 写修复实施方案 |
 | `pre-implementation-code-orientation` | team-standards | 文档写完后、开始实施代码前（含「帮我修改代码」「改代码」等直接编码请求） |
 | `architecture-ddd-lite-fullstack` | team-standards | 编写或审查 Java / React / Vue / Flutter 业务代码前；在实施前代码定位后，先判断 Feature、分层、单向依赖、原子能力与结构质量（清晰、易维护、低耦合、高内聚）；含 **函数级业务场景分流**（阶梯 1 私有方法 / 阶梯 2 升级 service，判定锚点是「业务定位」而非「代码相似度」） |
-| `frontend-excellence` | team-standards | 创建、重做或显著提升 React / Vue / Next.js 等生产级 Web 前端时；在架构边界之后建立视觉方向、设计令牌、完整组件状态、响应式与可访问性，并以真实浏览器完成桌面和移动视口验收 |
+| `frontend-excellence` | team-standards | 创建、重做或显著提升 React / Vue / Next.js 等生产级 Web 前端时；在架构边界之后建立视觉方向、设计令牌、可恢复状态、响应式与可访问性，拒绝无依据的通用生成式 UI 模式，并以真实浏览器完成视觉复核和桌面/移动验收 |
 | `coding-standards-common` | team-standards | 编写/修改任何源码语言（Java / TS / JS / Dart / Python / Kotlin / Go 等）前；通用 7 条铁律 + 注释三档（+ 字段可选档）+ 注释放置原则（注释只落在类/字段/方法声明上，函数体内除 §5.3 六类核心块外不写，靠拆函数+命名表达）+ §7.6 复用项目公共能力优先（编码前查 coding-profile 的 common-capabilities.md，禁造轮子/禁原生替代公共封装）；先于具体语言 skill 触发 |
 | `java-coding-standards` | team-standards | 编写或修改任何 Java 代码时（自动应用，通用条款 delegate 到 coding-standards-common） |
 | `dart-coding-standards` | team-standards | 编写或修改任何 Dart / Flutter 代码时（自动应用，dartdoc `///` 独占条款，通用条款 delegate 到 coding-standards-common；korepos backend 接口再叠加 kpay-daily-plugin 的 korepos-backend-service） |
@@ -76,7 +76,7 @@ flowchart TD
     PICO["pre-implementation-code-orientation\n从文档提取代码坐标"]
     ARCH["architecture-ddd-lite-fullstack\n编码前默认架构规则\nDDD-lite + Feature + 原子能力 + 结构质量"]
     FRONTEND{"是否为生产级 Web 前端?"}
-    FEX["frontend-excellence\n设计系统 + 完整状态\n响应式 + 浏览器验收"]
+    FEX["frontend-excellence\n设计系统 + 可恢复状态\n反通用模板复核 + 浏览器验收"]
     CSC["coding-standards-common\n跨语言通用 7 条铁律\n命名/函数原子/层次/零魔法值/注释三档/异常/DRY"]
     JCS["java-coding-standards\n编写代码（语言专属）"]
 
@@ -163,7 +163,7 @@ flowchart TD
 
     ORIENT --> ARCH["architecture-ddd-lite-fullstack\n编码前判断 Feature / 分层 / 原子能力 / 结构质量"]
     ARCH --> WEB{"是否为生产级 Web 前端?"}
-    WEB -- "是" --> FEX["frontend-excellence\n设计系统 / 响应式 / 可访问性 / 浏览器验收"]
+    WEB -- "是" --> FEX["frontend-excellence\n设计系统 / 可恢复状态 / 视觉复核 / 浏览器验收"]
     WEB -- "否" --> CSC["coding-standards-common\n跨语言通用 7 条铁律\n命名/函数原子/层次/零魔法值/注释三档/异常/DRY"]
     FEX --> CSC
     CSC --> CODE["java-coding-standards\n按 Java 独占条款实现代码\n（通用条款 delegate 到 common）"]
@@ -313,7 +313,7 @@ flowchart LR
 | Graphify 没有 LLM API Key 时是否直接 code-only? | 不能直接降级。纯代码语料本来就只需本地 AST；混合语料先尝试宿主 Graphify skill、Claude CLI 后端或已配置 CLI 后端。所有语义后端均不可用时，必须说明将跳过的文档/PDF/图片并取得用户确认，最后才允许 code-only。 |
 | project-docs-update 和 init-project-docs 的区别? | init-project-docs 是**从零构建**知识图谱（首次使用），project-docs-update 是**增量维护**（代码变更后同步文档）。前者生成，后者更新。 |
 | architecture-ddd-lite-fullstack 什么时候调? | 设计文档和代码定位完成后、第一行业务源码改动前。它是默认架构门禁：先判断 Feature、Presentation/Application/Domain/Repository/Infrastructure 分层、调用方向、原子能力和结构质量（清晰、易维护、低耦合、高内聚），再写代码。 |
-| frontend-excellence 和 architecture-ddd-lite-fullstack 有什么区别? | architecture-ddd-lite-fullstack 管 Feature 分层、业务边界与依赖方向；frontend-excellence 管产品级 Web 前端的视觉方向、设计令牌、完整组件状态、响应式、可访问性和真实浏览器验收。前端大改先定架构，再执行体验与验收规则。 |
+| frontend-excellence 和 architecture-ddd-lite-fullstack 有什么区别? | architecture-ddd-lite-fullstack 管 Feature 分层、业务边界与依赖方向；frontend-excellence 管产品级 Web 前端的视觉方向、设计令牌、可恢复状态、反通用模板复核、响应式、可访问性和真实浏览器验收。前端大改先定架构，再执行体验与验收规则。 |
 | 什么时候必须把 if-else 分支拆成独立 service，什么时候在函数内拆私有方法就够了？(v1.26.3) | 判定锚点是「业务定位」而非「代码相似度」。共享同一状态机/校验/补偿/团队 → 函数内拆私有方法即可（**阶梯 1**：`_handleTypeA()` / `_handleTypeB()` 私有方法，主方法只分流派发）；分支差异本质是不同业务定位（独立状态机/独立 PRD 模块/独立团队，命中 ≥3 个判定信号） → 升级到 service 级（**阶梯 2**：建 `AService` / `BService1`，共享逻辑沉到原子能力层）。1-100 期成熟项目扩展期最易违反——AI 看到 `OrderService.handle()` 已存在就习惯性加 `else if (type == B)`，结果两种业务定位逻辑黏死。详见 `architecture-ddd-lite-fullstack` 「函数级业务场景分流」节、`coding-standards-common §2.5`、`anti-pattern-case-library C4`。 |
 | architecture-ddd-lite-fullstack 和 java-coding-standards 的区别? | architecture-ddd-lite-fullstack 管**代码放哪一层、依赖方向、业务能力怎么复用、结构是否清晰易维护且低耦合高内聚**；java-coding-standards 管 **Java 代码质量**（命名、格式、异常、集合、日志等）。先分层和结构设计，再写具体语言代码。 |
 | coding-standards-common 和 java-coding-standards 的区别? | coding-standards-common 是**跨语言通用底**（命名表意、函数原子 80 行、层次分明、零魔法值、注释三档、异常不静默、DRY rule of 3），适用一切源码语言；java-coding-standards 是 **Java 独占条款**（Javadoc 语法、Integer 比较、SimpleDateFormat、SLF4J、HashMap 容量、@Override、关系库 SQL 规范等）。触发顺序：common 先（任何源码语言都要走） → 具体语言 skill 后（叠加独占条款）。新写 TS/Python/Kotlin/Go 时只走 common，新写 Java 走 common + java，新写 Dart 走 common + dart（korepos backend 接口再叠加 kpay-daily-plugin 的 korepos-backend-service）。 |

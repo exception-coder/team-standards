@@ -1,6 +1,6 @@
 ---
 name: frontend-excellence
-description: "Use when creating, redesigning, or substantially improving production Web frontends, including React, Vue, Next.js, dashboards, portals, landing pages, component libraries, or screenshot/Figma-to-code work. Enforces product-level visual direction, design systems, responsive behavior, accessibility, complete UI states, maintainable component architecture, and real-browser visual verification. Do not use for pure backend work, native mobile UI, or copy-only changes with no layout or interaction impact."
+description: "Use when creating, redesigning, or substantially improving production Web frontends, including React, Vue, Next.js, dashboards, portals, landing pages, component libraries, or screenshot/Figma-to-code work. Enforces product-level visual direction, deliberate anti-generic composition, design systems, responsive behavior, accessibility, complete recoverable UI states, maintainable component architecture, and real-browser visual verification. Do not use for pure backend work, native mobile UI, or copy-only changes with no layout or interaction impact."
 ---
 
 # Frontend Excellence
@@ -16,6 +16,7 @@ Deliver a coherent product interface, not a runnable mock. Preserve the reposito
    - Identify audience, primary task, content hierarchy, brand cues, target viewports, and accessibility expectations.
    - Use provided Figma selections, screenshots, brand assets, or written references as sources of truth.
    - If no visual reference exists, state a concise visual direction and its rationale before implementing it.
+   - Separate durable product character from fashionable references. Translate references into hierarchy, typography, density, material, and motion decisions instead of imitating a named brand.
 3. Resolve architecture and state ownership.
    - Apply `architecture-ddd-lite-fullstack` for Feature boundaries and dependency direction.
    - Read [architecture-and-state.md](references/architecture-and-state.md) when adding routes, features, shared components, data fetching, forms, or state.
@@ -23,10 +24,12 @@ Deliver a coherent product interface, not a runnable mock. Preserve the reposito
    - Read [design-system-and-aesthetics.md](references/design-system-and-aesthetics.md) for new projects, redesigns, new visual languages, or reusable component work.
    - Express repeated decisions through semantic tokens and component variants, not page-local magic values.
 5. Implement the complete experience.
+   - Read [interaction-and-states.md](references/interaction-and-states.md) when the page can load, fail, be empty, reject input, deny access, or block the user's current workflow.
    - Cover responsive layout, content hierarchy, keyboard behavior, focus, motion preferences, and all relevant loading, empty, error, success, disabled, and permission states.
    - Use real content shapes and realistic density. Keep fixtures centralized when live data is unavailable.
 6. Verify in a real browser.
    - Read [quality-gates.md](references/quality-gates.md) before declaring completion.
+   - Run [visual-review-checklist.md](references/visual-review-checklist.md) after the first complete render and again after material visual revisions.
    - Run the project's build, lint, type, and test commands that are relevant to the change.
    - Inspect at least one mobile and one desktop viewport. Exercise the primary interaction and one failure or empty path.
    - Compare against supplied references and iterate until material differences are resolved or explicitly documented.
@@ -49,8 +52,10 @@ Deliver a coherent product interface, not a runnable mock. Preserve the reposito
 - Do not use desktop shrinkage as the mobile strategy; reflow hierarchy and interaction for constrained space.
 - Do not omit focus, keyboard, reduced-motion, error, empty, loading, or disabled behavior when the component can enter those states.
 - Do not substitute visual novelty for information hierarchy, legibility, or task completion.
+- Do not default to a centered icon-title-description card, universal card grids, oversized radii, decorative gradients, or shadows on every surface. Each container and effect must express structure or interaction.
+- Do not leave empty, error, invalid, expired, or permission states as dead ends. Preserve context and provide the next useful action whenever one exists.
 - Do not declare completion from compilation alone; browser inspection is required for material visual work.
 
 ## Completion contract
 
-A finished result must be componentized, type-safe where the stack supports it, consistent with the repository, visually intentional, responsive, accessible, and backed by proportionate build/test/browser evidence. If any dimension is intentionally deferred, name it explicitly.
+A finished result must be componentized, type-safe where the stack supports it, consistent with the repository, visually intentional, free of unexamined generic UI patterns, responsive, accessible, recoverable in non-happy states, and backed by proportionate build/test/browser evidence. If any dimension is intentionally deferred, name it explicitly.
