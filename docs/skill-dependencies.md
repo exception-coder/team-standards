@@ -52,6 +52,11 @@ pre-implementation-code-orientation
 architecture-ddd-lite-fullstack   ← 强制门禁(无例外)
             ↓
 frontend-excellence              ← 创建/重做/显著提升 Web 前端时
+design-system-bootstrap          ← 初始化 Registry/Profile/Binding 时
+design-system-guardian           ← 有意义的 UI 工作前解析设计知识与模式
+design-observer                  ← 明确用户审美反馈后记录 Evidence
+design-pattern-miner             ← 重复 Evidence 出现后维护 Candidate
+design-reviewer                  ← 大型 UI 或里程碑完成后评审 Drift
             ↓
 coding-violation-log (回顾模式)   ← 项目存在违规表时
             ↓
@@ -70,6 +75,11 @@ arch-lint                        ← Flutter 代码异步触发
 |-------|------|------|------------|
 | `architecture-ddd-lite-fullstack` | 通常 `pre-implementation-code-orientation` 已完成 | `coding-standards-common` | — |
 | `frontend-excellence` | `architecture-ddd-lite-fullstack` 已确定前端 Feature 边界 | `coding-standards-common` 与实现验证 | Figma、ImageGen、浏览器或 Playwright 均按环境能力选用 |
+| `design-system-bootstrap` | 用户要求初始化、提取、绑定或 fork | `design-system-guardian` | Registry 数据写 `$HOME/.design-registry`，不写 Skill 目录 |
+| `design-system-guardian` | Registry/Profile/现有实现解析；缺 Registry 时先 bootstrap | `frontend-excellence`、按范围选择 observer/reviewer | 成熟区域 Conservative，新区域 Controlled Exploration |
+| `design-observer` | 明确用户反馈 + 已解析的最小 scope | Evidence 重复时 `design-pattern-miner` | 只写 Evidence，不改 Rule |
+| `design-pattern-miner` | 多条相关 Evidence / Candidate / References | 人工确认重大晋升或弃用 | Profile Evidence 不直升 Global Core |
+| `design-reviewer` | 代表性渲染 + Profile/References/Rubric | 只复验受影响维度 | 不另造设计语言，小改不过度验证 |
 | `coding-standards-common` | `architecture-ddd-lite-fullstack` | `{language}-coding-standards` | `bugfix-coding-style`(bug 修复时叠加) |
 | `java-coding-standards` | `coding-standards-common` | — | 通用部分 delegate 到 common,不替代 |
 | `bugfix-coding-style` | 仅 bug 修复 / 删冗余场景 | `coding-standards-common` 继续 | 注释方向与 `coding-standards-common` 注释三档对齐 |

@@ -93,13 +93,14 @@ flowchart LR
 
 ## Skills 能力地图
 
-当前包含 27 个 Skill，按工程阶段分为八组。README 只提供地图，详细触发条件以各 `SKILL.md` 为准。
+当前包含 33 个 Skill，按工程阶段分为九组。README 只提供地图，详细触发条件以各 `SKILL.md` 为准。
 
 | 阶段 | Skills | 解决的问题 |
 |---|---|---|
 | 方案与需求 | `solution-review-required`、`design-doc-required`、`bug-doc-required`、`business-logic-orientation` | 先澄清目标、现状、方案和根因 |
 | 实施前定位 | `pre-implementation-code-orientation`、`doc-index-required` | 精准找到代码坐标，避免重复扫描和重复文档 |
 | 架构与编码 | `architecture-ddd-lite-fullstack`、`frontend-excellence`、`coding-standards-common`、`java-coding-standards`、`dart-coding-standards`、`llm-agent-coding-standards`、`bugfix-coding-style` | 控制分层、产品级前端体验、依赖、语言细节、LLM 边界和源码表达 |
+| 设计治理 | `design-system-bootstrap`、`design-system-guardian`、`design-observer`、`design-pattern-miner`、`design-reviewer` | 初始化用户级 Registry，绑定和守护 Design Profile，从真实反馈形成 Evidence、Candidate 与视觉评审闭环 |
 | 提交与日志 | `git-commit-standards`、`daily-work-log` | 形成可审查提交和连续工作记录 |
 | 领域知识 | `backend-knowledge-graph-required`、`domain-spec-mining-required`、`reverse-index-required`、`glossary-required`、`cross-project-locator` | 建立正向事实、对象规格、反向影响、术语和跨项目索引 |
 | 质量回路 | `coding-violation-log`、`arch-lint`、`comment-cleanup`、`markdown-writing-standards`、`project-docs-update` | 检测违规、清理存量问题并同步文档 |

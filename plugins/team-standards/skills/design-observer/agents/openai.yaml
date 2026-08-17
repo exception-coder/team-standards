@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Observer"
+  short_description: "Capture explicit UI feedback as scoped evidence"
+  default_prompt: "Use $design-observer to record this UI feedback as preference evidence."

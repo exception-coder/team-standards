@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design System Guardian"
+  short_description: "Govern UI work with profiles and design evidence"
+  default_prompt: "Use $design-system-guardian to implement this UI without drifting from the approved design profile."

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "registryType": "user",
+  "status": "initialized",
+  "core": { "philosophy": "core/philosophy.md", "tokens": "core/tokens.md", "patterns": "core/patterns.md", "antiPatterns": "core/anti-patterns.md", "decisions": "core/decisions.md" },
+  "profilesRoot": "profiles",
+  "memory": { "preferences": "memory/preferences.jsonl", "candidates": "memory/candidates.md", "decisions": "memory/decisions.md" },
+  "evals": { "rubric": "evals/rubric.md", "baselines": "evals/baselines" }
+}

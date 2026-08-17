@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Design Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "name", "status", "maturity", "sources"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "name": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["active", "deprecated", "archived"] },
+    "maturity": { "enum": ["EXPERIMENTAL", "CANDIDATE", "ESTABLISHED", "CORE"] },
+    "extends": { "type": "string" },
+    "sources": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

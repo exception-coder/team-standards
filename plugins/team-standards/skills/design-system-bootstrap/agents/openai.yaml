@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design System Bootstrap"
+  short_description: "Initialize evidence-driven design registries and profiles"
+  default_prompt: "Use $design-system-bootstrap to initialize my global design registry from this project."

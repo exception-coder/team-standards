@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Preference Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "context", "type", "target", "signals", "reason", "source", "confidence", "scope", "createdAt"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^DESIGN-EVIDENCE-[0-9]{4,}$" },
+    "profile": { "type": "string" },
+    "context": { "type": "string", "minLength": 1 },
+    "type": { "enum": ["acceptance", "rejection", "comparison", "observation"] },
+    "target": { "type": "string", "minLength": 1 },
+    "signals": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+    "reason": { "type": "string", "minLength": 1 },
+    "source": { "enum": ["user-feedback", "approved-reference", "rejected-reference", "implementation-observation"] },
+    "confidence": { "enum": ["low", "medium", "high"] },
+    "scope": { "enum": ["local", "profile", "global"] },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Evidence-Driven Design Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "registryType", "status", "core", "profilesRoot", "memory", "evals"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "registryType": { "enum": ["user", "team"] },
+    "status": { "enum": ["initialized", "active", "migrating"] },
+    "core": {
+      "type": "object", "additionalProperties": false,
+      "required": ["philosophy", "tokens", "patterns", "antiPatterns", "decisions"],
+      "properties": {
+        "philosophy": { "type": "string" }, "tokens": { "type": "string" },
+        "patterns": { "type": "string" }, "antiPatterns": { "type": "string" }, "decisions": { "type": "string" }
+      }
+    },
+    "profilesRoot": { "type": "string" },
+    "memory": {
+      "type": "object", "additionalProperties": false,
+      "required": ["preferences", "candidates", "decisions"],
+      "properties": { "preferences": { "type": "string" }, "candidates": { "type": "string" }, "decisions": { "type": "string" } }
+    },
+    "evals": {
+      "type": "object", "additionalProperties": false, "required": ["rubric", "baselines"],
+      "properties": { "rubric": { "type": "string" }, "baselines": { "type": "string" } }
+    }
+  }
+}

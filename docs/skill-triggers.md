@@ -20,6 +20,10 @@
 | 写新接口前涉及表读写 / 状态判定 / 金额聚合 | 加接口 / 写 service / 写 DAO | korepos-backend-service(若 korepos,已迁至 kpay-daily-plugin) 或 `architecture-ddd-lite-fullstack`(通用) | `backend-knowledge-graph-required`(读图谱) + `coding-standards-common` | — |
 | 函数内按业务类型 if-else / switch 堆叠 ≥2 分支 | if-else 堆叠业务类型 / switch orderType / 不同订单类型同函数处理 / 函数内分流 / A 订单 B 订单同方法 | `architecture-ddd-lite-fullstack`(函数级业务场景分流节,判定阶梯 1/2) | `coding-standards-common §2.5`(通用兜底提醒) | — |
 | 创建、重做或显著提升 Web 前端 | React / Vue / Next.js / 仪表盘 / 门户 / 落地页 / 组件库 / Figma 转代码 / 截图转代码 | `frontend-excellence` | `architecture-ddd-lite-fullstack`(分层前置) + `coding-standards-common`(源码质量) | 纯后端、原生移动端、无布局影响的文案小改 |
+| 初始化或绑定 Design System | 全局 Registry / 从项目提取 Profile / design.config.json / inherit / reference / fork | `design-system-bootstrap` | `design-system-guardian`(后续 UI 治理) | 已存在 Registry 下的普通 UI 修改 |
+| 继承视觉 DNA 的 UI 修改 | 有意义的 UI 实现 / Profile 风格 / 防止 Design Drift | `design-system-guardian` | `frontend-excellence`(生产 Web 实现) | 纯文案且无布局影响 |
+| 明确审美反馈 | 太 AI / 舒服 / 图 2 好 / 圆角太大 / 布局割裂 | `design-observer` | `design-pattern-miner`(Evidence 重复时) | 无明确反馈的静默验收 |
+| 大型 UI 视觉评审 | 新页面 / 重构 / 新组件体系 / Navigation / Responsive redesign / Release | `design-reviewer` | `design-system-guardian` + `frontend-excellence` | 小文字、小间距、明显对齐 Bug |
 | 改 Flutter 代码 | Flutter / .dart / 退款 UI / pos | (后端) korepos-backend-service(已迁至 kpay-daily-plugin) 或 (前端) `architecture-ddd-lite-fullstack` | `arch-lint`(编码后) + `coding-standards-common` | — |
 | 写源码 Edit/Write | .java / .dart / .ts / .py / .kt 任一 | `design-doc-required`(若未触发) → `pre-implementation-code-orientation` → `architecture-ddd-lite-fullstack` | `coding-standards-common`(任何源码必经) + 语言专属 | `bug-doc-required`(无 bug 报告) |
 | 提交 commit | git commit / 提交 / push | `git-commit-standards`(大改 hook 强制) | `daily-work-log`(会话末) | — |
