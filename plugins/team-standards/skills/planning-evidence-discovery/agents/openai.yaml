@@ -1,0 +1,4 @@
+interface:
+  display_name: "Planning Evidence Discovery"
+  short_description: "Route PRD evidence across related projects"
+  default_prompt: "Use $planning-evidence-discovery to explore this requirement across related projects and produce a verifiable evidence trace."

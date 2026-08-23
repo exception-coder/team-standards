@@ -12,6 +12,7 @@
 | 改枚举值 / 字段定义 / 同步事件 payload / API endpoint | 改枚举 / 改字段 / 改事件 / 改 API | `design-doc-required` → 编码 → `reverse-index-required`(回写) | `backend-knowledge-graph-required`(若动表关系) | — |
 | 用户问表关系 / 字段来源 / SQL 怎么写 / 部分退判定 | 表关系 / ER / SQL / 退款判定 | `backend-knowledge-graph-required` | `glossary-required`(若涉及业务术语未登记) | `reverse-index-required`(查询正向, 非反向) |
 | PRD / 设计 / 对话出现未登记的业务领域名词 | 订单 / 账单 / 退款 / 分摊 / 流水 / 快照 / 对账 | `glossary-required`(候选追加) | `backend-knowledge-graph-required`(若已知正向定义) | — |
+| 探索初步 PRD、初始化规格、价值分析或工时评估且可能涉及关联项目 | 规格探索 / 初始化规格 / 价值分析 / 工时评估 / 重构来源 / 迁移来源 / 项目依赖 | `planning-evidence-discovery` | `domain-spec-mining-required`(状态或关联规格缺失时) + `cross-project-locator`(已有拓扑事实) | Graphify 单独承担项目关系解析 |
 | 用户与 AI 对同义词使用不一致 ("退货" vs "退款") | 同义词 / 同名异叫 | `glossary-required`(同义词归一) | — | `cross-project-locator`(跨项目才走) |
 | 跨项目调用链追踪 (≥2 个 kpay POS 工程) | 跨项目 / 调用链 / 接口对照 / 链路 / korepos+bff | `cross-project-locator` | `reverse-index-required`(若单服务内调用方仍需要) | `backend-knowledge-graph-required`(它管单服务) |
 | 重构 / 复写 / 迁移前需要梳理现状 | 重构前分析 / orientation / 现状梳理 / 业务逻辑 | `business-logic-orientation` | `backend-knowledge-graph-required`(若涉及后端) | — |
@@ -53,6 +54,7 @@
 | 反向影响 / 这个状态破坏哪些 / 字段在哪用 / 事件订阅 / API 调用方 | `reverse-index-required` | 反向影响索引 |
 | 业务术语 / 订单 / 退款 / 分摊 / 同义词 / glossary | `glossary-required` | 仅业务领域词 |
 | 跨项目 / 跨工程 / 调用链 / 链路 / end-to-end / kpay-pos-topology | `cross-project-locator` | ≥2 工程才触发 |
+| 规格探索 / 初始化规格 / 价值分析 / 工时评估 / planning evidence | `planning-evidence-discovery` | 先解析项目范围，再按关系查询并复用持久化轨迹 |
 | 编码违规 / 分层违规 / 用户纠错 / 防重犯 | `coding-violation-log` | 异步登记 + 编码前回顾 |
 | Flutter 架构检查 / arch lint / 5 类规则 | `arch-lint` | Flutter 改完异步 |
 | Mermaid / 图表 / 流程图 / 时序图 / 目录复核 / TOC | `markdown-writing-standards` | 任何 .md 改完结构性扫一遍 |
@@ -77,6 +79,7 @@
 | `bugfix-coding-style` vs `coding-standards-common` | bugfix 关注注释 / 历史痕迹清理; common 关注命名 / 函数原子 / 注释三档; 两者叠加 |
 | `bug-doc-required` vs `design-doc-required` | bug 修复链路两者都必走; bug 文档负责分析根因, design 文档负责实施方案 |
 | `solution-review-required` vs `design-doc-required` | 永远 solution-review 先; review 完成后 design-doc 才进入 |
+| `planning-evidence-discovery` vs `cross-project-locator` | planning-evidence-discovery 管 PRD 查询计划、证据账本和完成性；cross-project-locator 管已登记跨项目调用链定位与维护，可作为证据来源但不替代规划门禁 |
 
 ## 触发主次决策树 (快速判定)
 

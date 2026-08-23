@@ -101,6 +101,7 @@ arch-lint                        ← Flutter 代码异步触发
 |-------|------|------|------|
 | `backend-knowledge-graph-required` | 后端表 / SQL / 状态 / 原子能力相关 | 编码后回写图谱或候选池 | `reverse-index-required`(影响面分析) |
 | `domain-spec-mining-required` | 状态/关联闭环需求且已有规格缺失或冲突 | `design-doc-required` | `backend-knowledge-graph-required`(事实层) + `reverse-index-required`(影响面) |
+| `planning-evidence-discovery` | 初步 PRD、初始化规格、价值分析或工时评估 | `design-doc-required` 或规划输出 | Forge scope resolver + Graphify + project-domain-knowledge + `cross-project-locator`(拓扑事实) + `domain-spec-mining-required`(对象规格候选) |
 | `reverse-index-required` | 改枚举 / 字段 / 事件 / API | 同回合回写反向索引 | `backend-knowledge-graph-required`(正向 vs 反向) |
 | `glossary-required` | PRD / 设计 / 对话含未登记业务术语 | — | `init-project-docs`(批量初始化 07_glossary.md) |
 | `cross-project-locator` | ≥2 个 kpay POS 工程命中 | — | 与单服务图谱互斥(单服务归 backend-kg) |
@@ -145,6 +146,7 @@ arch-lint                        ← Flutter 代码异步触发
 | 用户直接要求改代码,无设计文档 | `design-doc-required`(强制门禁) |
 | AI 改完代码没回写枚举 / 字段反向索引 | `reverse-index-required`(回写模式) |
 | AI 改完后端代码没沉淀 DAO/SQL/状态判定 | `backend-knowledge-graph-required`(回写候选池或正式图谱) |
+| PRD 声称已检查依赖项目，但没有 resolver 调用和持久化 v2 轨迹 | `planning-evidence-discovery` + Forge 完成性门禁 |
 | 业务项目源码改动后未记工作日志 | `daily-work-log`(会话结束前必须回补) |
 | team-standards 决策型变更后无 dev-log 条目 | `dev-log`(会话结束前) |
 | Java 代码改完只走了 coding-standards-common 没走 java-coding-standards | 漏掉语言专属叠加 |

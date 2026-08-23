@@ -81,7 +81,7 @@ flowchart LR
 典型状态类需求的门禁是：
 
 1. 识别业务对象、状态字段、关联和不变量。
-2. 查询 Graphify 静态事实、DDL、反向索引与已有领域知识。
+2. 规格探索先解析主项目与重构、迁移、依赖、集成项目，再查询 Graphify 静态事实、DDL、反向索引与已有领域知识。
 3. 证据不足或冲突时，执行对象中心规格挖掘并保留人工评审。
 4. 编码前确认事务边界、共用 Service 副作用和失败回滚。
 5. 测试上游、当前动作、数据库终态和至少一个下游动作。
@@ -102,12 +102,14 @@ flowchart LR
 | 架构与编码 | `architecture-ddd-lite-fullstack`、`frontend-excellence`、`coding-standards-common`、`java-coding-standards`、`dart-coding-standards`、`llm-agent-coding-standards`、`bugfix-coding-style` | 控制分层、产品级前端体验、依赖、语言细节、LLM 边界和源码表达 |
 | 设计治理 | `design-system-bootstrap`、`design-system-guardian`、`design-observer`、`design-pattern-miner`、`design-reviewer` | 初始化用户级 Registry，绑定和守护 Design Profile，从真实反馈形成 Evidence、Candidate 与视觉评审闭环 |
 | 提交与日志 | `git-commit-standards`、`daily-work-log` | 形成可审查提交和连续工作记录 |
-| 领域知识 | `backend-knowledge-graph-required`、`domain-spec-mining-required`、`reverse-index-required`、`glossary-required`、`cross-project-locator` | 建立正向事实、对象规格、反向影响、术语和跨项目索引 |
+| 领域知识 | `backend-knowledge-graph-required`、`domain-spec-mining-required`、`planning-evidence-discovery`、`reverse-index-required`、`glossary-required`、`cross-project-locator` | 建立正向事实、对象规格、跨项目规划证据、反向影响、术语和拓扑索引 |
 | 质量回路 | `coding-violation-log`、`arch-lint`、`comment-cleanup`、`markdown-writing-standards`、`project-docs-update` | 检测违规、清理存量问题并同步文档 |
 | 项目初始化 | `init-project-docs`、`generate-project-profile` | 为新接入项目生成文档与项目画像基线 |
 | 插件维护 | `dev-log` | 记录规则方向、触发链路和重大团队决策 |
 
 其中 `domain-spec-mining-required` 是业务闭环的关键补强：它协调 Graphify、DDL、运行证据和规格候选，显式识别状态迁移、不变量、关联解除、冲突证据和下一动作。
+
+`planning-evidence-discovery` 补齐 PRD 规划链的跨项目入口：先由 Forge 确定性解析项目关系和真实路径，再由 Agent 按关系选择业务知识、Graphify、DDL、路由、源码与拓扑；所有命中和失败进入可恢复的 `planning-evidence-trace-v2`，价值分析和工时评估复用同一轨迹。
 
 ---
 
