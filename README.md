@@ -59,7 +59,7 @@ flowchart TD
 
 - **软判断与硬门禁分离**：Skill 能处理上下文和例外，Hook 只拦截客观、可机械判断的红线。
 - **跨客户端统一输入**：`change-input.js` 将 Claude 写入事件与 Codex `apply_patch` 归一为 Change 列表。
-- **单进程并发守卫**：`write-guard-dispatcher.js` 并发运行六条写入规则，并保持稳定输出顺序。
+- **单进程并发守卫**：`write-guard-dispatcher.js` 并发运行七条写入规则，并保持稳定输出顺序。
 - **风险分档**：S/M/L 三档让小改轻量通过，状态机、字段、接口和跨模块改动进入完整链路。
 - **证据驱动闭环**：状态/关联类需求不以接口成功为终点，而以业务对象终态和下一动作成功为验收标准。
 
@@ -131,9 +131,10 @@ Hook 不替代 Skill，而是在工具写入和提交边界提供最后一道机
 - 后端知识图谱就绪检查
 - 源码注释红线检查
 - SQL DDL 就绪检查
+- SQL 查询性能风险软提醒
 - AI 文档输出位置检查
 
-每条规则都有独立的 `TEAM_STANDARDS_*` 环境变量用于 `block`、`warn` 或 `off`。性能指标默认关闭；仅在排查时设置 `TEAM_STANDARDS_HOOK_METRICS=on`，指标不记录 Prompt、文件内容或绝对路径。
+每条规则都有独立的 `TEAM_STANDARDS_*` 环境变量；客观规则可配置 `block`、`warn` 或 `off`，查询性能等启发式规则只提供 `warn` 或 `off`。性能指标默认关闭；仅在排查时设置 `TEAM_STANDARDS_HOOK_METRICS=on`，指标不记录 Prompt、文件内容或绝对路径。
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "name": "team-standards",
-  "version": "1.56.0",
+  "version": "1.57.0",
   "description": "Team development standards plugin with design gates, cross-language architecture rules, and production frontend quality workflows.",
   "author": {
     "name": "Zhang Kai",

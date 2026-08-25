@@ -12,6 +12,7 @@ const guards = [
   'check-backend-kg-readiness.js',
   'check-comment-density.js',
   'check-sql-ddl-readiness.js',
+  'check-query-performance-risk.js',
   'check-ai-doc-location.js',
 ];
 const rounds = readRounds();

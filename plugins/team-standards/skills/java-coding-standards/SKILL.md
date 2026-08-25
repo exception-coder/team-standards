@@ -132,6 +132,9 @@ public class ConcurrencyController {
 - WHERE 条件字段须有索引;**禁止在索引列上做函数操作**(会失效索引)
 - 禁止 `LIKE '%keyword'` 开头的模糊查询(走不了索引)
 - 索引不超过 5 个;单值索引字段不超过 5 个
+- 禁止先分页取候选、再按 Java 计算结果过滤并持续翻批次凑页；优先把稳定条件下推到数据库，不能下推时先执行 `backend-knowledge-graph-required` 的高风险查询性能门禁
+- 禁止在循环或 Stream 中逐条调用 DAO / Mapper / Repository；改用集合查询、批量聚合或预计算能力，确有硬上限的例外须记录最坏查询次数
+- 禁止为 `count` / `exists` / 汇总加载全量明细到 Java；使用数据库集合运算，或明确受控离线场景的数据上限与资源边界
 
 ---
 

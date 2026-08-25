@@ -1,5 +1,12 @@
 # team-standards / design 文档索引
 
+## SQL 高风险查询门禁
+
+- 文件：`sql-performance-guard/sql-performance-guard-current.md`
+- 编码摘要：`sql-performance-guard/sql-performance-guard-coding.md`
+- 摘要：在编写无界统计、派生筛选、应用层分页和循环跨表查询前，强制告警、给出优化路径并记录执行计划与调用次数证据。
+- 大纲：目标与边界 / 整体架构 / 模块职责 / 核心规则 / 验证证据 / 编码落点 / 风险与回滚 / 验收标准
+
 ## Frontend Excellence Skill
 
 - 文件：`frontend-excellence/frontend-excellence-current.md`

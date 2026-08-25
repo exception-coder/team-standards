@@ -11,6 +11,7 @@ const GUARDS = [
   { script: 'check-backend-kg-readiness.js', env: 'TEAM_STANDARDS_BACKEND_KG_HOOK' },
   { script: 'check-comment-density.js', env: 'TEAM_STANDARDS_COMMENT_HOOK' },
   { script: 'check-sql-ddl-readiness.js', env: 'TEAM_STANDARDS_SQL_DDL_HOOK' },
+  { script: 'check-query-performance-risk.js', env: 'TEAM_STANDARDS_SQL_PERF_HOOK' },
   { script: 'check-ai-doc-location.js', env: 'TEAM_STANDARDS_DOC_LOCATION_HOOK' },
 ];
 

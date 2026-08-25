@@ -24,7 +24,7 @@
 | `solution-review-required` | team-standards | 用户提出具体想法/方案并要求实施，或要求按某个回复、目录策略、架构路径、现有代码直接改时，先审视目标、现有代码质量、风险和更优方案 |
 | `design-doc-required` | team-standards | 写任何实现代码前，或被要求提供修复方案/实施方案时（新功能和 bug 修复均适用）；**任何源码 Edit/Write 请求（含「根据文档改代码」「帮我改一下」等）也必须先触发**；文档定位为方案/接口开发的简明编码依据，重点确认核心逻辑、编码落点和风险点；图表遵循最小图原则；Git 管理下默认维护稳定/current 文档，历史由 commit body 承担 |
 | `doc-index-required` | team-standards | **(辅助)** 创建任何 Markdown 文档前先确定输出路径；AI 生成 Markdown 默认写用户 Documents 下的 `ai-docs/{project}/{type}/{topic}/{filename}`（无 `{agent}/`、无 `{YYYY-MM-DD}/`、文件名不带日期）；**v1.20 起用户目录知识库与项目 `docs/` 索引体系等同**，写文档前必须 Phase-A 读 INDEX 查重，写完必须 Phase-B 登记；`work-log/`（日期型）和 `knowledge-graph/`（自有 `00_index.md`）走自管模式 |
-| `backend-knowledge-graph-required` | team-standards | 后端接口/服务开发前读取后端图谱，重点回顾表逻辑索引、原子能力索引和 SQL 查询索引；会话中提到业务、表、字段来源、SQL/DAO/Mapper 查询逻辑时自动沉淀 SQL 指纹；生成/更新全景 ER、SQL 查询卡、表逻辑和原子能力；编码后同步 DAO/SQL、表关系、订单/退款/支付状态判定、金额聚合、原子能力复用 |
+| `backend-knowledge-graph-required` | team-standards | 后端接口/服务开发前读取图谱和 DDL；无界统计、派生筛选、应用层分页、全候选扫描或 N+1 在落码前先告警，估算最坏 SQL 次数，比较下推/集合化/预计算/有界异步方案并补执行计划或计时证据；同时沉淀 SQL、表逻辑、状态和原子能力 |
 | `domain-spec-mining-required` | team-standards | 订单、库存、标签、审核、取消、退货、调拨或占用等状态/关联需求在既有规格缺失、不完整或冲突时触发；复用 Graphify、DDL、反向索引与运行证据生成对象关系、状态迁移、不变量、闭环和冲突候选，编码前补齐终态、关联解除、失败/幂等、数据库断言和下一动作 |
 | `planning-evidence-discovery` | team-standards | 探索初步 PRD、生成初始化规格、价值分析或工时评估时，先由 Forge 解析主项目与重构、迁移、依赖、集成项目，再按关系动态查询领域知识、Graphify、DDL、路由、源码和跨项目拓扑；真实调用持久化为 v2 轨迹并由服务端驱动最多三轮补查 |
 | `bug-doc-required` | team-standards | 编写 bug 分析文档时；完成后必须继续调用 design-doc-required 写修复实施方案 |
@@ -306,13 +306,14 @@ flowchart LR
 | 用户要求“参考现有代码照着写”时可以直接抄吗? | 不可以默认抄。现有代码只能作为事实材料，必须先判断它是否符合当前架构、分层、状态机、数据一致性和测试约束。质量差的旧代码只能提取业务规则，不能作为新实现模板继续扩散。 |
 | 用户没问更优方案时，AI 要主动提吗? | 要。`solution-review-required` 的核心职责就是反迎合：当用户方案或现有代码惯性存在明显风险时，必须主动指出问题，并给出更简单、更安全或更可维护的建议。 |
 | 后端知识图谱会因为会话里反复提到就自动更新吗? | 会自动记录到用户目录候选池，避免遗漏；但不会把未验证猜测直接写入正式图谱。代码/DDL/枚举/API 契约验证过，或本次后端代码变更影响 DAO/SQL、表关系、状态判定、金额聚合、原子能力时，必须同步正式图谱或候选池。 |
-| backend-knowledge-graph-required 管哪些范围? | 管后端单服务。沉淀领域能力、原子能力、流程、全景 ER、SQL 查询逻辑、表逻辑、表关系、枚举、状态判定、API、外部依赖和代码坐标；前端 UI、跨项目拓扑不放进这个 skill。 |
+| backend-knowledge-graph-required 管哪些范围? | 管后端单服务。除领域能力、表、SQL、状态与原子能力外，也管查询性能门禁：无界聚合、应用层过滤分页、全候选批次遍历、循环数据访问和 N+1 必须先告警、优化并取证；前端 UI、跨项目拓扑不放进这个 skill。 |
 | domain-spec-mining-required 和后端知识图谱有什么区别? | 后端知识图谱登记已知事实和可复用能力；规格挖掘把代码、DDL、日志、历史数据等证据按业务对象重组，发现状态迁移、不变量、闭环和冲突候选。候选不能自动变成业务真理，owner 评审后最多先进入 draft。 |
 | PRD 规格探索如何发现重构来源项目的 Graphify 和 DDL? | 先由 `planning-evidence-discovery` 调用 Forge 的 `resolve_project_evidence_scope`，取得关系、角色和真实路径；再按 `REFACTORS` 或 `MIGRATES_FROM` 规则调用统一证据查询。Graphify 不负责猜项目依赖，模型文本也不能替代持久化工具轨迹。 |
 | 哪些需求必须验证下一动作? | 所有改变业务对象状态或关联的需求。当前接口、按钮或审核成功后，还要验证数据库终态与至少一个下游动作，例如库存恢复后能再次配货或调拨。 |
 | 后端接口开发前要看哪些图谱? | 先看 `07_table_logic_index.md`、`08_atomic_capability_index.md` 和 `09_sql_query_index.md`，再看命中的 `table-logic/{scenario}.md`、`atomic-capabilities/{capability}.md`、`sql-queries/{scenario}.md`、表卡、流程卡、枚举卡，最后才读 DAO/Service 代码。 |
 | 会话里提到 SQL 或业务查询逻辑要怎么处理? | 必须同回合追加到 `_sql_candidates.md`，记录业务问题、SQL 指纹、参数、返回字段、涉及表、join/where/group by/order by 语义、状态枚举、原子能力和代码坐标；用户要求整理时合并到 `09_sql_query_index.md`、`sql-queries/` 和全景 ER。 |
 | “完善 SQL”时能直接新写一条吗? | 不能默认新写。先查 `09_sql_query_index.md` 和 `sql-queries/`，命中相似 SQL 时按 SQL 指纹合并为同一查询能力的变体，只补必要的 join/where/group by/order by，并回写图谱。 |
+| 全量统计、派生筛选或 Java 内分页能直接写吗? | 不能。先读取 `query-performance-gate.md`：计算候选规模、批次数、单候选查询数和最坏 SQL 次数，优先过滤下推、集合化、预计算或有界异步；高风险查询补执行计划、SQL 调用次数和真实计时。无可信环境时标记“性能未验证”，不得直接描述为生产可用。 |
 | 订单部分退、订单状态判定这类反复问题怎么处理? | 必须沉淀到 `table-logic/` 和原子能力索引。卡片要写清涉及表、状态/金额字段、判定矩阵、状态变化矩阵、可复用 DAO/Service 方法和代码坐标，后续新增接口先按图谱判断是否支持。 |
 | 多项目知识图谱还要整理什么? | 不做各服务内部能力的重复沉淀，主要记录服务间调用关系、入口契约、关键业务对象、数据归属、失败传播和幂等补偿边界；具体跨项目链路由 `cross-project-locator` 负责。 |
 | 需要单独调用 doc-index-required 吗? | 创建任何 Markdown 文档前都要先应用它的"输出路径规则"。**v1.20 起：用户目录知识库与项目 `docs/` 索引体系等同**，写文档前都要 Phase-A 读 INDEX 查重，写完都要 Phase-B 登记；`work-log/`（日期型）和 `knowledge-graph/`（自管 `00_index.md`）走豁免模式。 |

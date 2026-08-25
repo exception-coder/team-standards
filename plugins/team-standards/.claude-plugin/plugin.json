@@ -1,7 +1,7 @@
 {
   "name": "team-standards",
   "description": "团队开发规范插件：设计文档、跨语言编码、架构边界与产品级前端工程质量",
-  "version": "1.56.0",
+  "version": "1.57.0",
   "author": {
     "name": "张凯",
     "email": ""

@@ -1,18 +1,19 @@
 ---
 name: backend-knowledge-graph-required
-description: "Use for single-service backend questions or Markdown about table relations, ER, SQL, state transitions, atomic capabilities, and recurring project-level technical pitfalls."
+description: "Use for single-service backend questions or Markdown about table relations, ER, SQL, state transitions, atomic capabilities, recurring technical pitfalls, or query performance risks such as unbounded aggregates, application-side filtering/pagination, batch scans, and N+1 data access."
 ---
 
 # 后端知识图谱门禁
 
 ## 触发范围
 
-用于单服务的表关系、ER、SQL、状态流转、业务流程到 CRUD、原子能力和可复用技术陷阱。跨项目调用链不归本 Skill；纯前端状态和通用编程知识也不归本 Skill。
+用于单服务的表关系、ER、SQL、状态流转、业务流程到 CRUD、原子能力、查询性能和可复用技术陷阱。跨项目调用链不归本 Skill；纯前端状态和通用编程知识也不归本 Skill。
 
 ## 渐进读取
 
 - 需要确定图谱归属、目录层级或读取顺序时，读取 [references/storage-and-routing.md](references/storage-and-routing.md)。
 - 需要进行接口开发闭环、候选沉淀或 SQL 归档时，读取 [references/update-workflow.md](references/update-workflow.md)。
+- 编写或评审统计、筛选、分页、批量遍历或循环数据访问逻辑时，读取 [references/query-performance-gate.md](references/query-performance-gate.md)。
 - 需要创建或更新正式表、SQL、原子能力、能力、流程、枚举卡片时，读取 [rules/card-templates.md](rules/card-templates.md) 中对应模板。
 
 ## 核心流程
@@ -27,6 +28,7 @@ description: "Use for single-service backend questions or Markdown about table r
 
 - 涉及数据库读写的项目必须有可追溯 DDL 基线；没有 DDL 时只登记已验证事实，不臆造字段或约束。
 - SQL 必须标注用途、参数、表关系、过滤条件和结果语义。
+- 命中无界聚合、应用层过滤分页、全候选批次遍历或 N+1 时，必须在落码前告警、估算最坏调用数、比较优化方案并取得与风险相称的执行计划或计时证据；证据缺失时标记“性能未验证”。
 - 状态流转必须记录进入条件、决策点、写入点和失败行为。
 - 新接口开发前确认是否已有可复用原子能力；开发后回写新增事实。
 
