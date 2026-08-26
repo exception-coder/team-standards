@@ -4,6 +4,7 @@
 |-----------|------|
 | [skill-flow.md](skill-flow.md) | Skill 链路全景图（最新版） |
 | [coding-violations.md](coding-violations.md) | 插件自身编码与规则维护违规记录 |
+| [anti-pattern-case-library.md](anti-pattern-case-library.md) | AI 与团队真实编码、架构和流程反模式案例库 |
 | [claude-config-mechanisms.md](claude-config-mechanisms.md) | CLAUDE.md / Commands / Skills 三种配置机制的设计原则与使用边界 |
 | [design/hook-event-logging.md](design/hook-event-logging.md) | warn 档 hook 命中事件本地登记设计 |
 | [design/prompt-signal-capture.md](design/prompt-signal-capture.md) | 团队疑问/纠正信号采集 → 知识图谱/标准约束闭环设计 |

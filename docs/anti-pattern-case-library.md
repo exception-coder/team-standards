@@ -183,6 +183,14 @@
 - **关联 skill**:`architecture-ddd-lite-fullstack` 「函数级业务场景分流」节、`coding-standards-common §2.5`
 - **历史 commit**:1.26.3 引入(本案例是 service 级 god service 反模式 A2 / A3 在函数粒度的下钻)
 
+### C5. 用完整领域字段名直接生成 Oracle SQL 别名
+
+- **现象**:AI 为了让 SQL 自解释,把完整领域字段名直接用作列别名,测试阶段未经过目标 Oracle 解析,上线后列表接口触发 `ORA-00972: identifier is too long`。
+- **根因**:AI 优先追求英文名语义完整,却没有读取目标数据库版本和兼容级别约束;Mock 测试只验证 SQL 片段和结果映射,没有验证数据库实际可解析性。
+- **反例**:`non_purchase_preparation_recorded` 长 33 bytes,超过未启用长标识符能力的 Oracle 30 bytes 上限;同名 `ResultSet` 读取让 SQL 名称与领域字段形成了不必要的绑定。
+- **正确做法**:SQL 标识符先服从目标数据库限制。Oracle 未取得 `COMPATIBLE` 证据时按 30 bytes 设计,使用 `non_purchase_prepared` 等短且稳定的别名,再由 JDBC / MyBatis 显式映射到完整领域字段;同步增加标识符长度断言或目标 Oracle 解析测试。
+- **关联 skill**:`java-coding-standards` §9「数据库(Java / 关系库通用)」、`coding-violation-log`
+
 ---
 
 ## D. 流程反模式

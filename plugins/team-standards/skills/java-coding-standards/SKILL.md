@@ -129,6 +129,7 @@ public class ConcurrencyController {
 - 禁止使用外键与级联,外键逻辑在应用层实现
 - 小数类型用 `decimal`,**禁止 `float` / `double`**(精度问题)
 - 禁止 `SELECT *`,须列明所有查询字段
+- SQL 标识符（表/列别名、CTE、视图、索引、约束等）必须满足目标数据库版本与兼容级别的长度限制。Oracle 在未取得目标环境 `COMPATIBLE` 证据时一律按 **30 bytes** 上限设计；只有确认支持长标识符时才能放宽。领域字段和接口字段不必照搬 SQL 别名，应使用短且稳定的 SQL 别名并显式映射；新增或修改别名时必须补长度断言或目标 Oracle 解析测试
 - WHERE 条件字段须有索引;**禁止在索引列上做函数操作**(会失效索引)
 - 禁止 `LIKE '%keyword'` 开头的模糊查询(走不了索引)
 - 索引不超过 5 个;单值索引字段不超过 5 个
@@ -176,6 +177,7 @@ public class AttachmentController { }
 | `log.error(e.getMessage())` | `log.error("描述: {}", param, e)` |
 | `new Thread(() -> {}).start()` | 使用线程池 |
 | `SELECT *` | 列明字段 |
+| Oracle 别名 `non_purchase_preparation_recorded`（33 bytes） | 使用不超过 30 bytes 的短别名并显式映射领域字段 |
 | `Executors.newFixedThreadPool(10)` | `new ThreadPoolExecutor(...)` |
 | 布尔字段 `isDeleted` | 字段名 `deleted` |
 | `for` 循环内 `str += x` | `StringBuilder.append(x)` |
