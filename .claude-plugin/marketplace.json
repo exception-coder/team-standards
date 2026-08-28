@@ -8,8 +8,8 @@
   "plugins": [
     {
       "name": "team-standards",
-      "description": "Claude Code 团队开发规范插件：设计文档、架构与跨语言编码、产品级前端质量、Git 提交规范",
-      "version": "1.57.1",
+      "description": "团队工程治理插件：21 个统一 Skill，覆盖设计、Bug、架构编码、前端治理、后端事实、文档与交付",
+      "version": "2.0.0",
       "source": "./plugins/team-standards",
       "author": {
         "name": "张凯",

@@ -96,7 +96,7 @@ flowchart TD
 | Skill | 关系 |
 |-------|------|
 | `java-coding-standards` | 互补。java-coding-standards 是通用规范（阿里黄山版），本 Skill 登记项目级的具体违规 |
-| `pre-implementation-code-orientation` | 本 Skill 的"编码前回顾"应在 pre-implementation-code-orientation 之后、实际编码之前执行 |
+| `change-readiness` 代码定位模式 | 本 Skill 的“编码前回顾”应在代码定位完成后、实际编码之前执行 |
 
 ---
 

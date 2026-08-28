@@ -6,7 +6,7 @@
 | [coding-violations.md](coding-violations.md) | 插件自身编码与规则维护违规记录 |
 | [anti-pattern-case-library.md](anti-pattern-case-library.md) | AI 与团队真实编码、架构和流程反模式案例库 |
 | [claude-config-mechanisms.md](claude-config-mechanisms.md) | CLAUDE.md / Commands / Skills 三种配置机制的设计原则与使用边界 |
-| [design/hook-event-logging.md](design/hook-event-logging.md) | warn 档 hook 命中事件本地登记设计 |
+| [design/hook-event-logging.md](design/hook-event-logging.md) | Hook Event v1 本地登记、兼容消费与跨仓契约设计 |
 | [design/prompt-signal-capture.md](design/prompt-signal-capture.md) | 团队疑问/纠正信号采集 → 知识图谱/标准约束闭环设计 |
 | [design/skill-context-slimming/skill-context-slimming-current.md](design/skill-context-slimming/skill-context-slimming-current.md) | Skill 常驻描述与渐进披露瘦身设计 |
 | [design/codex-plugin-reliability-hardening/codex-plugin-reliability-hardening-current.md](design/codex-plugin-reliability-hardening/codex-plugin-reliability-hardening-current.md) | Codex/Claude Hook 兼容、安全默认值与性能收敛设计 |

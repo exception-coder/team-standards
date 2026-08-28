@@ -101,8 +101,8 @@ description: "Use when exploring an initial PRD idea, generating an initializati
 
 - Graphify 负责查询指定代码图谱，不解析项目依赖。
 - `project-domain-knowledge` 负责领域知识与 DDL 的项目内继承适配，不是全局项目关系权威源。
-- `cross-project-locator` 负责已登记跨项目调用链的定位和维护，不承担 PRD 查询计划、证据账本或完成性门禁。
-- `domain-spec-mining-required` 负责从证据生成对象、状态和不变量候选；本 Skill 先确定跨项目证据范围并提供输入。
+- 跨项目调用链由实际业务项目或共享拓扑仓维护，本 Skill 不替代其契约所有权。
+- `backend-evidence` 的领域规格模式负责从证据生成对象、状态和不变量候选；本 Skill 先确定跨项目证据范围并提供输入。
 
 ## 禁止行为
 

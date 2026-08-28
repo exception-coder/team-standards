@@ -72,7 +72,7 @@ class RefundStatusBar extends StatelessWidget {
 
 ## 6. 金额禁用 `double`
 
-- 金额 / 数量等需要精确计算的值**禁用 `double`**（浮点精度问题），用 `int`（单位分）或 `Decimal`；与 `arch-lint` 的「金额禁 double」规则一致
+- 金额 / 数量等需要精确计算的值**禁用 `double`**（浮点精度问题），用 `int`（单位分）或 `Decimal`；项目若需要更严格的架构扫描，应在项目内声明并执行
 
 ---
 

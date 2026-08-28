@@ -1,34 +1,72 @@
-// =============================================================
-// hook 命中事件本地登记（best-effort，绝不阻断 hook 主流程）
-//
-// warn 档 hook 命中规则时调用，把一行 JSON 追加到本地
-//   ~/.kai-toolbox/hook-events.jsonl
-// 供后续统计「规则命中频率 / 是否升 block / 谁常踩」。
-//
-// 设计红线（见 docs/design/hook-event-logging.md）：
-//   - 只写本地，绝不在 hook 里做网络/SMB IO（热路径）。
-//   - 全程 try/catch 吞异常：登记失败绝不能影响放行/拦截判定。
-//   - 同步到 \\IT01 共享、聚合统计都在 yoooni-daily-plugin，本文件不感知。
-// =============================================================
-
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function logHookEvent(ev) {
+const HOOK_EVENT_SCHEMA_VERSION = 1;
+const EVENT_STRING_FIELDS = Object.freeze(['plugin', 'hook', 'rule', 'tool', 'file']);
+const EVENT_MODES = new Set(['warn', 'block']);
+
+function nonEmptyString(value) {
+  if (typeof value !== 'string') return '';
+  return value.trim();
+}
+
+function isoTimestamp(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString();
+}
+
+function buildHookEvent(event, context = {}) {
   try {
-    const dir = path.join(os.homedir(), '.kai-toolbox');
-    fs.mkdirSync(dir, { recursive: true });
-    const record = {
-      ts: new Date().toISOString(),
-      user: os.userInfo().username,
-      host: os.hostname(),
-      ...ev,
+    if (!event || typeof event !== 'object' || Array.isArray(event)) return null;
+    const mode = nonEmptyString(event.mode);
+    if (!EVENT_MODES.has(mode)) return null;
+
+    const fields = {};
+    for (const name of EVENT_STRING_FIELDS) {
+      fields[name] = nonEmptyString(event[name]);
+      if (!fields[name]) return null;
+    }
+
+    const timestamp = isoTimestamp(context.now ? context.now() : new Date());
+    const user = nonEmptyString(context.user ?? os.userInfo().username);
+    const host = nonEmptyString(context.host ?? os.hostname());
+    if (!timestamp || !user || !host) return null;
+
+    return {
+      schemaVersion: HOOK_EVENT_SCHEMA_VERSION,
+      ts: timestamp,
+      user,
+      host,
+      plugin: fields.plugin,
+      hook: fields.hook,
+      rule: fields.rule,
+      mode,
+      tool: fields.tool,
+      file: fields.file,
     };
-    fs.appendFileSync(path.join(dir, 'hook-events.jsonl'), JSON.stringify(record) + '\n');
   } catch (_) {
-    // 静默：登记是附带能力，任何失败都不得影响 hook 主流程
+    return null;
   }
 }
 
-module.exports = { logHookEvent };
+function logHookEvent(event, options = {}) {
+  try {
+    const record = buildHookEvent(event, options);
+    if (!record) return false;
+    const directory = options.directory
+      || process.env.TEAM_STANDARDS_HOOK_EVENT_DIR
+      || path.join(os.homedir(), '.kai-toolbox');
+    fs.mkdirSync(directory, { recursive: true });
+    fs.appendFileSync(path.join(directory, 'hook-events.jsonl'), `${JSON.stringify(record)}\n`, 'utf8');
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+module.exports = {
+  HOOK_EVENT_SCHEMA_VERSION,
+  buildHookEvent,
+  logHookEvent,
+};

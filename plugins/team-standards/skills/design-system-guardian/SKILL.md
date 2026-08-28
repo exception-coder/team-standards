@@ -1,6 +1,6 @@
 ---
 name: design-system-guardian
-description: "Govern meaningful UI implementation or modification by resolving the global design registry, optional project binding, design profile, approved/rejected references, and existing implementation before choosing conservative reuse or controlled exploration. Use for UI work that must preserve visual DNA, prevent design drift, or apply a named Design Profile."
+description: "Govern and review meaningful UI implementation by resolving the design registry, project binding, profile, references, and existing implementation before conservative reuse or controlled exploration. Use for UI work, visual drift checks, representative renders, responsive review, or release visual acceptance."
 ---
 
 # Design System Guardian
@@ -15,8 +15,9 @@ Treat approved existing UI as the visual source of truth and use design evidence
 4. In Conservative mode prefer `Reuse → Extend → Compose → Invent`.
 5. In Exploration mode keep changes bounded. Vary layout, hierarchy, or interaction—not color alone—when offering alternatives.
 6. For production Web work, also apply `frontend-excellence` for architecture, accessibility, responsive states, and browser verification.
-7. Scale validation to scope. Do not run a full build/observer/miner/reviewer loop for copy, tiny spacing, or obvious alignment fixes.
-8. Invoke `design-observer` for explicit aesthetic feedback and `design-reviewer` for large UI work after a representative render.
+7. Scale validation to scope. Do not run a full visual loop for copy, tiny spacing, or obvious alignment fixes.
+8. For new pages, major refactors, new component systems, navigation, responsive redesign or release acceptance, render a representative state and read [review-workflow.md](references/review-workflow.md) to check profile, reference, visual and engineering drift.
+9. Explicit aesthetic feedback is handed to `design-system-bootstrap` 的偏好学习模式记录，不在实施阶段直接改规则。
 
 ## Anti-drift guardrails
 

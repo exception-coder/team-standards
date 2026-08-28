@@ -31,6 +31,30 @@ const contractFiles = [
     team: 'team-standards/plugins/team-standards/hooks/hook-metrics.js',
     profile: 'project-coding-profiles/plugins/project-coding-profiles/hooks/hook-metrics.js',
   },
+  {
+    label: 'Hook Event v1 writer',
+    team: 'team-standards/plugins/team-standards/hooks/event-log.js',
+    profile: 'project-coding-profiles/plugins/project-coding-profiles/hooks/event-log.js',
+  },
+];
+
+const multiRepositoryContracts = [
+  {
+    label: 'plugin stale-version reminder',
+    files: [
+      'team-standards/plugins/team-standards/hooks/check-plugin-version-stale.js',
+      'project-coding-profiles/plugins/project-coding-profiles/hooks/check-plugin-version-stale.js',
+      'yoooni-daily-plugin/plugins/yoooni-daily-plugin/hooks/check-plugin-version-stale.js',
+    ],
+  },
+  {
+    label: 'Hook Event v1 schema',
+    files: [
+      'team-standards/plugins/team-standards/hooks/contracts/hook-event.v1.schema.json',
+      'project-coding-profiles/plugins/project-coding-profiles/hooks/contracts/hook-event.v1.schema.json',
+      'yoooni-daily-plugin/plugins/yoooni-daily-plugin/skills/yoooni-hook-report/contracts/hook-event.v1.schema.json',
+    ],
+  },
 ];
 
 for (const contract of contractFiles) {
@@ -44,6 +68,18 @@ for (const contract of contractFiles) {
     fail(`${contract.label} drifted:\n  ${teamPath}\n  ${profilePath}`);
   }
   console.log(`[contracts] ${contract.label}: ${sha256(teamBytes)}`);
+}
+
+for (const contract of multiRepositoryContracts) {
+  const files = contract.files.map((relativePath) => path.join(workspace, relativePath));
+  files.forEach(assertFile);
+  const canonicalBytes = fs.readFileSync(files[0]);
+  for (const filePath of files.slice(1)) {
+    if (!canonicalBytes.equals(fs.readFileSync(filePath))) {
+      fail(`${contract.label} drifted:\n${files.map((file) => `  ${file}`).join('\n')}`);
+    }
+  }
+  console.log(`[contracts] ${contract.label}: ${sha256(canonicalBytes)}`);
 }
 
 const integrityPath = path.join(workspace, contractFiles[2].team);

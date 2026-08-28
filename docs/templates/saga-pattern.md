@@ -336,5 +336,5 @@ class CreateOrderSaga:
 ## 关联 skill
 
 - `architecture-ddd-lite-fullstack`「跨分支编排」「聚合边界与事务一致性」
-- `backend-knowledge-graph-required`(若实施了 Saga,把 Saga 流程登记到正向图谱)
-- `reverse-index-required`(事件订阅者要登记到 events 反向索引)
+- `backend-evidence`(若实施了 Saga,把 Saga 流程登记到正向图谱)
+- `backend-evidence` 反向影响模式（事件订阅者登记到 events 反向索引）

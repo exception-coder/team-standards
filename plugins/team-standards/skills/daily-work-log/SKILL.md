@@ -9,7 +9,7 @@ description: "业务项目源码发生修改，或用户要求记录、更新工
 
 **每次对业务项目源码有实质改动（Edit/Write），就在用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md` 追加或合并一条记录。**
 
-工作日志记录的是个人工时与改动流水，属于**个人工作记录**，与 `bug-doc-required` / `design-doc-required` 等 AI 起草文档一样默认写入用户文档目录，**不写入项目仓库**，与项目代码、设计文档、bug 文档物理隔离。
+工作日志记录的是个人工时与改动流水，属于**个人工作记录**，与 `bug-doc-required` / `change-readiness` 等 AI 起草文档一样默认写入用户文档目录，**不写入项目仓库**，与项目代码、设计文档、bug 文档物理隔离。
 
 不是记录 AI 对话内容；不是记录流水账；是**把"今天做了什么可以上交日报的工作"按 bug / 功能 分类沉淀**。
 
@@ -59,7 +59,7 @@ description: "业务项目源码发生修改，或用户要求记录、更新工
 
 ### 写入前必须回显输出路径
 
-与 `doc-index-required` 一致，写日志文件前向用户回显一行：
+与 `markdown-writing-standards` 一致，写日志文件前向用户回显一行：
 
 ```text
 工作日志输出路径：{用户目录默认 / 用户指定路径} -> {目标路径}
@@ -71,7 +71,7 @@ description: "业务项目源码发生修改，或用户要求记录、更新工
 
 ### 用户显式指定项目内路径的例外
 
-仅当用户明确说「写到项目 docs/work-log/」/「上传到仓库」时，才允许落项目目录，且此时必须主动检查 `.gitignore` 是否已忽略 `docs/work-log/`，未忽略则按"用户指定项目路径"流程交由 `doc-index-required` 走 Phase-A/B（这是非默认路径）。
+仅当用户明确说「写到项目 docs/work-log/」/「上传到仓库」时，才允许落项目目录，且此时必须主动检查 `.gitignore` 是否已忽略 `docs/work-log/`，未忽略则按“用户指定项目路径”流程交由 `markdown-writing-standards` 完成写前查重与写后登记（这是非默认路径）。
 
 ---
 
@@ -147,7 +147,7 @@ flowchart TD
     START(["本次改动待登记"]) --> R["Read 今日 work-log\n提取所有条目标题"]
     R --> Q1{"本次会话是否\n触发过 bug-doc-required?"}
     Q1 -->|"是"| B1["用 bug 文档的标题\n查已有 Bx 条目"]
-    Q1 -->|"否"| Q2{"本次会话是否\n触发过 design-doc-required?"}
+    Q1 -->|"否"| Q2{"本次会话是否\n触发过 change-readiness?"}
     Q2 -->|"是"| F1["用设计文档标题\n查已有 Fx 条目"]
     Q2 -->|"否"| Q3{"用户给出主题名?"}
     Q3 -->|"是"| ASK["按用户主题名\n模糊匹配已有条目"]
@@ -168,7 +168,7 @@ flowchart TD
 ### 判定优先级（从高到低）
 
 1. **bug-doc-required 已生成的 bug 文档** → 该 bug 文档标题就是 B 条目标题
-2. **design-doc-required 已生成的设计文档** → 该设计文档需求名就是 F 条目标题
+2. **change-readiness 已生成的设计文档** → 该设计文档需求名就是 F 条目标题
 3. **用户显式说的主题** → 用"给我记到 XX 这个功能下"
 4. **启发式判断** → 看 bug 信号（"修复"/"fix"/"报错"）还是功能信号（"加"/"新增"/"实现"）
 
@@ -184,7 +184,7 @@ flowchart TD
 | 有 `docs/bug/{...}/{bug 名}.md` 新建 / 编辑 | 🐛 Bug 修复 |
 | 用户说「修复」「fix」「bug」「报错」「异常」「空列表」「不对」「有问题」 | 🐛 Bug 修复 |
 | 改动主要是"让原本该工作的代码真正工作" | 🐛 Bug 修复 |
-| 本会话触发过 `design-doc-required` 且是**新需求/新接口** | ✨ 功能开发 |
+| 本会话触发过 `change-readiness` 且是**新需求/新接口** | ✨ 功能开发 |
 | 用户说「加个」「新增」「实现」「做一个」「feature」 | ✨ 功能开发 |
 | 改动主要是"引入原本不存在的能力" | ✨ 功能开发 |
 | 混合（既是 bug 也引入新字段）→ 主诉为准 | 按主诉分类 |
@@ -305,9 +305,9 @@ flowchart TD
 ## 与其他 skill 的关系
 
 ```
-design-doc-required / bug-doc-required
+change-readiness / bug-doc-required
          ↓
-pre-implementation-code-orientation
+change-readiness 代码定位模式
          ↓
 {代码实际 Edit/Write}
          ↓

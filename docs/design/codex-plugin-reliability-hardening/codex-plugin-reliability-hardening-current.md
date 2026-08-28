@@ -7,6 +7,12 @@
 - [第二轮目标与架构](#12-第二轮深化目标)
 - [第二轮验收标准](#16-第二轮验收标准)
 - [第二轮实施结果](#17-第二轮实施结果)
+- [第三轮共享 Hook 契约](#19-第三轮共享-hook-契约收敛)
+- [第三轮关键交互](#20-第三轮关键交互)
+- [第四轮上下文门禁](#21-第四轮上下文门禁对齐)
+- [第五轮 Skill 边界](#22-第五轮-skill-边界收敛)
+- [第六轮事实源收敛](#23-第六轮事实源收敛)
+- [第七轮项目接入轻量化](#24-第七轮项目接入轻量化)
 
 ## 1. 背景与目标
 
@@ -247,3 +253,129 @@ flowchart LR
 - 三处 manifest 相等只证明格式一致；CI 还要比较 Git 基线，运行载荷变化后版本必须严格递增。
 - Plugin 载荷白名单包括 Skill、运行时 Hook、命令、Agent、App、MCP 及项目画像；README、docs、测试、benchmark 和纯发布脚本不触发发版。
 - MCP 引擎载荷包括 `src/`、工具 schema、依赖锁和构建契约；知识 Markdown 不改变引擎版本，刷新 catalog 后调用 `reload_knowledge`。
+
+## 19. 第三轮共享 Hook 契约收敛
+
+第三轮不引入运行时共享包，继续保持三个插件可独立安装；通过相同运行时副本、版本化 schema 和工作区发布门禁消除静默漂移。
+
+```mermaid
+flowchart LR
+    subgraph Source["插件运行时副本"]
+        Team["team-standards"]
+        Profile["project-coding-profiles"]
+        Daily["yoooni-daily-plugin"]
+    end
+    subgraph Contracts["可执行契约"]
+        Version["通用版本提醒"]
+        Event["Hook Event v1 schema"]
+        Mirror["工作区镜像检查"]
+    end
+    Team --> Mirror
+    Profile --> Mirror
+    Daily --> Mirror
+    Version --> Mirror
+    Event --> Mirror
+```
+
+### 19.1 版本提醒
+
+- 三个插件携带字节级一致的 `check-plugin-version-stale.js`。
+- 插件名从当前 `CLAUDE_PLUGIN_ROOT/.claude-plugin/plugin.json` 推导，不维护三份常量分支。
+- 通用关闭开关为 `TEAM_TOOLS_VERSION_REMINDER=off`，并兼容已有三个插件专属开关。
+- marketplace 名与插件名保持一致；读取失败继续静默放行。
+
+### 19.2 Hook Event v1
+
+- 生产端显式构造字段，禁止调用方通过对象展开覆盖系统字段。
+- daily 消费端兼容无版本历史数据，拒绝未知版本和非法字段，并输出无效记录数。
+- schema 随三个插件分别分发，发布时执行三方字节比较。
+
+### 19.3 目录与历史入口
+
+- 删除已移除 Skill 留下的本地空目录；CI 只检测“含文件但缺少 `SKILL.md`”的可分发孤儿目录。
+- 删除仍指向已移除 Skill 的 Cursor `.mdc` 规则。
+- Claude 与 Codex manifest 的关键词按当前两个 daily Skill 对齐。
+
+## 20. 第三轮关键交互
+
+### 20.1 版本提醒解析
+
+```mermaid
+sequenceDiagram
+    box rgb(217, 226, 246) 当前插件
+        participant Hook as version-stale Hook
+        participant Manifest as plugin.json
+    end
+    box rgb(212, 237, 218) 本地 marketplace
+        participant Market as marketplace.json
+    end
+    Hook->>Manifest: 读取插件名与已加载版本
+    Hook->>Market: 按插件名读取最新版本
+    alt 最新版本更高且未提醒
+        Hook-->>Hook: stderr 提醒重启
+    else 无更新或读取失败
+        Hook-->>Hook: 静默结束
+    end
+```
+
+### 20.2 跨仓发布校验
+
+```mermaid
+sequenceDiagram
+    box rgb(217, 226, 246) 发布入口
+        participant Release as release-team-tools
+        participant Check as workspace-contracts
+    end
+    box rgb(212, 237, 218) 插件仓库
+        participant Files as 三仓契约文件
+    end
+    Release->>Check: 执行工作区契约检查
+    Check->>Files: 比较运行时副本和 schema
+    alt 任一文件漂移
+        Check-->>Release: 失败并列出契约
+    else 全部一致
+        Check-->>Release: 允许后续测试与打包
+    end
+```
+
+## 21. 第四轮上下文门禁对齐
+
+Skill 已将 OpenSpec 定义为首选设计载体、Graphify 定义为当前实现定位层后，机械 Hook 必须采用相同边界：
+
+1. 设计依据检查认可项目内 OpenSpec，但不能只判断目录存在。配置必须包含真实 `context`，且至少一个非归档 change 同时具有 proposal、design、tasks 和 delta specs。
+2. 传统 `docs/design` 与用户知识库继续作为未接入 OpenSpec 项目的兼容路径。
+3. 后端上下文检查兼容历史知识卡并优先识别 Graphify 查询。历史卡只作为已有证据读取；Graphify 查询必须验证目标文件已被 manifest 覆盖且文件版本不晚于图谱。
+4. Graphify 缺少 manifest、目标未索引或目标文件更新时间更新时，默认 warn；项目可通过既有 block 模式升级为硬阻断。
+5. Hook 不选择“哪个 change 与本次需求相关”，也不判断业务设计质量；相关性和语义审查仍由 `change-readiness` 完成。
+
+## 22. 第五轮 Skill 边界收敛
+
+Graphify 与 OpenSpec 接入后，公共 Skill 只保留意图级编排和质量责任：
+
+1. `design-doc-required` 更名为 `change-readiness`，明确它约束的是实施就绪，而不是强制自产设计文档。
+2. `backend-knowledge-graph-required` 更名为 `backend-evidence`，明确 Graphify 之外仍需验证 DDL、数据库、运行证据和领域语义。
+3. `init-project-docs` 不再复制 Graphify 的安装、语料检测、后端选择、抽取、聚类和导出手册；第七轮进一步取消事实投影，只保留调用、状态与新鲜度边界。
+4. 项目画像不再全仓手工扫描 Entity、Service 和 Controller 建第二套索引，只消费 Graphify 并定向补证其无法证明的语义。
+5. 新 Hook 名和环境变量与新职责一致；旧环境变量保留一个大版本周期的兼容读取，但不再出现在主文档和默认示例中。
+
+## 23. 第六轮事实源收敛
+
+第五轮完成名称和编排收敛后，`backend-evidence` 内部仍保留手工反向索引扫描器、四类索引模板和十类代码知识卡，实际仍与 Graphify/OpenSpec 构成平行事实源。本轮进一步明确：
+
+1. 状态、字段、事件、API、读写点和调用方使用新鲜 Graphify 即时查询；图谱未覆盖时用 `git diff`、`rg` 和定向源码补证。
+2. 当前变更的影响、协同项和验收写入相关 OpenSpec change，不生成长期手工反向索引。
+3. 经确认且跨变更稳定的业务语义、不变量和术语进入 domain knowledge；DDL、迁移、Mapper 测试和运行记录留在各自权威系统。
+4. 删除 `scan-reverse-index.js`、反向索引模板及代码知识卡模板，不再维护第二套 Entity、Service、流程、枚举和调用关系索引。
+5. 工具自检必须比较工作区 manifest 与 Codex 缓存版本；只检测到缓存目录不能判定 Ready。
+6. `glossary-required` 只保留术语对齐意图：稳定术语进入 domain knowledge，代码映射使用 Graphify，当前未决术语记录在 OpenSpec；删除独立候选池和 glossary 模板。
+
+## 24. 第七轮项目接入轻量化
+
+`init-project-docs` 虽已停止复制 Graphify 执行手册，但仍生成六份 Graphify Markdown 投影、00–10 项目说明树和三份项目画像。这些文件会在代码、Graphify、OpenSpec 与领域知识之外形成第四套需要同步的事实源。本轮收敛为：
+
+1. 默认只输出会话内上下文状态，不创建项目说明文档树。
+2. 项目自有规则归 `AGENTS.md` 或项目内 Skill；当前实现归 Graphify；目标行为归 OpenSpec；稳定业务语义归 domain knowledge。
+3. `refresh` 更新权威来源本身，不再维护 `modules/api-map/data-access/impact-index` 等二次投影。
+4. `profile` 仅在用户明确要求且现有入口不足时生成一份轻量 `project-profile.md` 导航，不复制业务上下文与编码规则正文。
+5. `bug-doc-required` 与 `change-readiness` 改为直接按权威来源取上下文；旧 `00_project_overview.md` 只作为兼容导航读取。
+6. 删除 20 份旧说明、画像和技术卡模板，保留 onboarding 状态脚本与三份编排 reference。

@@ -133,7 +133,7 @@ flowchart TD
 
 ## 15:10 · 发版 · team-standards 1.2.0 → 1.3.0
 
-**原因：** 新增了 bug-doc-required 和 pre-implementation-code-orientation 两个 Skill，需要 push 让团队成员通过 /plugin update 获取。
+**原因：** 新增了两个相互配合的公共 Skill，需要发布后让团队成员通过插件更新获取。
 
 **改动：**
 - plugin.json version: 1.2.0 → 1.3.0

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // =============================================================
 // PreToolUse hook: AI 生成的 Markdown 默认落「用户文档/ai-docs/{project}/」，
-// 不写进业务/应用项目仓库的 docs/。给 doc-index-required(skill,建议级) 补一道机械闸——
+// 不写进业务/应用项目仓库的 docs/。给 markdown-writing-standards 的文档生命周期补一道机械闸——
 // 防"图省事写项目 docs/"这类反复发生的越界(项目 docs/ 与 ai-docs/ 被当等价、无力量纠偏)。
 //
 // 只拦「新建」(Write)；Edit/MultiEdit(改已有) 放行。全中才拦：
@@ -89,10 +89,10 @@ process.stdin.on('end', () => {
 目标(被拦)：${fp}
 推断项目：${project}
 建议写到：${suggested}
-  （设计→design/、bug→bug/、知识图谱→knowledge-graph/、现状梳理→work-log/，按 doc-index-required 归类）
+  （设计→design/、bug→bug/、知识图谱→knowledge-graph/、现状梳理→work-log/，按 markdown-writing-standards 归类）
 
 为什么：保持业务仓干净；AI 生成的设计/分析/现状/知识图谱统一沉淀到个人 ai-docs 知识库，后续异步汇聚到团队共享。
-旁路：用户明确要求写项目 docs → 设 TEAM_STANDARDS_DOC_LOCATION_HOOK=off 本次绕过；或先走 doc-index-required 确认归属。
+旁路：用户明确要求写项目 docs → 设 TEAM_STANDARDS_DOC_LOCATION_HOOK=off 本次绕过；或先走 markdown-writing-standards 确认归属。
 `);
     process.exit(MODE === 'block' ? 2 : 0);
   }

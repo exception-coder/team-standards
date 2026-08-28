@@ -1,9 +1,13 @@
 ---
 name: markdown-writing-standards
-description: "Use when Markdown contains Mermaid, complex tables, or structured documentation, and after structural edits that add, remove, rename, move, merge, or reorganize sections."
+description: "Use before creating or structurally changing Markdown in a project docs tree or user knowledge base, when Markdown contains Mermaid, complex tables, or reorganized sections, and after structural edits. Performs write-before deduplication, Markdown validation, and write-after index registration."
 ---
 
 # Markdown 编写规范
+
+## 文档生命周期路由
+
+创建或结构性修改项目文档、设计文档、Bug 文档或用户知识库 Markdown 时，先读取 [references/document-index-workflow.md](references/document-index-workflow.md)：写前确认唯一归属并查重，写后更新索引与反向引用。日期型工作日志和索引文件自身按该参考中的豁免规则处理。
 
 ## 概述
 
@@ -368,7 +372,7 @@ classDiagram
 
 | Skill | 协作方式 |
 |-------|---------|
-| `design-doc-required` | 设计文档中的 Mermaid 图表必须遵守本规范；设计文档要求哪些图是必须的由 design-doc-required 决定，图怎么写由本规范决定 |
+| `change-readiness` | 设计文档中的 Mermaid 图表必须遵守本规范；设计文档要求哪些图是必须的由 change-readiness 决定，图怎么写由本规范决定 |
 | `bug-doc-required` | Bug 文档中的调用链 Mermaid 图遵守本规范 |
 | `init-project-docs` | 项目文档中的架构图遵守本规范 |
 

@@ -1,7 +1,7 @@
 {
   "name": "team-standards",
-  "description": "团队开发规范插件：设计文档、跨语言编码、架构边界与产品级前端工程质量",
-  "version": "1.57.1",
+  "description": "团队工程治理插件：21 个统一 Skill，覆盖设计、Bug、架构编码、前端治理、后端事实、文档与交付",
+  "version": "2.0.0",
   "author": {
     "name": "张凯",
     "email": ""
@@ -12,7 +12,9 @@
   "keywords": [
     "java",
     "coding-standards",
-    "design-doc",
+    "change-readiness",
+    "openspec",
+    "graphify",
     "team-standards",
     "frontend",
     "design-system"

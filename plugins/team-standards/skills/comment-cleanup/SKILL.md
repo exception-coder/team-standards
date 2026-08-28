@@ -131,6 +131,6 @@ flowchart TD
 | Skill | 关系 |
 |-------|------|
 | `coding-standards-common` | 红线唯一规则源（§5.4 / §5.4.1 判什么该清；§5.5 顺手清理；§5.0 注释语言）。本 skill 只执行存量批量清理 |
-| `bugfix-coding-style` | 存量 `[DEPRECATED]`/`[ADDED]` 标记顺手清理的边界由它承载；本 skill 是用户主动发起的成批版本 |
+| `bug-doc-required` 修复模式 | 存量 `[DEPRECATED]`/`[ADDED]` 标记随 Bug 修复顺手清理的边界由它承载；本 Skill 是用户主动发起的成批版本 |
 | `git-commit-standards` | 清理 commit 走其规范：单独 commit、不夹带逻辑、message 不罗列 |
 | `daily-work-log` | 业务项目清理后按改动登记工作日志（归 🐛/✨ 视主诉） |

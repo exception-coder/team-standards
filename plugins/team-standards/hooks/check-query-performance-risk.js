@@ -46,7 +46,7 @@ process.stdin.on('end', () => {
     .map((finding) => `  - ${finding.filePath}: ${finding.risks.join('、')}`)
     .join('\n');
   process.stderr.write(
-    '[team-standards] 本次改动出现查询性能风险信号，请先执行 backend-knowledge-graph-required 的高风险查询性能门禁。\n' +
+    '[team-standards] 本次改动出现查询性能风险信号，请先执行 backend-evidence 的高风险查询性能门禁。\n' +
     `${details}\n` +
     '  落码前：估算候选规模与最坏 SQL 次数，优先比较过滤下推、集合查询、预计算或有界异步方案；高风险查询补充执行计划、调用次数和真实计时。\n' +
     '  说明：这是启发式软提醒，命中不代表方案必错；TEAM_STANDARDS_SQL_PERF_HOOK=off 可关闭。\n'

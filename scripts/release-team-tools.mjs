@@ -125,8 +125,9 @@ function runRepositoryTests() {
   if (process.platform === 'win32') {
     const daily = plugins[2];
     const windowsPowerShellEnvironment = { PSModulePath: undefined };
-    run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(daily.pluginRoot, 'skills', 'yoooni-prod-log-query', 'query-prod-log.ps1'), '-SelfTest'], daily.repositoryRoot, windowsPowerShellEnvironment);
-    run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(daily.pluginRoot, 'scripts', 'tests', 'update-lock.tests.ps1')], daily.repositoryRoot, windowsPowerShellEnvironment);
+    for (const test of ['check-team-tools.tests.ps1', 'update-lock.tests.ps1']) {
+      run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(daily.pluginRoot, 'scripts', 'tests', test)], daily.repositoryRoot, windowsPowerShellEnvironment);
+    }
   }
 }
 

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Design Reviewer"
-  short_description: "Review rendered UI for drift and visual quality"
-  default_prompt: "Use $design-reviewer to review this rendered UI against its design profile."

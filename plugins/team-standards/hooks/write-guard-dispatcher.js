@@ -6,11 +6,12 @@ const { recordHookMetric } = require('./hook-metrics');
 
 const CHILD_TIMEOUT_MS = 15000;
 const GUARDS = [
-  { script: 'check-design-doc.js', env: 'TEAM_STANDARDS_DESIGN_DOC_HOOK' },
+  { script: 'check-change-readiness.js', env: 'TEAM_STANDARDS_CHANGE_READINESS_HOOK', legacyEnv: 'TEAM_STANDARDS_DESIGN_DOC_HOOK' },
   { script: 'check-architecture-boundaries.js', env: 'TEAM_STANDARDS_ARCH_BOUNDARY_HOOK' },
-  { script: 'check-backend-kg-readiness.js', env: 'TEAM_STANDARDS_BACKEND_KG_HOOK' },
+  { script: 'check-backend-evidence-readiness.js', env: 'TEAM_STANDARDS_BACKEND_EVIDENCE_HOOK', legacyEnv: 'TEAM_STANDARDS_BACKEND_KG_HOOK' },
   { script: 'check-comment-density.js', env: 'TEAM_STANDARDS_COMMENT_HOOK' },
   { script: 'check-sql-ddl-readiness.js', env: 'TEAM_STANDARDS_SQL_DDL_HOOK' },
+  { script: 'check-sql-correctness-risk.js', env: 'TEAM_STANDARDS_SQL_CORRECTNESS_HOOK' },
   { script: 'check-query-performance-risk.js', env: 'TEAM_STANDARDS_SQL_PERF_HOOK' },
   { script: 'check-ai-doc-location.js', env: 'TEAM_STANDARDS_DOC_LOCATION_HOOK' },
 ];
@@ -19,7 +20,7 @@ let raw = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { raw += chunk; });
 process.stdin.on('end', async () => {
-  const active = GUARDS.filter((guard) => (process.env[guard.env] || '').toLowerCase() !== 'off');
+  const active = GUARDS.filter((guard) => guardMode(guard) !== 'off');
   const results = await Promise.all(active.map((guard) => runGuard(guard.script, raw)));
 
   // Stable output order follows GUARDS even though the children run concurrently.
@@ -40,6 +41,13 @@ process.stdin.on('end', async () => {
   if (results.some((result) => result.code !== 0)) process.exit(1);
   process.exit(0);
 });
+
+function guardMode(guard) {
+  const value = process.env[guard.env]
+    || (guard.legacyEnv ? process.env[guard.legacyEnv] : '')
+    || '';
+  return value.toLowerCase();
+}
 
 function runGuard(script, input) {
   return new Promise((resolve) => {

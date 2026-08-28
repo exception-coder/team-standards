@@ -8,8 +8,8 @@ const { spawnSync } = require('node:child_process');
 const hookRoot = path.resolve(__dirname, '..');
 const dispatcher = path.join(hookRoot, 'write-guard-dispatcher.js');
 const guards = [
-  'check-design-doc.js',
-  'check-backend-kg-readiness.js',
+  'check-change-readiness.js',
+  'check-backend-evidence-readiness.js',
   'check-comment-density.js',
   'check-sql-ddl-readiness.js',
   'check-query-performance-risk.js',

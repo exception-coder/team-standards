@@ -1,6 +1,6 @@
 ---
 name: design-system-bootstrap
-description: "Initialize or extend an evidence-driven design registry at $HOME/.design-registry, create a profile from an existing UI, bind a project through design.config.json, or fork/reference/inherit an existing profile. Use when users ask to initialize a global Design System, create a Design Profile from a project, bind a project to a style, or bootstrap design governance in any directory."
+description: "Initialize or extend an evidence-driven design registry, create or bind a Design Profile, capture explicit user visual preferences, and mine repeated evidence into candidate patterns. Use for design bootstrap, profile binding, preference recording, or pattern learning."
 ---
 
 # Design System Bootstrap
@@ -17,6 +17,12 @@ Create design governance from observed evidence. Do not invent a complete design
 6. Validate profiles, bindings, and evidence with the schemas in `references/`.
    - Use [reference-metadata-template.md](references/reference-metadata-template.md) for approved and rejected visual references.
 7. Report created paths, evidence sources, unresolved choices, and validation results.
+
+## 偏好学习模式
+
+- 用户明确表达接受、拒绝或比较某个 UI 选择时，读取 [evidence-capture.md](references/evidence-capture.md)，只记录最小作用域的 Preference Evidence，不直接改设计规则。
+- 同类 Evidence 重复出现、互相冲突或用户要求归纳偏好时，读取 [pattern-mining.md](references/pattern-mining.md)，更新候选强弱、冲突与晋升建议。
+- 单次反馈不得直接升级为 Profile 或 Global Core；重大晋升必须人工确认。
 
 ## Resolver and storage contract
 

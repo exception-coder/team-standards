@@ -237,7 +237,7 @@ team-standards/
 
 ### 调用关系说明
 
-- 前端需求 → `design-doc-required` → `pre-implementation-code-orientation` → `architecture-ddd-lite-fullstack` → `frontend-excellence` → `coding-standards-common` → 实现与浏览器验证。
+- 前端需求 → `change-readiness`（含代码定位）→ `architecture-ddd-lite-fullstack` → `frontend-excellence` → `coding-standards-common` → 实现与浏览器验证。
 
 ## 7. 数据与依赖变更
 

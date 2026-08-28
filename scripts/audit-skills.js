@@ -12,6 +12,7 @@
  *   - 最近 commit 日期(过旧可能 stale)
  *   - dev-log 中出现次数(决策密度)
  *   - rules / references Markdown 是否能从 SKILL.md 的链接图到达
+ *   - skills/ 下含文件但缺少 SKILL.md 的可分发孤儿目录
  *
  * 用法:
  *   node scripts/audit-skills.js                # 输出全表 + 警告(exit 0)
@@ -111,6 +112,39 @@ function countDevLogMentions(skillName) {
   return count;
 }
 
+function isTrackedSkill(skillName) {
+  try {
+    execFileSync('git', [
+      '-c', `safe.directory=${ROOT}`,
+      '-C', ROOT,
+      'ls-files', '--error-unmatch',
+      `plugins/team-standards/skills/${skillName}/SKILL.md`,
+    ], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'ignore', 'ignore'],
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function directoryContainsFiles(directory) {
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    if (entry.isFile()) return true;
+    if (entry.isDirectory() && directoryContainsFiles(path.join(directory, entry.name))) return true;
+  }
+  return false;
+}
+
+function findOrphanSkillDirectories() {
+  return fs.readdirSync(SKILLS_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((name) => !fs.existsSync(path.join(SKILLS_DIR, name, 'SKILL.md')))
+    .filter((name) => directoryContainsFiles(path.join(SKILLS_DIR, name)));
+}
+
 function findUnreachableResources(skillName) {
   const skillDir = path.join(SKILLS_DIR, skillName);
   const entry = path.join(skillDir, 'SKILL.md');
@@ -164,7 +198,11 @@ function analyze() {
     const lines = getLineCount(name);
     const refs = countReferences(name, skills);
     const lastCommit = getLastCommitDate(name);
-    const stale = daysSince(lastCommit) > TH_STALE_DAYS;
+    // A new or renamed Skill has no path history until the current change is committed.
+    // Treat it as current; after commit, Git history becomes the normal freshness source.
+    const stale = lastCommit
+      ? daysSince(lastCommit) > TH_STALE_DAYS
+      : isTrackedSkill(name);
     const devLogMentions = countDevLogMentions(name);
     const unreachableResources = findUnreachableResources(name);
 
@@ -183,7 +221,7 @@ function analyze() {
   return rows;
 }
 
-function output(allRows) {
+function output(allRows, orphanDirectories) {
   const warnSkills = allRows.filter((r) => r.warnings.length > 0);
   const rows = ARG_WARN_ONLY ? warnSkills : allRows;
 
@@ -194,6 +232,9 @@ function output(allRows) {
       console.log(
         `| \`${r.name}\` | ${r.descLen} | ${r.lines} | ${r.refs} | ${r.lastCommit} | ${r.devLogMentions} | ${r.warnings.join('; ') || '—'} |`
       );
+    }
+    if (orphanDirectories.length > 0) {
+      console.log(`\n孤儿 Skill 目录: ${orphanDirectories.map((name) => `\`${name}\``).join(', ')}`);
     }
     return;
   }
@@ -222,15 +263,19 @@ function output(allRows) {
   if (warnSkills.length > 0) {
     console.log('建议关注的 skill:', warnSkills.map((r) => r.name).join(', '));
   }
+  if (orphanDirectories.length > 0) {
+    console.log('孤儿 Skill 目录（含文件但缺少 SKILL.md）:', orphanDirectories.join(', '));
+  }
 }
 
 const rows = analyze();
-output(rows);
+const orphanDirectories = findOrphanSkillDirectories();
+output(rows, orphanDirectories);
 
 if (ARG_CI) {
   const warnSkills = rows.filter((r) => r.warnings.length > 0);
-  if (warnSkills.length > 0) {
-    console.error(`\n[audit-skills] ✖ CI 模式: 发现 ${warnSkills.length} 个 skill 有警告,阻断 PR`);
+  if (warnSkills.length > 0 || orphanDirectories.length > 0) {
+    console.error(`\n[audit-skills] ✖ CI 模式: 发现 ${warnSkills.length} 个 skill 警告、${orphanDirectories.length} 个孤儿目录,阻断 PR`);
     console.error(`修复: 按警告类型处理(SKILL.md 拆 rules/ 子文档 / 压缩 description / 补 dev-log 等)`);
     process.exit(1);
   }

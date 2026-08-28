@@ -43,7 +43,7 @@ CLAUDE.md 的内容在**每次对话开始时自动注入上下文**，无论做
 ## Skill 索引
 | Skill 名称 | 关键词 |
 |-----------|--------|
-| design-doc-required | 写代码前、新功能、bug 修复 |
+| change-readiness | 写代码前、新功能、bug 修复 |
 | git-commit-standards | 提交、commit、git |
 ```
 
@@ -201,12 +201,12 @@ Bug 分析文档、设计文档有固定的章节结构和模板。模板本身�
 
 | Skill | 触发条件 | 为什么不放 CLAUDE.md |
 |-------|---------|---------------------|
-| `design-doc-required` | 写任何实现代码前 | 包含完整文档模板，体量大 |
+| `change-readiness` | 写任何实现代码前 | 包含完整文档模板，体量大 |
 | `bug-doc-required` | 编写 bug 分析文档时 | 包含章节结构约束和 Mermaid 要求 |
 | `java-coding-standards` | 编写/审查 Java 代码时 | 规范内容超过 500 行 |
 | `git-commit-standards` | 执行 git commit 前 | 只在提交时需要，且需读取 diff 后执行 |
-| `pre-implementation-code-orientation` | 文档写完、开始实施代码前 | 需要 AI 读文档提取坐标后才能执行 |
-| `doc-index-required` | 写 docs/ 下任何文档前 | 需要先读索引再判断，是多步流程 |
+| `change-readiness` 代码定位模式 | 文档写完、开始实施代码前 | 需要 AI 读文档提取坐标后才能执行 |
+| `markdown-writing-standards` 文档生命周期 | 写 docs/ 下任何文档前后 | 需要写前读索引、写中校验、写后登记 |
 
 ### Commands（暂未使用，以下为规划示例）
 

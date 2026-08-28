@@ -3,7 +3,7 @@
 // PreToolUse hook: 写/改任何「带 SQL 的文件」之前，
 //   检查本会话是否读过项目 knowledge-graph/ddl-baseline.md。
 //
-// 诞生背景：check-backend-kg-readiness.js 的路径白名单是 Dart/Flutter 专用
+// 诞生背景：check-backend-evidence-readiness.js 的路径白名单是 Dart/Flutter 专用
 //   (lib/features/**/backend/**/*.dart)，对 Java + iBatis / MyBatis XML、
 //   .sql、Kotlin/JPA 等项目完全不触发；且它对 ≤20 行小改豁免，而一次
 //   「tdate → checkdate」这种 1 行字段名改动恰恰是最该拦的。本 hook 补这个洞：
@@ -86,7 +86,7 @@ process.stdin.on('end', () => {
   const msg =
     '[team-standards] 即将写/改 SQL / Mapper，但本会话尚未读过项目 DDL 基线。\n' +
     `  目标文件：${targetPaths.join('、')}\n` +
-    '  改 SQL 前必做（backend-knowledge-graph-required 规范）：\n' +
+    '  改 SQL 前必做（backend-evidence 规范）：\n' +
     '    1) Read DDL 基线（集中库 project-domain-knowledge 的 knowledge/{project}/impl/ddl-baseline.md，或项目 knowledge-graph/ddl-baseline.md），按目标表名核对字段名 / 类型 / 默认值 / 索引；\n' +
     '    2) 若该文件不存在 → 先 dump DDL 基线再写 SQL（Oracle 可查 ALL_TAB_COLUMNS / expdp METADATA_ONLY）；\n' +
     '    3) Read 命中的 knowledge-graph/scenarios/*.md 确认取数口径（如「某时间字段取 makedate 还是 checkdate」）。\n' +

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Design Pattern Miner"
-  short_description: "Mine repeated evidence into governed design candidates"
-  default_prompt: "Use $design-pattern-miner to find repeated design patterns in this profile evidence."

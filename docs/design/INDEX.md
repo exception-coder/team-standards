@@ -1,11 +1,18 @@
 # team-standards / design 文档索引
 
-## SQL 高风险查询门禁
+## Hook 命中事件本地登记
+
+- 文件：`hook-event-logging.md`
+- 编码摘要：`codex-plugin-reliability-hardening/codex-plugin-reliability-hardening-coding.md` 第 12 节
+- 摘要：定义独立插件共同遵守的 Hook Event v1 生产、兼容消费和跨仓防漂移契约。
+- 大纲：背景与目标 / 设计原则 / 整体架构 / Hook Event v1 契约 / 关键交互 / 接入与下游 / 验证要点
+
+## SQL 正确性与性能门禁
 
 - 文件：`sql-performance-guard/sql-performance-guard-current.md`
 - 编码摘要：`sql-performance-guard/sql-performance-guard-coding.md`
-- 摘要：在编写无界统计、派生筛选、应用层分页和循环跨表查询前，强制告警、给出优化路径并记录执行计划与调用次数证据。
-- 大纲：目标与边界 / 整体架构 / 模块职责 / 核心规则 / 验证证据 / 编码落点 / 风险与回滚 / 验收标准
+- 摘要：用 DDL、字段限定、真实数据库、Mapper 契约、性能证据和制品 SHA 共同治理 AI 生成 SQL。
+- 大纲：目标与边界 / 整体架构 / 模块职责 / 正确性与性能规则 / 验证证据 / 编码落点 / 风险与回滚 / 验收标准
 
 ## Frontend Excellence Skill
 
@@ -26,4 +33,4 @@
 - 文件：`codex-plugin-reliability-hardening/codex-plugin-reliability-hardening-current.md`
 - 编码摘要：`codex-plugin-reliability-hardening/codex-plugin-reliability-hardening-coding.md`
 - 摘要：统一 Claude Code 与 Codex Hook 输入契约，收紧安全默认值，并建立隔离安装、共享契约、性能预算和可重复发布闭环。
-- 大纲：目标与边界 / 整体架构 / 模块职责 / 核心规则 / 第一轮实施结果 / 第二轮架构 / 安全边界 / 验收标准 / 第二轮实施结果 / 运行载荷版本门禁
+- 大纲：目标与边界 / 整体架构 / 模块职责 / 核心规则 / 第一轮实施结果 / 第二轮架构 / 安全边界 / 验收标准 / 第二轮实施结果 / 运行载荷版本门禁 / 第三轮共享 Hook 契约收敛 / 第三轮关键交互

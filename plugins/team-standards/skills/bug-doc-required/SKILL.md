@@ -1,9 +1,18 @@
 ---
 name: bug-doc-required
-description: "Use when a user reports a bug, error, exception, timeout, or broken behavior; asks for investigation or root-cause analysis; or requests a bug-analysis document."
+description: "Use when a user reports a bug, error, exception, timeout, or broken behavior; asks for investigation or root-cause analysis; requests a bug-analysis document; or asks to implement a bug fix, align authoritative behavior, or remove redundant repair code."
 ---
 
-# Bug 分析文档强制规范
+# Bug 分析与修复工作流
+
+## 模式路由
+
+- 仅调查或解释问题：执行本文的证据、根因和 Bug 文档流程，不改源码。
+- 用户明确要求修复：先完成可验证根因，再读取 [references/repair-rules.md](references/repair-rules.md)，按最小闭环修复并回归。
+- 对齐上游、云端或权威实现：先证明权威来源和差异，不把“看起来相似”当成依据。
+- 清理修复期冗余：只删除已由证据证明不再需要的分支、兼容层或历史补丁。
+
+修复模式仍叠加 `coding-standards-common`；源码注释只描述当前逻辑，修复历史留在 Bug 文档和 Git 历史中。
 
 ## 核心原则
 
@@ -11,18 +20,17 @@ description: "Use when a user reports a bug, error, exception, timeout, or broke
 
 ---
 
-## Step 0：知识图谱上下文预热
+## Step 0：权威上下文预热
 
-**在开始 Bug 分析之前，先加载项目知识图谱上下文，快速定位受影响的模块和架构约束。**
+在开始 Bug 分析前按需读取唯一权威来源：
 
-1. 检查用户目录知识库 `{USER_DOCUMENTS}/ai-docs/{project}/00_project_overview.md` 是否存在（知识图谱由 `init-project-docs` 统一生成在用户目录，不再在项目 `docs/`）
-2. **若存在**：
-   - 读取该文件，获取项目全局索引 + AI 上下文路由表
-   - 按路由表「Bug 修复」行加载：`08_constraints_and_rules` + `modules/{受影响模块}.md`
-   - 按需：若 Bug 涉及数据库，追加读 `04_data_model_map`；涉及接口调用，追加读 `06_frontend_backend_mapping`
-3. **若不存在**：跳过，直接进入下方流程（兼容无知识图谱的项目）
+1. 项目 `AGENTS.md`/README：项目规则、构建验证与知识入口。
+2. 新鲜 Graphify：受影响模块、符号、调用方与数据访问；过期时先刷新或以 `git diff`、`rg` 和定向源码补齐。
+3. OpenSpec：与故障相关的已接受行为或活动 change；不得当作当前实现证据。
+4. Domain Knowledge、真实 DDL/数据库、日志与执行计划：业务语义、表结构和运行事实。
+5. 旧项目已有 `00_project_overview.md` 时可作为兼容导航读取，但不要求创建或更新 00–10 文档树。
 
-> Step 0 提供的上下文用于：准确判断 Bug 涉及哪些类/层/模块、识别是否违反架构约束、加速「涉及类清单」和「关键代码路径」的填写。
+Step 0 只加载与当前 Bug 相关的上下文，避免预读整库或生成新的事实副本。
 
 ---
 
@@ -33,7 +41,7 @@ flowchart TD
     A(["收到 bug 文档编写任务\n（Step 0 预热完成后）"]) --> P{"用户是否明确给出\n项目 docs/ 路径或要求上传终版?"}
     P -->|"否（默认）"| ROOT_USER["输出根 = 用户目录知识库\n{USER_DOCUMENTS}/ai-docs/{project}/bug/"]
     P -->|"是（明确写入项目 docs/）"| ROOT_PROJ["输出根 = 项目 docs/bug/"]
-    ROOT_USER --> B["调用 doc-index-required Phase-A\n读 INDEX 查重 + 边界判断"]
+    ROOT_USER --> B["调用 markdown-writing-standards 写前阶段\n读 INDEX 查重 + 边界判断"]
     ROOT_PROJ --> B
     B --> M{"扫描同根下\ndesign/ 是否有对应模块?"}
     M -->|"有"| M1["归档到\n{ROOT}/bug/{模块名}/"]
@@ -44,7 +52,7 @@ flowchart TD
     C -->|"否"| E["按中文命名规范确定目录名与文件名\n{bug名称}/{bug名称}.md（不带日期）"]
     E --> F["按标准模板生成文档结构"]
     F --> G["填充分析内容\n核心流程按场景选最合适的\nMermaid 图类型（≥1 张）"]
-    G --> H["调用 doc-index-required Phase-B\n登记 bug/INDEX.md（必要时回填顶层 INDEX）"]
+    G --> H["调用 markdown-writing-standards 写后阶段\n登记 bug/INDEX.md（必要时回填顶层 INDEX）"]
     H --> Z(["完成"])
     D --> F
 ```
@@ -53,7 +61,7 @@ flowchart TD
 
 ## 输出路径边界
 
-> **核心规则（v1.20 起）**：AI 生成的 bug 分析文档**默认写入用户目录知识库** `{USER_DOCUMENTS}/ai-docs/{project}/bug/`，由本 skill 与 `doc-index-required` Phase-A/B 共同管控。用户目录知识库与项目 `docs/bug/` 享有同等的索引规范——**两者都必须执行 Phase-A 查重和 Phase-B 登记**。
+> **核心规则**：AI 生成的 bug 分析文档**默认写入用户目录知识库** `{USER_DOCUMENTS}/ai-docs/{project}/bug/`，由本 Skill 与 `markdown-writing-standards` 的写前查重、写后登记共同管控。用户目录知识库与项目 `docs/bug/` 享有同等索引规范。
 
 ### 默认输出路径（用户未指定项目内路径时）
 
@@ -80,8 +88,8 @@ flowchart TD
 - **文件名禁止带日期后缀**（不要 `-bug分析-{YYYYMMDD}-v{N}.md`）；同一 bug 始终更新 `{bug名称}.md`，复盘历史由 git log 承担
 
 **默认路径下的文档：**
-- **必须**调用 `doc-index-required` Phase-A（读 `bug/INDEX.md` 查重）和 Phase-B（写完登记/更新条目）
-- 写入前必须按 `doc-index-required` 的"输出路径回显"要求向用户展示一行目标路径
+- **必须**调用 `markdown-writing-standards` 的写前阶段（读 `bug/INDEX.md` 查重）和写后阶段（登记/更新条目）
+- 写入前必须按 `markdown-writing-standards` 的“输出路径回显”要求向用户展示一行目标路径
 - 若 Phase-A 命中已有同主题 bug 文档，**默认补充到已有文档**而非新建带版本号副本
 
 ### 项目 docs/bug/ 例外（仅当用户明确要求时）
@@ -308,8 +316,8 @@ flowchart LR
 
 | Skill | 何时调用 |
 |---|---|
-| `doc-index-required` | **必须调用**（v1.20 起）。无论默认用户目录知识库还是项目 `docs/bug/`，都按"前置 Phase-A → 文档写作 → 后置 Phase-B"流程调用，读 `bug/INDEX.md` 查重，写完登记/更新条目 |
-| `design-doc-required` | 若 bug 修复需要引入新功能或接口变更，修复方案实施前须调用 |
+| `markdown-writing-standards` | **必须调用**。无论默认用户目录知识库还是项目 `docs/bug/`，都按“写前查重 → 文档写作 → 写后登记”执行 |
+| `change-readiness` | 若 bug 修复需要引入新功能或接口变更，修复方案实施前须调用 |
 
 ---
 
