@@ -20,7 +20,8 @@ flowchart LR
 ## 模式
 
 - `onboard`：新系统首次接入时读取 [references/onboard-workflow.md](references/onboard-workflow.md)，使用 `onboard-pipeline.mjs` 断点续跑。
-- `init`：建立项目身份与权威入口，初始化或校验 Graphify/OpenSpec/领域知识的连接状态。
+- `structure`：用户要求初始化 AI 工程结构、AI 目录或默认项目解析结构时，在当前目录执行 `init-ai-structure.mjs`，建立六层职责入口。
+- `init`：先执行 `structure`，再初始化或校验 Graphify/OpenSpec/领域知识的连接状态。
 - `refresh`：读取 [references/update-workflow.md](references/update-workflow.md)，按 Git 变化刷新权威产物，不生成平行投影。
 - `status`：只读检查项目入口、图谱新鲜度、OpenSpec 状态和知识缺口。
 - `profile`：用户明确要求独立画像时读取 [references/project-profile-generation.md](references/project-profile-generation.md)，只生成一份轻量导航。
@@ -37,11 +38,39 @@ flowchart LR
 
 ## 共享流程
 
+### 0. 初始化 AI 工程结构
+
+用户明确要求初始化时，当前目录就是默认项目根；只有用户给出其它路径时才使用 `--root`。执行：
+
+```text
+node <skill-root>/init-ai-structure.mjs plan --root <project-root>
+node <skill-root>/init-ai-structure.mjs apply --root <project-root>
+```
+
+先回显 `plan` 的 `missing/preserved/update` 清单，再运行 `apply`。显式执行本 Skill 即授权创建当前项目范围内的缺失结构；不得扩展到父目录、用户主目录或其它仓库。
+
+脚本创建最小入口：
+
+- `AGENTS.md` 与 `CLAUDE.md`
+- `docs/README.md`、`docs/INDEX.md`、`docs/ai-coding-architecture.md`
+- `openspec/AGENTS.md` 与 `openspec/config.yaml`
+- `.gitignore` 中受标记管理的 Graphify 共享边界
+
+已有文件按字节保留并标记 `preserved`，由 Agent 读取后决定是否需要人工合并；禁止使用强制覆盖绕过项目自有规则。脚本不创建空 `.codex/skills`、领域、设计、ADR、OpenSpec specs/changes 或 `graphify-out/` 目录。
+
+`apply` 后继续执行当前安装的 Graphify Skill；首次项目构建图谱，已有图谱则检查新鲜度并按需增量更新。随后运行 OpenSpec 严格校验。最后执行：
+
+```text
+node <skill-root>/init-ai-structure.mjs status --root <project-root>
+```
+
+Graphify 产物缺失属于 `pending`，不是脚本伪造文件的理由；OpenSpec 只有空配置时也必须报告 `initialized-empty`，不能包装为已具备业务规格。
+
 ### 1. 确认项目身份
 
 1. 确认项目根、仓库/系统边界、当前 HEAD 与工作区变化。
 2. 读取 `AGENTS.md`、README、构建文件和既有索引，识别项目自有规则。
-3. 缺少 Agent 入口时，只补一个指向现有权威来源的精简入口；不得自动创建 00–10 文档树。
+3. 缺少 Agent 入口时通过 `structure` 模式补齐；不得自动创建 00–10 文档树。
 
 ### 2. 校验实现事实
 
@@ -84,6 +113,7 @@ flowchart LR
 ## 约束与协作
 
 - 不自动安装或升级 Graphify/OpenSpec，不修改全局配置，不创建定时任务。
+- 不把 Yoooni One 的 Java、React、Oracle、模块命名或业务规则写入通用初始化模板。
 - 不把项目特有规范写回公共插件；它们属于项目 `AGENTS.md` 或项目内 Skill。
 - `backend-evidence` 按需查询 Graphify、领域知识、DDL 与运行证据，不消费二次影响索引。
 - `change-readiness` 以 OpenSpec/兼容设计为变更依据，以 Graphify/源码为实现坐标。

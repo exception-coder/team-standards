@@ -10,7 +10,7 @@ flowchart TD
     B -->|"需求 / 方案"| C["change-readiness"]
     B -->|"Bug"| D["bug-doc-required"]
     B -->|"现状"| E["business-logic-orientation"]
-    B -->|"新系统接入 / 上下文状态"| F["init-project-docs"]
+    B -->|"AI 目录初始化 / 新系统接入 / 上下文状态"| F["init-project-docs"]
     C --> G["2. 建立证据与风险档位"]
     D --> G
     E --> G
@@ -39,7 +39,7 @@ flowchart TD
 | `backend-evidence` | 即时影响 | 修改状态、字段、事件或 API 前用新鲜 Graphify 查询；不回写手工索引 |
 | `backend-evidence` | 领域规格 | 状态密集业务缺少不变量、终态或下一动作证据 |
 | `markdown-writing-standards` | 写前 / 写中 / 写后 | 查重归属、结构与 Mermaid、索引登记 |
-| `init-project-docs` | onboard / init / refresh / status / profile | 九阶段系统接入、权威入口初始化、增量刷新、状态检查或可选轻量画像 |
+| `init-project-docs` | structure / onboard / init / refresh / status / profile | 当前目录 AI 结构、九阶段接入、权威入口、增量刷新、状态或可选画像 |
 | `design-system-bootstrap` | registry / preference | 建立设计资料或记录、归纳偏好证据 |
 | `design-system-guardian` | implementation / review | UI 实施和代表性渲染验收 |
 
@@ -60,7 +60,7 @@ Graphify、OpenSpec 和 Skill 分属不同层级，不建立三个并行主流�
 1. `change-readiness` 读取并评审对应 OpenSpec change，不再创建一份平行设计文档；风险分档和团队必填项优先进入项目的 OpenSpec schema 或配置。
 2. `business-logic-orientation` 优先查询 Graphify 获取代码事实，只补充 Graphify 无法证明的业务语义与运行证据；除非用户明确要求或需要长期重构基线，否则不生成新的梳理文档和 AI 索引。
 3. `backend-evidence` 使用 OpenSpec `specs/` 作为已接受行为契约，使用 Graphify 查询当前实现和影响，以 DDL、SQL、数据库和日志验证数据事实；不维护同义行为规格或手工代码索引。
-4. `init-project-docs` 编排项目规则、Graphify、OpenSpec 与领域证据的初始化和状态；不复制图谱、规格或 00–10 文档树。
+4. `init-project-docs` 先以 structure 模式建立六层最小入口，再编排项目规则、Graphify、OpenSpec 与领域证据；不复制图谱、规格或 00–10 文档树。
 5. `planning-evidence-discovery` 继续负责跨项目证据编排；Graphify 和 OpenSpec只是证据适配器，不替代项目关系权威源。
 
 “已启用”不等于目录存在：`openspec/config.yaml` 必须包含真实项目上下文，相关 change 可定位且所需 artifacts 可读取。只有空模板、无相关 change、artifacts 不完整或 CLI 不可用时，现有设计文档流程才作为兼容路径。

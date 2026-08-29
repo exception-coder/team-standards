@@ -11,6 +11,7 @@
 - [Skill 边界迁移](#14-skill-边界迁移坐标)
 - [事实源与缓存版本](#15-事实源与缓存版本坐标)
 - [项目接入轻量化](#16-项目接入轻量化坐标)
+- [AI 工程结构初始化](#17-ai-工程结构初始化坐标)
 
 ## 1. 变更摘要
 
@@ -196,3 +197,12 @@ readEvents(directory): { events, invalidRecords }
 - `templates/` 与三个顶层旧模板全部删除；Skill 校验不得再要求模板目录存在。
 - `bug-doc-required` 与 `change-readiness` 直接查询项目入口、Graphify、OpenSpec、domain knowledge 与运行证据。
 - 活动文档与跨引用审计只允许将 `00_project_overview.md` 作为旧项目兼容入口。
+
+## 17. AI 工程结构初始化坐标
+
+- `init-project-docs/init-ai-structure.mjs` 提供 `plan/apply/status`，默认根为 `process.cwd()`，拒绝磁盘根和用户主目录。
+- `init-project-docs/assets/project-ai-structure/` 只保存会进入目标项目的七份最小模板；项目名在写入前替换，不把 Yoooni 技术栈写成通用规则。
+- 缺失文件允许创建；已有文件按字节保留。`.gitignore` 只维护 `team-standards:graphify` 标记块，重复执行必须保持单块。
+- 初始化脚本不创建空 `.codex/skills`、`docs/domain`、`docs/design`、`docs/decisions`、`openspec/specs` 或 `openspec/changes` 目录。
+- `ai-structure-initializer.test.mjs` 覆盖 plan 无写入、首次创建、项目名替换、人工文件保护、Graphify 边界和重复执行幂等。
+- `init-project-docs` 在 `apply` 后按当前安装版本调用 Graphify，并以 OpenSpec 严格校验和脚本 `status` 作为完成证据。

@@ -48,7 +48,7 @@ flowchart LR
 | 知识文档 | `backend-evidence` | 单服务数据事实、Graphify 即时影响、领域规格与查询性能 |
 | 知识文档 | `glossary-required` | 将业务术语路由到 domain knowledge，并用 Graphify 验证代码映射 |
 | 知识文档 | `markdown-writing-standards` | 写前查重、Markdown/Mermaid 和写后索引 |
-| 知识文档 | `init-project-docs` | 通用项目接入与上下文状态；编排 Graphify/OpenSpec/项目规则，不复制事实 |
+| 知识文档 | `init-project-docs` | 在当前目录初始化统一 AI 工程结构，并编排 Graphify/OpenSpec/项目规则与上下文状态 |
 | 质量反馈 | `coding-violation-log` | 记录用户纠正并防止重犯 |
 | 质量反馈 | `comment-cleanup` | 经授权批量清理存量违规注释 |
 | 日志交付 | `daily-work-log` | 业务项目个人工作日志 |
@@ -65,7 +65,7 @@ flowchart LR
 | Bug 修复编码约束 | `bug-doc-required` 修复模式 |
 | 文档索引 | `markdown-writing-standards` 文档生命周期 |
 | 反向影响、领域规格挖掘 | `backend-evidence` 使用 Graphify 即时查询和 domain knowledge 候选流程 |
-| 通用项目接入、上下文刷新、可选轻量画像 | `init-project-docs` 的 `onboard/refresh/profile` 模式；移除默认 00–10 文档树与 Graphify 镜像 |
+| AI 工程目录、通用项目接入、上下文刷新、可选轻量画像 | `init-project-docs` 的 `structure/onboard/refresh/profile` 模式；不生成 00–10 文档树与 Graphify 镜像 |
 
 ---
 

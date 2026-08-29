@@ -15,7 +15,7 @@ flowchart TD
     B -->|"需求 / 改码 / 具体方案"| C["change-readiness\n方案审视 + 风险档位 + 设计依据"]
     B -->|"Bug / 异常"| D["bug-doc-required\n证据 + 根因 + 修复合同"]
     B -->|"现状梳理"| E["business-logic-orientation"]
-    B -->|"新系统接入 / 项目上下文状态"| F["init-project-docs\nonboard / init / refresh / status / profile"]
+    B -->|"AI 目录初始化 / 新系统接入 / 上下文状态"| F["init-project-docs\nstructure / onboard / init / refresh / status / profile"]
     C --> G{"是否涉及后端事实或共享契约"}
     D --> G
     E --> G
@@ -37,7 +37,7 @@ flowchart TD
 2. `bug-doc-required` 是 Bug 唯一入口，覆盖调查、根因、修复约束和回归；未获修复授权时只调查。
 3. `backend-evidence` 是单服务后端证据唯一入口；代码事实和反向影响使用 Graphify 即时查询，不维护第二套手工索引。
 4. `markdown-writing-standards` 覆盖写前查重、Markdown/Mermaid 结构和写后索引登记。
-5. `init-project-docs` 覆盖通用项目 onboarding 与上下文状态；编排项目入口、Graphify、OpenSpec 和领域证据，不生成平行事实投影。
+5. `init-project-docs` 在当前目录初始化六层 AI 工程入口，并覆盖通用项目 onboarding 与上下文状态；不生成平行事实投影。
 6. 小改按风险缩短流程，但不得跳过通用编码规范；项目专属规则由项目内 Skill 或 `AGENTS.md` 叠加。
 7. Graphify 提供带新鲜度边界的当前实现事实，OpenSpec 提供项目行为规格与活动变更；Skill 只做意图路由和质量门禁，不复制图谱或建立平行规格。
 
@@ -60,7 +60,7 @@ flowchart TD
 | 后端表、SQL、状态、字段、事件、API、领域闭环或查询性能 | `backend-evidence` |
 | 新建或结构性修改 Markdown、Mermaid、复杂表格 | `markdown-writing-standards` |
 | 术语缺失、歧义或命名不一致 | `glossary-required` |
-| 初始化新项目、一键 onboard、接入新系统；或刷新、检查项目上下文/图谱/规格状态 | `init-project-docs` |
+| 初始化 AI 工程结构/AI 目录；初始化新项目、一键 onboard、接入新系统；或刷新上下文状态 | `init-project-docs` |
 | 用户纠正 AI 编码规范错误；或项目前置违规表存在 | `coding-violation-log` |
 | 用户明确要求批量清理存量注释 | `comment-cleanup` |
 | 业务项目源码发生改动或要求记工作日志 | `daily-work-log` |
@@ -108,7 +108,7 @@ flowchart TD
 | `frontend-excellence` | 生产 Web 前端架构、视觉、响应式、可访问性和浏览器验收 | 不用于纯后端或无布局小改 |
 | `git-commit-standards` | 提交标题、中文三段正文和 Author | 每次 commit 前调用 |
 | `glossary-required` | 将业务术语路由到 domain knowledge，并用 Graphify 验证代码映射 | 不维护独立 glossary 候选池 |
-| `init-project-docs` | 通用项目接入、上下文刷新与状态检查 | 不复制 Graphify/OpenSpec；新员工环境由目标项目负责 |
+| `init-project-docs` | 当前目录 AI 结构初始化、通用项目接入、上下文刷新与状态检查 | structure 模式安全幂等；不复制 Graphify/OpenSpec |
 | `java-coding-standards` | Java 与关系库独占规范 | 叠加 common |
 | `llm-agent-coding-standards` | LLM/Agent 信任边界、确定性契约和循环兜底 | 仅 LLM 集成代码触发 |
 | `markdown-writing-standards` | 文档查重、Markdown/Mermaid 结构与索引登记 | 日期日志与索引文件按规则豁免 |
@@ -129,6 +129,8 @@ flowchart TD
 | `skills/markdown-writing-standards/references/document-index-workflow.md` | `markdown-writing-standards` | 写前查重与写后登记 |
 | `skills/init-project-docs/references/` | `init-project-docs` | onboarding、权威来源刷新与可选轻量画像流程 |
 | `skills/init-project-docs/onboard-pipeline.mjs` | `init-project-docs` | 九阶段可续跑状态与关卡脚本 |
+| `skills/init-project-docs/init-ai-structure.mjs` | `init-project-docs` | 当前目录六层 AI 工程结构的 plan/apply/status 初始化器 |
+| `skills/init-project-docs/assets/project-ai-structure/` | `init-project-docs` | 写入目标项目的最小 Agent、Docs 与 OpenSpec 模板 |
 | `skills/design-system-bootstrap/assets/` | `design-system-bootstrap` | Registry 和 Profile 模板 |
 | `skills/design-system-bootstrap/references/evidence-capture.md` | `design-system-bootstrap` | 偏好证据记录 |
 | `skills/design-system-bootstrap/references/pattern-mining.md` | `design-system-bootstrap` | 候选模式归纳 |

@@ -12,7 +12,7 @@
 | 共享定义影响面 | `backend-evidence` Graphify 即时影响模式 | `change-readiness` |
 | 状态密集业务缺少闭环规格 | `backend-evidence` 领域规格模式 | `planning-evidence-discovery` |
 | 新建或重组 Markdown | `markdown-writing-standards` | 内容所属 Skill |
-| 初始化新项目、接入新系统、刷新或检查项目上下文状态 | `init-project-docs` | `backend-evidence` |
+| 初始化 AI 工程结构/AI 目录、新项目、接入新系统，或刷新上下文状态 | `init-project-docs` | `backend-evidence` |
 | 新建或大改 Web UI | `frontend-excellence` | `design-system-guardian` |
 | 初始化设计资料或记录偏好 | `design-system-bootstrap` | — |
 | UI 视觉验收 | `design-system-guardian` | `frontend-excellence` |

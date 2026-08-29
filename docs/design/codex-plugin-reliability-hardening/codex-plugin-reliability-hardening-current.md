@@ -13,6 +13,7 @@
 - [第五轮 Skill 边界](#22-第五轮-skill-边界收敛)
 - [第六轮事实源收敛](#23-第六轮事实源收敛)
 - [第七轮项目接入轻量化](#24-第七轮项目接入轻量化)
+- [第八轮 AI 工程结构初始化](#25-第八轮-ai-工程结构初始化)
 
 ## 1. 背景与目标
 
@@ -379,3 +380,36 @@ Graphify 与 OpenSpec 接入后，公共 Skill 只保留意图级编排和质量
 4. `profile` 仅在用户明确要求且现有入口不足时生成一份轻量 `project-profile.md` 导航，不复制业务上下文与编码规则正文。
 5. `bug-doc-required` 与 `change-readiness` 改为直接按权威来源取上下文；旧 `00_project_overview.md` 只作为兼容导航读取。
 6. 删除 20 份旧说明、画像和技术卡模板，保留 onboarding 状态脚本与三份编排 reference。
+
+## 25. 第八轮 AI 工程结构初始化
+
+Yoooni One 验证了轻量接入之后仍需要一个可重复执行的物理初始化入口，否则每个项目会以不同方式手工创建 `AGENTS.md`、文档索引、OpenSpec 和 Graphify 提交边界。本轮在 `init-project-docs` 内增加 `structure` 模式，不新增公共 Skill。
+
+### 25.1 标准职责模型
+
+```mermaid
+flowchart TD
+    RULES["L1 Instructions<br/>AGENTS.md and adapters"] --> ROUTER["任务上下文路由"]
+    ROUTER --> DOCS["L2 Knowledge<br/>docs and INDEX"]
+    ROUTER --> SPEC["L3 Specification<br/>OpenSpec"]
+    ROUTER --> GRAPH["L4 Code Intelligence<br/>Graphify"]
+    DOCS --> CAP["L5 Agent Capability<br/>project Skills when needed"]
+    SPEC --> CAP
+    GRAPH --> CAP
+    CAP --> CODE["L6 Implementation<br/>project source and tests"]
+```
+
+六层是职责模型，不要求创建六个同名目录。初始化只生成能够承担真实职责的最小入口；`.codex/skills/`、领域、设计和 ADR 目录在出现实际内容时再创建，`graphify-out/` 由 Graphify 自身生成。
+
+### 25.2 执行边界
+
+1. 当前目录默认作为项目根，可用 `--root` 与 `--name` 覆盖。
+2. `plan` 只报告；`apply` 创建缺失文件并维护 `.gitignore` 中带标记的 Graphify 共享边界；`status` 只检查。
+3. 已有非托管文件一律保留，不覆盖、不搬迁；初始化结果必须明确列出 `created/preserved/updated/pending`。
+4. 脚本只负责确定性骨架，不内嵌 Graphify 或 OpenSpec CLI；Skill 在脚本完成后调用各自权威工具生成和验证产物。
+5. 默认共享 `graph.json`、`GRAPH_REPORT.md` 与 `manifest.json`，忽略 Graphify 缓存、memory 和本地分析文件。
+6. 初始化结果必须幂等；重复执行不能制造副本、重复 `.gitignore` 规则或重写人工内容。
+
+### 25.3 默认检索顺序
+
+新项目的 Agent 入口统一声明：项目规则先读 `AGENTS.md`，长期知识经 `docs/INDEX.md` 路由，目标行为查询 OpenSpec，当前实现关系查询 Graphify，最后才定向读取源码。Graphify 结果在编辑前仍需用当前源码验证，OpenSpec 校验不替代实现、数据库和发布制品验证。

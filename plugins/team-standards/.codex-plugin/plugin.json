@@ -1,6 +1,6 @@
 {
   "name": "team-standards",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Team engineering governance with 21 unified skills for design, bugs, architecture, coding, UI governance, backend facts, documentation, and delivery.",
   "author": {
     "name": "Zhang Kai",
@@ -15,6 +15,7 @@
     "change-readiness",
     "openspec",
     "graphify",
+    "ai-project-structure",
     "team-standards",
     "developer-workflow",
     "frontend",
@@ -36,6 +37,7 @@
     "termsOfServiceURL": "https://gitee.com/wyoooni/team-standards",
     "defaultPrompt": [
       "Review this OpenSpec change and resolve implementation readiness before coding.",
+      "Initialize the standard AI project structure in the current directory.",
       "Build a polished, responsive frontend with a coherent design system and browser verification.",
       "Review this Java code using the team standards plugin.",
       "Map the current business logic before refactoring this module."

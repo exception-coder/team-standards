@@ -32,5 +32,5 @@
 
 - 文件：`codex-plugin-reliability-hardening/codex-plugin-reliability-hardening-current.md`
 - 编码摘要：`codex-plugin-reliability-hardening/codex-plugin-reliability-hardening-coding.md`
-- 摘要：统一 Claude Code 与 Codex Hook 输入契约，收紧安全默认值，并建立隔离安装、共享契约、性能预算和可重复发布闭环。
-- 大纲：目标与边界 / 整体架构 / 模块职责 / 核心规则 / 第一轮实施结果 / 第二轮架构 / 安全边界 / 验收标准 / 第二轮实施结果 / 运行载荷版本门禁 / 第三轮共享 Hook 契约收敛 / 第三轮关键交互
+- 摘要：统一 Hook 与插件契约，收敛 Skill/事实源，并建立可重复、幂等的六层 AI 工程结构初始化入口。
+- 大纲：目标与边界 / Hook 架构与安全 / 发布和共享契约 / OpenSpec 与 Graphify 门禁 / Skill 与事实源收敛 / 项目接入轻量化 / AI 工程结构初始化
