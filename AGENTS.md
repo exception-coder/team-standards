@@ -25,9 +25,10 @@ flowchart TD
     I --> J["architecture-ddd-lite-fullstack\n+ coding-standards-common\n+ 语言或 LLM 专属标准"]
     J --> K{"是否重大 Web UI"}
     K -->|"是"| L["frontend-excellence\n+ design-system-guardian"]
-    K -->|"否"| M["实施与验证"]
+    K -->|"否"| M["实施"]
     L --> M
-    M --> N["知识 / 索引 / 日志回写"]
+    M --> V["delivery-verification\n真实环境验证 + PASS 门禁"]
+    V --> N["知识 / 索引 / 日志回写"]
     N --> O["git-commit-standards"]
 ```
 
@@ -63,6 +64,7 @@ flowchart TD
 | 初始化 AI 工程结构/AI 目录；初始化新项目、一键 onboard、接入新系统；或刷新上下文状态 | `init-project-docs` |
 | 用户纠正 AI 编码规范错误；或项目前置违规表存在 | `coding-violation-log` |
 | 用户明确要求批量清理存量注释 | `comment-cleanup` |
+| 可执行改动完成、准备最终回复 | `delivery-verification` |
 | 业务项目源码发生改动或要求记工作日志 | `daily-work-log` |
 | team-standards 发生决策型变更 | `dev-log` |
 | 任何 git commit 或生成提交信息 | `git-commit-standards` |
@@ -85,7 +87,7 @@ flowchart TD
 | 架构与编码 | `architecture-ddd-lite-fullstack`、`coding-standards-common`、`java-coding-standards`、`dart-coding-standards`、`llm-agent-coding-standards` |
 | 前端与设计治理 | `frontend-excellence`、`design-system-bootstrap`、`design-system-guardian` |
 | 知识与文档 | `backend-evidence`、`glossary-required`、`markdown-writing-standards`、`init-project-docs` |
-| 质量与反馈 | `coding-violation-log`、`comment-cleanup` |
+| 质量与反馈 | `coding-violation-log`、`comment-cleanup`、`delivery-verification` |
 | 日志与交付 | `daily-work-log`、`dev-log`、`git-commit-standards` |
 
 ## Skill 索引
@@ -104,6 +106,7 @@ flowchart TD
 | `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
 | `design-system-bootstrap` | Registry/Profile 初始化、绑定、Preference Evidence 与 Pattern Mining | 只从证据晋升规则 |
 | `design-system-guardian` | UI 实现治理、复用策略与视觉评审 | 小文案/间距不跑完整循环 |
+| `delivery-verification` | 完成前真实验证、有限修复循环与 PASS-only Done | 优先 `forge_verify phase=all`，修改后证据失效 |
 | `dev-log` | team-standards 决策日志 | 普通措辞和版本更新不记录 |
 | `frontend-excellence` | 生产 Web 前端架构、视觉、响应式、可访问性和浏览器验收 | 不用于纯后端或无布局小改 |
 | `git-commit-standards` | 提交标题、中文三段正文和 Author | 每次 commit 前调用 |

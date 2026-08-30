@@ -1,7 +1,7 @@
 {
   "name": "team-standards",
-  "description": "团队工程治理插件：21 个统一 Skill，覆盖设计、Bug、架构编码、前端治理、后端事实、文档与交付",
-  "version": "2.2.0",
+  "description": "团队工程治理插件：22 个统一 Skill，覆盖设计、Bug、架构编码、前端治理、后端事实、文档与交付",
+  "version": "2.3.0",
   "author": {
     "name": "张凯",
     "email": ""

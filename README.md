@@ -5,7 +5,7 @@
 ## 快速导航
 
 - **理解统一流程** → [主流程](#主流程)、[Skill 流程图](docs/skill-flow.md)
-- **查看能力清单** → [21 个 Skill](#21-个-skill)、[合并后的入口](#合并后的入口)
+- **查看能力清单** → [22 个 Skill](#22-个-skill)、[合并后的入口](#合并后的入口)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
 - **安装和维护** → [安装](#安装)、[维护与验证](#维护与验证)
@@ -20,8 +20,9 @@ flowchart LR
     EVIDENCE --> IMPACT["后端事实与影响分析"]
     IMPACT --> LOCATE["精确代码定位"]
     LOCATE --> GUARD["架构与编码门禁"]
-    GUARD --> BUILD["实施与验证"]
-    BUILD --> WRITEBACK["知识、索引与日志回写"]
+    GUARD --> BUILD["实施"]
+    BUILD --> VERIFY["真实验证与 PASS 门禁"]
+    VERIFY --> WRITEBACK["知识、索引与日志回写"]
     WRITEBACK --> COMMIT["规范提交"]
 ```
 
@@ -29,7 +30,7 @@ flowchart LR
 
 ---
 
-## 21 个 Skill
+## 22 个 Skill
 
 | 类别 | Skill | 核心价值 |
 |---|---|---|
@@ -51,6 +52,7 @@ flowchart LR
 | 知识文档 | `init-project-docs` | 在当前目录初始化统一 AI 工程结构，并编排 Graphify/OpenSpec/项目规则与上下文状态 |
 | 质量反馈 | `coding-violation-log` | 记录用户纠正并防止重犯 |
 | 质量反馈 | `comment-cleanup` | 经授权批量清理存量违规注释 |
+| 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，有限修复并以最新 PASS 放行 Done |
 | 日志交付 | `daily-work-log` | 业务项目个人工作日志 |
 | 日志交付 | `dev-log` | 插件决策型变更日志 |
 | 日志交付 | `git-commit-standards` | 可审查提交信息和提交前复核 |
@@ -84,7 +86,7 @@ coding-standards-common              所有源码修改的公共基线
 
 ## Hook 边界
 
-Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。OpenSpec 项目要求当前会话明确选择并读取一个完整活动 change，仓库中的无关 change 或 legacy 设计文档不再自动放行；未启用 OpenSpec 的项目继续认可兼容设计文档。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
+Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。OpenSpec 项目要求当前会话明确选择并读取一个完整活动 change，仓库中的无关 change 或 legacy 设计文档不再自动放行；未启用 OpenSpec 的项目继续认可兼容设计文档。完成前 Hook 对可执行工作区改动要求最近一次 `forge_verify phase=all` 或项目 Forge CLI 返回 PASS，验证后再次编辑会使证据失效。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
 
 ---
 

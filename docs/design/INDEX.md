@@ -1,5 +1,11 @@
 # team-standards / design 文档索引
 
+## Forge AI Coding真实验证闭环
+
+- 文件：`ForgeAI-Coding真实验证闭环/ForgeAI-Coding真实验证闭环开发说明-current.md`
+- 摘要：以 Forge Verification 为执行引擎，在团队套件中建立完成前真实验证、有限修复和 PASS-only Done 门禁。
+- 大纲：首期目标 / 总体链路 / 组件职责 / 触发与证据规则 / 失败与修复闭环 / 安全边界 / 验收标准
+
 ## Hook 命中事件本地登记
 
 - 文件：`hook-event-logging.md`

@@ -19,9 +19,10 @@ flowchart TD
     H -->|"否"| J["4. 精确代码定位"]
     I --> J
     J --> K["5. 架构与编码门禁"]
-    K --> L["6. 实施与验证"]
-    L --> M["7. 知识、索引、日志回写"]
-    M --> N["8. 提交规范"]
+    K --> L["6. 实施"]
+    L --> V["7. delivery-verification\n真实验证与 PASS 门禁"]
+    V --> M["8. 知识、索引、日志回写"]
+    M --> N["9. 提交规范"]
 ```
 
 ---
@@ -42,6 +43,7 @@ flowchart TD
 | `init-project-docs` | structure / onboard / init / refresh / status / profile | 当前目录 AI 结构、九阶段接入、权威入口、增量刷新、状态或可选画像 |
 | `design-system-bootstrap` | registry / preference | 建立设计资料或记录、归纳偏好证据 |
 | `design-system-guardian` | implementation / review | UI 实施和代表性渲染验收 |
+| `delivery-verification` | completion | 可执行改动完成后、最终回复前调用 Forge 并检查最新 PASS 证据 |
 
 ---
 
@@ -104,4 +106,5 @@ flowchart LR
 | 业务源码变化 | `daily-work-log` |
 | 用户纠正规范错误 | `coding-violation-log` |
 | team-standards 决策变化 | `dev-log` |
+| 可执行改动准备交付 | `delivery-verification`；优先 `forge_verify phase=all` |
 | 准备 commit | `git-commit-standards` |
