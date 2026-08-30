@@ -33,7 +33,7 @@ flowchart LR
 
 | 类别 | Skill | 核心价值 |
 |---|---|---|
-| 分析设计 | `change-readiness` | 路由 OpenSpec/兼容设计，统一方案审视、风险分档和实施前代码定位 |
+| 分析设计 | `change-readiness` | 自动匹配或创建 OpenSpec change，持续更新 artifacts，并统一方案审视、风险分档和实施前代码定位 |
 | 分析设计 | `bug-doc-required` | 统一 Bug 证据、根因、修复约束与回归 |
 | 分析设计 | `business-logic-orientation` | Graphify 优先理解当前业务逻辑，按需沉淀长期基线 |
 | 分析设计 | `planning-evidence-discovery` | 跨项目 PRD 和估算的证据轨迹 |
@@ -84,7 +84,7 @@ coding-standards-common              所有源码修改的公共基线
 
 ## Hook 边界
 
-Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。设计依据检查同时认可“真实 OpenSpec context + 完整活动 change artifacts”和兼容设计文档；后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。动态 SQL 的最终结论仍由项目 DDL、真实数据库和 Mapper 契约测试给出。
+Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。OpenSpec 项目要求当前会话明确选择并读取一个完整活动 change，仓库中的无关 change 或 legacy 设计文档不再自动放行；未启用 OpenSpec 的项目继续认可兼容设计文档。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
 
 ---
 
@@ -95,7 +95,7 @@ Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义�
 - Domain knowledge 保存经确认、跨变更稳定的业务真理和术语。
 - `team-standards` 只负责意图路由与质量门禁，不复制图谱或建立平行规格。
 
-项目的 OpenSpec 配置包含真实上下文、相关 change 可定位且 artifacts 可读取后，`change-readiness` 评审 OpenSpec change 而不是另建设计文档；只有空模板、无相关 change 或 CLI 不可用时才走兼容流程。Graphify 查询前还必须校验其对 HEAD 和工作区改动的新鲜度。具体职责矩阵见 [Skill 流程图](docs/skill-flow.md#graphify-与-openspec-接入边界)。
+项目的 OpenSpec 配置包含真实上下文后，M/L 变更由 `change-readiness` 自动匹配或创建 change，并复用 OpenSpec 官方 Skill/CLI 完成 artifacts、apply 上下文、update、verify、sync 与 archive 判定。没有相关 change 或生成 Skill 缺失不再是 legacy 降级理由；CLI 正常时继续走官方 agent 协议。Graphify 查询前还必须校验其对 HEAD 和工作区改动的新鲜度。具体职责矩阵见 [Skill 流程图](docs/skill-flow.md#graphify-与-openspec-接入边界)。
 
 ---
 

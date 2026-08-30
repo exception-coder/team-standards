@@ -7,7 +7,7 @@
 ```mermaid
 flowchart TD
     A["用户意图"] --> B{"任务类型"}
-    B -->|"需求 / 改码 / 具体方案"| C["change-readiness\n方案审视 + 风险档位 + 设计依据"]
+    B -->|"需求 / 改码 / 具体方案"| C["change-readiness\nOpenSpec 自动路由 + 风险档位 + 设计依据"]
     B -->|"Bug / 异常"| D["bug-doc-required\n证据 + 根因 + 修复合同"]
     B -->|"现状梳理"| E["business-logic-orientation"]
     B -->|"AI 目录初始化 / 新系统接入 / 上下文状态"| F["init-project-docs\nstructure / onboard / init / refresh / status / profile"]
@@ -28,7 +28,7 @@ flowchart TD
 
 主流程原则：
 
-1. `change-readiness` 是开发前唯一主门禁；优先路由到项目 OpenSpec change，未就绪项目才使用兼容设计文档，并在内部完成方案审视、档位设计和代码定位。
+1. `change-readiness` 是开发前唯一主门禁；项目启用 OpenSpec 后，M/L 变更自动匹配或创建 change，并在实施期间更新、验证、同步和判断归档。只有未启用 OpenSpec 的项目，或用户明确批准的单次降级，才使用兼容设计文档。
 2. `bug-doc-required` 是 Bug 唯一入口，覆盖调查、根因、修复约束和回归；未获修复授权时只调查。
 3. `backend-evidence` 是单服务后端证据唯一入口；代码事实和反向影响使用 Graphify 即时查询，不维护第二套手工索引。
 4. `markdown-writing-standards` 覆盖写前查重、Markdown/Mermaid 结构和写后索引登记。
@@ -96,7 +96,7 @@ flowchart TD
 | `comment-cleanup` | 用户授权下批量清理存量违规注释 | 不顺手扩大到逻辑修改 |
 | `daily-work-log` | 业务项目个人工作日志 | 不用于 team-standards 自身决策 |
 | `dart-coding-standards` | Dart、Flutter、dartdoc 和 null-safety 规范 | 叠加 common |
-| `change-readiness` | OpenSpec/兼容设计路由、方案审视、风险分档和代码定位 | 开发前唯一主门禁，不维护平行设计正文 |
+| `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
 | `design-system-bootstrap` | Registry/Profile 初始化、绑定、Preference Evidence 与 Pattern Mining | 只从证据晋升规则 |
 | `design-system-guardian` | UI 实现治理、复用策略与视觉评审 | 小文案/间距不跑完整循环 |
 | `dev-log` | team-standards 决策日志 | 普通措辞和版本更新不记录 |
@@ -117,6 +117,7 @@ flowchart TD
 | `skills/change-readiness/references/classification.md` | `change-readiness` | S/M/L 与模板选择 |
 | `skills/change-readiness/references/document-workflow.md` | `change-readiness` | 设计文档查找、命名和更新 |
 | `skills/change-readiness/references/code-orientation.md` | `change-readiness` | 实施前代码坐标与约束 |
+| `skills/change-readiness/references/openspec-lifecycle.md` | `change-readiness` | OpenSpec change 自动匹配、创建、更新、验证、同步与归档判定 |
 | `skills/business-logic-orientation/references/orientation-document-workflow.md` | `business-logic-orientation` | 仅在需要长期基线时加载的完整现状文档流程 |
 | `skills/bug-doc-required/template.md` | `bug-doc-required` | Bug 文档模板 |
 | `skills/bug-doc-required/references/repair-rules.md` | `bug-doc-required` | 修复期最小改动和源码规则 |

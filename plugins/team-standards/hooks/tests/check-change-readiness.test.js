@@ -26,6 +26,15 @@ function mkTmpProject(name) {
   return root;
 }
 
+function makeTranscript(changeName) {
+  const transcript = path.join(os.tmpdir(), `td-openspec-${Date.now()}-${Math.random()}.jsonl`);
+  fs.writeFileSync(transcript, JSON.stringify({
+    command: `openspec status --change ${changeName} --json`,
+    path: `openspec/changes/${changeName}/proposal.md`,
+  }));
+  return transcript;
+}
+
 test('放行：非 Write/Edit/MultiEdit 工具', () => {
   const { code } = runHook({ tool_name: 'Read', tool_input: { file_path: '/tmp/x.dart' } });
   assert.equal(code, 0);
@@ -148,6 +157,7 @@ test('兼容：旧 TEAM_STANDARDS_DESIGN_DOC_HOOK=off 仍可绕过', () => {
 
 test('放行：OpenSpec 有真实 context 和完整活动 change artifacts', () => {
   const root = mkTmpProject('openspec-ready');
+  const transcript = makeTranscript('add-feature');
   try {
     const changeRoot = path.join(root, 'openspec', 'changes', 'add-feature');
     fs.mkdirSync(path.join(changeRoot, 'specs', 'feature'), { recursive: true });
@@ -161,7 +171,53 @@ test('放行：OpenSpec 有真实 context 和完整活动 change artifacts', () 
       tool_name: 'Edit',
       tool_input: { file_path: path.join(root, 'src', 'Feature.java') },
       cwd: root,
+      transcript_path: transcript,
     });
+    assert.equal(code, 0, stderr);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+    fs.rmSync(transcript, { force: true });
+  }
+});
+
+test('阻断：OpenSpec 项目不能用无关活动 change 或 legacy 文档静默放行', () => {
+  const root = mkTmpProject('openspec-unselected');
+  try {
+    const changeRoot = path.join(root, 'openspec', 'changes', 'other-feature');
+    fs.mkdirSync(path.join(changeRoot, 'specs', 'feature'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'docs', 'design'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'openspec', 'config.yaml'), 'schema: spec-driven\ncontext: |\n  Real project context\n');
+    fs.writeFileSync(path.join(changeRoot, 'proposal.md'), '# Proposal');
+    fs.writeFileSync(path.join(changeRoot, 'design.md'), '# Design');
+    fs.writeFileSync(path.join(changeRoot, 'tasks.md'), '# Tasks');
+    fs.writeFileSync(path.join(changeRoot, 'specs', 'feature', 'spec.md'), '# Spec');
+    fs.writeFileSync(path.join(root, 'docs', 'design', 'legacy.md'), '# Legacy');
+
+    const { code, stderr } = runHook({
+      tool_name: 'Edit',
+      tool_input: { file_path: path.join(root, 'src', 'Feature.java') },
+      cwd: root,
+    });
+    assert.equal(code, 2);
+    assert.match(stderr, /本会话未选择|legacy/);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('放行：用户在进程启动前明确批准 OpenSpec legacy 兼容', () => {
+  const root = mkTmpProject('openspec-approved-legacy');
+  try {
+    fs.mkdirSync(path.join(root, 'openspec'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'docs', 'design'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'openspec', 'config.yaml'), 'schema: spec-driven\ncontext: |\n  Real project context\n');
+    fs.writeFileSync(path.join(root, 'docs', 'design', 'legacy.md'), '# Legacy');
+
+    const { code, stderr } = runHook({
+      tool_name: 'Edit',
+      tool_input: { file_path: path.join(root, 'src', 'Feature.java') },
+      cwd: root,
+    }, { TEAM_STANDARDS_OPENSPEC_LEGACY_APPROVED: 'on' });
     assert.equal(code, 0, stderr);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });

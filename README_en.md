@@ -17,7 +17,7 @@ flowchart LR
 
 The main consolidated entry points are:
 
-- `change-readiness`: proposal review, risk classification, design basis, and code orientation.
+- `change-readiness`: automatically matches or creates an OpenSpec change, keeps its artifacts coherent through implementation, and performs proposal review, risk classification, and code orientation. OpenSpec-enabled M/L changes cannot silently fall back to legacy design docs.
 - `bug-doc-required`: evidence, root cause, repair contract, minimal fix, and regression.
 - `backend-evidence`: database/runtime truth, fresh Graphify impact queries, domain specifications, and query-performance gates; it does not maintain a parallel code index.
 - `markdown-writing-standards`: document deduplication, Markdown/Mermaid structure, and index registration.

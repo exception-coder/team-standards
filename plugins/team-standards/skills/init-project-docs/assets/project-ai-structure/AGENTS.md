@@ -12,6 +12,8 @@ Read context in this order:
 
 Graphify describes current implementation relationships; it does not define business intent. OpenSpec describes expected behavior and changes; validation does not prove the implementation conforms. Verify both against the task-owned source and tests before editing.
 
+When `openspec/config.yaml` contains real project context, every non-trivial behavior or architecture change must match or create an OpenSpec change before implementation. Keep that change coherent as requirements or implementation discoveries evolve, validate it before coding and completion, and sync/archive only after its tasks and project verification evidence are complete. Do not silently replace it with a legacy design document.
+
 ## Project-specific rules
 
 Keep project architecture, naming, build, test, deployment, data, and compatibility rules in this repository. Put substantial rationale in indexed documents and keep this file focused on mandatory rules and routing.

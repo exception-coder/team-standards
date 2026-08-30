@@ -20,3 +20,5 @@ rules:
     - Cite current source or Graphify coordinates and record verification and rollback strategy.
   tasks:
     - Keep tasks independently verifiable and do not mark them complete before evidence exists.
+    - Update the active change when implementation discoveries alter scope, behavior, contracts, or acceptance evidence.
+    - Keep unresolved or unverified work active; do not archive merely because code was edited.

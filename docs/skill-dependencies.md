@@ -21,7 +21,7 @@ flowchart LR
 
 | Skill | 前置 | 后续 / 叠加 |
 |---|---|---|
-| `change-readiness` | 用户意图与可用项目证据 | 架构、后端事实或编码标准 |
+| `change-readiness` | 用户意图、OpenSpec 配置与可用项目证据 | 自动 change 生命周期、架构、后端事实或编码标准 |
 | `bug-doc-required` | Bug 现象与可验证证据 | 需要修复时进入设计与编码链 |
 | `business-logic-orientation` | 现有代码和业务场景 | 重构设计 |
 | `planning-evidence-discovery` | 项目范围解析 | 规划输出或设计 |
@@ -41,4 +41,4 @@ flowchart LR
 - S 档可缩短设计文档，但不能跳过通用编码标准。
 - 状态、字段、事件、API 或数据模型变化必须进入后端事实与影响模式。
 - 跨项目契约和项目专属规则由拥有它们的仓库维护。
-- Graphify 作为当前实现事实适配器，OpenSpec 作为行为规格与变更制品；Skill 编排两者但不复制其产物。项目启用 OpenSpec 后，设计入口复用对应 change；项目接入也不再生成 Graphify Markdown 镜像或 00–10 文档树。
+- Graphify 作为当前实现事实适配器，OpenSpec 作为行为规格与变更制品；Skill 编排两者但不复制其产物。项目启用 OpenSpec 后，M/L 变更必须自动匹配或创建 change，并在实施中持续 update；只有未启用项目或明确批准的单次降级使用 legacy。项目接入不再生成 Graphify Markdown 镜像或 00–10 文档树。

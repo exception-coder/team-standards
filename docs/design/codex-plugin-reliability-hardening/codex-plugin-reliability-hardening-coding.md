@@ -12,6 +12,7 @@
 - [事实源与缓存版本](#15-事实源与缓存版本坐标)
 - [项目接入轻量化](#16-项目接入轻量化坐标)
 - [AI 工程结构初始化](#17-ai-工程结构初始化坐标)
+- [OpenSpec 自动生命周期](#18-openspec-自动生命周期坐标)
 
 ## 1. 变更摘要
 
@@ -161,7 +162,7 @@ readEvents(directory): { events, invalidRecords }
 
 ## 13. OpenSpec 与 Graphify 门禁坐标
 
-- `check-change-readiness.js#hasOpenSpecDesign(projectRoot)`：读取 `openspec/config.yaml`，排除注释空模板，检查非归档 change 的 proposal、design、tasks 和 delta specs。
+- `check-change-readiness.js#hasOpenSpecDesign(projectRoot, transcriptPath)`：读取 `openspec/config.yaml`，排除注释空模板，并只检查当前 transcript 已选择的非归档 change 是否具有 proposal、design、tasks 和 delta specs。
 - `check-backend-evidence-readiness.js#readContextKind(transcriptPath)`：区分传统 knowledge-graph 和 Graphify 查询，避免把两种证据混成一个布尔值。
 - `check-backend-evidence-readiness.js#findStaleGraphifyTargets(projectRoot, targetPaths)`：兼容 manifest 根映射和 `files` 包装结构，按仓库相对路径比较目标文件 mtime。
 - 新鲜度校验只覆盖本次目标文件，不扫描整个仓库，不额外增加 Hook 进程；默认使用 `TEAM_STANDARDS_BACKEND_EVIDENCE_HOOK=warn`，`block` 模式返回 2。
@@ -206,3 +207,13 @@ readEvents(directory): { events, invalidRecords }
 - 初始化脚本不创建空 `.codex/skills`、`docs/domain`、`docs/design`、`docs/decisions`、`openspec/specs` 或 `openspec/changes` 目录。
 - `ai-structure-initializer.test.mjs` 覆盖 plan 无写入、首次创建、项目名替换、人工文件保护、Graphify 边界和重复执行幂等。
 - `init-project-docs` 在 `apply` 后按当前安装版本调用 Graphify，并以 OpenSpec 严格校验和脚本 `status` 作为完成证据。
+
+## 18. OpenSpec 自动生命周期坐标
+
+- `change-readiness/SKILL.md`：OpenSpec 已启用时，M/L 变更强制进入 change；移除“无相关 change 或 CLI 不可用即自动 legacy”的路由。
+- `change-readiness/references/openspec-lifecycle.md`：维护官方 Skill/CLI 选择、change 匹配与创建、schema-driven artifacts、实施 update、验证、sync 和 archive 判定。
+- `check-change-readiness.js#readSelectedOpenSpecChanges(transcriptPath)`：从当前 transcript 中提取实际读取或通过 `--change` 选择的 change ID。
+- `check-change-readiness.js#hasOpenSpecDesign(projectRoot, transcriptPath)`：只认可本会话选择且 proposal、design、tasks、specs 完整的活动 change。
+- `check-change-readiness.js#hasDesignBasis(...)`：检测到 `openspec/config.yaml` 后默认禁止 legacy 设计放行；仅 `TEAM_STANDARDS_OPENSPEC_LEGACY_APPROVED=on` 支持启动会话前明确批准的兼容路径。
+- 回归测试覆盖匹配 change 放行、无关 change + legacy 文档阻断、显式 legacy 批准和空模板阻断。
+- README、统一流程、依赖、触发、dev-log 与三个 manifest 随核心行为同步；发布版本升级为 2.2.0。

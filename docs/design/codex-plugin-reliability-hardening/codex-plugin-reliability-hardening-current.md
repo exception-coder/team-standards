@@ -14,6 +14,7 @@
 - [第六轮事实源收敛](#23-第六轮事实源收敛)
 - [第七轮项目接入轻量化](#24-第七轮项目接入轻量化)
 - [第八轮 AI 工程结构初始化](#25-第八轮-ai-工程结构初始化)
+- [第九轮 OpenSpec 自动生命周期](#26-第九轮-openspec-自动生命周期门禁)
 
 ## 1. 背景与目标
 
@@ -413,3 +414,38 @@ flowchart TD
 ### 25.3 默认检索顺序
 
 新项目的 Agent 入口统一声明：项目规则先读 `AGENTS.md`，长期知识经 `docs/INDEX.md` 路由，目标行为查询 OpenSpec，当前实现关系查询 Graphify，最后才定向读取源码。Graphify 结果在编辑前仍需用当前源码验证，OpenSpec 校验不替代实现、数据库和发布制品验证。
+
+## 26. 第九轮 OpenSpec 自动生命周期门禁
+
+此前 `change-readiness` 把 OpenSpec 作为优先载体，但“没有相关 change、artifacts 不完整或 CLI 不可用”会自动降级到 legacy。该策略使已接入 OpenSpec 的项目仍可能绕过规格生产，并且 Hook 只要发现任意完整活动 change 就会放行无关实现。
+
+本轮将路由改为：
+
+```mermaid
+flowchart TD
+    REQUEST["自然语言变更请求"] --> CLASSIFY{"S、M 或 L?"}
+    CLASSIFY -->|"S 且不改变行为契约"| DIRECT["回显依据后直接实现"]
+    CLASSIFY -->|"M 或 L"| ENABLED{"OpenSpec 已启用?"}
+    ENABLED -->|"否"| LEGACY["兼容设计流程"]
+    ENABLED -->|"是"| MATCH["list/show/status 匹配 change"]
+    MATCH --> FOUND{"存在唯一相关 change?"}
+    FOUND -->|"是"| PLAN["补齐或更新 artifacts"]
+    FOUND -->|"否"| CREATE["自动创建 change"]
+    CREATE --> PLAN
+    PLAN --> APPLY["读取 apply instructions 并实现"]
+    APPLY --> UPDATE["需求或实现漂移时更新同一 change"]
+    UPDATE --> VERIFY["validate + verify + 项目证据"]
+    VERIFY --> CLOSE{"满足关闭条件?"}
+    CLOSE -->|"否"| ACTIVE["保持活动并回显剩余项"]
+    CLOSE -->|"是"| ARCHIVE["sync 与 archive"]
+```
+
+核心决策：
+
+1. OpenSpec 项目的 M/L 变更必须使用相关 change；没有 change 时自动创建，不再以 legacy 作为默认退路。
+2. 优先复用 OpenSpec 生成的 `openspec-*` Skill；缺失时使用 `list/status/instructions/new change/validate` 等结构化 CLI，不复制官方工作流实现。
+3. Codex 为 Skills-only 集成，不把 `/opsx:*` 拼写写成跨宿主硬依赖。
+4. 实施中发现行为、范围、失败方式或契约变化时，先使用官方 update 能力协调 existing artifacts，再继续代码修改。
+5. Hook 要求 transcript 能定位到本会话实际选择的完整 change；仓库中无关 change 和 legacy 文档不能为 OpenSpec 项目放行。
+6. verify 的 CRITICAL 结果、未完成任务、项目测试、DDL/数据库或发布证据缺失都会阻断团队层归档，即使 OpenSpec 自身只给出 warning。
+7. 只有项目未启用 OpenSpec，或用户明确批准当前变更单次降级时，才进入 legacy；CLI/Skill 故障必须显式阻断和修复。

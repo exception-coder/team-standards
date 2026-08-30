@@ -7,7 +7,7 @@
 ```mermaid
 flowchart TD
     A["1. 识别意图"] --> B{"需求、Bug、现状还是项目接入"}
-    B -->|"需求 / 方案"| C["change-readiness"]
+    B -->|"需求 / 方案"| C["change-readiness\n自动匹配或创建 OpenSpec change"]
     B -->|"Bug"| D["bug-doc-required"]
     B -->|"现状"| E["business-logic-orientation"]
     B -->|"AI 目录初始化 / 新系统接入 / 上下文状态"| F["init-project-docs"]
@@ -57,13 +57,15 @@ Graphify、OpenSpec 和 Skill 分属不同层级，不建立三个并行主流�
 
 项目已启用 OpenSpec 时：
 
-1. `change-readiness` 读取并评审对应 OpenSpec change，不再创建一份平行设计文档；风险分档和团队必填项优先进入项目的 OpenSpec schema 或配置。
+1. `change-readiness` 对 M/L 变更自动匹配或创建 OpenSpec change，不再创建平行设计文档；实施中的需求修正和新发现通过官方 `update` 工作流回写同一 change。
 2. `business-logic-orientation` 优先查询 Graphify 获取代码事实，只补充 Graphify 无法证明的业务语义与运行证据；除非用户明确要求或需要长期重构基线，否则不生成新的梳理文档和 AI 索引。
 3. `backend-evidence` 使用 OpenSpec `specs/` 作为已接受行为契约，使用 Graphify 查询当前实现和影响，以 DDL、SQL、数据库和日志验证数据事实；不维护同义行为规格或手工代码索引。
 4. `init-project-docs` 先以 structure 模式建立六层最小入口，再编排项目规则、Graphify、OpenSpec 与领域证据；不复制图谱、规格或 00–10 文档树。
 5. `planning-evidence-discovery` 继续负责跨项目证据编排；Graphify 和 OpenSpec只是证据适配器，不替代项目关系权威源。
 
-“已启用”不等于目录存在：`openspec/config.yaml` 必须包含真实项目上下文，相关 change 可定位且所需 artifacts 可读取。只有空模板、无相关 change、artifacts 不完整或 CLI 不可用时，现有设计文档流程才作为兼容路径。
+“已启用”不等于目录存在：`openspec/config.yaml` 必须包含真实项目上下文。启用后，没有相关 change 就自动创建，artifacts 不完整就按 schema 补齐，生成 Skill 缺失但 CLI 正常时走 agent-compatible CLI；这些都不再触发静默 legacy。只有项目未启用 OpenSpec，或用户明确批准当前变更降级时，才使用兼容设计文档。
+
+完成阶段复用 OpenSpec 官方能力：严格 validate 后执行 verify；需要提前合并 delta specs 时 sync；任务与验证满足条件后才 archive。OpenSpec 自身的 verify/archive warning 在团队门禁中不能替代阻断判断，项目测试、数据库和发布证据仍独立验证。
 
 Graphify 查询也不天然代表当前工作区。消费图谱前比较其 manifest 或来源元数据与 Git HEAD、未提交文件版本；过期时先按已安装能力刷新，或用 `git diff`、`rg` 和定向源码读取补齐。OpenSpec 校验通过只证明 artifacts 结构合法，不能代替 DDL、数据库、测试和发布制品验证。
 

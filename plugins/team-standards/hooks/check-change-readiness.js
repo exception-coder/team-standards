@@ -20,7 +20,8 @@
 //   （例如仓库叫 my-tools，但文档集中放在 ai-docs/kai-toolbox/ 下）。
 //
 // 检查路径(命中任一即放行):
-//   <projectRoot>/openspec/config.yaml + changes/<change>/{proposal,design,tasks,specs}
+//   OpenSpec 项目：本会话明确读取的 changes/<change>/{proposal,design,tasks,specs}
+//   非 OpenSpec 项目：
 //   <projectRoot>/docs/design/**/*.md
 //   <projectRoot>/docs/**/{design,设计}*.md
 //   <USER_HOME>/Documents/ai-docs/<projectName>/design/**/*.md (Windows/macOS)
@@ -36,6 +37,7 @@
 // 旁路:
 //   TEAM_STANDARDS_CHANGE_READINESS_HOOK=off 一次性禁用
 //   兼容旧变量 TEAM_STANDARDS_DESIGN_DOC_HOOK
+//   TEAM_STANDARDS_OPENSPEC_LEGACY_APPROVED=on 允许启动会话前已获批准的 OpenSpec 单次兼容降级
 //
 // 退出码:
 //   0 = 放行
@@ -50,6 +52,9 @@ const { normalizeChanges } = require('./change-input');
 const MODE = process.env.TEAM_STANDARDS_CHANGE_READINESS_HOOK
   || process.env.TEAM_STANDARDS_DESIGN_DOC_HOOK
   || '';
+const OPENSPEC_LEGACY_APPROVED = (
+  process.env.TEAM_STANDARDS_OPENSPEC_LEGACY_APPROVED || ''
+).toLowerCase() === 'on';
 if (MODE.toLowerCase() === 'off') {
   process.exit(0);
 }
@@ -96,9 +101,10 @@ process.stdin.on('end', () => {
     const filePath = change.filePath;
     const projectRoot = findProjectRoot(filePath) || payload.cwd || process.cwd();
     const projectName = resolveProjectName(projectRoot);
-    if (hasDesignBasis(projectRoot, projectName)) continue;
+    if (hasDesignBasis(projectRoot, projectName, payload.transcript_path)) continue;
 
     const overridden = projectName !== path.basename(projectRoot);
+    const openSpecConfigured = hasOpenSpecConfig(projectRoot);
     process.stderr.write(
 `[team-standards] 即将编辑源码文件，但未检测到可用设计依据。
 
@@ -106,13 +112,19 @@ process.stdin.on('end', () => {
 推断的项目根：${projectRoot}
 ai-docs 子目录名：${projectName}${overridden ? '（来自 .team-standards-project.json）' : ''}
 
-未在以下任一位置找到可用设计依据：
-  • ${path.join(projectRoot, 'openspec')}（真实 context + 完整活动 change artifacts）
+${openSpecConfigured ? `项目已启用 OpenSpec，但本会话未选择并读取一个完整的相关 change：
+  • 先运行 openspec list --json
+  • 再运行 openspec status/instructions --change <name> --json
+  • 无相关 change 时自动创建并补齐 planning artifacts
+  • 项目内 legacy 设计文档不能替代当前 change
+` : `未在以下任一位置找到可用兼容设计依据：
   • ${path.join(projectRoot, 'docs', 'design')}
   • ${path.join(os.homedir(), 'Documents', 'ai-docs', projectName, 'design')}
   • ${path.join(os.homedir(), 'ai-docs', projectName, 'design')}
+`}
 
-请先触发 change-readiness skill 评审 OpenSpec change 或生成兼容设计文档（极简改动可走「极简跳过」硬清单）。
+请先触发 change-readiness skill；OpenSpec 项目必须匹配或创建当前 change，未启用项目才生成兼容设计文档（极简改动可走「极简跳过」硬清单）。
+已启用 OpenSpec 的项目若确需单次 legacy 兼容，必须先获得用户批准，并在启动当前 Agent 会话前设置 TEAM_STANDARDS_OPENSPEC_LEGACY_APPROVED=on。
 若 git 仓名与 ai-docs 子目录名不一致（monorepo 文档集中存放场景），
 请在项目根创建 .team-standards-project.json：
   {"aiDocsProject": "<ai-docs 下的子目录名>"}
@@ -199,8 +211,11 @@ function isTestOrConfigFile(filePath) {
   return false;
 }
 
-function hasDesignBasis(projectRoot, projectName) {
-  if (hasOpenSpecDesign(projectRoot)) return true;
+function hasDesignBasis(projectRoot, projectName, transcriptPath) {
+  if (hasOpenSpecConfig(projectRoot)) {
+    if (hasOpenSpecDesign(projectRoot, transcriptPath)) return true;
+    if (!OPENSPEC_LEGACY_APPROVED) return false;
+  }
 
   const projectPaths = [
     path.join(projectRoot, 'docs', 'design'),
@@ -225,7 +240,15 @@ function hasDesignBasis(projectRoot, projectName) {
   return false;
 }
 
-function hasOpenSpecDesign(projectRoot) {
+function hasOpenSpecConfig(projectRoot) {
+  try {
+    return fs.statSync(path.join(projectRoot, 'openspec', 'config.yaml')).isFile();
+  } catch (e) {
+    return false;
+  }
+}
+
+function hasOpenSpecDesign(projectRoot, transcriptPath) {
   const openspecRoot = path.join(projectRoot, 'openspec');
   const configPath = path.join(openspecRoot, 'config.yaml');
   let config;
@@ -236,20 +259,35 @@ function hasOpenSpecDesign(projectRoot) {
   }
   if (!/^context:\s*\|\s*$/m.test(config)) return false;
 
-  let changes;
-  try {
-    changes = fs.readdirSync(path.join(openspecRoot, 'changes'), { withFileTypes: true });
-  } catch (e) {
-    return false;
-  }
-
-  return changes.some((entry) => {
-    if (!entry.isDirectory() || entry.name === 'archive' || entry.name.startsWith('.')) return false;
-    const changeRoot = path.join(openspecRoot, 'changes', entry.name);
+  const selectedChanges = readSelectedOpenSpecChanges(transcriptPath);
+  return selectedChanges.some((changeName) => {
+    const changeRoot = path.join(openspecRoot, 'changes', changeName);
     const required = ['proposal.md', 'design.md', 'tasks.md'];
     if (!required.every((name) => safeFile(path.join(changeRoot, name)))) return false;
     return dirHasMarkdownRecursive(path.join(changeRoot, 'specs'), /\.md$/i, 3);
   });
+}
+
+function readSelectedOpenSpecChanges(transcriptPath) {
+  if (!transcriptPath || !fs.existsSync(transcriptPath)) return [];
+  let content;
+  try {
+    content = fs.readFileSync(transcriptPath, 'utf8');
+  } catch (e) {
+    return [];
+  }
+
+  const normalized = content.replace(/\\\\/g, '/').replace(/\\/g, '/');
+  const names = new Set();
+  const patterns = [
+    /openspec\/changes\/([a-z0-9](?:[a-z0-9-]*[a-z0-9])?)/gi,
+    /--change(?:=|\s+)["']?([a-z0-9](?:[a-z0-9-]*[a-z0-9])?)/gi,
+    /["']changeName["']\s*:\s*["']([a-z0-9](?:[a-z0-9-]*[a-z0-9])?)["']/gi,
+  ];
+  for (const pattern of patterns) {
+    for (const match of normalized.matchAll(pattern)) names.add(match[1]);
+  }
+  return [...names];
 }
 
 function safeFile(filePath) {
