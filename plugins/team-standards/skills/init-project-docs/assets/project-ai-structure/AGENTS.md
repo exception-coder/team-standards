@@ -12,6 +12,8 @@ Read context in this order:
 
 Graphify describes current implementation relationships; it does not define business intent. OpenSpec describes expected behavior and changes; validation does not prove the implementation conforms. Verify both against the task-owned source and tests before editing.
 
+Use the repository's `.graphifyignore` as the shared input boundary. Treat `graphify-out/graph.json`, `manifest.json`, and `GRAPH_REPORT.md` as generated team baselines only when they are current for the relevant Git state; local caches, personal memory, and machine metadata are not shared project facts.
+
 When `openspec/config.yaml` contains real project context, every non-trivial behavior or architecture change must match or create an OpenSpec change before implementation. Keep that change coherent as requirements or implementation discoveries evolve, validate it before coding and completion, and sync/archive only after its tasks and project verification evidence are complete. Do not silently replace it with a legacy design document.
 
 ## Project-specific rules

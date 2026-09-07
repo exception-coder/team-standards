@@ -202,10 +202,11 @@ readEvents(directory): { events, invalidRecords }
 ## 17. AI 工程结构初始化坐标
 
 - `init-project-docs/init-ai-structure.mjs` 提供 `plan/apply/status`，默认根为 `process.cwd()`，拒绝磁盘根和用户主目录。
-- `init-project-docs/assets/project-ai-structure/` 只保存会进入目标项目的七份最小模板；项目名在写入前替换，不把 Yoooni 技术栈写成通用规则。
-- 缺失文件允许创建；已有文件按字节保留。`.gitignore` 只维护 `team-standards:graphify` 标记块，重复执行必须保持单块。
+- `init-project-docs/assets/project-ai-structure/` 只保存会进入目标项目的八份最小模板；项目名在写入前替换，不把 Yoooni 技术栈写成通用规则。
+- 缺失文件允许创建；已有文件按字节保留。`.graphifyignore` 作为完整项目文件只在缺失时创建；`.gitignore` 只维护 `team-standards:graphify` 标记块，重复执行必须保持单块。
 - 初始化脚本不创建空 `.codex/skills`、`docs/domain`、`docs/design`、`docs/decisions`、`openspec/specs` 或 `openspec/changes` 目录。
-- `ai-structure-initializer.test.mjs` 覆盖 plan 无写入、首次创建、项目名替换、人工文件保护、Graphify 边界和重复执行幂等。
+- `references/initialization-output.md` 维护 structure/init 的完整文件清单、后续工具产物、保留策略和不初始化边界。
+- `ai-structure-initializer.test.mjs` 覆盖 plan 无写入、首次创建、项目名替换、人工文件与 `.graphifyignore` 保护、Graphify 边界和重复执行幂等。
 - `init-project-docs` 在 `apply` 后按当前安装版本调用 Graphify，并以 OpenSpec 严格校验和脚本 `status` 作为完成证据。
 
 ## 18. OpenSpec 自动生命周期坐标
@@ -217,3 +218,11 @@ readEvents(directory): { events, invalidRecords }
 - `check-change-readiness.js#hasDesignBasis(...)`：检测到 `openspec/config.yaml` 后默认禁止 legacy 设计放行；仅 `TEAM_STANDARDS_OPENSPEC_LEGACY_APPROVED=on` 支持启动会话前明确批准的兼容路径。
 - 回归测试覆盖匹配 change 放行、无关 change + legacy 文档阻断、显式 legacy 批准和空模板阻断。
 - README、统一流程、依赖、触发、dev-log 与三个 manifest 随核心行为同步；发布版本升级为 2.2.0。
+
+## 19. 初始化输出清单与 Graphify 边界坐标
+
+- `init-project-docs/references/initialization-output.md` 是 structure/init 初始化内容的唯一详细说明；Skill 入口只保留摘要和加载条件。
+- `.graphifyignore` 加入 `TEMPLATE_TARGETS`，只在缺失时创建，已有项目扫描规则按字节保留。
+- `.gitignore` 继续只维护受标记管理的输出白名单；Graphify 核心共享产物仍由 Graphify 生成，初始化器不创建空 `graphify-out/`。
+- 初始化回归测试同时验证 `.graphifyignore` 通用排除项与已有项目配置保护。
+- README、统一流程、依赖、设计、dev-log 与三个 manifest 随核心行为同步；发布版本升级为 2.4.0。

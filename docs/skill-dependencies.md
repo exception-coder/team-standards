@@ -31,7 +31,7 @@ flowchart LR
 | `coding-standards-common` | 架构边界 | Java、Dart 或 LLM 专属规范 |
 | `frontend-excellence` | 有意义的 Web UI 工作 | `design-system-guardian` 与浏览器验收 |
 | `design-system-bootstrap` | 明确初始化或偏好证据 | `design-system-guardian` 消费 Profile |
-| `init-project-docs` | 当前项目根和 Git/工作区状态 | structure 建最小入口；onboard/init/refresh/status 编排 Graphify、OpenSpec 与领域证据 |
+| `init-project-docs` | 当前项目根和 Git/工作区状态 | structure 建最小入口、`.graphifyignore` 与 Graphify Git 共享边界；onboard/init/refresh/status 编排真实 Graphify、OpenSpec 与领域证据 |
 | `daily-work-log` | 业务源码变化 | commit 前收尾 |
 | `git-commit-standards` | 已验证改动 | commit |
 

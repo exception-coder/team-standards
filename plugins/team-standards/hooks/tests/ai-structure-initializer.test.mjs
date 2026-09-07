@@ -11,6 +11,7 @@ const INITIALIZER = fileURLToPath(new URL('../../skills/init-project-docs/init-a
 const REQUIRED_FILES = [
   'AGENTS.md',
   'CLAUDE.md',
+  '.graphifyignore',
   '.gitignore',
   'docs/README.md',
   'docs/INDEX.md',
@@ -53,6 +54,8 @@ test('apply creates the minimal six-layer entry structure', (t) => {
   for (const relativePath of REQUIRED_FILES) assert.equal(fs.existsSync(path.join(root, relativePath)), true);
   assert.match(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8'), /Demo Project Agent Guide/);
   assert.match(fs.readFileSync(path.join(root, 'openspec/config.yaml'), 'utf8'), /Demo Project uses AGENTS\.md/);
+  assert.match(fs.readFileSync(path.join(root, '.graphifyignore'), 'utf8'), /graphify-out\//);
+  assert.match(fs.readFileSync(path.join(root, '.graphifyignore'), 'utf8'), /\*\*\/target\//);
   assert.match(fs.readFileSync(path.join(root, '.gitignore'), 'utf8'), /!graphify-out\/graph\.json/);
   assert.equal(fs.existsSync(path.join(root, 'graphify-out')), false);
   assert.equal(fs.existsSync(path.join(root, '.codex', 'skills')), false);
@@ -63,6 +66,7 @@ test('apply is idempotent and preserves existing project documents', (t) => {
   const root = createProject(t);
   fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
   fs.writeFileSync(path.join(root, 'docs', 'INDEX.md'), '# Human index\n', 'utf8');
+  fs.writeFileSync(path.join(root, '.graphifyignore'), '# Project-owned Graphify scope\nspecial-generated/\n', 'utf8');
 
   const first = run(root, 'apply', '--name', 'Stable Project');
   const firstSnapshot = snapshot(root);
@@ -72,6 +76,7 @@ test('apply is idempotent and preserves existing project documents', (t) => {
   assert.equal(second.status, 0, second.stderr);
   assert.deepEqual(snapshot(root), firstSnapshot);
   assert.equal(fs.readFileSync(path.join(root, 'docs', 'INDEX.md'), 'utf8'), '# Human index\n');
+  assert.equal(fs.readFileSync(path.join(root, '.graphifyignore'), 'utf8'), '# Project-owned Graphify scope\nspecial-generated/\n');
   assert.equal((fs.readFileSync(path.join(root, '.gitignore'), 'utf8').match(/team-standards:graphify:start/g) || []).length, 1);
   assert.match(second.stdout, /changes: 0/);
 });

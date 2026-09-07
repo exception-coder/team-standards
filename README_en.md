@@ -21,7 +21,7 @@ The main consolidated entry points are:
 - `bug-doc-required`: evidence, root cause, repair contract, minimal fix, and regression.
 - `backend-evidence`: database/runtime truth, fresh Graphify impact queries, domain specifications, and query-performance gates; it does not maintain a parallel code index.
 - `markdown-writing-standards`: document deduplication, Markdown/Mermaid structure, and index registration.
-- `init-project-docs`: initializes the standard AI project structure in the current directory, then routes project rules, Graphify, OpenSpec, and domain evidence without duplicate fact projections.
+- `init-project-docs`: idempotently initializes Agent entrypoints, document indexes, OpenSpec, `.graphifyignore`, and the Graphify Git sharing boundary, then routes project rules and evidence without duplicate fact projections.
 - `design-system-bootstrap`: registry/profile initialization and evidence-based preference learning.
 - `design-system-guardian`: UI implementation governance and visual review.
 

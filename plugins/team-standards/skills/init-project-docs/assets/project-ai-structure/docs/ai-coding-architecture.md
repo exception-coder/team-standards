@@ -15,12 +15,17 @@
 ├── openspec/                     已接受行为与活动变更
 │   ├── AGENTS.md                 OpenSpec 局部规则
 │   └── config.yaml               项目上下文与 artifact 规则
-├── graphify-out/                 Graphify 生成的当前代码事实
+├── .graphifyignore               Graphify 输入排除边界
+├── .gitignore                    Graphify 共享产物白名单
+├── graphify-out/                 Graphify 后续生成的当前代码事实
+│   ├── graph.json                Agent 查询的共享图谱
+│   ├── manifest.json             增量更新与新鲜度依据
+│   └── GRAPH_REPORT.md           人工审计报告
 ├── .codex/skills/                项目特有能力 按需创建
 └── source and tests              最终实现与验证证据
 ```
 
-不提前创建空的项目 Skill、领域、设计、决策或规格目录。`graphify-out/` 由 Graphify 生成，不由初始化脚本伪造。
+不提前创建空的项目 Skill、领域、设计、决策或规格目录。初始化脚本只创建 `.graphifyignore` 和 `.gitignore` 共享边界；`graphify-out/` 及其内容由 Graphify 生成，不由初始化脚本伪造。
 
 ---
 
@@ -76,5 +81,6 @@ flowchart TD
 - 项目特有规则和能力归项目仓；团队通用规范只引用，不复制。
 - 长期文档必须登记到 `docs/INDEX.md`，临时分析不自动升级为权威文档。
 - OpenSpec 只承载可观察行为与变更，不复制代码结构报告。
-- Graphify 产物保持可再生；共享文件与本地缓存边界由 `.gitignore` 明确。
+- `.graphifyignore` 固定团队共同的扫描输入边界；项目特有的生成物或 vendor 路径在这里追加。
+- Graphify 产物保持可再生；`.gitignore` 默认只共享 `graph.json`、`manifest.json` 与 `GRAPH_REPORT.md`，机器路径、缓存、成本和个人学习状态不得提交。
 - `.codex/skills/`、`.claude/` 和知识子目录只有在出现真实内容时才创建。

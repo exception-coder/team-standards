@@ -10,6 +10,7 @@ const TEMPLATE_ROOT = path.join(SCRIPT_DIR, 'assets', 'project-ai-structure');
 const TEMPLATE_TARGETS = [
   'AGENTS.md',
   'CLAUDE.md',
+  '.graphifyignore',
   'docs/README.md',
   'docs/INDEX.md',
   'docs/ai-coding-architecture.md',

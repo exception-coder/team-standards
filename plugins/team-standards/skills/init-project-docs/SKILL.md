@@ -1,6 +1,6 @@
 ---
 name: init-project-docs
-description: "用于接入新代码项目或系统，以及初始化、刷新或检查项目上下文，包括系统边界、Agent 入口、项目自有规则、Graphify、OpenSpec、领域知识和新鲜度。"
+description: "用于接入新代码项目或系统，以及初始化、刷新或检查项目上下文；安全幂等地建立 Agent、文档索引、OpenSpec、Graphify 输入与 Git 共享边界，并编排领域知识和新鲜度状态。"
 ---
 
 # 项目上下文接入
@@ -20,8 +20,8 @@ flowchart LR
 ## 模式
 
 - `onboard`：新系统首次接入时读取 [references/onboard-workflow.md](references/onboard-workflow.md)，使用 `onboard-pipeline.mjs` 断点续跑。
-- `structure`：用户要求初始化 AI 工程结构、AI 目录或默认项目解析结构时，在当前目录执行 `init-ai-structure.mjs`，建立六层职责入口。
-- `init`：先执行 `structure`，再初始化或校验 Graphify/OpenSpec/领域知识的连接状态。
+- `structure`：用户要求初始化 AI 工程结构、AI 目录或默认项目解析结构时，读取 [references/initialization-output.md](references/initialization-output.md)，在当前目录执行 `init-ai-structure.mjs`，建立六层职责入口、Graphify 输入边界和 Git 共享边界。
+- `init`：读取 [references/initialization-output.md](references/initialization-output.md)，先执行 `structure`，再构建或校验 Graphify、严格校验 OpenSpec，并报告领域知识与运行证据连接状态。
 - `refresh`：读取 [references/update-workflow.md](references/update-workflow.md)，按 Git 变化刷新权威产物，不生成平行投影。
 - `status`：只读检查项目入口、图谱新鲜度、OpenSpec 状态和知识缺口。
 - `profile`：用户明确要求独立画像时读取 [references/project-profile-generation.md](references/project-profile-generation.md)，只生成一份轻量导航。
@@ -37,6 +37,18 @@ flowchart LR
 | DDL / 数据库 / 日志 | 表结构与运行事实 | 记录权威入口；不由静态图谱推断替代 |
 
 ## 共享流程
+
+### 初始化内容摘要
+
+| 类型 | `structure` 负责 | `init` 继续负责 |
+|---|---|---|
+| 项目入口 | `AGENTS.md`、`CLAUDE.md` | 读取并核实项目边界与项目自有规则 |
+| 长期文档 | `docs/README.md`、`docs/INDEX.md`、`docs/ai-coding-architecture.md` | 检查权威入口和知识缺口，不生成 00–10 文档树 |
+| 行为规格 | `openspec/AGENTS.md`、`openspec/config.yaml` | 严格校验配置和活动 change，不伪造 specs/changes |
+| 代码图谱 | `.graphifyignore` 与 `.gitignore` 共享白名单 | 由 Graphify 生成或刷新 `graph.json`、`manifest.json`、`GRAPH_REPORT.md` |
+| 领域与运行事实 | 不生成正文 | 识别领域知识、DDL、数据库、日志和验证命令入口并报告状态 |
+
+完整文件、保留策略和明确不初始化的内容见 [references/initialization-output.md](references/initialization-output.md)。
 
 ### 0. 初始化 AI 工程结构
 
@@ -54,6 +66,7 @@ node <skill-root>/init-ai-structure.mjs apply --root <project-root>
 - `AGENTS.md` 与 `CLAUDE.md`
 - `docs/README.md`、`docs/INDEX.md`、`docs/ai-coding-architecture.md`
 - `openspec/AGENTS.md` 与 `openspec/config.yaml`
+- `.graphifyignore` 中团队共享的 Graphify 输入排除基线
 - `.gitignore` 中受标记管理的 Graphify 共享边界
 
 已有文件按字节保留并标记 `preserved`，由 Agent 读取后决定是否需要人工合并；禁止使用强制覆盖绕过项目自有规则。脚本不创建空 `.codex/skills`、领域、设计、ADR、OpenSpec specs/changes 或 `graphify-out/` 目录。

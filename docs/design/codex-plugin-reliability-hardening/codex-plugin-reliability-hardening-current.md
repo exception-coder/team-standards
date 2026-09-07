@@ -400,16 +400,17 @@ flowchart TD
     CAP --> CODE["L6 Implementation<br/>project source and tests"]
 ```
 
-六层是职责模型，不要求创建六个同名目录。初始化只生成能够承担真实职责的最小入口；`.codex/skills/`、领域、设计和 ADR 目录在出现实际内容时再创建，`graphify-out/` 由 Graphify 自身生成。
+六层是职责模型，不要求创建六个同名目录。初始化只生成能够承担真实职责的最小入口；`.codex/skills/`、领域、设计和 ADR 目录在出现实际内容时再创建。初始化器创建 `.graphifyignore` 与 `.gitignore` 共享边界，`graphify-out/` 及其事实内容仍由 Graphify 自身生成。
 
 ### 25.2 执行边界
 
 1. 当前目录默认作为项目根，可用 `--root` 与 `--name` 覆盖。
-2. `plan` 只报告；`apply` 创建缺失文件并维护 `.gitignore` 中带标记的 Graphify 共享边界；`status` 只检查。
+2. `plan` 只报告；`apply` 创建缺失文件、补齐 `.graphifyignore`，并维护 `.gitignore` 中带标记的 Graphify 共享边界；`status` 只检查。
 3. 已有非托管文件一律保留，不覆盖、不搬迁；初始化结果必须明确列出 `created/preserved/updated/pending`。
 4. 脚本只负责确定性骨架，不内嵌 Graphify 或 OpenSpec CLI；Skill 在脚本完成后调用各自权威工具生成和验证产物。
-5. 默认共享 `graph.json`、`GRAPH_REPORT.md` 与 `manifest.json`，忽略 Graphify 缓存、memory 和本地分析文件。
+5. `.graphifyignore` 固定团队扫描输入边界；`.gitignore` 默认只共享 `graph.json`、`GRAPH_REPORT.md` 与 `manifest.json`，忽略 Graphify 缓存、memory、reflections、机器路径和本地分析文件。
 6. 初始化结果必须幂等；重复执行不能制造副本、重复 `.gitignore` 规则或重写人工内容。
+7. 完整初始化清单独立放在 `references/initialization-output.md`；Skill 入口只保留模式摘要和加载条件。
 
 ### 25.3 默认检索顺序
 
