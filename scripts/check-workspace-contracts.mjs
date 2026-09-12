@@ -62,8 +62,8 @@ for (const contract of contractFiles) {
   const profilePath = path.join(workspace, contract.profile);
   assertFile(teamPath);
   assertFile(profilePath);
-  const teamBytes = fs.readFileSync(teamPath);
-  const profileBytes = fs.readFileSync(profilePath);
+  const teamBytes = contractBytes(teamPath);
+  const profileBytes = contractBytes(profilePath);
   if (!teamBytes.equals(profileBytes)) {
     fail(`${contract.label} drifted:\n  ${teamPath}\n  ${profilePath}`);
   }
@@ -73,9 +73,9 @@ for (const contract of contractFiles) {
 for (const contract of multiRepositoryContracts) {
   const files = contract.files.map((relativePath) => path.join(workspace, relativePath));
   files.forEach(assertFile);
-  const canonicalBytes = fs.readFileSync(files[0]);
+  const canonicalBytes = contractBytes(files[0]);
   for (const filePath of files.slice(1)) {
-    if (!canonicalBytes.equals(fs.readFileSync(filePath))) {
+    if (!canonicalBytes.equals(contractBytes(filePath))) {
       fail(`${contract.label} drifted:\n${files.map((file) => `  ${file}`).join('\n')}`);
     }
   }
@@ -84,8 +84,8 @@ for (const contract of multiRepositoryContracts) {
 
 const integrityPath = path.join(workspace, contractFiles[2].team);
 const integrity = JSON.parse(fs.readFileSync(integrityPath, 'utf8'));
-const adapterHash = sha256(fs.readFileSync(path.join(workspace, contractFiles[0].team)));
-const fixtureHash = sha256(fs.readFileSync(path.join(workspace, contractFiles[1].team)));
+const adapterHash = sha256(contractBytes(path.join(workspace, contractFiles[0].team)));
+const fixtureHash = sha256(contractBytes(path.join(workspace, contractFiles[1].team)));
 if (integrity.changeInputSha256 !== adapterHash || integrity.writeEventsSha256 !== fixtureHash) {
   fail('contract-integrity.json does not match the canonical adapter or fixture');
 }
@@ -105,6 +105,10 @@ function assertFile(filePath) {
 
 function sha256(bytes) {
   return crypto.createHash('sha256').update(bytes).digest('hex');
+}
+
+function contractBytes(file) {
+  return Buffer.from(fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n'), 'utf8');
 }
 
 function fail(message) {

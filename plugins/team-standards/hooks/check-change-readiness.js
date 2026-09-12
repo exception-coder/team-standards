@@ -91,6 +91,11 @@ process.stdin.on('end', () => {
     process.exit(0);
   }
 
+  const governance = require('./check-openspec-governance');
+  const outcome = governance.handle(payload);
+  if (outcome.stderr) process.stderr.write(outcome.stderr);
+  if (outcome.code) process.exit(outcome.code);
+
   const changes = normalizeChanges(payload).filter((change) => (
     change.operation !== 'delete' &&
     isSourceFile(change.filePath) &&
@@ -101,6 +106,9 @@ process.stdin.on('end', () => {
     const filePath = change.filePath;
     const projectRoot = findProjectRoot(filePath) || payload.cwd || process.cwd();
     const projectName = resolveProjectName(projectRoot);
+    if (governance.hasConfig(projectRoot)
+      && (process.env.TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK || '').toLowerCase() === 'block'
+      && !OPENSPEC_LEGACY_APPROVED) continue;
     if (hasDesignBasis(projectRoot, projectName, payload.transcript_path)) continue;
 
     const overridden = projectName !== path.basename(projectRoot);

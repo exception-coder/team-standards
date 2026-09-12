@@ -26,6 +26,7 @@ description: "Use after executable project changes and before declaring completi
 4. 读取 `status`、`staticStatus`、`runtimeStatus`、`issues`、`executedCheckers` 和 `executedVerifiers`。未执行的检查器不得报告为通过。
 5. `FAILED` 时按 `issues` 修复最小必要范围，然后重新验证。最多进行 3 轮自动修复；第三轮仍失败时停止，保留真实失败证据并向用户报告阻断。
 6. 验证之后发生任何相关编辑，返回第 1 步。只有最新工作区的 PASS 可以放行。
+7. OpenSpec 项目同时按 change-readiness 的 [治理检查器协议](../change-readiness/references/governance-checker.md) 记录本切片的验证、设计视图和 Scenario 映射，再检查 delivery。完成当前任务不等于整个 change 可归档；记录命令不执行验证，不能用 record 代替前述真实检查。
 
 ## 环境与安全边界
 

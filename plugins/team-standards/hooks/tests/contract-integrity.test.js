@@ -14,5 +14,5 @@ test('adapter and Golden Fixtures match contract v1 integrity hashes', () => {
 });
 
 function sha256(filePath) {
-  return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+  return crypto.createHash('sha256').update(fs.readFileSync(filePath, 'utf8').replace(/\r\n/g, '\n')).digest('hex');
 }

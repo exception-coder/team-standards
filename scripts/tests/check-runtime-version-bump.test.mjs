@@ -26,6 +26,20 @@ test('allows documentation-only changes without a version bump', () => {
   });
 });
 
+test('plugin governance CLI changes require a version bump', () => {
+  withRepository(root => {
+    const file = path.join(root, 'plugins/team-standards/scripts/openspec-governance.js');
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, 'console.log("baseline");\n');
+    git(root, ['add', '.']);
+    git(root, ['commit', '-m', 'CLI baseline']);
+    fs.writeFileSync(file, 'console.log("changed");\n');
+    const result = run(root);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /version did not increase/);
+  });
+});
+
 function withRepository(callback) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'version-bump-'));
   try {

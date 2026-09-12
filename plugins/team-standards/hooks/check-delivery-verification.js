@@ -14,6 +14,9 @@ function main(input) {
   if (mode === 'off') return;
   const payload = parseJson(input);
   const projectRoot = resolveProjectRoot(payload.cwd || process.cwd());
+  if (require('./check-openspec-governance').hasConfig(projectRoot)
+    && (process.env.TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK || '').toLowerCase() === 'block'
+    && (process.env.TEAM_STANDARDS_OPENSPEC_LEGACY_APPROVED || '').toLowerCase() !== 'on') return;
   const changes = executableChanges(projectRoot);
   if (changes.length === 0) return;
 

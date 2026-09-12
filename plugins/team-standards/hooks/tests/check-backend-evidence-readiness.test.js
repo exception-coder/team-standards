@@ -23,7 +23,7 @@ function runHook(payload, env = {}) {
 }
 
 function makeRepo(opts = {}) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ts-kg-hook-'));
+  const dir = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'ts-kg-hook-')));
   execSync('git init -q', { cwd: dir });
   execSync('git config user.email test@local', { cwd: dir });
   execSync('git config user.name test', { cwd: dir });

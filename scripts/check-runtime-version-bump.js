@@ -20,7 +20,7 @@ function isRuntimePayload(file) {
   const relative = file.slice(prefix.length);
   if (relative === '.claude-plugin/plugin.json' || relative === '.codex-plugin/plugin.json') return false;
   if (/^(?:hooks\/tests|hooks\/benchmarks)\//.test(relative) || relative === 'hooks/package.json') return false;
-  return /^(?:skills|hooks|commands|agents|apps|mcp)\//.test(relative);
+  return /^(?:skills|hooks|scripts|commands|agents|apps|mcp)\//.test(relative);
 }
 function currentVersion() {
   const values = MANIFESTS.map((file, index) => { const json = JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8')); return index === 2 ? json.plugins[0].version : json.version; });

@@ -8,6 +8,21 @@ on:
   workflow_dispatch:
 
 jobs:
+  openspec-governance-integration:
+    name: governance with OpenSpec 1.13.0
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: install isolated pinned OpenSpec CLI
+        run: npm install --prefix "$RUNNER_TEMP/openspec" --no-audit --no-fund @fission-ai/openspec@1.13.0
+      - name: verify real CLI and repository evidence lifecycle
+        env:
+          OPENSPEC_TEST_CLI: ${{ runner.temp }}/openspec/node_modules/@fission-ai/openspec/bin/openspec.js
+        run: node --test plugins/team-standards/hooks/tests/governance.test.js
+
   hooks-test:
     name: hooks tests (Node ${{ matrix.node }})
     runs-on: ${{ matrix.os }}

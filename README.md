@@ -86,6 +86,8 @@ coding-standards-common              所有源码修改的公共基线
 
 ## Hook 边界
 
+OpenSpec 文档推进增加阶段准出、专家意见回写、概设详设和续跑交接，并提供共享治理检查器。新增检查默认 `warn` 试运行，保留原门禁；通过项目宿主验收后设置 `TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK=block`，按会话绑定 change 和文件范围，真实验证后记录内容指纹，写前/Stop/CI 使用同一检查结果。Stop 补齐最多两轮，退出循环仍可能未完成。详见 [治理检查器协议与当前支持边界](plugins/team-standards/skills/change-readiness/references/governance-checker.md)。
+
 Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。OpenSpec 项目要求当前会话明确选择并读取一个完整活动 change，仓库中的无关 change 或 legacy 设计文档不再自动放行；未启用 OpenSpec 的项目继续认可兼容设计文档。完成前 Hook 对可执行工作区改动要求最近一次 `forge_verify phase=all` 或项目 Forge CLI 返回 PASS，验证后再次编辑会使证据失效。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
 
 ---
