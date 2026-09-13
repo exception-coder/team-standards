@@ -27,13 +27,13 @@ flowchart LR
 | `business-logic-orientation` | 现有代码和业务场景 | 结论；已授权重构时继续设计 |
 | `planning-evidence-discovery` | 项目范围解析 | 规划输出或设计 |
 | `backend-evidence` | 已识别服务边界 | 即时影响分析、领域规格或实施验证 |
-| `markdown-writing-standards` | 已确定文档归属 | 写后索引登记 |
+| `markdown-writing-standards` | 已确定文档归属 | 受影响的已有导航维护 |
 | `architecture-ddd-lite-fullstack` | 设计和代码坐标 | common 与语言规范 |
 | `coding-standards-common` | 架构边界 | 按需 Java 或 LLM 专属规范 |
 | `frontend-excellence` | 有意义的 Web UI 工作 | `design-system-guardian` 与浏览器验收 |
 | `design-system-bootstrap` | 明确初始化或偏好证据 | `design-system-guardian` 消费 Profile |
 | `init-project-docs` | 当前项目根和 Git/工作区状态 | structure 建最小入口、`.graphifyignore` 与 Graphify Git 共享边界；onboard/init/refresh/status 编排真实 Graphify、OpenSpec 与领域证据 |
-| `daily-work-log` | 业务 M/L 源码改动收尾或显式要求 | 按主题合并，S 默认免写 |
+| `daily-work-log` | 用户或项目明确要求日志 | 默认 Git 历史，按需日报按主题合并 |
 | `git-commit-standards` | 已验证改动 | commit |
 
 ## 规则

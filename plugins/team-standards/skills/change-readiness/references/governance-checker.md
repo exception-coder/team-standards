@@ -39,22 +39,22 @@ node <plugin>/scripts/openspec-governance.js check --repo <repo> --session <sess
 
 ## 3. 审阅输入
 
-路径必须是 Git 根内相对路径，标题必须含 `#` 并唯一定位非空章节。下表定义 `review.json`；数组成员均需实值，不使用示例占位数据记录交付。
+路径必须是 Git 根内相对路径。设计、场景与审阅引用的标题必须含 `#` 并唯一定位非空章节；验证可直接引用非空原始结果文件。下表定义 `review.json`；数组成员均需实值，不使用示例占位数据记录交付。
 
 | 字段 | 内容 |
 |---|---|
 | files | 精确文件路径数组，覆盖本次新增、删除及重命名两端 |
 | taskIds | 当前切片在 CLI apply 返回中的真实任务 ID，不能猜测为 Markdown 编号 |
-| views | 每项含 id、files、disposition、reason、reference |
+| views | 每项含 id、files、disposition、reason；非 not-applicable 项必须有 reference |
 | scenarios | 每项含唯一 id、files、taskIds、reference、verificationIds |
-| review | type 为 agent/human/independent，actor 为实际执行者，result 为 PASS，reference 指向审阅正文 |
-| dedup | query、decision、reference，记录检索范围与复用或新建理由 |
-| handoff | stage、nextTask、blockers 数组及 reference；当前切片有阻塞不能交付 |
+| review | type 为 agent/human/independent，actor 为实际执行者，result 为 PASS，reference 复用被审阅的现有设计或审阅正文，不另建报告 |
+| dedup | 可选；需要保留选择理由时填写 query、decision，reference 可省略 |
+| handoff | 暂停或转交时按需提供 stage、nextTask、blockers，reference 可省略；存在阻塞仍不能交付 |
 | verifications | 每项含唯一 id、实际 command/人工操作、environment、result 与 reference；record 要求 PASS |
 
-`reference` 为 `{ "path": "相对文档路径", "heading": "## 实际唯一标题" }`。视图 id 包括 implementation、contracts、data、workflow、async、runtime、architecture、ui；每个文件至少覆盖 implementation。检查器按路径给出额外候选视图，审阅者按实际差异补全影响并集。disposition 为 updated/already-covered/not-applicable，所有状态都要正文定位与具体理由。
+`reference` 为 `{ "path": "相对文档路径", "heading": "## 实际唯一标题" }`。视图 id 包括 implementation、contracts、data、workflow、async、runtime、architecture、ui；每个文件至少覆盖 implementation。检查器按路径给出额外候选视图，审阅者按实际差异补全影响并集。disposition 为 updated/already-covered/not-applicable，所有状态都要具体理由；not-applicable 不需要正文引用，其余状态保留标题定位。不能用“不适用”掩盖实际影响，具名审阅仍须核实内容。验证 reference 可仅有 path，直接引用原始日志或 JSON（上限 4 MiB）；引用内容纳入新鲜度检查，不验证日志所声称的执行真实性。CI 使用的结果文件须进入待验收提交，不把本地忽略日志冒充可复现的 CI 证据。
 
-归档记录在相同输入中增加 `sync`（status 为 synced/not-applicable、reason、reference、targets 引用数组）和 `promotion`（按视图 id、disposition、reason、reference）。先由官方工具同步主规格并晋升长期设计，再以 `record --phase archive` 记录结果；sync 不是自动合并命令。
+归档记录在相同输入中增加 `sync`（status 为 synced/not-applicable、reason、reference、targets 引用数组）和 `promotion`（按视图 id、disposition、reason、reference）。无需晋升的视图只记录理由，不需要 reference；实际更新或已有覆盖仍引用正文。先由官方工具同步主规格并更新受影响的长期设计，再以 `record --phase archive` 记录结果；sync 不是自动合并命令。
 
 ---
 
@@ -83,3 +83,7 @@ node <plugin>/scripts/openspec-governance.js check --repo <repo> --base <commit>
 CI 不依赖本地会话缓存；检查输入必须全部处于目标提交。单次 CI 命令覆盖一个 change，出现其它未覆盖可执行变化会失败；多 change 聚合交付仍需后续扩展，不能忽略额外变化。分支保护由目标仓库配置，提供命令和自身测试不代表远端门禁已启用。
 
 已提供临时 Git 仓库、JSON 命令和 Hook 适配测试，真实 OpenSpec 测试通过 `OPENSPEC_TEST_CLI` 指向固定版本 CLI。doctor 仅报告本地能力并将宿主状态标为 UNVERIFIED；Hook 信任、事件注册、业务试点、Linux/macOS 宿主触发和外部 store 支持均须取得实际证据后再升级支持声明。
+
+## 6. 策略版本与升级
+
+3.4.0 使用 schemaVersion 1、policyVersion 2、checkerVersion 2。旧计划字段仍可读取，但旧绑定和交付证据不会被静默视为新策略 PASS。更新计划后对同一 session/change 重新 bind：保留起始基线、脏文件归属、已有范围和重试数，清除已交付标记；未知版本拒绝迁移。复核适用内容与真实验证后重新 record，CI 必须固定匹配的插件版本。不要通过删除状态或换会话绕过基线。

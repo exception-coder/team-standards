@@ -6,10 +6,10 @@ const repoApi = require('./repository');
 const openspec = require('./openspec');
 const { validatePlan } = require('./evidence');
 const { checkEnrolled } = require('../../state-contract/enrollment');
-const { requireValue, VERSION, readJson, statePath, fingerprints, atomicUpdate, safePath } = storage;
+const { requireValue, VERSION, POLICY_VERSION, CHECKER_VERSION, readJson, statePath, fingerprints, atomicUpdate, safePath } = storage;
 
 function result(status, findings = [], extra = {}) {
-  return { schemaVersion: VERSION, policyVersion: VERSION, checkerVersion: VERSION, status, findings, ...extra };
+  return { schemaVersion: VERSION, policyVersion: POLICY_VERSION, checkerVersion: CHECKER_VERSION, status, findings, ...extra };
 }
 
 function guarded(action) {
@@ -27,8 +27,8 @@ function readBinding(repo, session) {
   const file = statePath(repo.root, session);
   requireValue(fs.existsSync(file), 'BINDING_REQUIRED', '当前会话未绑定 change；请运行 bind 并提供任务、文件及设计证据');
   const binding = readJson(file);
-  requireValue(binding.schemaVersion === VERSION && binding.policyVersion === VERSION,
-    'VERSION_MISMATCH', '绑定版本不兼容，请迁移而非静默改变完成标准');
+  requireValue(binding.schemaVersion === VERSION && binding.policyVersion === POLICY_VERSION,
+    'VERSION_MISMATCH', '绑定版本不兼容；更新计划并对同一会话重新 bind，保留基线后重新审阅和验证');
   repoApi.verifyBaseline(repo, binding);
   return binding;
 }
@@ -43,13 +43,15 @@ function bind(options) {
   const file = statePath(repo.root, options.session);
   const binding = atomicUpdate(file, previous => {
     if (previous) {
+      requireValue(previous.schemaVersion === VERSION && [1, POLICY_VERSION].includes(previous.policyVersion),
+        'VERSION_MISMATCH', '仅支持同结构的策略 1/2 绑定迁移，不能覆盖未知版本');
       repoApi.verifyBaseline(repo, previous);
       requireValue(previous.change === options.change, 'REBIND_CONFLICT', '同一会话已有不同 change 绑定，不按最近修改时间替换');
       requireValue(previous.plan.files.every(item => plan.files.includes(item)), 'SCOPE_SHRINK', '不能通过缩小范围排除已绑定改动');
     }
     const initial = previous?.initial || fingerprints(repo.root, current);
     requireValue(plan.files.every(item => !Object.hasOwn(initial, item)), 'DIRTY_OWNERSHIP', '范围含任务开始前的脏文件；请先分离改动，不覆盖他人基线');
-    return { schemaVersion: VERSION, policyVersion: VERSION, repo: repo.root, branch: repo.branch,
+    return { schemaVersion: VERSION, policyVersion: POLICY_VERSION, repo: repo.root, branch: repo.branch,
       base: previous?.base || repo.head, initial, change: options.change, session: options.session,
       context, plan, references, retries: previous?.retries || 0, evidence: null };
   });
@@ -111,7 +113,7 @@ function record(options) {
   checkEnrolled(repo.root, phase);
   requireValue(['delivery', 'archive'].includes(phase), 'PHASE_INVALID', 'record 只接受 delivery 或 archive');
   const references = validatePlan(repo.root, plan, context, phase);
-  const evidence = { schemaVersion: VERSION, policyVersion: VERSION, checkerVersion: VERSION, phase,
+  const evidence = { schemaVersion: VERSION, policyVersion: POLICY_VERSION, checkerVersion: CHECKER_VERSION, phase,
     bindingId: storage.hash(`${repo.root}\n${options.session}`),
     change: binding.change, base: binding.base, context, plan, references,
     inputs: fingerprints(repo.root, plan.files) };
@@ -129,8 +131,8 @@ function record(options) {
 
 function verifyEvidence(root, evidence, phase) {
   checkEnrolled(root, phase);
-  requireValue(evidence.schemaVersion === VERSION && evidence.policyVersion === VERSION
-    && evidence.checkerVersion === VERSION, 'VERSION_MISMATCH', '证据版本不兼容');
+  requireValue(evidence.schemaVersion === VERSION && evidence.policyVersion === POLICY_VERSION
+    && evidence.checkerVersion === CHECKER_VERSION, 'VERSION_MISMATCH', '证据版本不兼容');
   requireValue(evidence.change === evidence.context.change, 'EVIDENCE_CHANGE', '证据与工件 change 不匹配');
   requireValue(phase !== 'archive' || evidence.phase === 'archive', 'ARCHIVE_EVIDENCE', '归档检查缺少同步及长期设计晋升证据', 'NEEDS_WORK');
   compareFingerprints(evidence.inputs, fingerprints(root, evidence.plan.files), 'CODE_STALE');

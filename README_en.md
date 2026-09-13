@@ -1,6 +1,6 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **3.3.0**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **3.4.0**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 See the [suite panorama by engineering domain](docs/suite-panorama.md) for all 24 public Skills, evidence sources, hook checkpoints, maintenance tools and end-to-end task paths.
 
@@ -23,7 +23,7 @@ The main consolidated entry points are:
 - `delivery-verification`: requires current execution evidence before completion, then routes documentation synchronization and automatic local commit.
 - `bug-doc-required`: evidence-led investigation, minimal authorized fixes, and regression. Simple bugs do not require separate reports, diagrams, or fixed tables. Complex or high-risk bugs retain evidence in an existing issue, OpenSpec change, or project document; create a separate report only when needed. The existing invocation name remains compatible.
 - `backend-evidence`: database/runtime truth, fresh Graphify impact queries, domain specifications, and query-performance gates; it does not maintain a parallel code index.
-- `markdown-writing-standards`: document deduplication, Markdown/Mermaid structure, and index registration.
+- `markdown-writing-standards`: document ownership, Markdown/Mermaid structure, and affected existing navigation.
 - `init-project-docs`: idempotently initializes Agent entrypoints, document indexes, OpenSpec, `.graphifyignore`, and the Graphify Git sharing boundary, then routes project rules and evidence without duplicate fact projections.
 - `design-system-bootstrap`: registry/profile initialization and evidence-based preference learning.
 - `design-system-guardian`: UI implementation governance and visual review.
@@ -32,7 +32,7 @@ See [README.md](README.md) for the complete 21-Skill catalog and [docs/skill-flo
 
 ## Bug records
 
-Prefer the existing authoritative record over duplicate reports. If an independent report is needed and no project location is defined, use a stable file under `docs/bug/`. The document-location hook permits that directory while retaining other location rules; it does not determine whether a report is needed or whether a diagnosis is correct. Investigation-only tasks do not modify source code or create empty commits.
+Prefer the existing authoritative record over duplicate reports. If an independent report is needed and no project location is defined, use a stable file under `docs/bug/`. The old document-location hook is retired; shared documents default to repository-native locations under project or user conventions. Investigation-only tasks do not modify source code or create empty commits.
 
 ## Task completion
 
@@ -61,7 +61,7 @@ Version 2.6.0 adds a project-owned state contract schema, source-impact checks, 
 
 See [接入协议与 CLI](plugins/team-standards/skills/change-readiness/references/state-contract.md). No new Skill or business-specific state constants are required.
 
-Local verification follows the change-impact table in [delivery-verification](plugins/team-standards/skills/delivery-verification/SKILL.md); Forge and full CI gates remain in force. Frequent Skills load detailed references only when needed. Daily logs merge completed M/L work by topic; S changes are exempt unless requested. Automatic commits retain scoped staging and structured messages without repeating the full body in chat.
+Local verification follows the change-impact table in [delivery-verification](plugins/team-standards/skills/delivery-verification/SKILL.md); Forge and full CI gates remain in force. Frequent Skills load detailed references only when needed. Git is the default work history; standalone daily logs are created only when explicitly required by the user or project. Automatic commits retain scoped staging and structured messages without repeating the full body in chat.
 
 
 Version 3.2.0 adds `test:fast` (8 lightweight adapter/integrity/event tests); `npm test` and `test:full` retain full discovery. Fast checks do not replace affected integration tests. Run `node scripts/sync-shared-contracts.mjs --workspace ..` to preview canonical copies, adding `--write` to apply only when destinations are clean. Consumers remain independently packaged and versioned.
@@ -69,3 +69,11 @@ Version 3.2.0 adds `test:fast` (8 lightweight adapter/integrity/event tests); `n
 Run `node scripts/sync-workspace-overview.mjs --workspace .. --write` to update only the root README metadata, then `node scripts/check-version-sync.js --workspace ..` to verify it. Release preflight checks the overview; standalone CI needs no sibling repositories. Store temporary output in the repository-root `.logs/` or the OS temporary directory, outside plugin payloads. The non-Git workspace root's ignore file does not govern nested repositories. See [maintenance details](README.md#维护与验证).
 
 Intent routing distinguishes Explore, Repair, Evolve and Bootstrap from authorization and risk. Choose the primary Skill by the problem, finish analysis without implicit implementation, and continue already authorized work across stages without repeated approval. Pure refactoring needs relevant regression evidence, not automatic specification exemption. See the [routing scenarios](docs/skill-flow.md#易混淆请求的预期路由).
+
+## Minimal documentation (3.4.0)
+
+Use existing OpenSpec artifacts, or one repository-native design when OpenSpec is not enabled. Separate coding summaries, AI reference indexes, personal Phase-A/B index registration and fixed diagram counts are no longer required. Preserve unique domain knowledge, decisions, incident reports and runbooks; update affected documentation without deleting historical assets.
+
+The dispatcher now runs seven guards; the retired location entry remains callable without side effects. Governance keeps scenario coverage, named review, scope and verification fingerprints. Dedup/handoff records are optional, not-applicable views need reasons without duplicate chapters, and verification can reference raw result files directly. The checker does not execute tests or authenticate claimed results.
+
+Policy/checker version 2 requires existing sessions to rebind without resetting baseline, scope or retries, then review and record valid evidence again. Old PASS records are not silently upgraded. See the [migration protocol](plugins/team-standards/skills/change-readiness/references/governance-checker.md#6-策略版本与升级).

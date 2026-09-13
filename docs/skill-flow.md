@@ -143,7 +143,7 @@ flowchart LR
     CONFIG -->|"UserPromptSubmit"| SIGNAL["提示信号采集与版本提醒"]
 ```
 
-- 写入分发清单在 [write-guard-dispatcher.js](../plugins/team-standards/hooks/write-guard-dispatcher.js) 的 `GUARDS`；八项分别检查就绪、架构、后端证据、注释、DDL、SQL 正确性、性能与文档位置。每项职责见 [全景中的机械门禁表](suite-panorama.md#机械门禁在什么位置工作)。它使用 Worker 分发原始输入，不负责选择主 Skill。
+- 写入分发清单在 [write-guard-dispatcher.js](../plugins/team-standards/hooks/write-guard-dispatcher.js) 的 `GUARDS`；七项分别检查就绪、架构、后端证据、注释、DDL、SQL 正确性与性能；旧文档位置入口已退役，不再分发。每项职责见 [全景中的机械门禁表](suite-panorama.md#机械门禁在什么位置工作)。它使用 Worker 分发原始输入，不负责选择主 Skill。
 - Bash 入口是 [check-git-commit-skill.js](../plugins/team-standards/hooks/check-git-commit-skill.js) 和 [check-commit-no-ai-signature.js](../plugins/team-standards/hooks/check-commit-no-ai-signature.js)；不是 Git 自带 pre-commit，也不会替 Agent 自动写好提交正文。
 - Stop 入口是 [check-delivery-verification.js](../plugins/team-standards/hooks/check-delivery-verification.js) 与 [check-openspec-governance.js](../plugins/team-standards/hooks/check-openspec-governance.js)。前者判定证据，后者检查已接入治理；不是业务测试执行器。
 - 提示事件入口是 [prompt-signal-capture.js](../plugins/team-standards/hooks/prompt-signal-capture.js) 与 [check-plugin-version-stale.js](../plugins/team-standards/hooks/check-plugin-version-stale.js)。事件与性能辅助分别见 [event-log.js](../plugins/team-standards/hooks/event-log.js)、[hook-metrics.js](../plugins/team-standards/hooks/hook-metrics.js)。
@@ -219,7 +219,7 @@ hooks/check-openspec-governance.js                    宿主事件入口
 | `backend-evidence` | 数据与运行事实 | DDL、真实数据库、SQL、日志、执行计划和性能问题 |
 | `backend-evidence` | 即时影响 | 修改状态、字段、事件或 API 前用新鲜 Graphify 查询；不回写手工索引 |
 | `backend-evidence` | 领域规格 | 状态密集业务缺少不变量、终态或下一动作证据 |
-| `markdown-writing-standards` | 文档同步 / 写前 / 写中 / 写后 | 套件或项目更新核对文档影响，查重归属、结构与 Mermaid、索引登记 |
+| `markdown-writing-standards` | 文档同步 / 写前 / 写中 / 写后 | 套件或项目更新核对文档影响，唯一归属、结构与 Mermaid、必要已有链接 |
 | `git-commit-standards` | 完成收尾 / 提交 | 文档和验证完成后自动提交本次范围；独立判断推送授权 |
 | `init-project-docs` | structure / onboard / init / refresh / status / profile | 当前目录 Agent/Docs/OpenSpec 入口、Graphify 输入与 Git 共享边界、九阶段接入、增量刷新、状态或可选画像 |
 | `design-system-bootstrap` | registry / preference | 建立设计资料或记录、归纳偏好证据 |
@@ -270,7 +270,7 @@ flowchart LR
     RISK -->|"是"| LARGE["L：完整证据、设计、影响分析与知识回写"]
     RISK -->|"否"| SIZE{"不超过 2 文件、30 行且仅局部修改?"}
     SIZE -->|"是"| SMALL["S：极简判断、编码标准、定向验证"]
-    SIZE -->|"否"| MEDIUM["M：轻量设计、架构门禁、实施验证与日志"]
+    SIZE -->|"否"| MEDIUM["M：轻量设计、架构门禁、实施验证与提交"]
 ```
 
 ---
@@ -278,7 +278,7 @@ flowchart LR
 ## 冲突规则
 
 1. 同一 Skill 多次出现表示不同模式，不是重复触发。
-2. Bug 链路中 `bug-doc-required` 管诊断证据和最小修复，`change-readiness` 管实施风险与代码坐标。简单 Bug 不以独立文档为前置条件；复杂问题优先复用已有 OpenSpec change、问题记录或项目文档，仅无合适载体且有沉淀必要时新建报告。代码定位消费会话证据与当前源码，工作日志按问题主题归并，不反向要求补文档。
+2. Bug 链路中 `bug-doc-required` 管诊断证据和最小修复，`change-readiness` 管实施风险与代码坐标。简单 Bug 不以独立文档为前置条件；复杂问题优先复用已有 OpenSpec change、问题记录或项目文档，仅无合适载体且有沉淀必要时新建报告。代码定位消费会话证据与当前源码，日志默认由 Git 承载，需要独立日报时按问题主题归并，不反向要求补文档。
 3. `coding-standards-common` 先于 Java 或 LLM 专属标准，专属标准只补充不替代。
 4. 后端即时影响与领域规格属于 `backend-evidence`，跨项目契约仍由实际项目或拓扑仓维护。
 5. 项目专属规范始终优先从项目内 Skill 或 `AGENTS.md` 读取；独立项目画像只是缺少入口时的可选导航，不承载规范正文。
@@ -290,10 +290,10 @@ flowchart LR
 | 变化 | 回写 |
 |---|---|
 | 套件或项目更新 | `markdown-writing-standards` 文档影响核对与同步 |
-| Markdown 新建或重组 | `markdown-writing-standards` 写后索引 |
+| Markdown 新建或重组 | `markdown-writing-standards` 检查受影响导航 |
 | 状态、字段、事件、API 变化 | `backend-evidence` Graphify 即时影响查询；协同项写入 OpenSpec |
 | 项目结构、API、数据访问变化 | `init-project-docs` refresh：更新 Graphify 本体，不生成 Markdown 镜像 |
-| 业务 M/L 源码改动收尾或显式要求 | `daily-work-log` |
+| 用户或项目明确要求工作日志 | `daily-work-log` |
 | 用户纠正规范错误 | `coding-violation-log` |
 | team-standards 决策变化 | `dev-log` |
 | 可执行改动准备交付 | `delivery-verification`；优先 `forge_verify phase=all` |
@@ -305,7 +305,7 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 
 ## 轻量交付
 
-本地检查按 [delivery-verification 的影响分级](../plugins/team-standards/skills/delivery-verification/SKILL.md) 选择，Forge 与 CI 门禁保持原约束。Markdown 格式细则和提交示例由对应 Skill 按需加载。业务日志在收尾时按主题合并，S 档默认免写，不按文件数累加工时；正常自动提交仅报告提交结果，不重复展示完整正文。
+本地检查按 [delivery-verification 的影响分级](../plugins/team-standards/skills/delivery-verification/SKILL.md) 选择，Forge 与 CI 门禁保持原约束。Markdown 格式细则和提交示例由对应 Skill 按需加载。日常日志默认由 Git 承载，明确要求独立日报时按主题合并，不按文件数累加工时；正常自动提交仅报告提交结果，不重复展示完整正文。
 
 
 套件维护复用 [README 的维护入口](../README.md#维护与验证)：快测只覆盖轻量契约，改动相关集成测试与完整 CI 继续执行；共享副本先预览再同步，消费者独立验证升版；发布前检查根总览元数据。此轮保持 21 个独立意图入口与现有 warn/block，清理架构 Skill 的 Dart 触发残留。
@@ -327,3 +327,17 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 | 查线上订单金额不一致 | bug-doc-required 调查 + backend-evidence | 不将只读等同低风险，不默认授权修数据 |
 | 只更新 README / 提交已完成改动 | markdown-writing-standards / git-commit-standards | 直接进入专门动作，不新增需求生命周期 |
 | 已授权修复但发现需删除生产数据 | 继续安全调查，补齐具体操作授权 | 修复授权不自动覆盖破坏性数据操作 |
+
+## 最小证据链与产物去留
+
+| 需要回答的问题 | 读取哪里 / 如何维护 | 不再默认产出 |
+|---|---|---|
+| 当前实现与影响是什么 | 新鲜 Graphify + 定向源码；见 business-logic-orientation | 现状双文档、ai-ref、手工调用索引 |
+| 本次应该改什么、为何这样改 | change-readiness → OpenSpec 实际工件；未启用时复用一份仓内设计 | 独立 coding 摘要、API 摘要和并行设计正文 |
+| 实际是否通过验证 | delivery-verification → 真实命令/CI/Forge/运行结果；治理文件引用其位置和输入指纹 | 为机器引用而转抄的 validation.md |
+| 文档如何被找到 | markdown-writing-standards → 唯一归属和受影响的已有导航 | 个人目录 Phase-A/B、逐层 INDEX、编号文档树 |
+| 作业做了什么 | git-commit-standards → 已验证的范围与 Git 提交 | 自动 Markdown 日报；daily-work-log 改为按需 |
+
+不是所有知识都能由这三类工具恢复：业务术语、不变量、架构取舍、事故复盘和运行手册保留独有内容；已有历史文档不批量删除。长期文档仍在实现变化时同步。
+
+实际源码：文档规则见上方 references 表；旧 `hooks/check-ai-doc-location.js` 仅兼容旧宿主调用，当前 dispatcher 不再加载。`hooks/governance/evidence.js` 接受可选 dedup/handoff、无需正文的不适用视图及原始验证文件；`service.js` 执行策略版本迁移、范围和新鲜度检查。升级步骤见 [治理协议](../plugins/team-standards/skills/change-readiness/references/governance-checker.md#6-策略版本与升级)。

@@ -13,7 +13,6 @@ const GUARDS = [
   { script: 'check-sql-ddl-readiness.js', env: 'TEAM_STANDARDS_SQL_DDL_HOOK' },
   { script: 'check-sql-correctness-risk.js', env: 'TEAM_STANDARDS_SQL_CORRECTNESS_HOOK' },
   { script: 'check-query-performance-risk.js', env: 'TEAM_STANDARDS_SQL_PERF_HOOK' },
-  { script: 'check-ai-doc-location.js', env: 'TEAM_STANDARDS_DOC_LOCATION_HOOK' },
 ];
 
 let raw = '';

@@ -7,6 +7,8 @@ const os = require('node:os');
 const MAX_BYTES = 4 * 1024 * 1024;
 const MAX_FILES = 1000;
 const VERSION = 1;
+const POLICY_VERSION = 2;
+const CHECKER_VERSION = 2;
 
 class GovernanceError extends Error {
   constructor(rule, message, status = 'CONTEXT_REQUIRED') {
@@ -110,5 +112,5 @@ function atomicUpdate(file, update) {
   }
 }
 
-module.exports = { GovernanceError, MAX_BYTES, MAX_FILES, VERSION, requireValue, hash, readText,
+module.exports = { GovernanceError, MAX_BYTES, MAX_FILES, VERSION, POLICY_VERSION, CHECKER_VERSION, requireValue, hash, readText,
   readJson, safePath, inside, canonicalPath, relativePath, hashBytes, fingerprint, fingerprints, statePath, atomicUpdate };

@@ -22,7 +22,7 @@ description: "Use to investigate reported bugs, errors, timeouts, or unexpected 
 - **跨模块、反复出现、难以复现，或涉及金额、权限、数据丢失、生产事故的问题：** 保留可供后续接手的持久分析，包括证据、未决假设、影响和验证结果；仍不要求另建一份文档。
 - **载体优先级：** 用户或项目指定的位置 → 已有相关 OpenSpec change / 共享问题记录 → 已有项目文档。优先补充同一载体并引用测试与代码，不复制成 Issue、change、Bug 报告三份正文。外部 Issue 的写入须已有授权；没有时先使用项目内载体。
 - **确需独立报告时：** 用户明确要求，或复杂问题没有合适载体，才按项目文档约定创建；项目未约定时使用 `docs/bug/` 下一个稳定主题文件，不强制多层目录、中文文件名或与 design 目录同名。个人笔记路径仅在用户或项目指定时采用。
-- 只有实际新建或结构性修改 Markdown 时才执行 [文档查重与索引流程](../markdown-writing-standards/SKILL.md)。图只在解释并发、状态或跨系统链路更清楚时使用；按需参考 [简短分析模板](template.md)，可合并和删减段落。
+- 只有实际新建或结构性修改 Markdown 时才执行 [文档归属与链接规则](../markdown-writing-standards/SKILL.md)。图只在解释并发、状态或跨系统链路更清楚时使用；按需参考 [简短分析模板](template.md)，可合并和删减段落。
 
 ## 调查与实施路由
 

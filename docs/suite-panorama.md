@@ -119,7 +119,7 @@ flowchart TD
 | [init-project-docs](../plugins/team-standards/skills/init-project-docs/SKILL.md) | 接入、初始化、刷新或状态请求 | status 只检查；structure/init/onboard 建立或编排约定基线；refresh 更新已授权上下文；profile 按请求生成画像 | Agent/文档/OpenSpec/Graphify 入口与接入缺口，不生成虚构业务内容 |
 | [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | 文档变更或套件/项目交付 | 查唯一归属、同步受影响事实、校验结构与链接、维护索引 | 当前有效的说明与导航；不要求每次任务另写报告 |
 
-文档写到哪里取决于用途和已有约定：行为契约归 OpenSpec，稳定语义归业务知识，跨系统连接归拓扑，个人日报默认在用户目录。不要用 README、日志或图谱复制另一份完整规则。
+文档写到哪里取决于用途和已有约定：行为契约归 OpenSpec，稳定语义归业务知识，跨系统连接归拓扑，日常日志默认由 Git 承载，按需个人日报默认在用户目录。不要用 README、日志或图谱复制另一份完整规则。
 
 ### F：验证与交付域
 
@@ -136,7 +136,7 @@ flowchart TD
 
 | 节点 | 输入 | 做什么 | 输出与回流位置 |
 |---|---|---|---|
-| [daily-work-log](../plugins/team-standards/skills/daily-work-log/SKILL.md) | 业务 M/L 作业完成，或用户要求记日志 | 按天、按主题合并结果；S 默认免写，工时不机械累加 | 个人工作记录，默认不进入项目仓库 |
+| [daily-work-log](../plugins/team-standards/skills/daily-work-log/SKILL.md) | 用户或项目明确要求日志 | 默认读取 Git 历史，确需日报时按天、按主题合并 | 按需个人工作记录，默认不进入项目仓库 |
 | [dev-log](../plugins/team-standards/skills/dev-log/SKILL.md) | 团队规范的决策型变更 | 保存规则方向和跨流程取舍 | 团队标准决策背景；普通措辞修改由 commit 记录 |
 | [coding-violation-log](../plugins/team-standards/skills/coding-violation-log/SKILL.md) | 用户明确纠正编码、分层、命名等错误 | 记录实际违规并在后续编码前回顾 | 项目反馈约束，避免同类错误重犯 |
 | [comment-cleanup](../plugins/team-standards/skills/comment-cleanup/SKILL.md) | 用户明确要求批量清理存量注释 | 在授权范围清理无效注释，不改业务逻辑 | 注释质量改善与相应验证；不被普通改码顺带触发 |
@@ -178,7 +178,7 @@ flowchart TD
 | 写入分发 5 | check-sql-ddl-readiness | SQL/DDL 变更所需结构依据 |
 | 写入分发 6 | check-sql-correctness-risk | 可识别 SQL 正确性风险 |
 | 写入分发 7 | check-query-performance-risk | 查询性能风险信号 |
-| 写入分发 8 | check-ai-doc-location | 新建文档位置是否符合约定 |
+| 已退役兼容入口 | check-ai-doc-location | 当前不分发；旧宿主调用无副作用放行，不再要求个人文档目录 |
 | 写入/提交保护 | check-file-encoding / pre-commit-encoding | 已登记项目文件是否保持要求的编码；Git 兜底须已安装 |
 | Bash 提交前 | check-git-commit-skill | 需要重审的提交是否进入提交 Skill |
 | Bash 提交前 | check-commit-no-ai-signature | 标题、三段正文、真实 Author 与 AI 署名约束 |

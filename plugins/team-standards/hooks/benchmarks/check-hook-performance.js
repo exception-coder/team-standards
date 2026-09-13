@@ -9,11 +9,12 @@ const hookRoot = path.resolve(__dirname, '..');
 const dispatcher = path.join(hookRoot, 'write-guard-dispatcher.js');
 const guards = [
   'check-change-readiness.js',
+  'check-architecture-boundaries.js',
   'check-backend-evidence-readiness.js',
   'check-comment-density.js',
   'check-sql-ddl-readiness.js',
+  'check-sql-correctness-risk.js',
   'check-query-performance-risk.js',
-  'check-ai-doc-location.js',
 ];
 const rounds = readRounds();
 const input = JSON.stringify({ tool_name: 'noop', tool_input: {}, cwd: hookRoot });

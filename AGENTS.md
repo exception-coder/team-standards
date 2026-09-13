@@ -28,7 +28,7 @@ flowchart TD
 1. `change-readiness` 是开发前唯一主门禁；项目启用 OpenSpec 后，M/L 变更自动匹配或创建 change，并在实施期间更新、验证、同步和判断归档。只有未启用 OpenSpec 的项目，或用户明确批准的单次降级，才使用兼容设计文档。
 2. `bug-doc-required` 是 Bug 唯一入口，覆盖证据、根因、最小修复和回归；未获修复授权时只调查。简单 Bug 不另建报告，复杂或高风险问题复用唯一持久记录，图表和独立报告按需生成。
 3. `backend-evidence` 是单服务后端证据唯一入口；代码事实和反向影响使用 Graphify 即时查询，不维护第二套手工索引。
-4. `markdown-writing-standards` 覆盖写前查重、Markdown/Mermaid 结构和写后索引登记。
+4. `markdown-writing-standards` 维护唯一文档归属、Markdown/Mermaid 结构与受影响的已有导航。
 5. `init-project-docs` 在当前目录幂等初始化六层 AI 工程入口、`.graphifyignore` 与 Graphify Git 共享边界，并覆盖通用项目 onboarding 与上下文状态；不生成平行事实投影。
 6. 小改按风险缩短流程，但不得跳过通用编码规范；项目专属规则由项目内 Skill 或 `AGENTS.md` 叠加。
 7. Graphify 提供带新鲜度边界的当前实现事实，OpenSpec 提供项目行为规格与活动变更；Skill 只做意图路由和质量门禁，不复制图谱或建立平行规格。
@@ -36,6 +36,10 @@ flowchart TD
 9. AI 原生作业将实现、受影响文档和提交作为同一交付单元：每次更新核对 README 与规则入口，验证通过后自动提交本次范围。文档影响规则归 markdown-writing-standards，自动提交及例外归 git-commit-standards；本地 commit 与 push 分别判断授权。
 
 状态契约治理复用现有四个 Skill：change-readiness 登记状态与影响，backend-evidence 核对存储及不变量，business-logic-orientation 定位消费者，delivery-verification 检查实际执行证据。共享入口为 `plugins/team-standards/scripts/state-contract.js`；按 [接入协议](plugins/team-standards/skills/change-readiness/references/state-contract.md) 逐模块启用，不将静态检查等同业务正确。
+
+## 最小文档与证据
+
+默认复用新鲜 Graphify 的实现关系、OpenSpec 的行为与活动变更、实际测试/运行结果；领域知识、架构决策及运行手册保留独有事实。未启用 OpenSpec 时只维护一份仓内设计，不生成独立 coding 摘要、ai-ref 或个人目录 Phase-A/B 索引；历史文档按需读，不自动迁移、删除或刷新 00–10 树。Git 是日常作业日志，日报仅按明确约定生成。具体归属与例外由 markdown-writing-standards 维护。
 
 ## 意图、授权与风险
 
@@ -79,7 +83,7 @@ flowchart TD
 | 用户纠正 AI 编码规范错误；或项目前置违规表存在 | `coding-violation-log` |
 | 用户明确要求批量清理存量注释 | `comment-cleanup` |
 | 可执行改动完成、准备最终回复 | `delivery-verification` |
-| 业务项目 M/L 源码改动收尾或要求记工作日志 | `daily-work-log` |
+| 用户或项目明确要求工作日志 | `daily-work-log` |
 | team-standards 发生决策型变更 | `dev-log` |
 | 本次作业完成且有可提交改动；任何 git commit 或生成提交信息 | `git-commit-standards` |
 
@@ -88,7 +92,7 @@ flowchart TD
 | 档位 | 判定 | 最小链路 |
 |---|---|---|
 | S | 不超过 2 个文件、30 行，仅局部修改，不动接口/状态/枚举/字段/事件 | `change-readiness` 极简判断 → 编码标准 → 验证 |
-| M | 单 Feature、最多 6 个文件和 200 行，不改共享契约 | 设计依据 → 架构与编码标准 → 实施验证 → 日志 |
+| M | 单 Feature、最多 6 个文件和 200 行，不改共享契约 | 设计依据 → 架构与编码标准 → 实施验证 → 提交 |
 | L | 跨模块/项目，或改接口、状态机、枚举、字段、事件、数据模型 | 完整设计 → 后端事实/影响分析 → 精确定位 → 实施验证 → 知识回写 |
 
 风险优先于行数：生产故障、高风险金额/库存/订单状态、不可逆迁移直接按 L 档处理。
@@ -115,7 +119,7 @@ flowchart TD
 | `coding-standards-common` | 跨语言命名、结构、异常、重复、测试和注释规则 | 所有源码改动必经 |
 | `coding-violation-log` | 记录用户纠正并在后续编码前回顾 | 只记录明确违规证据 |
 | `comment-cleanup` | 用户授权下批量清理存量违规注释 | 不顺手扩大到逻辑修改 |
-| `daily-work-log` | 业务项目按主题批量工作日志 | S 档默认免写；不机械累加工时 |
+| `daily-work-log` | 按明确需求汇总或记录工作日志 | 默认用 Git 历史，不自动写日报；不机械累加工时 |
 | `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
 | `design-system-bootstrap` | Registry/Profile 初始化、绑定、Preference Evidence 与 Pattern Mining | 只从证据晋升规则 |
 | `design-system-guardian` | UI 实现治理、复用策略与视觉评审 | 小文案/间距不跑完整循环 |
@@ -127,7 +131,7 @@ flowchart TD
 | `init-project-docs` | 当前目录 AI 结构初始化、通用项目接入、上下文刷新与状态检查 | structure 创建最小入口和 Graphify 输入/共享边界；init 再编排真实工具，不复制 Graphify/OpenSpec |
 | `java-coding-standards` | Java 与关系库独占规范 | 叠加 common |
 | `llm-agent-coding-standards` | LLM/Agent 信任边界、确定性契约和循环兜底 | 仅 LLM 集成代码触发 |
-| `markdown-writing-standards` | 文档查重、Markdown/Mermaid 结构与索引登记 | 日期日志与索引文件按规则豁免 |
+| `markdown-writing-standards` | 唯一归属、Markdown/Mermaid 结构与必要导航 | 不强制新建索引或日报 |
 | `planning-evidence-discovery` | 跨项目规划证据、轨迹和完成性门禁 | 不拥有项目契约 |
 
 ## 辅助资源索引
@@ -147,7 +151,7 @@ flowchart TD
 | `skills/backend-evidence/references/` | `backend-evidence` | 存储路由、更新、SQL 正确性、性能、反向影响和领域规格 |
 | `skills/git-commit-standards/references/commit-details.md` | `git-commit-standards` | 按需提交示例与插件版本细则 |
 | `skills/markdown-writing-standards/references/markdown-format.md` | `markdown-writing-standards` | 按需 Markdown/Mermaid 格式检查 |
-| `skills/markdown-writing-standards/references/document-index-workflow.md` | `markdown-writing-standards` | 写前查重与写后登记 |
+| `skills/markdown-writing-standards/references/document-index-workflow.md` | `markdown-writing-standards` | 唯一归属与必要导航 |
 | `skills/init-project-docs/references/` | `init-project-docs` | onboarding、权威来源刷新与可选轻量画像流程 |
 | `skills/init-project-docs/references/initialization-output.md` | `init-project-docs` | structure/init 的完整初始化清单、保留策略和不生成边界 |
 | `skills/init-project-docs/onboard-pipeline.mjs` | `init-project-docs` | 九阶段可续跑状态与关卡脚本 |

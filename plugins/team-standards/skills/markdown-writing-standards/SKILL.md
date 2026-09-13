@@ -1,13 +1,13 @@
 ---
 name: markdown-writing-standards
-description: "Use when delivering suite or project updates to synchronize affected documentation, and when creating or structurally editing Markdown. Covers documentation impact, deduplication, Markdown/Mermaid validation, and index registration."
+description: "Use when delivering suite or project updates to synchronize affected documentation, and when creating or structurally editing Markdown. Covers documentation impact, deduplication, Markdown/Mermaid validation, and existing navigation maintenance."
 ---
 
 # Markdown 编写规范
 
 ## 文档生命周期路由
 
-创建或结构性修改项目文档、设计文档、Bug 文档或用户知识库 Markdown 时，先读取 [references/document-index-workflow.md](references/document-index-workflow.md)：写前确认唯一归属并查重，写后更新索引与反向引用。日期型工作日志和索引文件自身按该参考中的豁免规则处理。
+创建或结构性修改项目文档、设计文档、Bug 文档或用户知识库 Markdown 时，先读取 [references/document-index-workflow.md](references/document-index-workflow.md)：优先更新唯一权威载体，写后只维护受影响的已有导航。不要求 Phase-A / Phase-B、个人目录索引或另建 INDEX.md。
 
 ## 作业交付时同步文档
 

@@ -41,12 +41,13 @@ for (const tool of ['Write', 'apply_patch']) {
     }
   });
 
-  test(`${tool} retains restrictions for other new documents and escaped paths`, t => {
+  test(`${tool} permits repository-native documents through the retired compatibility entry`, t => {
     const root = repository(t);
     for (const file of ['docs/design/new.md', 'docs/bug-like/new.md', 'docs/bug/../design/new.md']) {
       const result = check(root, tool, file);
-      assert.equal(result.status, 2, `${file}: ${result.stderr}`);
-      assert.match(result.stderr, /ai-docs/);
+      assert.equal(result.status, 0, `${file}: ${result.stderr}`);
+      assert.equal(result.stderr, '');
+      assert.equal(fs.existsSync(path.join(root, file)), false);
     }
   });
 }

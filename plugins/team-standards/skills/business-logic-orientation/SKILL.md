@@ -23,7 +23,7 @@ description: "Use to understand existing business logic before refactoring, rewr
 4. 用定向源码、DDL、SQL、测试或运行证据核实 Graphify 无法证明的业务语义、状态不变量和失败行为。
 5. 将输出区分为“当前实现事实”“已接受行为”“活动变更”和“待确认推断”。
 
-普通分析直接输出结论和证据位置，不复制 Graphify 节点或 OpenSpec 正文。只有用户明确要求沉淀现状文档、项目没有可复用知识入口，或重构需要长期基线时，才读取 [references/orientation-document-workflow.md](references/orientation-document-workflow.md)，并叠加 `markdown-writing-standards` 的写前查重与写后登记。
+普通分析直接输出结论和证据位置，不复制 Graphify 节点或 OpenSpec 正文。只有用户明确要求沉淀现状文档、项目没有可复用知识入口，或重构需要长期基线时，才读取 [references/orientation-document-workflow.md](references/orientation-document-workflow.md)，并叠加 `markdown-writing-standards` 的唯一归属与必要链接检查。
 
 ## 边界
 

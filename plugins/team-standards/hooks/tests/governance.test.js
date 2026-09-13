@@ -251,3 +251,117 @@ test('real OpenSpec CLI parses planning, selected tasks and strict validation', 
   service.record(f.options);
   assert.equal(service.check(f.options).status, 'PASS');
 });
+
+
+test('minimal plan delivers with existing design and a real raw test result, without validation Markdown', t => {
+  const f = fixture(t);
+  delete f.plan.dedup;
+  delete f.plan.handoff;
+  f.plan.review.reference = f.ref('design.md', '## Design');
+  f.plan.verifications[0].reference = { path: `${changeDir}/test-result.log` };
+  fs.unlinkSync(path.join(f.root, changeDir, 'validation.md'));
+  f.save();
+  service.bind(f.options);
+  implement(f);
+  const command = "require('node:assert/strict').equal(require('./src/greet'), undefined)";
+  const success = "require('node:assert/strict').equal(require('./src/greet')(), 'hello'); console.log('greeting assertion passed')";
+  const output = spawnSync(process.execPath, ['-e', success], { cwd: f.root, encoding: 'utf8', windowsHide: true });
+  assert.equal(output.status, 0, output.stderr);
+  f.plan.verifications[0].command = `node -e ${JSON.stringify(success)}`;
+  write(f.root, `${changeDir}/test-result.log`, output.stdout);
+  f.save();
+  const recorded = service.record(f.options);
+  assert.equal(service.check(f.options).status, 'PASS');
+  assert.equal(recorded.policyVersion, 2);
+  assert.equal(fs.existsSync(path.join(f.root, changeDir, 'validation.md')), false);
+  // The recorded result cannot survive changes to its underlying raw evidence.
+  write(f.root, `${changeDir}/test-result.log`, 'different execution result');
+  assert.equal(service.guarded(() => service.check(f.options)).findings[0].rule, 'REVIEW_STALE');
+  const failure = spawnSync(process.execPath, ['-e', command], { cwd: f.root, encoding: 'utf8', windowsHide: true });
+  assert.notEqual(failure.status, 0);
+  write(f.root, `${changeDir}/test-result.log`, failure.stderr);
+  f.plan.verifications[0].result = 'FAIL';
+  f.save();
+  assert.equal(service.guarded(() => service.record(f.options)).status, 'NEEDS_WORK');
+});
+
+test('not-applicable views need a reason but no duplicate chapter; applicable views still require references', t => {
+  const f = fixture(t);
+  f.plan.views.push({ id: 'data', files: ['src/greet.js'], disposition: 'not-applicable', reason: 'No database access or persistence changes.' });
+  f.save();
+  assert.equal(service.bind(f.options).status, 'PASS');
+  f.plan.views[1].reason = '';
+  f.save();
+  assert.equal(service.guarded(() => service.bind(f.options)).findings[0].rule, 'VIEW_INVALID');
+  f.plan.views[1].reason = 'Changes persistence';
+  f.plan.views[1].disposition = 'updated';
+  f.save();
+  assert.equal(service.guarded(() => service.bind(f.options)).findings[0].rule, 'REFERENCE_REQUIRED');
+});
+
+test('optional dedup and handoff accept inline facts but still reject blockers and malformed records', t => {
+  const f = fixture(t);
+  delete f.plan.dedup.reference;
+  delete f.plan.handoff.reference;
+  f.save();
+  assert.equal(service.bind(f.options).status, 'PASS');
+  f.plan.handoff.blockers = ['Unresolved business decision'];
+  f.save();
+  assert.equal(service.guarded(() => service.bind(f.options)).findings[0].rule, 'SLICE_BLOCKED');
+  f.plan.handoff.blockers = [];
+  f.plan.dedup = null;
+  f.save();
+  assert.equal(service.guarded(() => service.bind(f.options)).findings[0].rule, 'DEDUP_REQUIRED');
+});
+
+test('raw verification rejects empty files, unsafe paths and ambiguous supplied headings', t => {
+  const f = fixture(t);
+  const { reference } = require('../governance/evidence');
+  write(f.root, `${changeDir}/empty.log`, '  \n');
+  assert.throws(() => reference(f.root, { path: `${changeDir}/empty.log` }, true), /为空/);
+  assert.throws(() => reference(f.root, { path: '../outside.log' }, true), /越界/);
+  assert.throws(() => reference(f.root, { path: `${changeDir}/design.md`, heading: '' }, true), /唯一标题/);
+  assert.throws(() => reference(f.root, { path: `${changeDir}/design.md` }), /唯一标题/);
+});
+
+test('policy migration preserves baseline, scope and retries without promoting old PASS evidence', t => {
+  const f = fixture(t);
+  service.bind(f.options);
+  implement(f);
+  service.record(f.options);
+  const stateFile = storage.statePath(fs.realpathSync(f.root), f.options.session);
+  const previous = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+  previous.policyVersion = 1;
+  previous.retries = 2;
+  fs.writeFileSync(stateFile, JSON.stringify(previous));
+  assert.equal(service.guarded(() => service.check(f.options)).findings[0].rule, 'VERSION_MISMATCH');
+  service.bind(f.options);
+  const current = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+  assert.equal(current.base, previous.base);
+  assert.deepEqual(current.initial, previous.initial);
+  assert.deepEqual(current.plan.files, previous.plan.files);
+  assert.equal(current.retries, 2);
+  assert.equal(current.evidence, null);
+  assert.equal(service.guarded(() => service.check(f.options)).findings[0].rule, 'EVIDENCE_REQUIRED');
+  service.record(f.options);
+  assert.equal(service.check(f.options).status, 'PASS');
+  current.policyVersion = 99;
+  fs.writeFileSync(stateFile, JSON.stringify(current));
+  assert.equal(service.guarded(() => service.bind(f.options)).findings[0].rule, 'VERSION_MISMATCH');
+});
+
+
+test('archive records not-applicable promotion without duplicate prose and rejects missing applicable references', t => {
+  const f = fixture(t);
+  const { validatePlan } = require('../governance/evidence');
+  const inputFingerprint = storage.hash(JSON.stringify(storage.fingerprints(f.root, f.plan.files)));
+  f.plan.review.inputFingerprint = inputFingerprint;
+  f.plan.verifications[0].inputFingerprint = inputFingerprint;
+  f.plan.sync = { status: 'not-applicable', reason: 'No additional main spec synchronization in this unit fixture.',
+    reference: f.ref('validation.md', '## Sync'), targets: [] };
+  f.plan.promotion = [{ id: 'implementation', disposition: 'not-applicable', reason: 'Existing change design is sufficient; no separate long-term architecture document is needed.' }];
+  const context = { tasks: [{ id: '1.1', done: true }, { id: '1.2', done: true }] };
+  assert.doesNotThrow(() => validatePlan(f.root, f.plan, context, 'archive'));
+  f.plan.promotion[0].disposition = 'updated';
+  assert.throws(() => validatePlan(f.root, f.plan, context, 'archive'), /唯一标题/);
+});

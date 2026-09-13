@@ -5,7 +5,12 @@ const VIEW_IDS = ['implementation', 'contracts', 'data', 'workflow', 'async', 'r
 
 function text(value) { return typeof value === 'string' && value.trim().length > 0; }
 
-function reference(root, ref) {
+function reference(root, ref, allowFile = false) {
+  if (allowFile && ref && text(ref.path) && ref.heading === undefined) {
+    const body = readText(safePath(root, ref.path));
+    requireValue(body.trim().length > 0, 'REFERENCE_EMPTY', `验证结果文件为空：${ref.path}`, 'NEEDS_WORK');
+    return { key: ref.path, digest: hash(body) };
+  }
   requireValue(ref && text(ref.path) && text(ref.heading), 'REFERENCE_REQUIRED', '证据必须定位文件和唯一标题', 'NEEDS_WORK');
   const lines = readText(safePath(root, ref.path)).split('\n');
   const matches = lines.flatMap((line, index) => line === ref.heading ? [index] : []);
@@ -48,7 +53,9 @@ function validateViews(root, plan, remember) {
     requireValue(VIEW_IDS.includes(view.id) && ['updated', 'already-covered', 'not-applicable'].includes(view.disposition)
       && text(view.reason) && Array.isArray(view.files) && view.files.length > 0 && view.files.every(file => plan.files.includes(file)),
     'VIEW_INVALID', '设计视图须含有效类型、文件范围、覆盖状态和理由', 'NEEDS_WORK');
-    remember(reference(root, view.reference));
+    if (view.disposition !== 'not-applicable' || view.reference !== undefined) {
+      remember(reference(root, view.reference));
+    }
   }
   for (const file of plan.files) {
     safePath(root, file);
@@ -84,12 +91,17 @@ function validateReview(root, plan, remember, delivery) {
   requireValue(plan.review && ['agent', 'human', 'independent'].includes(plan.review.type)
     && text(plan.review.actor) && plan.review.result === 'PASS', 'REVIEW_REQUIRED', '缺少具名审阅及通过结论', 'NEEDS_WORK');
   remember(reference(root, plan.review.reference));
-  requireValue(plan.dedup && text(plan.dedup.query) && text(plan.dedup.decision), 'DEDUP_REQUIRED', '缺少查重范围及复用/新建理由', 'NEEDS_WORK');
-  remember(reference(root, plan.dedup.reference));
-  requireValue(plan.handoff && text(plan.handoff.stage) && text(plan.handoff.nextTask)
-    && Array.isArray(plan.handoff.blockers), 'HANDOFF_REQUIRED', '缺少阶段、下一任务及阻塞清单', 'NEEDS_WORK');
-  remember(reference(root, plan.handoff.reference));
-  requireValue(plan.handoff.blockers.length === 0, 'SLICE_BLOCKED', '当前切片仍有阻塞；请先解决或分离独立切片', 'NEEDS_WORK');
+  if (plan.dedup !== undefined) {
+    requireValue(plan.dedup && text(plan.dedup.query) && text(plan.dedup.decision),
+      'DEDUP_REQUIRED', '查重记录须含检索范围与复用/新建理由', 'NEEDS_WORK');
+    if (plan.dedup.reference !== undefined) remember(reference(root, plan.dedup.reference));
+  }
+  if (plan.handoff !== undefined) {
+    requireValue(plan.handoff && text(plan.handoff.stage) && text(plan.handoff.nextTask)
+      && Array.isArray(plan.handoff.blockers), 'HANDOFF_REQUIRED', '交接须含阶段、下一任务与阻塞清单', 'NEEDS_WORK');
+    if (plan.handoff.reference !== undefined) remember(reference(root, plan.handoff.reference));
+    requireValue(plan.handoff.blockers.length === 0, 'SLICE_BLOCKED', '当前切片仍有阻塞；请先解决或分离独立切片', 'NEEDS_WORK');
+  }
   if (!delivery) return;
   const inputFingerprint = hash(JSON.stringify(fingerprints(root, plan.files)));
   requireValue(plan.review.inputFingerprint === inputFingerprint, 'REVIEW_INPUTS_STALE',
@@ -102,7 +114,7 @@ function validateReview(root, plan, remember, delivery) {
     ids.add(item.id);
     requireValue(item.inputFingerprint === inputFingerprint, 'VERIFICATION_INPUTS_STALE',
       '验证输入已变化；重新验证后记录当时的 snapshot.inputFingerprint，不能仅重新 record', 'NEEDS_WORK');
-    remember(reference(root, item.reference));
+    remember(reference(root, item.reference, true));
   }
 }
 
@@ -133,7 +145,9 @@ function validateArchive(root, plan, context, remember) {
   for (const item of plan.promotion) {
     requireValue(text(item.reason) && ['updated', 'already-covered', 'not-applicable'].includes(item.disposition),
       'PROMOTION_INVALID', '晋升记录缺少状态或理由', 'NEEDS_WORK');
-    remember(reference(root, item.reference));
+    if (item.disposition !== 'not-applicable' || item.reference !== undefined) {
+      remember(reference(root, item.reference));
+    }
   }
 }
 
