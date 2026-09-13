@@ -115,7 +115,7 @@ flowchart LR
 | Markdown 新建或重组 | `markdown-writing-standards` 写后索引 |
 | 状态、字段、事件、API 变化 | `backend-evidence` Graphify 即时影响查询；协同项写入 OpenSpec |
 | 项目结构、API、数据访问变化 | `init-project-docs` refresh：更新 Graphify 本体，不生成 Markdown 镜像 |
-| 业务源码变化 | `daily-work-log` |
+| 业务 M/L 源码改动收尾或显式要求 | `daily-work-log` |
 | 用户纠正规范错误 | `coding-violation-log` |
 | team-standards 决策变化 | `dev-log` |
 | 可执行改动准备交付 | `delivery-verification`；优先 `forge_verify phase=all` |
@@ -124,3 +124,7 @@ flowchart LR
 ## 状态契约治理扩展
 
 change-readiness → backend-evidence / business-logic-orientation → delivery-verification 复用同一状态契约检查器。模块逐步登记，策略统一、业务链路测试与输入新鲜度共同防止状态漂移。详见 [状态契约治理协议](../plugins/team-standards/skills/change-readiness/references/state-contract.md)。
+
+## 轻量交付
+
+本地检查按 [delivery-verification 的影响分级](../plugins/team-standards/skills/delivery-verification/SKILL.md) 选择，Forge 与 CI 门禁保持原约束。Markdown 格式细则和提交示例由对应 Skill 按需加载。业务日志在收尾时按主题合并，S 档默认免写，不按文件数累加工时；正常自动提交仅报告提交结果，不重复展示完整正文。

@@ -68,7 +68,7 @@ flowchart TD
 | 用户纠正 AI 编码规范错误；或项目前置违规表存在 | `coding-violation-log` |
 | 用户明确要求批量清理存量注释 | `comment-cleanup` |
 | 可执行改动完成、准备最终回复 | `delivery-verification` |
-| 业务项目源码发生改动或要求记工作日志 | `daily-work-log` |
+| 业务项目 M/L 源码改动收尾或要求记工作日志 | `daily-work-log` |
 | team-standards 发生决策型变更 | `dev-log` |
 | 本次作业完成且有可提交改动；任何 git commit 或生成提交信息 | `git-commit-standards` |
 
@@ -104,7 +104,7 @@ flowchart TD
 | `coding-standards-common` | 跨语言命名、结构、异常、重复、测试和注释规则 | 所有源码改动必经 |
 | `coding-violation-log` | 记录用户纠正并在后续编码前回顾 | 只记录明确违规证据 |
 | `comment-cleanup` | 用户授权下批量清理存量违规注释 | 不顺手扩大到逻辑修改 |
-| `daily-work-log` | 业务项目个人工作日志 | 不用于 team-standards 自身决策 |
+| `daily-work-log` | 业务项目按主题批量工作日志 | S 档默认免写；不机械累加工时 |
 | `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
 | `design-system-bootstrap` | Registry/Profile 初始化、绑定、Preference Evidence 与 Pattern Mining | 只从证据晋升规则 |
 | `design-system-guardian` | UI 实现治理、复用策略与视觉评审 | 小文案/间距不跑完整循环 |
@@ -134,6 +134,8 @@ flowchart TD
 | `skills/bug-doc-required/template.md` | `bug-doc-required` | 按需分析模板，不作为每次 Bug 的必填报告 |
 | `skills/bug-doc-required/references/repair-rules.md` | `bug-doc-required` | 最小修复与回归证据，编码风格复用 common |
 | `skills/backend-evidence/references/` | `backend-evidence` | 存储路由、更新、SQL 正确性、性能、反向影响和领域规格 |
+| `skills/git-commit-standards/references/commit-details.md` | `git-commit-standards` | 按需提交示例与插件版本细则 |
+| `skills/markdown-writing-standards/references/markdown-format.md` | `markdown-writing-standards` | 按需 Markdown/Mermaid 格式检查 |
 | `skills/markdown-writing-standards/references/document-index-workflow.md` | `markdown-writing-standards` | 写前查重与写后登记 |
 | `skills/init-project-docs/references/` | `init-project-docs` | onboarding、权威来源刷新与可选轻量画像流程 |
 | `skills/init-project-docs/references/initialization-output.md` | `init-project-docs` | structure/init 的完整初始化清单、保留策略和不生成边界 |
@@ -155,6 +157,8 @@ flowchart TD
 6. 每次套件更新按文档同步规则检查中文与英文 README、组件版本与数量、用法、流程和套件总览；受影响文档在同次作业中修正。完成验证后自动提交本次改动，不积压；明确禁止提交、无改动或验证失败等例外按提交 Skill 处理。
 
 ## 发版校验
+
+本地按 [delivery-verification](plugins/team-standards/skills/delivery-verification/SKILL.md) 的变更影响表选择检查；CI 保留以下完整回归。Skill 指令不是纯说明，资源移动需安装测试，影响不明时扩大验证。
 
 ```bash
 (cd plugins/team-standards/hooks && npm test) && \

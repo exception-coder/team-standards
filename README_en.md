@@ -1,6 +1,6 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **3.0.0**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **3.1.0**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 ## Unified flow
 
@@ -42,7 +42,7 @@ See the [documentation rules](plugins/team-standards/skills/markdown-writing-sta
 
 ## Validation
 
-Version 3.0.0 removes the Dart coding skill and distributes 21 Skills. Remove any project-specific invocations of the retired entrypoint.
+Version 3.0.0 removed the Dart coding skill and distributes 21 Skills. Remove any project-specific invocations of the retired entrypoint.
 
 ```bash
 node scripts/sync-agents.js
@@ -58,3 +58,5 @@ node scripts/audit-skills.js --warnings --ci
 Version 2.6.0 adds a project-owned state contract schema, source-impact checks, a read-only Graphify adapter, and execution evidence bound to current inputs. Adopt per module through `.team-standards/state-contracts.json`; existing OpenSpec governance checks enrolled modules. Static checks do not prove business correctness or artifact provenance.
 
 See [接入协议与 CLI](plugins/team-standards/skills/change-readiness/references/state-contract.md). No new Skill or business-specific state constants are required.
+
+Local verification follows the change-impact table in [delivery-verification](plugins/team-standards/skills/delivery-verification/SKILL.md); Forge and full CI gates remain in force. Frequent Skills load detailed references only when needed. Daily logs merge completed M/L work by topic; S changes are exempt unless requested. Automatic commits retain scoped staging and structured messages without repeating the full body in chat.

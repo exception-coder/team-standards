@@ -22,12 +22,26 @@ description: "Use after executable project changes and before declaring completi
    {"project":"当前项目绝对路径","phase":"all"}
    ```
 
-3. MCP 不可用时，使用项目 `AGENTS.md` 明确声明的 Forge CLI；项目未声明 Forge 时执行项目原生构建、测试和专项验证，并明确说明降级证据。
+3. MCP 不可用时，使用项目 `AGENTS.md` 明确声明的 Forge CLI；项目未声明 Forge 时按下方变更分级选择项目原生构建、测试和专项验证，并明确说明降级证据。
 4. 读取 `status`、`staticStatus`、`runtimeStatus`、`issues`、`executedCheckers` 和 `executedVerifiers`。未执行的检查器不得报告为通过。
 5. `FAILED` 时按 `issues` 修复最小必要范围，然后重新验证。最多进行 3 轮自动修复；第三轮仍失败时停止，保留真实失败证据并向用户报告阻断。
 6. 验证之后发生任何相关编辑，返回第 1 步。只有最新工作区的 PASS 可以放行。
 7. OpenSpec 项目同时按 change-readiness 的 [治理检查器协议](../change-readiness/references/governance-checker.md) 记录本切片的验证、设计视图和 Scenario 映射，再检查 delivery。完成当前任务不等于整个 change 可归档；记录命令不执行验证，不能用 record 代替前述真实检查。
 8. 按 [文档同步规则](../markdown-writing-standards/SKILL.md#作业交付时同步文档) 更新受影响文档并核对引用；若改变验证输入，重新验证。通过后进入 [git-commit-standards](../git-commit-standards/SKILL.md) 自动提交本次作业，报告提交号和未提交项。纯文档任务通过文档检查后也进入提交流程，不伪造 Runtime 验证。
+
+## 本地验证按影响选择
+
+以下分级用于项目原生验证，不覆盖 Forge 的 `phase=all`、项目明确门禁或 CI 全量检查。按实际行为和依赖选择，不能仅以扩展名或行数分档；混合变更取各类检查的并集。
+
+| 改动 | 本地最低验证 |
+|---|---|
+| 纯说明、措辞 | 受影响链接、结构、事实和生成入口同步；不运行无关 Runtime 测试 |
+| Skill 指令、触发或工作流 | 上述检查 + Skill 结构/引用校验 + 正常、豁免、失败场景逐项审视；Markdown 中的可执行指令不能当纯说明 |
+| 单个 Hook/脚本或业务模块 | 受影响单元测试与必要集成/构建，覆盖改动行为及相邻依赖 |
+| Skill 增删、资源移动或安装元数据 | 引用/数量/版本检查 + 受影响打包安装测试 |
+| 共享运行库、调度、依赖、构建/CI 契约或影响无法确定 | 项目完整相关回归；不能以“文档多”缩小可执行改动影响 |
+
+验证后只因新的相关改动、失败或未解决疑点扩大/重跑；无关文档措辞不使已验证源码的证据自动失效，项目内容指纹门禁另有约定时遵从。CI 保留完整回归，本地选择及未执行项在交付说明中如实简述，不另建验证报告，不把场景审视当运行测试。
 
 ## 环境与安全边界
 
