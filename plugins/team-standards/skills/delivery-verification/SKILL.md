@@ -51,3 +51,7 @@ description: "Use after executable project changes and before declaring completi
 - 不在验证失败后跳过修复循环直接 Done。
 - 不无限修复；达到轮次上限后必须停止并交付失败观察。
 - 不接受发生在最后一次相关修改之前的验证证据。
+
+## 状态契约闭环
+
+状态相关改动按 [状态契约治理协议](../change-readiness/references/state-contract.md) 执行已登记模块的真实命令并检查新鲜证据。STATIC_PASS 不等于业务 PASS；核对测试实际依赖与构建产物，旧 JAR、缺失环境或过期图谱不得冒充当前验证。已接入项目由共享治理入口检查，未接入模块明确披露。

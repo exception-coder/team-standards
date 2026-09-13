@@ -24,3 +24,7 @@ description: "Use to understand existing business logic before refactoring, rewr
 - 本 Skill 不替代 `change-readiness` 的变更设计，也不实现 Graphify 查询算法。
 - Graphify 过期或缺失时可以用确定性扫描降级，但必须说明覆盖缺口。
 - 业务规则、术语和状态语义需要权威文档、运行证据或人工确认；不得仅凭图谱关系晋升为真相。
+
+## 状态契约闭环
+
+梳理状态消费者时，读取 [状态契约治理协议](../change-readiness/references/state-contract.md)。优先复用已登记的状态契约及只读 Graphify 关联视图，逐项核对写入、策略、查询、展示、迁移和测试；不新建第二份手工状态字典。

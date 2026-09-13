@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0] - 2026-09-12
+
+- 新增可复用状态契约 Schema、只读 Graphify 关联视图、源码影响扫描及真实命令验证。
+- 现有四个 Skill 接入状态治理协议；OpenSpec 治理检查器对已登记模块检查静态契约与当前执行证据。
+- 提供独立 CLI、可运行示例与故障注入回归；支持逐模块登记，不宣称自动穷尽语义或证明部署制品。
+
+
 > 仅记录每个 plugin 发布版本的**关键变化**(新 skill / 规则方向反转 / 触发链路调整 / 重大基础设施)。逐次 commit 的细节用 `git log` 看,长期决策背景在 [docs/dev-log/](docs/dev-log/) 里。
 >
 > 版本号约定:`MAJOR.MINOR.PATCH`(SemVer)——`MINOR` 用于新 skill / 触发链路扩展 / 基础设施(hook、CI、sync 脚本),`PATCH` 用于规则微调与版本号同步。

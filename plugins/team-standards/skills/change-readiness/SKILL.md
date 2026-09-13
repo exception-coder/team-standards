@@ -61,3 +61,7 @@ OpenSpec 的结构校验通过只证明 artifacts 合法，不证明代码、DDL
 - 不得把接口契约、状态机、字段或跨服务变更降为极简档。
 - 不得在 OpenSpec 已启用时用无关活动 change 或历史 `docs/design` 为当前实现背书。
 - 不得自己复制实现 `propose/update/apply/verify/sync/archive`；优先复用项目中 OpenSpec 生成的 Skill，缺失时使用官方 agent-compatible CLI 接口完成同等协议。
+
+## 状态契约闭环
+
+状态值、转换、迁移、状态筛选或按钮条件发生变化时，读取 [状态契约治理协议](references/state-contract.md)。复用项目权威 OpenSpec 状态契约，生成并核对消费者影响清单；已登记模块执行静态检查，不为通过检查缩小范围。

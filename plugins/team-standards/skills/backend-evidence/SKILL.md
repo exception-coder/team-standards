@@ -44,3 +44,7 @@ description: "Use for backend changes or analysis involving DDL, SQL, data relat
 ## 输出
 
 输出应区分“已验证事实”“基于证据的推断”和“待确认候选”，并给出对应代码、DDL、SQL 或日志证据位置。
+
+## 状态契约闭环
+
+涉及业务状态时，读取 [状态契约治理协议](../change-readiness/references/state-contract.md)：核对 dimensions、转换、不变量与真实 DDL/历史值，验证 writer/policy/query/migration 的等价关系。图谱与字面扫描只是影响候选，SQL 与业务链路仍须真实验证。

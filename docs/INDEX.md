@@ -14,3 +14,5 @@
 | [design/sql-performance-guard/sql-performance-guard-current.md](design/sql-performance-guard/sql-performance-guard-current.md) | SQL 高风险查询的语义门禁、软告警与运行证据要求 |
 | [dev-log/](dev-log/) | 开发日志（按日期） |
 | [superpowers/](superpowers/) | superpowers skill 规格与计划文档 |
+
+- [状态契约治理协议](../plugins/team-standards/skills/change-readiness/references/state-contract.md)：结构化状态、影响扫描、Graphify 候选视图和执行证据。

@@ -5,6 +5,7 @@ const storage = require('./storage');
 const repoApi = require('./repository');
 const openspec = require('./openspec');
 const { validatePlan } = require('./evidence');
+const { checkEnrolled } = require('../../state-contract/enrollment');
 const { requireValue, VERSION, readJson, statePath, fingerprints, atomicUpdate, safePath } = storage;
 
 function result(status, findings = [], extra = {}) {
@@ -77,6 +78,7 @@ function check(options) {
   const repo = repoApi.repository(options.repo);
   const binding = readBinding(repo, options.session);
   const phase = options.phase || 'delivery';
+  checkEnrolled(repo.root, phase);
   requireValue(['preflight', 'delivery', 'archive'].includes(phase), 'PHASE_INVALID', '不支持的检查阶段');
   checkRange(repo, binding, options.files || []);
   if (phase === 'preflight') {
@@ -106,6 +108,7 @@ function record(options) {
   const context = openspec.loadContext(repo.root, binding.change, options);
   openspec.validate(repo.root, binding.change, options);
   const phase = options.phase || 'delivery';
+  checkEnrolled(repo.root, phase);
   requireValue(['delivery', 'archive'].includes(phase), 'PHASE_INVALID', 'record 只接受 delivery 或 archive');
   const references = validatePlan(repo.root, plan, context, phase);
   const evidence = { schemaVersion: VERSION, policyVersion: VERSION, checkerVersion: VERSION, phase,
@@ -125,6 +128,7 @@ function record(options) {
 }
 
 function verifyEvidence(root, evidence, phase) {
+  checkEnrolled(root, phase);
   requireValue(evidence.schemaVersion === VERSION && evidence.policyVersion === VERSION
     && evidence.checkerVersion === VERSION, 'VERSION_MISMATCH', '证据版本不兼容');
   requireValue(evidence.change === evidence.context.change, 'EVIDENCE_CHANGE', '证据与工件 change 不匹配');

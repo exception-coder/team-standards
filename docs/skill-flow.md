@@ -110,3 +110,7 @@ flowchart LR
 | team-standards 决策变化 | `dev-log` |
 | 可执行改动准备交付 | `delivery-verification`；优先 `forge_verify phase=all` |
 | 准备 commit | `git-commit-standards` |
+
+## 状态契约治理扩展
+
+change-readiness → backend-evidence / business-logic-orientation → delivery-verification 复用同一状态契约检查器。模块逐步登记，策略统一、业务链路测试与输入新鲜度共同防止状态漂移。详见 [状态契约治理协议](../plugins/team-standards/skills/change-readiness/references/state-contract.md)。

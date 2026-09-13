@@ -37,3 +37,9 @@ node scripts/check-cross-refs.js
 node scripts/check-version-sync.js
 node scripts/audit-skills.js --warnings --ci
 ```
+
+## State contract governance / 状态契约治理
+
+Version 2.6.0 adds a project-owned state contract schema, source-impact checks, a read-only Graphify adapter, and execution evidence bound to current inputs. Adopt per module through `.team-standards/state-contracts.json`; existing OpenSpec governance checks enrolled modules. Static checks do not prove business correctness or artifact provenance.
+
+See [接入协议与 CLI](plugins/team-standards/skills/change-readiness/references/state-contract.md). No new Skill or business-specific state constants are required.

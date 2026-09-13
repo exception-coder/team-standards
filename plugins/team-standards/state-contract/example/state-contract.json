@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "module": "parcel-example",
+  "spec": "spec.md",
+  "sourceRoots": [
+    "src"
+  ],
+  "inputFiles": [
+    "test.js"
+  ],
+  "scanTerms": [
+    "state"
+  ],
+  "dimensions": [
+    {
+      "id": "lifecycle",
+      "meaning": "Parcel availability",
+      "values": [
+        {
+          "code": "READY",
+          "meaning": "May dispatch",
+          "kind": "current"
+        },
+        {
+          "code": "WITHDRAWN",
+          "meaning": "Cannot dispatch",
+          "kind": "current"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "dispatch",
+      "meaning": "Dispatch a parcel",
+      "preconditions": [
+        "Ready parcel"
+      ],
+      "effects": [
+        "Dispatch accepted; availability unchanged in this demonstration"
+      ],
+      "invariants": [
+        "Withdrawn parcel cannot dispatch"
+      ],
+      "transitions": [
+        {
+          "dimension": "lifecycle",
+          "from": [
+            "READY"
+          ],
+          "to": [
+            "READY"
+          ]
+        }
+      ]
+    }
+  ],
+  "bindings": [
+    {
+      "file": "src/parcel.js",
+      "anchor": "exports.",
+      "role": "writer",
+      "dimension": "lifecycle",
+      "values": [
+        "READY",
+        "WITHDRAWN"
+      ],
+      "actions": [
+        "dispatch"
+      ]
+    },
+    {
+      "file": "src/parcel.js",
+      "anchor": "exports.",
+      "role": "policy",
+      "dimension": "lifecycle",
+      "values": [
+        "READY",
+        "WITHDRAWN"
+      ],
+      "actions": [
+        "dispatch"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "lifecycle",
+      "kind": "lifecycle",
+      "actions": [
+        "dispatch"
+      ],
+      "command": [
+        "node",
+        "test.js",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "negative",
+      "kind": "negative",
+      "actions": [
+        "dispatch"
+      ],
+      "command": [
+        "node",
+        "test.js",
+        "negative"
+      ]
+    }
+  ]
+}
