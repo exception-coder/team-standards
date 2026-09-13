@@ -179,7 +179,6 @@ class OrderService {
 
 - 通用「新代码落点决策」(上一节)兜底所有"扩展旧代码"场景;本节是它在 service 粒度的**硬化下钻**——零退路。
 - `coding-standards-common §2 函数原子`(80 行硬阈值)在方法粒度限制单一方法体积;本节在 service 粒度限制每个 service 只服务一个业务分支。两者**正交**。
-- `korepos-backend-service` 的"一接口一 service"是 Flutter backend 侧的强约束;本节是它在 Java/Spring + 通用全栈侧的对应规则,本质同向:**业务分支隔离 + god service 只做 delegate 入口**。
 
 ### 函数级业务场景分流:分支差异即拆分(不只是 service 级,函数级也要拆)
 
@@ -192,8 +191,8 @@ class OrderService {
 **两级拆分阶梯**(明确不要跳到最重的方案,也不要图省事停在最轻的):
 
 | 阶梯 | 触发条件 | 拆分动作 | 落点 |
-|------|---------|---------|------|
-| **阶梯 1(函数级)** | 函数内按业务类型 if-else / switch 分流 ≥2 个分支,**但分支共享同一业务定位**(例如 `refund` 的全额 / 部分变种,共享同一状态机和补偿) | 抽 `_handleTypeA()` / `_handleTypeB()` 私有方法,主方法只做分流派发;或重构成参数化的单一方法 | 同一 service 内 |
+|------|---------|---------|
+| **阶梯 1(函数级)** | 函数内按业务类型 if-else / switch 分流 ≥2 个分支,**但分支共享同一业务定位**(例如 `refund` 的全额 / 部分变种,共享同一状态机和补偿) | 抽 `_handleTypeA()` / `_handleTypeB()` 私有方法,主方法只做分流派发;或重构成参数化的单一方法 |
 | **阶梯 2(service 级)** | 分支差异本质是**不同业务定位**——A 订单 vs B 订单是 PRD / 业务概念上的不同业务实体,只是部分技术流程相似 | 升级到 service 级,按上一节「Service 业务动作扩展铁律」拆 `AService` / `BService1` | 不同 service(每个分支自己的 focused service) |
 
 **业务定位 vs 代码相似度——判定锚点表**(命中 ≥3 个倾向阶梯 2 → 升级 service 级):
@@ -261,38 +260,6 @@ class OrderService {
         // 禁止在 OrderService 内写任何业务逻辑——它只能做派发
     }
 }
-```
-
-**Dart 示例(对照 korepos 后端典型场景:handler 内按订单类型分流)**:
-
-```dart
-// ❌ 反例:handler 内按 itemType 堆叠堂食 / 外卖,业务定位完全不同
-class OrderHandler {
-  Future<Response> execute(OrderRequest req) async {
-    if (req.itemType == ItemType.dineIn) {
-      // 50 行:堂食流程(桌号绑定 + 厨房工单 + 桌台计费)
-    } else if (req.itemType == ItemType.takeout) {
-      // 60 行:外卖流程(配送员调度 + 打包工单 + 配送费计算)
-      // 触达通知和包装策略完全不同
-    }
-  }
-}
-```
-
-**阶梯 2 重构**(堂食 / 外卖在业务定位上是两类独立动作,触达 / 工单 / 计费规则都各自独立):
-
-```dart
-// ✅ 阶梯 2:拆独立 service,共享逻辑沉到原子能力层
-class DineInOrderService {
-  Future<void> execute(DineInOrderRequest req) async { /* 堂食业务 */ }
-}
-class TakeoutOrderService {
-  Future<void> execute(TakeoutOrderRequest req) async { /* 外卖业务 */ }
-}
-
-// 共享的"金额计算 / 库存扣减"沉到 common/backend_infra/services/ 原子能力层,
-// 与 korepos-backend-service 的「跨 feature 业务原子能力层」规则对齐——
-// 而不是塞进同一个 handler 方法用 if-else 区分
 ```
 
 **常见自我说服话术 → 一律视为违规**(与上一节 god service 自我说服话术清单同模式,函数级新增):
@@ -398,18 +365,18 @@ class ApproveAndRefundOrchestrator {
 
 > 容易混淆的边界:日志、审计、权限、事务声明、metrics、缓存、限流、链路追踪——这些**横切关注点**如果按"每个 focused service 各自实现一遍"就重复污染;但它们的**集中实现类**(`AuditAspect` / `LoggingInterceptor` / `SecurityFilter`)看起来像 god class(一个类切到所有 service)。**这种集中实现不算 god service,不受本节约束**,因为它们处理的不是业务分支,是横切机制。
 
-**横切关注点的归属(Java / Python / Dart 三栈对照)**:
+**横切关注点的归属(Java / Python 两栈对照)**:
 
-| 横切类别 | Java(Spring) | Python(FastAPI / Django) | Dart(Flutter / Shelf / Serverpod) |
-|---------|-------------|--------------------------|-----------------------------------|
-| 日志 / 审计 | Spring AOP `@Aspect` / Servlet Filter / Interceptor | `@audit` decorator / FastAPI `Depends` / Django middleware | Shelf middleware / Riverpod ProviderObserver / Serverpod future hooks |
-| 权限 / 鉴权 | Spring Security / `@PreAuthorize` + AOP | FastAPI `Depends(get_current_user)` / Django `@login_required` / DRF `permission_classes` | Shelf middleware / Serverpod auth handler / Flutter route guard |
-| 事务声明 | `@Transactional` | SQLAlchemy `with session.begin():` / Django `@transaction.atomic` / 上下文管理器 | Drift `transaction()` / SQLite `db.transaction()` / Serverpod `db.transaction()` |
-| Metrics / 链路追踪 | Micrometer / OpenTelemetry / AOP | OpenTelemetry / Prometheus client + middleware / `@trace` decorator | OpenTelemetry Dart SDK / Riverpod observer |
-| 缓存 | `@Cacheable` + AOP | `functools.lru_cache` / `@cache` decorator / Redis client + middleware | `package:cache` / Riverpod `AsyncValue` cache |
-| 限流 / 熔断 | Resilience4j / Sentinel / 网关层 | `slowapi` / `aiolimiter` / API Gateway | Shelf rate-limiter middleware / API Gateway |
-| 入参校验 | `@Valid` + Bean Validation | Pydantic models / FastAPI 自动校验 / Django Form | freezed + json_serializable / built_value / 手动 assert |
-| 错误统一处理 | `@ControllerAdvice` + `@ExceptionHandler` | FastAPI `@app.exception_handler` / Django middleware | Shelf middleware / Serverpod endpoint error handler |
+| 横切类别 | Java(Spring) | Python(FastAPI / Django) |
+|---------|-------------|--------------------------|
+| 日志 / 审计 | Spring AOP `@Aspect` / Servlet Filter / Interceptor | `@audit` decorator / FastAPI `Depends` / Django middleware |
+| 权限 / 鉴权 | Spring Security / `@PreAuthorize` + AOP | FastAPI `Depends(get_current_user)` / Django `@login_required` / DRF `permission_classes` |
+| 事务声明 | `@Transactional` | SQLAlchemy `with session.begin():` / Django `@transaction.atomic` / 上下文管理器 |
+| Metrics / 链路追踪 | Micrometer / OpenTelemetry / AOP | OpenTelemetry / Prometheus client + middleware / `@trace` decorator |
+| 缓存 | `@Cacheable` + AOP | `functools.lru_cache` / `@cache` decorator / Redis client + middleware |
+| 限流 / 熔断 | Resilience4j / Sentinel / 网关层 | `slowapi` / `aiolimiter` / API Gateway |
+| 入参校验 | `@Valid` + Bean Validation | Pydantic models / FastAPI 自动校验 / Django Form |
+| 错误统一处理 | `@ControllerAdvice` + `@ExceptionHandler` | FastAPI `@app.exception_handler` / Django middleware |
 
 **强制规则**:
 
@@ -418,7 +385,7 @@ class ApproveAndRefundOrchestrator {
 - **事务边界归 orchestrator / Application 层**,不归 Domain / focused service 内部;focused service 的方法应该可以脱离事务运行(便于单测)。
 - **横切关注点不算"新下游依赖"**——focused service 上加 `@Transactional` / `@Cacheable` / `@PreAuthorize` 不触发"引入新下游 → 拆分支"的判定,因为它们是机制不是业务依赖。
 
-**反模式与正确形态对照(Java / Python / Dart 三栈写法等价)**:
+**反模式与正确形态对照(Java / Python 两栈写法等价)**:
 
 ```java
 // Java ❌ — focused service 内手写横切
@@ -456,27 +423,6 @@ class RefundService:
     def refund(self, req): pass  # 只写退款业务
 ```
 
-```dart
-// Dart ❌ — focused service 内手写横切
-class RefundService {
-  Future<void> refund(req) async {
-    logger.info('refund start, req=$req');                    // ❌ 走 middleware
-    if (!hasPermission(req.userId, 'REFUND')) throw ...;      // ❌ 走 auth guard
-    await auditService.record('refund', req);                 // ❌ 走 middleware
-    // ... 业务逻辑
-  }
-}
-
-// Dart ✅ — 横切由 middleware / interceptor 统一注入
-// (在 endpoint 注册时挂上 auth/audit/logging middleware)
-class RefundService {
-  Future<void> refund(req) async {
-    await db.transaction(() async {
-      // 只写退款业务
-    });
-  }
-}
-```
 
 ## 禁止行为
 

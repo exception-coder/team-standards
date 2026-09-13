@@ -201,7 +201,7 @@
 - **根因**:"决策型变更必写 dev-log"被 AI 自己绕过——通常理由是"commit body 已经写清楚了"。
 - **反例**:连续 4 次方向反转(注释语言豁免取消 / Service 业务动作扩展 / 同分支变种豁免取消 / Python-Dart 三栈拉齐)都没有 dev-log。
 - **正确做法**:任何规则方向反转、跨 skill 链路变化、重大原则沉淀必写 dev-log,即使 commit body 已经详细;commit body 是"本次为什么改",dev-log 是"这条规则为什么存在"。
-- **关联 skill**:`dev-log`
+- **关联 skill**:旧 dev-log 入口
 - **历史 commit**:`abec8f8`(本次补回 2026-05-12.md)
 
 ### D2. 改 1 个 skill 要同步 3 处文件,遗漏导致漂移

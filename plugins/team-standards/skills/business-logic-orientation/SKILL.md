@@ -1,6 +1,6 @@
 ---
 name: business-logic-orientation
-description: "Use to understand existing business logic before refactoring, rewriting, migration, or regression review, or when the user explicitly requests a logic-orientation document. Prefers Graphify and accepted OpenSpec specs over rebuilding parallel code indexes."
+description: "Use to understand existing business logic before refactoring, rewriting, migration, or regression review, or when aligning ambiguous business terminology or explicitly documenting current logic. Prefers Graphify and accepted OpenSpec specs over rebuilding parallel code indexes."
 ---
 
 # 业务逻辑现状理解
@@ -13,7 +13,7 @@ description: "Use to understand existing business logic before refactoring, rewr
 
 独立现状理解或审查请求默认只分析，不自动改源码、刷新图谱文件或创建实施 change；当前证据不足时定向读取并说明缺口。若它是已授权重构或修复的前置阶段，证据充分后继续原任务，不重复请求实施授权。查询生产系统的负载、数据范围与权限单独评估，只读不代表低风险。
 
-异常调查优先 bug-doc-required；跨项目价值与工作量评估使用 planning-evidence-discovery；专业审查按对象选择规则。本 Skill 不把所有 Explore 请求收为同一执行流程。
+异常调查优先 bug-doc-required；跨项目价值与工作量评估优先读取项目声明的关系与证据来源；缺少平台时在已知范围分析并说明缺口；专业审查按对象选择规则。本 Skill 不把所有 Explore 请求收为同一执行流程。
 
 ## 上下文优先级
 
@@ -34,3 +34,7 @@ description: "Use to understand existing business logic before refactoring, rewr
 ## 状态契约闭环
 
 梳理状态消费者时，读取 [状态契约治理协议](../change-readiness/references/state-contract.md)。优先复用已登记的状态契约及只读 Graphify 关联视图，逐项核对写入、策略、查询、展示、迁移和测试；不新建第二份手工状态字典。
+
+## 术语模式
+
+业务术语歧义或命名映射需要核对时读取 [terminology.md](references/terminology.md)，复用权威知识源，不新建术语索引。

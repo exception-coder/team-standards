@@ -38,7 +38,6 @@ flowchart TD
 | B 授权与副作用 | CLAUDE 的意图规则 + 目标项目 AGENTS + 对话中已有授权 | 由 Agent 判断具体操作边界；本仓没有名为 resolveRoute 的分类器或权限状态机 |
 | C 风险 | [change-readiness/references/classification.md](../plugins/team-standards/skills/change-readiness/references/classification.md) | 实施时按影响分档；探查也独立评估生产访问、负载和数据风险 |
 | D 主 Skill | `plugins/team-standards/skills/<name>/SKILL.md`，见下方完整索引 | 宿主暴露名称/描述，Agent 读取匹配入口；不会自动全量读取 references |
-| E 当前阶段证据 | [business-logic-orientation](../plugins/team-standards/skills/business-logic-orientation/SKILL.md)、[backend-evidence](../plugins/team-standards/skills/backend-evidence/SKILL.md)、[planning-evidence-discovery](../plugins/team-standards/skills/planning-evidence-discovery/SKILL.md) | 规则指定查什么；实际代码、数据、图谱与 MCP 内容在目标项目或外部服务 |
 | F 是否实施 | CLAUDE 意图规则；[change-readiness 的阶段边界](../plugins/team-standards/skills/change-readiness/SKILL.md) | 结合当前目标与已有授权选择分支，不靠“迁移/重构”关键词自动改码 |
 | G 分析交付 | 对应调查/现状/规划 Skill 的输出约定 | 默认直接回复结论与证据；没有必须运行的“生成报告.js” |
 | H 变更就绪 | [change-readiness/SKILL.md](../plugins/team-standards/skills/change-readiness/SKILL.md)；其 `references/` 中的方案、分类、OpenSpec 与代码定位规则 | Agent 核对依据；OpenSpec 已接入时调用其官方能力，团队治理工具负责绑定与检查 |
@@ -98,22 +97,14 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [business-logic-orientation](../plugins/team-standards/skills/business-logic-orientation/SKILL.md) | [references/](../plugins/team-standards/skills/business-logic-orientation/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | [references/](../plugins/team-standards/skills/change-readiness/references/)；[rules/](../plugins/team-standards/skills/change-readiness/rules/) | 规则编排；OpenSpec 与治理程序见下一节 |
 | [coding-standards-common](../plugins/team-standards/skills/coding-standards-common/SKILL.md) | [references/](../plugins/team-standards/skills/coding-standards-common/references/) | Agent 读取的规则；没有独立同名执行器 |
-| [coding-violation-log](../plugins/team-standards/skills/coding-violation-log/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
-| [comment-cleanup](../plugins/team-standards/skills/comment-cleanup/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
-| [daily-work-log](../plugins/team-standards/skills/daily-work-log/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) | 直接阅读主入口；无上述下钻目录 | 读取规则后调用外部 Forge 或项目声明命令 |
-| [design-system-bootstrap](../plugins/team-standards/skills/design-system-bootstrap/SKILL.md) | [references/](../plugins/team-standards/skills/design-system-bootstrap/references/)；[assets/](../plugins/team-standards/skills/design-system-bootstrap/assets/) | Agent 读取的规则；没有独立同名执行器 |
-| [design-system-guardian](../plugins/team-standards/skills/design-system-guardian/SKILL.md) | [references/](../plugins/team-standards/skills/design-system-guardian/references/) | Agent 读取的规则；没有独立同名执行器 |
-| [dev-log](../plugins/team-standards/skills/dev-log/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
 | [frontend-excellence](../plugins/team-standards/skills/frontend-excellence/SKILL.md) | [references/](../plugins/team-standards/skills/frontend-excellence/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [git-commit-standards](../plugins/team-standards/skills/git-commit-standards/SKILL.md) | [references/](../plugins/team-standards/skills/git-commit-standards/references/)；[scripts/](../plugins/team-standards/skills/git-commit-standards/scripts/) | scripts/build-commit-message.js 生成消息；Git 负责提交 |
-| [glossary-required](../plugins/team-standards/skills/glossary-required/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
 | [init-project-docs](../plugins/team-standards/skills/init-project-docs/SKILL.md) | [references/](../plugins/team-standards/skills/init-project-docs/references/)；[assets/](../plugins/team-standards/skills/init-project-docs/assets/)；[init-ai-structure.mjs](../plugins/team-standards/skills/init-project-docs/init-ai-structure.mjs)；[onboard-pipeline.mjs](../plugins/team-standards/skills/init-project-docs/onboard-pipeline.mjs) | 同时含初始化和 onboarding 可执行入口 |
 | [java-coding-standards](../plugins/team-standards/skills/java-coding-standards/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
 | [go-coding-standards](../plugins/team-standards/skills/go-coding-standards/SKILL.md) | 直接阅读主入口；架构复用 DDD-lite 的 Go 章节 | Go 语言规则；没有独立 Go Hook |
 | [llm-agent-coding-standards](../plugins/team-standards/skills/llm-agent-coding-standards/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
 | [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | [references/](../plugins/team-standards/skills/markdown-writing-standards/references/) | Agent 读取的规则；没有独立同名执行器 |
-| [planning-evidence-discovery](../plugins/team-standards/skills/planning-evidence-discovery/SKILL.md) | [references/](../plugins/team-standards/skills/planning-evidence-discovery/references/) | 读取工具契约后调用外部规划证据平台 |
 
 ### 按模式找具体参考文件
 
@@ -124,8 +115,8 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | Bug 最小修复与记录模板 | [repair-rules.md](../plugins/team-standards/skills/bug-doc-required/references/repair-rules.md) / [template.md](../plugins/team-standards/skills/bug-doc-required/template.md) |
 | SQL 正确性 / 查询性能 / 领域规格候选 | [sql-correctness-gate.md](../plugins/team-standards/skills/backend-evidence/references/sql-correctness-gate.md) / [query-performance-gate.md](../plugins/team-standards/skills/backend-evidence/references/query-performance-gate.md) / [domain-spec-mining.md](../plugins/team-standards/skills/backend-evidence/references/domain-spec-mining.md) |
 | 分层边界 / 结构质量 | [layers-and-boundaries.md](../plugins/team-standards/skills/architecture-ddd-lite-fullstack/references/layers-and-boundaries.md) / [structure-quality-gates.md](../plugins/team-standards/skills/architecture-ddd-lite-fullstack/rules/structure-quality-gates.md) |
-| UI 绑定解析（guardian 复用 bootstrap 的 resolver）/ 视觉评审 | [resolver.md](../plugins/team-standards/skills/design-system-bootstrap/references/resolver.md) / [review-workflow.md](../plugins/team-standards/skills/design-system-guardian/references/review-workflow.md) |
-| 设计偏好 / 模式候选 | [evidence-capture.md](../plugins/team-standards/skills/design-system-bootstrap/references/evidence-capture.md) / [pattern-mining.md](../plugins/team-standards/skills/design-system-bootstrap/references/pattern-mining.md) |
+| UI 绑定解析（guardian 复用 bootstrap 的 resolver）/ 视觉评审 | [resolver.md](../plugins/team-standards/skills/design-system/references/resolver.md) / [review-workflow.md](../plugins/team-standards/skills/design-system/references/review-workflow.md) |
+| 设计偏好 / 模式候选 | [evidence-capture.md](../plugins/team-standards/skills/design-system/references/evidence-capture.md) / [pattern-mining.md](../plugins/team-standards/skills/design-system/references/pattern-mining.md) |
 | 初始化输出 / onboarding / 刷新 | [initialization-output.md](../plugins/team-standards/skills/init-project-docs/references/initialization-output.md) / [onboard-workflow.md](../plugins/team-standards/skills/init-project-docs/references/onboard-workflow.md) / [update-workflow.md](../plugins/team-standards/skills/init-project-docs/references/update-workflow.md) |
 | 文档归属索引 / Markdown 格式 | [document-index-workflow.md](../plugins/team-standards/skills/markdown-writing-standards/references/document-index-workflow.md) / [markdown-format.md](../plugins/team-standards/skills/markdown-writing-standards/references/markdown-format.md) |
 
@@ -193,7 +184,6 @@ hooks/check-openspec-governance.js                    宿主事件入口
 | Graphify | 外部安装的 CLI/Skill；目标项目 `graphify-out/` | 查询当前代码图谱；本仓图谱只描述本仓，不等于业务项目图谱 |
 | OpenSpec | 外部 CLI/项目生成能力；目标项目 `openspec/` | 官方生命周期操作读写项目规格；团队 reference 规定何时调用 |
 | Forge 验证 | 外部 MCP/项目声明 CLI；目标项目 `.forge/verify.yml` 与环境 | 本仓 delivery Skill 定义调用规则，Forge 服务实现不在本仓 |
-| 跨项目规划平台 | 外部项目范围解析、查询与账本工具；协议在 [tool-contracts.md](../plugins/team-standards/skills/planning-evidence-discovery/references/tool-contracts.md) | planning Skill 调用已接入服务，不在本仓自行猜项目关系 |
 
 ## 想改某个行为时从哪里下手
 
@@ -225,8 +215,6 @@ hooks/check-openspec-governance.js                    宿主事件入口
 | `markdown-writing-standards` | 文档同步 / 写前 / 写中 / 写后 | 套件或项目更新核对文档影响，唯一归属、结构与 Mermaid、必要已有链接 |
 | `git-commit-standards` | 完成收尾 / 提交 | 文档和验证完成后自动提交本次范围；独立判断推送授权 |
 | `init-project-docs` | structure / onboard / init / refresh / status / profile | 当前目录 Agent/Docs/OpenSpec 入口、Graphify 输入与 Git 共享边界、九阶段接入、增量刷新、状态或可选画像 |
-| `design-system-bootstrap` | registry / preference | 建立设计资料或记录、归纳偏好证据 |
-| `design-system-guardian` | implementation / review | UI 实施和代表性渲染验收 |
 | `delivery-verification` | completion | 可执行改动完成后、最终回复前调用 Forge 并检查最新 PASS 证据 |
 
 ---
@@ -255,7 +243,7 @@ Graphify、OpenSpec 和 Skill 分属不同层级，不建立三个并行主流�
 2. `business-logic-orientation` 优先查询 Graphify 获取代码事实，只补充 Graphify 无法证明的业务语义与运行证据；除非用户明确要求或需要长期重构基线，否则不生成新的梳理文档和 AI 索引。
 3. `backend-evidence` 使用 OpenSpec `specs/` 作为已接受行为契约，使用 Graphify 查询当前实现和影响，以 DDL、SQL、数据库和日志验证数据事实；不维护同义行为规格或手工代码索引。
 4. `init-project-docs` 先以 structure 模式建立六层最小入口、`.graphifyignore` 和 Graphify Git 共享白名单，再由 init 编排真实 Graphify、OpenSpec 与领域证据；不复制图谱、规格或 00–10 文档树。
-5. `planning-evidence-discovery` 继续负责跨项目证据编排；Graphify 和 OpenSpec只是证据适配器，不替代项目关系权威源。
+5. 项目声明的规划流程负责跨项目证据编排；Graphify 和 OpenSpec只是证据适配器，不替代项目关系权威源。
 
 “已启用”不等于目录存在：`openspec/config.yaml` 必须包含真实项目上下文。启用后，没有相关 change 就自动创建，artifacts 不完整就按 schema 补齐，生成 Skill 缺失但 CLI 正常时走 agent-compatible CLI；这些都不再触发静默 legacy。只有项目未启用 OpenSpec，或用户明确批准当前变更降级时，才使用兼容设计文档。
 
@@ -296,9 +284,6 @@ flowchart LR
 | Markdown 新建或重组 | `markdown-writing-standards` 检查受影响导航 |
 | 状态、字段、事件、API 变化 | `backend-evidence` Graphify 即时影响查询；协同项写入 OpenSpec |
 | 项目结构、API、数据访问变化 | `init-project-docs` refresh：更新 Graphify 本体，不生成 Markdown 镜像 |
-| 用户或项目明确要求工作日志 | `daily-work-log` |
-| 用户纠正规范错误 | `coding-violation-log` |
-| team-standards 决策变化 | `dev-log` |
 | 可执行改动准备交付 | `delivery-verification`；优先 `forge_verify phase=all` |
 | 作业完成且有可提交改动 / 准备 commit | `git-commit-standards` 自动本地提交本次范围 |
 
@@ -323,7 +308,6 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 | 为什么报错（没有既有修复授权） | bug-doc-required / 调查 | 证据与原因，不自动改码 |
 | 查明原因并修复 | bug-doc-required / 调查 → 就绪 → 修复 → 验证 | 已授权范围连续推进，必要规格照常维护 |
 | 上轮已要求修复，本轮补充报错日志 | 继续原修复任务 | 不把最新短句视作撤销已有授权 |
-| 评估迁移是否值得 | 规划探查；跨项目用 planning-evidence-discovery | 默认回答，不因“迁移”创建实施 change |
 | 分析怎么重构 / 按方案重构 | 前者方案探查，后者 change-readiness / 纯重构 | 实施才进入设计生命周期，回归支持行为保持 |
 | 为什么 SQL 慢 / 优化 SQL | 前者后端探查，后者演进；已知性能退化归修复 | 查询负载与数据访问风险独立评估 |
 | 检查接入状态 / 初始化项目 | init-project-docs / status 或 init | status 不写入修复，init 仅改约定基线 |
@@ -339,7 +323,6 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 | 本次应该改什么、为何这样改 | change-readiness → OpenSpec 实际工件；未启用时复用一份仓内设计 | 独立 coding 摘要、API 摘要和并行设计正文 |
 | 实际是否通过验证 | delivery-verification → 真实命令/CI/Forge/运行结果；治理文件引用其位置和输入指纹 | 为机器引用而转抄的 validation.md |
 | 文档如何被找到 | markdown-writing-standards → 唯一归属和受影响的已有导航 | 个人目录 Phase-A/B、逐层 INDEX、编号文档树 |
-| 作业做了什么 | git-commit-standards → 已验证的范围与 Git 提交 | 自动 Markdown 日报；daily-work-log 改为按需 |
 
 不是所有知识都能由这三类工具恢复：业务术语、不变量、架构取舍、事故复盘和运行手册保留独有内容；已有历史文档不批量删除。长期文档仍在实现变化时同步。
 
@@ -362,3 +345,14 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 ## Go 编码链路
 
 Go 源码 → `coding-standards-common` + `go-coding-standards`；业务边界变更叠加 `architecture-ddd-lite-fullstack/references/framework-rules.md` 的 Go 章节。需求/修复仍复用原入口，SQL 复用 backend-evidence，交付使用项目 Go 工具链与 delivery-verification，最后同步文档和提交。包结构、接口归属和事务归 DDD-lite；错误、context、goroutine、资源释放与 Go 验证归 Go Skill。
+
+## 4.0.0 模式与源码
+
+| 通用入口 | 按需源码 | 职责 |
+|---|---|---|
+| [design-system](../plugins/team-standards/skills/design-system/SKILL.md) | references/bootstrap.md、review-mode.md、review-workflow.md、evidence-capture.md、pattern-mining.md；assets/ 与 schema 保留 | 设计复用、初始化、评审和偏好；不强制创建 Registry |
+| coding-standards-common | references/comment-maintenance.md、feedback.md | 显式清理和纠正，不创建计数式违规日志 |
+| business-logic-orientation | references/terminology.md | 术语核对与已有知识源维护 |
+| git-commit-standards | references/work-summary.md | 按需查询汇总，不自动写日报 |
+
+Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成区](platform-integrations/planning-evidence-discovery/SKILL.md) 保留；只有实际平台接入才使用，不阻断一般跨项目分析。本仓决策流程见 [维护规则](maintenance/decision-log.md)。旧入口与迁移表以 README 的 4.0.0 章节为准。

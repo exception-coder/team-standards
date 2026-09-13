@@ -3,7 +3,7 @@
 | 目录/文件 | 说明 |
 |-----------|------|
 | [../plugins/team-standards/skills/bug-doc-required/SKILL.md](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | Bug 证据闭环与按风险记录，简单问题免独立报告 |
-| [suite-panorama.md](suite-panorama.md) | 整套工具八个工程职责域、24 个 Skill、事实源、Hook 与任务全景 |
+| [suite-panorama.md](suite-panorama.md) | 整套工具八个工程职责域、18 个 Skill、事实源、Hook 与任务全景 |
 | [skill-flow.md](skill-flow.md) | Skill 链路与源码导航（A—K 节点、规则文件、执行调用链和目标目录） |
 | [coding-violations.md](coding-violations.md) | 插件自身编码与规则维护违规记录 |
 | [anti-pattern-case-library.md](anti-pattern-case-library.md) | AI 与团队真实编码、架构和流程反模式案例库 |
@@ -18,3 +18,6 @@
 | [superpowers/](superpowers/) | superpowers skill 规格与计划文档 |
 
 - [状态契约治理协议](../plugins/team-standards/skills/change-readiness/references/state-contract.md)：结构化状态、影响扫描、Graphify 候选视图和执行证据。
+
+- [本仓决策记录](maintenance/decision-log.md)：仅用于套件维护，不分发。
+- [Forge 平台集成协议](platform-integrations/planning-evidence-discovery/SKILL.md)：原平台专属规划流程，不属于通用 Skill。

@@ -1,6 +1,6 @@
 ---
 name: design-review-workflow-reference
-description: "Internal visual-review rules loaded by design-system-guardian; not a standalone Skill."
+description: "Internal visual-review rules loaded by design-system; not a standalone Skill."
 ---
 
 # Design Reviewer
@@ -9,9 +9,9 @@ Identify drift against resolved design knowledge. Do not invent a replacement vi
 
 ## Required workflow
 
-1. Resolve profile and references through [resolver.md](../design-system-bootstrap/references/resolver.md).
+1. Resolve profile and references through [resolver.md](resolver.md).
 2. Require representative rendered evidence for material visual review. Without it, label findings preliminary.
-3. Read [rubric.md](../design-system-bootstrap/assets/registry-template/evals/rubric.md).
+3. Read [rubric.md](../assets/registry-template/evals/rubric.md).
 4. Review hierarchy, alignment, spacing, typography, density, consistency, readability, restraint, interaction, recovery, responsive behavior, and AI-pattern risk.
 5. Check arbitrary colors, radii, spacing, or shadows; duplicate components; token violations; overflow; focus and reduced-motion behavior.
 6. Classify severity and cite the profile rule, reference, token, or implementation evidence for each finding.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design System"
+  short_description: "Reuse and review design systems; initialize profiles when needed"
+  default_prompt: "Use $design-system to review this UI against existing project design assets."

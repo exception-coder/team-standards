@@ -43,7 +43,6 @@ flowchart TD
 
 | 意图 | 目标与主入口 |
 |---|---|
-| 探查 Explore | 现状理解用 business-logic-orientation；异常原因用 bug-doc-required 调查模式；跨项目价值与工作量评估用 planning-evidence-discovery；专业审查按对象选择 Skill |
 | 修复 Repair | 恢复预期行为，进入 bug-doc-required；区分只调查与已授权修复 |
 | 演进 Evolve | 功能、纯重构、性能提升及规则维护；实施前进入 change-readiness，纯文档编辑直接使用文档规范 |
 | 接入 Bootstrap | init-project-docs 的状态检查、初始化、配置或刷新；status 不自动升级为 init |
@@ -60,28 +59,26 @@ flowchart TD
 
 | 用户意图或动作 | 调用 Skill / 模式 |
 |---|---|
+| 跨项目规划或估算 | 使用项目声明的证据源；Forge 专属协议不在通用插件内 |
+| 初始化、评审设计或记录明确视觉偏好 | `design-system` 的对应模式；已有设计资产优先 |
+| 业务术语歧义 | `business-logic-orientation` 的术语模式 |
+| 用户要求批量清理注释或纠正规范 | `coding-standards-common` 的对应模式 |
+| 用户要求工作汇总 | `git-commit-standards` 的工作汇总模式 |
 | 已授权实施的方案、需求、重构或源码修改 | `change-readiness` |
 | 只咨询方案可行性、审查或影响 | 按问题对象探查；不自动进入实施 |
 | 报告 Bug、异常、超时、错误行为；或明确要求修复 | `bug-doc-required` |
 | 重构、复写、迁移前理解现有业务 | `business-logic-orientation` |
-| 初步 PRD、价值分析、工时评估且证据跨项目 | `planning-evidence-discovery` |
 | 开始写业务代码 | `architecture-ddd-lite-fullstack` |
 | 任何源码 Edit/Write | `coding-standards-common` |
 | Java 源码 | `java-coding-standards` |
 | Go 源码 | `go-coding-standards`；业务代码叠加 DDD-lite 的 Go 章节 |
 | LLM SDK、Agent、Prompt、工具调用或结构化模型输出 | `llm-agent-coding-standards` |
-| 创建、重做或显著提升生产 Web 前端 | `frontend-excellence` |
-| 初始化 Design Registry、绑定 Profile、记录或归纳审美反馈 | `design-system-bootstrap` |
-| 有意义的 UI 实现、视觉漂移或发布验收 | `design-system-guardian` |
+| 创建、重做或显著提升生产 Web 前端 | `design-system` | 设计复用、按需初始化、视觉评审和偏好证据 | 无 Registry 不阻断普通 UI 工作 |
+| `frontend-excellence` |
 | 后端表、SQL、状态、字段、事件、API、领域闭环或查询性能 | `backend-evidence` |
 | 套件或项目更新的文档同步；新建或结构性修改 Markdown、Mermaid、复杂表格 | `markdown-writing-standards` |
-| 术语缺失、歧义或命名不一致 | `glossary-required` |
 | 初始化 AI 工程结构/AI 目录；初始化新项目、一键 onboard、接入新系统；或刷新上下文状态 | `init-project-docs` |
-| 用户纠正 AI 编码规范错误；或项目前置违规表存在 | `coding-violation-log` |
-| 用户明确要求批量清理存量注释 | `comment-cleanup` |
 | 可执行改动完成、准备最终回复 | `delivery-verification` |
-| 用户或项目明确要求工作日志 | `daily-work-log` |
-| team-standards 发生决策型变更 | `dev-log` |
 | 本次作业完成且有可提交改动；任何 git commit 或生成提交信息 | `git-commit-standards` |
 
 ## 改动规模与流程档位
@@ -96,14 +93,15 @@ flowchart TD
 
 ## Skill 分类
 
-| 类别 | Skill |
-|---|---|
-| 分析与设计 | `change-readiness`、`bug-doc-required`、`business-logic-orientation`、`planning-evidence-discovery` |
-| 架构与编码 | `architecture-ddd-lite-fullstack`、`coding-standards-common`、`java-coding-standards`、`go-coding-standards`、`llm-agent-coding-standards` |
-| 前端与设计治理 | `frontend-excellence`、`design-system-bootstrap`、`design-system-guardian` |
-| 知识与文档 | `backend-evidence`、`glossary-required`、`markdown-writing-standards`、`init-project-docs` |
-| 质量与反馈 | `coding-violation-log`、`comment-cleanup`、`delivery-verification` |
-| 日志与交付 | `daily-work-log`、`dev-log`、`git-commit-standards` |
+- 分析：change-readiness、bug-doc-required、business-logic-orientation（含术语）。
+- 编码：architecture-ddd-lite-fullstack、coding-standards-common（含清理/反馈）、java-coding-standards、go-coding-standards、llm-agent-coding-standards。
+- 设计：frontend-excellence、design-system（含初始化/评审/偏好）。
+- 证据与接入：backend-evidence、init-project-docs、markdown-writing-standards。
+- 交付：delivery-verification、git-commit-standards（含按需工作汇总）。
+
+## 本仓维护
+
+新增/移除 Skill 或改变核心规则时按 [决策记录](docs/maintenance/decision-log.md) 留下原因；此规则仅适用于套件维护。Forge 专属协议保留在 [平台集成区](docs/platform-integrations/planning-evidence-discovery/SKILL.md)，不作为通用插件能力加载。
 
 ## Skill 索引
 
@@ -114,23 +112,15 @@ flowchart TD
 | `bug-doc-required` | Bug 证据、根因、修复合同、最小修复与回归 | 调查模式不改源码；简单问题不强制独立文档 |
 | `business-logic-orientation` | Graphify 优先的现状理解与业务语义核实 | 仅明确要求或需要长期基线时生成梳理文档 |
 | `coding-standards-common` | 跨语言命名、结构、异常、重复、测试和注释规则 | 所有源码改动必经 |
-| `coding-violation-log` | 记录用户纠正并在后续编码前回顾 | 只记录明确违规证据 |
-| `comment-cleanup` | 用户授权下批量清理存量违规注释 | 不顺手扩大到逻辑修改 |
-| `daily-work-log` | 按明确需求汇总或记录工作日志 | 默认用 Git 历史，不自动写日报；不机械累加工时 |
 | `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
-| `design-system-bootstrap` | Registry/Profile 初始化、绑定、Preference Evidence 与 Pattern Mining | 只从证据晋升规则 |
-| `design-system-guardian` | UI 实现治理、复用策略与视觉评审 | 小文案/间距不跑完整循环 |
 | `delivery-verification` | 完成前真实验证、有限修复循环与 PASS-only Done | 优先 `forge_verify phase=all`，修改后证据失效 |
-| `dev-log` | team-standards 决策日志 | 普通措辞和版本更新不记录 |
 | `frontend-excellence` | 生产 Web 前端架构、视觉、响应式、可访问性和浏览器验收 | 不用于纯后端或无布局小改 |
 | `git-commit-standards` | 提交标题、中文三段正文和 Author | 每次 commit 前调用 |
-| `glossary-required` | 将业务术语路由到 domain knowledge，并用 Graphify 验证代码映射 | 不维护独立 glossary 候选池 |
 | `init-project-docs` | 当前目录 AI 结构初始化、通用项目接入、上下文刷新与状态检查 | structure 创建最小入口和 Graphify 输入/共享边界；init 再编排真实工具，不复制 Graphify/OpenSpec |
 | `java-coding-standards` | Java 与关系库独占规范 | 叠加 common |
 | `go-coding-standards` | Go 包、接口、错误、并发与验证规范 | 叠加 common；架构复用 DDD-lite |
 | `llm-agent-coding-standards` | LLM/Agent 信任边界、确定性契约和循环兜底 | 仅 LLM 集成代码触发 |
 | `markdown-writing-standards` | 唯一归属、Markdown/Mermaid 结构与必要导航 | 不强制新建索引或日报 |
-| `planning-evidence-discovery` | 跨项目规划证据、轨迹和完成性门禁 | 不拥有项目契约 |
 
 ## 辅助资源索引
 
@@ -155,10 +145,6 @@ flowchart TD
 | `skills/init-project-docs/onboard-pipeline.mjs` | `init-project-docs` | 九阶段可续跑状态与关卡脚本 |
 | `skills/init-project-docs/init-ai-structure.mjs` | `init-project-docs` | 当前目录六层 AI 工程结构的 plan/apply/status 初始化器 |
 | `skills/init-project-docs/assets/project-ai-structure/` | `init-project-docs` | 写入目标项目的最小 Agent、Docs 与 OpenSpec 模板 |
-| `skills/design-system-bootstrap/assets/` | `design-system-bootstrap` | Registry 和 Profile 模板 |
-| `skills/design-system-bootstrap/references/evidence-capture.md` | `design-system-bootstrap` | 偏好证据记录 |
-| `skills/design-system-bootstrap/references/pattern-mining.md` | `design-system-bootstrap` | 候选模式归纳 |
-| `skills/design-system-guardian/references/review-workflow.md` | `design-system-guardian` | 视觉验收流程 |
 
 ## 插件维护规则
 

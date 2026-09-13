@@ -21,6 +21,6 @@ description: "Internal minimal-fix and regression guidance loaded by bug-doc-req
 
 ## 代码与记录
 
-编码及注释规则复用 [coding-standards-common](../../coding-standards-common/SKILL.md)，不另设 Bug 专属风格。修改同一段代码时可移除无用的旧标记或注释式旧实现，但不扩展成全仓清理；用户明确批量清理时才进入 comment-cleanup。
+编码及注释规则复用 [coding-standards-common](../../coding-standards-common/SKILL.md)，不另设 Bug 专属风格。修改同一段代码时可移除无用的旧标记或注释式旧实现，但不扩展成全仓清理；用户明确批量清理时才进入 coding-standards-common 的注释清理模式。
 
 现象、根因、修复依据与回归结果写入本次问题的唯一载体或 commit 正文；是否需要独立报告由 [Bug 主流程](../SKILL.md) 判断。源码只保留当前职责和必要约束，不留修复历史流水。

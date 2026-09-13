@@ -1,6 +1,6 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **3.5.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.0.0**. The plugin exposes 15 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Operational workspaces use the width and height allocated by their shell with explicit scroll ownership. Reading content may retain a readable maximum width. The [workspace viewport contract](plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract) requires real-browser checks of tall, short and narrow viewports, live resizing, and sparse/overflowing content; it does not imply an automatic layout checker exists.
 
@@ -27,10 +27,10 @@ The main consolidated entry points are:
 - `backend-evidence`: database/runtime truth, fresh Graphify impact queries, domain specifications, and query-performance gates; it does not maintain a parallel code index.
 - `markdown-writing-standards`: document ownership, Markdown/Mermaid structure, and affected existing navigation.
 - `init-project-docs`: idempotently initializes Agent entrypoints, document indexes, OpenSpec, `.graphifyignore`, and the Graphify Git sharing boundary, then routes project rules and evidence without duplicate fact projections.
-- `design-system-bootstrap`: registry/profile initialization and evidence-based preference learning.
-- `design-system-guardian`: UI implementation governance and visual review.
+- `design-system`: registry/profile initialization and evidence-based preference learning.
+- `design-system`: UI implementation governance and visual review.
 
-See [README.md](README.md) for the complete 22-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+See [README.md](README.md) for the complete 15-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
 
 ## Bug records
 
@@ -83,3 +83,7 @@ Policy/checker version 2 requires existing sessions to rebind without resetting 
 ## Go support
 
 Version 3.5.0 adds [Go coding standards](plugins/team-standards/skills/go-coding-standards/SKILL.md) for package/interface design, errors, context, concurrency ownership, resource safety, and verification. The existing DDD-lite architecture skill now covers Go: consumer-owned ports, use-case transactions, framework-free domain behavior, and explicit adapters. Small projects need no empty layers or mandatory DI framework. Go import boundaries are not covered by the existing hooks.
+
+## 4.0.0 migration
+
+The distributed plugin now has 15 skills. Comment cleanup and coding feedback become common-coding modes; terminology becomes a business-orientation mode; work summaries become a commit mode. Design bootstrap and review share one design-system entry. Suite decision logging is repository-local; the Forge planning contract lives under docs/platform-integrations and is not distributed. Update old invocations using the Chinese README migration table. Existing logs and registries are preserved.

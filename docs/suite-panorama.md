@@ -2,7 +2,7 @@
 
 这套工具帮助 AI 把自然语言目标转成有依据、边界明确、可验证、可交接的工程成果。它同时管理“怎样工作”和“依据什么工作”：前者是工程规范，后者是项目事实、业务知识与行为规格。
 
-本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。基于 3.3.0 工作区核对：三个公共插件合计 24 个 Skill，其中 team-standards 21 个。
+本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。基于 3.3.0 工作区核对：三个公共插件合计 18 个 Skill，其中 team-standards 21 个。
 
 需要从节点找到实际文件、理解 Skill 与程序的关系时，先看 [链路源码导航](skill-flow.md#总图节点对应哪些源码)。
 
@@ -66,7 +66,6 @@ flowchart TD
 | [business-logic-orientation](../plugins/team-standards/skills/business-logic-orientation/SKILL.md) | 现有业务、源码与行为问题 | 理解入口、分支、依赖和不变量，区分事实与推断 | 现状结论；已授权重构时给 change-readiness 提供依据 |
 | [bug-doc-required](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | 现象、预期、日志或失败测试 | 调查根因；有授权才做最小修复；按风险选择记录载体 | 诊断结论，或修复依据与回归结果；简单 Bug 不强制独立报告 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | 已授权变更目标、影响与项目规则 | 审视方案、分档、定位；按项目 OpenSpec 或合法兼容路径准备实施 | 设计依据、活动切片和代码坐标；进入架构与实现 |
-| [planning-evidence-discovery](../plugins/team-standards/skills/planning-evidence-discovery/SKILL.md) | 跨项目价值、可行性或工作量问题 | 解析项目范围、关系与证据，遵守平台账本和完成性协议 | 有证据的评估/所请求规格与缺口；不自动实施迁移 |
 
 入口细则见 [CLAUDE 的意图规则](../CLAUDE.md#意图授权与风险)，成对请求见 [路由场景](skill-flow.md#易混淆请求的预期路由)。
 
@@ -82,7 +81,6 @@ flowchart TD
 | Cross-project topology | 相关系统与调用/数据流问题 | 查询跨项目连接、接口提供消费关系和失败边界 | 跨系统影响范围；不能替代单项目代码图谱 |
 | DDL / 数据库 / 日志 / 测试 | 授权环境与有边界的查询 | 核实真实结构、记录、执行计划和运行行为 | 现场证据；只读查询仍需考虑负载、租户和敏感数据 |
 | [backend-evidence](../plugins/team-standards/skills/backend-evidence/SKILL.md) | 表、SQL、状态、字段、事件、API 或性能问题 | 协调上述来源，核对数据关系、不变量、反向影响和性能依据 | 后端事实结论与待验证影响，送往方案、实现或回归 |
-| [glossary-required](../plugins/team-standards/skills/glossary-required/SKILL.md) | 术语歧义、缺失或命名冲突 | 统一业务定义，并用代码事实验证映射 | 稳定语义回到领域知识，避免额外维护同义字典 |
 | 规格挖掘与评审 | 代码、DDL、日志与历史证据 | 形成对象/状态/不变量/冲突候选，保留反例与评审状态 | 候选经 owner 评审后才可晋升，不把高频实现当业务真理 |
 
 知识查询通常先目录/摘要，再全文：`list_projects` → `list_modules/list_topics/search_knowledge` → `get_knowledge/get_related`。模块咨询和规格候选分别使用引擎提供的上下文、Core Spec 与候选查询接口，按当前契约调用，不要求每次全部执行。
@@ -105,8 +103,7 @@ flowchart TD
 
 | 节点 | 输入 | 做什么 | 输出与下一站 |
 |---|---|---|---|
-| [design-system-bootstrap](../plugins/team-standards/skills/design-system-bootstrap/SKILL.md) | 初始化设计基线、绑定 Profile 或审美反馈 | 建立/扩展 Registry，记录偏好证据，归纳候选模式 | 有来源的 Profile 与设计资产，供 UI 工作使用 |
-| [design-system-guardian](../plugins/team-standards/skills/design-system-guardian/SKILL.md) | 有意义的 UI 修改或视觉审查 | 读取项目绑定、Profile 和既有实现，控制复用与探索，核对漂移 | UI 约束与视觉验收结论 |
+| [design-system](../plugins/team-standards/skills/design-system/references/review-mode.md) | 有意义的 UI 修改或视觉审查 | 读取项目绑定、Profile 和既有实现，控制复用与探索，核对漂移 | UI 约束与视觉验收结论 |
 | [frontend-excellence](../plugins/team-standards/skills/frontend-excellence/SKILL.md) | 新建、重做或显著改善 Web 前端 | 设计并实现布局、组件、响应式、可访问性与完整交互状态 | 可运行页面及真实浏览器验证结果 |
 
 有可复用 Profile 时直接消费，不每次重建。典型链路是“绑定/读取设计依据 → 页面实现 → 代表性浏览器验收”，纯文字修改不跑完整设计循环。
@@ -136,10 +133,6 @@ flowchart TD
 
 | 节点 | 输入 | 做什么 | 输出与回流位置 |
 |---|---|---|---|
-| [daily-work-log](../plugins/team-standards/skills/daily-work-log/SKILL.md) | 用户或项目明确要求日志 | 默认读取 Git 历史，确需日报时按天、按主题合并 | 按需个人工作记录，默认不进入项目仓库 |
-| [dev-log](../plugins/team-standards/skills/dev-log/SKILL.md) | 团队规范的决策型变更 | 保存规则方向和跨流程取舍 | 团队标准决策背景；普通措辞修改由 commit 记录 |
-| [coding-violation-log](../plugins/team-standards/skills/coding-violation-log/SKILL.md) | 用户明确纠正编码、分层、命名等错误 | 记录实际违规并在后续编码前回顾 | 项目反馈约束，避免同类错误重犯 |
-| [comment-cleanup](../plugins/team-standards/skills/comment-cleanup/SKILL.md) | 用户明确要求批量清理存量注释 | 在授权范围清理无效注释，不改业务逻辑 | 注释质量改善与相应验证；不被普通改码顺带触发 |
 | [yoooni-hook-report](https://github.com/exception-coder/yoooni-daily-plugin/blob/master/plugins/yoooni-daily-plugin/skills/yoooni-hook-report/SKILL.md) | 用户要求团队 Hook 周报或反馈分析 | 汇总命中、warn、纠正及脱敏信号 | 反馈报告；不自动修改规则或业务项目 |
 | [yoooni-smb-share-access](https://github.com/exception-coder/yoooni-daily-plugin/blob/master/plugins/yoooni-daily-plugin/skills/yoooni-smb-share-access/SKILL.md) | IT01 SMB 访问异常或明确修复请求 | 诊断网络、凭据与安全策略，在授权下修复访问 | 访问诊断或恢复结果；不承担项目环境初始化 |
 

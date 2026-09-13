@@ -1,6 +1,6 @@
 ---
 name: coding-standards-common
-description: Use when writing, reviewing, or modifying source code in any language. Provides cross-language rules for structure, naming, scope, errors, duplication, testing, and comments.
+description: "Use when writing, reviewing, or modifying source code, explicitly cleaning comments, or handling coding-standard corrections. Provides cross-language structure, naming, errors, testing, comments, and optional maintenance modes."
 ---
 
 # 跨语言通用编码规范
@@ -38,3 +38,8 @@ description: Use when writing, reviewing, or modifying source code in any langua
 - 是否引入反向依赖、魔法值、静默异常或重复规则？
 - 注释是否短、准确且没有历史叙事？
 - 是否复用了已有能力并验证了关键路径？
+
+## 按需维护模式
+
+- 用户明确批量清理注释时，读取 [comment-maintenance.md](references/comment-maintenance.md)；普通改码只整理本次范围。
+- 用户纠正编码规范时，读取 [feedback.md](references/feedback.md)；不强制创建违规日志或累计次数。

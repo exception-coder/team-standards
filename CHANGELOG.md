@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.0.0] - 2026-09-13
+
+- Breaking: distribute 15 skills; retire eight old names and add the unified design-system entry.
+- Move Forge planning contracts outside the plugin; keep suite decision logging repository-local.
+- Fold comment cleanup, feedback, terminology and work summaries into existing skills as optional modes.
+- Prefer existing project design assets; remove automatic Registry bootstrap, violation counters and cleanup-triggered work logs.
+- Preserve existing knowledge, logs and design data. See README for invocation migration.
+
 ## [3.4.1] - 2026-09-13
 
 - 补充操作型工作台可用宽高、容器高度链及滚动归属规范，阅读页保留自然布局。

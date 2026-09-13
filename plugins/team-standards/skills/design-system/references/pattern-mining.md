@@ -1,6 +1,6 @@
 ---
 name: design-pattern-mining-reference
-description: "Internal pattern-mining rules loaded by design-system-bootstrap; not a standalone Skill."
+description: "Internal pattern-mining rules loaded by design-system; not a standalone Skill."
 ---
 
 # Design Pattern Miner
@@ -9,7 +9,7 @@ Mine governed candidates from repeated evidence. Do not auto-promote major rules
 
 ## Required workflow
 
-1. Resolve the registry and target profile through [resolver.md](../design-system-bootstrap/references/resolver.md).
+1. Resolve the registry and target profile through [resolver.md](resolver.md).
 2. Read relevant preferences, candidates, decisions, and approved/rejected reference metadata.
 3. Group evidence by observable signal, context, direction, and scope; keep contradictions visible.
 4. Produce only: `New Candidate`, `Candidate Strengthened`, `Candidate Weakened`, `Contradiction`, `Potential Deprecation`, or `Potential Promotion`.

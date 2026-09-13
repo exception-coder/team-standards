@@ -1,6 +1,6 @@
 ---
 name: git-commit-standards
-description: Use when a task has completed changes ready for automatic local commit, or before any git commit or commit-message generation. Requires synchronized documentation, current validation, scoped staging, a three-part Chinese body, and a real Author; push authorization is separate.
+description: "Use before committing completed work or when querying, summarizing, or explicitly recording work history. Requires scoped commits, synchronized documentation, current validation, a three-part Chinese body, and a real Author; push authorization is separate."
 ---
 
 # Git 提交规范
@@ -37,3 +37,7 @@ git commit -F "<脚本输出的绝对路径>"
 - 修改或发布插件/MCP 运行载荷前，必须读取 [提交与版本细则](references/commit-details.md) 的版本要求；team-standards 三处 manifest 同步升版，CLAUDE.md 修改后生成 AGENTS.md。业务项目不套用插件升版规则。
 - 需要格式示例或排查提交步骤时读取同一参考。Hook 的小改豁免只影响额外重审，不能豁免本 Skill 的提交格式和安全边界；宿主未执行 Hook 不代表已校验。
 - 收尾只报告结果、验证、提交号及实际剩余问题，不重复提交正文和内部清单。
+
+## 工作汇总模式
+
+用户要求工作查询、汇总或持久日志时，读取 [work-summary.md](references/work-summary.md)；普通交付不自动创建日报。

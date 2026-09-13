@@ -6,7 +6,7 @@
 
 - **先看整套做什么** → [按领域的全景链路与节点字典](docs/suite-panorama.md)
 - **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)
-- **查看能力清单** → [22 个 Skill](#22-个-skill)、[合并后的入口](#合并后的入口)
+- **查看能力清单** → [15 个 Skill](#15-个-skill)、[合并后的入口](#合并后的入口)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
 - **安装和维护** → [安装](#安装)、[维护与验证](#维护与验证)、[作业完成条件](#作业完成条件)、[Bug 处理与记录](#bug-处理与记录)
@@ -37,31 +37,24 @@ flowchart TD
 
 ---
 
-## 22 个 Skill
+## 15 个 Skill
 
 | 类别 | Skill | 核心价值 |
 |---|---|---|
 | 分析设计 | `change-readiness` | 自动匹配或创建 OpenSpec change，持续更新 artifacts，并统一方案审视、风险分档和实施前代码定位 |
 | 分析设计 | `bug-doc-required` | 证据驱动的 Bug 调查、最小修复与回归；简单问题不另建报告 |
 | 分析设计 | `business-logic-orientation` | Graphify 优先理解当前业务逻辑，按需沉淀长期基线 |
-| 分析设计 | `planning-evidence-discovery` | 跨项目 PRD 和估算的证据轨迹 |
 | 架构编码 | `architecture-ddd-lite-fullstack` | 跨语言 DDD-lite 分层和依赖方向 |
 | 架构编码 | `coding-standards-common` | 通用命名、结构、异常、测试与注释规则 |
 | 架构编码 | `java-coding-standards` | Java 与关系数据库专属规范 |
 | 架构编码 | `go-coding-standards` | Go 整洁编码、错误、并发与验证；架构复用 DDD-lite |
 | 架构编码 | `llm-agent-coding-standards` | LLM/Agent 信任边界和循环安全 |
+| 前端设计 | `design-system` | 复用项目设计；按需初始化、评审与偏好学习 |
 | 前端设计 | `frontend-excellence` | 生产 Web 前端质量和浏览器验收 |
-| 前端设计 | `design-system-bootstrap` | Design Registry/Profile 和偏好学习 |
-| 前端设计 | `design-system-guardian` | UI 实施治理和视觉验收 |
 | 知识文档 | `backend-evidence` | 单服务数据事实、Graphify 即时影响、领域规格与查询性能 |
-| 知识文档 | `glossary-required` | 将业务术语路由到 domain knowledge，并用 Graphify 验证代码映射 |
 | 知识文档 | `markdown-writing-standards` | 写前查重、Markdown/Mermaid 和写后索引 |
 | 知识文档 | `init-project-docs` | 在当前目录幂等初始化 Agent、文档索引、OpenSpec、`.graphifyignore` 与 Graphify Git 共享边界，再编排上下文状态 |
-| 质量反馈 | `coding-violation-log` | 记录用户纠正并防止重犯 |
-| 质量反馈 | `comment-cleanup` | 经授权批量清理存量违规注释 |
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，有限修复并以最新 PASS 放行 Done |
-| 日志交付 | `daily-work-log` | 按需汇总或记录工作日志；默认 Git 历史 |
-| 日志交付 | `dev-log` | 插件决策型变更日志 |
 | 日志交付 | `git-commit-standards` | 作业完成后自动提交本次范围，保留文档、验证与真实作者要求，独立判断 push |
 
 ---
@@ -210,3 +203,18 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 ## Go 支持（3.5.0）
 
 新增 [Go 编码规范](plugins/team-standards/skills/go-coding-standards/SKILL.md)，共 22 个 Skill；[DDD-lite 技术栈规则](plugins/team-standards/skills/architecture-ddd-lite-fullstack/references/framework-rules.md#go按业务复杂度选择-ddd-lite) 补充消费方接口、用例事务和适配器边界。简单 Go 项目保持轻量包结构，不机械照搬 Java 类层次；没有新增 Go Hook 或强制框架依赖。
+
+## 4.0.0 入口迁移
+
+通用插件由 22 个入口收敛为 15 个。移除旧名属于破坏性升级，项目调用需按表更新；不保留会继续占用路由的空壳 Skill。
+
+| 旧入口 | 新位置 |
+|---|---|
+| `planning-evidence-discovery` | [Forge 平台集成协议](docs/platform-integrations/planning-evidence-discovery/SKILL.md)，退出插件分发 |
+| 旧 dev-log 入口 | [本仓决策记录](docs/maintenance/decision-log.md) |
+| `daily-work-log` | git-commit-standards → references/work-summary.md |
+| `comment-cleanup` / `coding-violation-log` | coding-standards-common → references/comment-maintenance.md / feedback.md |
+| `glossary-required` | business-logic-orientation → references/terminology.md |
+| `design-system-bootstrap` / `design-system-guardian` | design-system → 初始化、评审、偏好模式 |
+
+保留历史日志与知识数据；不再强制个人 ai-docs、违规计数或无 Registry 时的初始化。Graphify、OpenSpec 和真实验证边界不变。平台协议只是移出通用分发，本轮没有假称已部署到 Forge。
