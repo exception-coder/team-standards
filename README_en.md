@@ -2,6 +2,8 @@
 
 Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **3.3.0**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
+See the [suite panorama by engineering domain](docs/suite-panorama.md) for all 24 public Skills, evidence sources, hook checkpoints, maintenance tools and end-to-end task paths.
+
 ## Unified flow
 
 ```mermaid

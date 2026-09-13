@@ -1,20 +1,21 @@
 # Skill 依赖与模式
 
+全部职责域与节点见 [套件全景](suite-panorama.md)。下图只表示实施依赖，箭头不代表自动取得授权。
+
 ## 主依赖
 
 ```mermaid
 flowchart LR
-    DESIGN["change-readiness"] --> ARCH["architecture-ddd-lite-fullstack"]
-    BUG["bug-doc-required"] --> DESIGN
-    ORIENTATION["business-logic-orientation"] --> DESIGN
-    PLAN["planning-evidence-discovery"] --> DESIGN
-    DESIGN --> KG["backend-evidence"]
-    DESIGN --> MARKDOWN["markdown-writing-standards"]
-    KG --> ARCH
+    ANALYSIS["现状理解 / 规划 / 异常调查"] --> SCOPE{"当前是否包含已授权实施?"}
+    SCOPE -->|"否"| ANSWER["结论、证据和缺口"]
+    SCOPE -->|"是"| DESIGN["change-readiness"]
+    DESIGN --> FACTS["按需后端事实与设计依据"]
+    FACTS --> ARCH["architecture-ddd-lite-fullstack"]
     ARCH --> COMMON["coding-standards-common"]
-    COMMON --> LANGUAGE["Java / Dart / LLM 专属标准"]
-    LANGUAGE --> LOG["daily-work-log"]
-    LOG --> COMMIT["git-commit-standards"]
+    COMMON --> SPECIAL["按需 Java / LLM / UI / 编码保护"]
+    SPECIAL --> VERIFY["delivery-verification"]
+    VERIFY --> SYNC["受影响文档与按需日志"]
+    SYNC --> COMMIT["git-commit-standards"]
 ```
 
 ## 依赖表
@@ -23,16 +24,16 @@ flowchart LR
 |---|---|---|
 | `change-readiness` | 用户意图、OpenSpec 配置与可用项目证据 | 自动 change 生命周期、架构、后端事实或编码标准 |
 | `bug-doc-required` | Bug 现象与可验证证据 | 需要修复时进入设计与编码链 |
-| `business-logic-orientation` | 现有代码和业务场景 | 重构设计 |
+| `business-logic-orientation` | 现有代码和业务场景 | 结论；已授权重构时继续设计 |
 | `planning-evidence-discovery` | 项目范围解析 | 规划输出或设计 |
 | `backend-evidence` | 已识别服务边界 | 即时影响分析、领域规格或实施验证 |
 | `markdown-writing-standards` | 已确定文档归属 | 写后索引登记 |
 | `architecture-ddd-lite-fullstack` | 设计和代码坐标 | common 与语言规范 |
-| `coding-standards-common` | 架构边界 | Java、Dart 或 LLM 专属规范 |
+| `coding-standards-common` | 架构边界 | 按需 Java 或 LLM 专属规范 |
 | `frontend-excellence` | 有意义的 Web UI 工作 | `design-system-guardian` 与浏览器验收 |
 | `design-system-bootstrap` | 明确初始化或偏好证据 | `design-system-guardian` 消费 Profile |
 | `init-project-docs` | 当前项目根和 Git/工作区状态 | structure 建最小入口、`.graphifyignore` 与 Graphify Git 共享边界；onboard/init/refresh/status 编排真实 Graphify、OpenSpec 与领域证据 |
-| `daily-work-log` | 业务源码变化 | commit 前收尾 |
+| `daily-work-log` | 业务 M/L 源码改动收尾或显式要求 | 按主题合并，S 默认免写 |
 | `git-commit-standards` | 已验证改动 | commit |
 
 ## 规则
