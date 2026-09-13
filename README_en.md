@@ -1,6 +1,6 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **2.8.1**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **3.0.0**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 ## Unified flow
 
@@ -26,7 +26,7 @@ The main consolidated entry points are:
 - `design-system-bootstrap`: registry/profile initialization and evidence-based preference learning.
 - `design-system-guardian`: UI implementation governance and visual review.
 
-See [README.md](README.md) for the complete 22-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+See [README.md](README.md) for the complete 21-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
 
 ## Bug records
 
@@ -40,9 +40,9 @@ After current validation and documentation checks pass, automatically commit onl
 
 See the [documentation rules](plugins/team-standards/skills/markdown-writing-standards/SKILL.md) and [commit rules](plugins/team-standards/skills/git-commit-standards/SKILL.md).
 
-Dart and Flutter use the common comment rules, without requiring dartdoc, generated API documentation, or a special documentation-comment format.
-
 ## Validation
+
+Version 3.0.0 removes the Dart coding skill and distributes 21 Skills. Remove any project-specific invocations of the retired entrypoint.
 
 ```bash
 node scripts/sync-agents.js

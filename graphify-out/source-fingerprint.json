@@ -1,7 +1,7 @@
 {
   "files": {
-    "plugins/team-standards/.claude-plugin/plugin.json": "3155fb8805047cc8c5c3106f55f299b9032c8f7f771ec14ec922fbf6cb63b97a",
-    "plugins/team-standards/.codex-plugin/plugin.json": "8fde56f48c222e36f8061f7cd7d4b9360eb8c160308f760cce22ce5cb787e934",
+    "plugins/team-standards/.claude-plugin/plugin.json": "8e3b866e2c5a4d26cd465689906f77914949870692394958d055774bcfe71cd1",
+    "plugins/team-standards/.codex-plugin/plugin.json": "0fda3e8beadc9ae261f67f0e9c04321b34d27e57afea048006706d59bb164fd9",
     "plugins/team-standards/hooks/benchmarks/check-hook-performance.js": "4d4514d1366b8a63058f5fac0314c69f63ecfb80fefdd55be2908e352513d242",
     "plugins/team-standards/hooks/change-input.js": "e89590d02f8e3984ee953ab80b932f3148e1a4222d023faa32540154e3c61b72",
     "plugins/team-standards/hooks/check-ai-doc-location.js": "5b2b08d91672ad71a800b74f2b544704aa43cf6400248cf7f281183e2c1a9d6b",
@@ -94,7 +94,6 @@
     "plugins/team-standards/skills/coding-violation-log/SKILL.md": "a686cd13dacf77d957de5fefe7330ffcd1b424281989e9d8e2d908bd4b47fe2a",
     "plugins/team-standards/skills/comment-cleanup/SKILL.md": "1bd5ba8284b9ee0d439f16c133c1f69d88aef562145ad9052de6570c6a039e07",
     "plugins/team-standards/skills/daily-work-log/SKILL.md": "aa9c99a3ce82a98f4cfe4c35ac8331e4d6bbafe58b3bdf77a23759c704d877c5",
-    "plugins/team-standards/skills/dart-coding-standards/SKILL.md": "3525b30e69ce7ae93e3e99acb902adefa376830f0f33fdc9c1bb3acfbf306a80",
     "plugins/team-standards/skills/delivery-verification/SKILL.md": "a2cf55653d7f6631fc018cd0a9bb10497d5353ed2408444b26cbdbf1dc389709",
     "plugins/team-standards/skills/design-system-bootstrap/SKILL.md": "004a4c6d13a7c15fa9e065e03d96a661abfd3bff95b146762e76e90030116cd6",
     "plugins/team-standards/skills/design-system-bootstrap/assets/design.config.json": "6886d828186e61de6c6faf151ae6450421626aeee088d68c8574e60d7be5b1c8",
@@ -153,7 +152,7 @@
     "plugins/team-standards/skills/init-project-docs/references/project-profile-generation.md": "91a7b3414e359ae72c355c3f801e6298c4097c18ad305e7749bdde718f5bfc5f",
     "plugins/team-standards/skills/init-project-docs/references/update-workflow.md": "9e19097e372cf764879ddc8927010251b8abc850cc52d5ec98bf5e2d859f4bcd",
     "plugins/team-standards/skills/java-coding-standards/SKILL.md": "9c7d38017618f3a7b0b0d9cbe745ed222862a5e89e6d39a763771279f21b75b6",
-    "plugins/team-standards/skills/llm-agent-coding-standards/SKILL.md": "7d1599bc80fe7b9eb32dc58bf8723153d16eee483a0906193ec4f5ffaa6bfb5b",
+    "plugins/team-standards/skills/llm-agent-coding-standards/SKILL.md": "f68fc8dc0e9414b9675461e0ab63c700270910577b0bee74a531ccac4c57f909",
     "plugins/team-standards/skills/markdown-writing-standards/SKILL.md": "dbb6b8b36348df8ecea0a272227dee8e4450241fb5ce4d62648dca31c6a30f4c",
     "plugins/team-standards/skills/markdown-writing-standards/mermaid-syntax-ref.md": "87a4beebc8467c3ef09e63b70cea34fd3f58e2f045caed44958317f9fc6cbf5e",
     "plugins/team-standards/skills/markdown-writing-standards/references/document-index-workflow.md": "d8fc13a2a885a3fea26b1f2c30e1888ca2e6a5b1da4bb5abab6644570f30059f",

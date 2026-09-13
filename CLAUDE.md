@@ -52,7 +52,6 @@ flowchart TD
 | 开始写业务代码 | `architecture-ddd-lite-fullstack` |
 | 任何源码 Edit/Write | `coding-standards-common` |
 | Java 源码 | `java-coding-standards` |
-| Dart / Flutter 源码 | `dart-coding-standards` |
 | LLM SDK、Agent、Prompt、工具调用或结构化模型输出 | `llm-agent-coding-standards` |
 | 创建、重做或显著提升生产 Web 前端 | `frontend-excellence` |
 | 初始化 Design Registry、绑定 Profile、记录或归纳审美反馈 | `design-system-bootstrap` |
@@ -83,7 +82,7 @@ flowchart TD
 | 类别 | Skill |
 |---|---|
 | 分析与设计 | `change-readiness`、`bug-doc-required`、`business-logic-orientation`、`planning-evidence-discovery` |
-| 架构与编码 | `architecture-ddd-lite-fullstack`、`coding-standards-common`、`java-coding-standards`、`dart-coding-standards`、`llm-agent-coding-standards` |
+| 架构与编码 | `architecture-ddd-lite-fullstack`、`coding-standards-common`、`java-coding-standards`、`llm-agent-coding-standards` |
 | 前端与设计治理 | `frontend-excellence`、`design-system-bootstrap`、`design-system-guardian` |
 | 知识与文档 | `backend-evidence`、`glossary-required`、`markdown-writing-standards`、`init-project-docs` |
 | 质量与反馈 | `coding-violation-log`、`comment-cleanup`、`delivery-verification` |
@@ -101,7 +100,6 @@ flowchart TD
 | `coding-violation-log` | 记录用户纠正并在后续编码前回顾 | 只记录明确违规证据 |
 | `comment-cleanup` | 用户授权下批量清理存量违规注释 | 不顺手扩大到逻辑修改 |
 | `daily-work-log` | 业务项目个人工作日志 | 不用于 team-standards 自身决策 |
-| `dart-coding-standards` | Dart、Flutter 专属编码规范 | 叠加 common |
 | `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
 | `design-system-bootstrap` | Registry/Profile 初始化、绑定、Preference Evidence 与 Pattern Mining | 只从证据晋升规则 |
 | `design-system-guardian` | UI 实现治理、复用策略与视觉评审 | 小文案/间距不跑完整循环 |

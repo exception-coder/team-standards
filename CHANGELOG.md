@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.0] - 2026-09-12
+
+- 删除 dart-coding-standards：团队不编写 Dart，不再分发该语言专属 Skill。
+- 清理触发表、LLM Skill 引用、README 与发布元数据，团队标准由 22 个 Skill 调整为 21 个，套件公共层合计 24 个。
+- 属于 Skill 入口移除，按规则递增 Major；使用旧调用名的项目需要移除对应引用。
+
 ## [2.8.1] - 2026-09-12
 
 - 移除 Dart Skill 的 dartdoc、强制 `///` 和专用文档格式要求，必要注释复用通用规范。
