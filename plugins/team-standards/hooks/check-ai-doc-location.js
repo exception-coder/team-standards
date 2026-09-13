@@ -11,6 +11,7 @@
 //   - 文件名不是 INDEX.md / 00_index.md（索引豁免）
 //   - 所属项目根不是「插件源码仓」（无 .claude-plugin/marketplace.json 等标记）——
 //     插件仓 docs/design、docs/dev-log 是随仓发布的产品文档(CHANGELOG 引用)，豁免
+//   - 项目 docs/bug/ 允许保存按风险决定保留的共享问题记录；不要求每个 Bug 建文档
 //
 // 默认 block（exit 2，把正确 ai-docs 路径回灌给 AI 让它改写过去）：
 //   TEAM_STANDARDS_DOC_LOCATION_HOOK=warn → 仅提示放行 / =off → 关闭
@@ -47,6 +48,11 @@ function isPluginRepo(root) {
   if (!root) return false;
   return PLUGIN_MARKERS.some((seg) => { try { return fs.existsSync(path.join(root, ...seg)); } catch (_) { return false; } });
 }
+function isProjectBugDocument(root, filePath) {
+  if (!root) return false;
+  const relative = path.relative(root, filePath).replace(/\\/g, '/');
+  return relative.startsWith('docs/bug/');
+}
 function resolveProjectName(root) {
   try {
     const f = path.join(root, '.team-standards-project.json');
@@ -77,6 +83,7 @@ process.stdin.on('end', () => {
 
     const root = findGitRoot(path.dirname(fp));
     if (isPluginRepo(root)) continue;                             // 插件源码仓 docs/ 是发布物：豁免
+    if (isProjectBugDocument(root, fp)) continue;
 
     const project = resolveProjectName(root);
     const home = os.homedir();
@@ -84,7 +91,7 @@ process.stdin.on('end', () => {
     const suggested = path.join(docsBase, 'design', path.basename(fp));
 
     process.stderr.write(
-`[team-standards] AI 文档默认不写进业务/应用项目仓的 docs/，应落到用户知识库 ai-docs/{project}/。
+`[team-standards] 此类新建 AI 文档默认应落到用户知识库 ai-docs/{project}/；项目 docs/bug/ 的问题记录除外。
 
 目标(被拦)：${fp}
 推断项目：${project}

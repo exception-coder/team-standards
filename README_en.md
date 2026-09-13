@@ -1,6 +1,6 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **2.7.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **2.8.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 ## Unified flow
 
@@ -19,7 +19,7 @@ The main consolidated entry points are:
 
 - `change-readiness`: automatically matches or creates an OpenSpec change, keeps its artifacts coherent through implementation, and performs proposal review, risk classification, and code orientation. OpenSpec-enabled M/L changes cannot silently fall back to legacy design docs.
 - `delivery-verification`: requires current execution evidence before completion, then routes documentation synchronization and automatic local commit.
-- `bug-doc-required`: evidence, root cause, repair contract, minimal fix, and regression.
+- `bug-doc-required`: evidence-led investigation, minimal authorized fixes, and regression. Simple bugs do not require separate reports, diagrams, or fixed tables. Complex or high-risk bugs retain evidence in an existing issue, OpenSpec change, or project document; create a separate report only when needed. The existing invocation name remains compatible.
 - `backend-evidence`: database/runtime truth, fresh Graphify impact queries, domain specifications, and query-performance gates; it does not maintain a parallel code index.
 - `markdown-writing-standards`: document deduplication, Markdown/Mermaid structure, and index registration.
 - `init-project-docs`: idempotently initializes Agent entrypoints, document indexes, OpenSpec, `.graphifyignore`, and the Graphify Git sharing boundary, then routes project rules and evidence without duplicate fact projections.
@@ -27,6 +27,10 @@ The main consolidated entry points are:
 - `design-system-guardian`: UI implementation governance and visual review.
 
 See [README.md](README.md) for the complete 22-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+
+## Bug records
+
+Prefer the existing authoritative record over duplicate reports. If an independent report is needed and no project location is defined, use a stable file under `docs/bug/`. The document-location hook permits that directory while retaining other location rules; it does not determine whether a report is needed or whether a diagnosis is correct. Investigation-only tasks do not modify source code or create empty commits.
 
 ## Task completion
 

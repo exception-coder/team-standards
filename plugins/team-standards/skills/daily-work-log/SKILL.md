@@ -9,7 +9,7 @@ description: "业务项目源码发生修改，或用户要求记录、更新工
 
 **每次对业务项目源码有实质改动（Edit/Write），就在用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/work-log/{YYYY-MM-DD}.md` 追加或合并一条记录。**
 
-工作日志记录的是个人工时与改动流水，属于**个人工作记录**，与 `bug-doc-required` / `change-readiness` 等 AI 起草文档一样默认写入用户文档目录，**不写入项目仓库**，与项目代码、设计文档、bug 文档物理隔离。
+工作日志记录的是个人工时与改动流水，属于**个人工作记录**，默认写入用户文档目录，**不写入项目仓库**。Bug 证据载体由 `bug-doc-required` 独立决定，工作日志不要求另建 Bug 报告。
 
 不是记录 AI 对话内容；不是记录流水账；是**把"今天做了什么可以上交日报的工作"按 bug / 功能 分类沉淀**。
 
@@ -146,7 +146,7 @@ description: "业务项目源码发生修改，或用户要求记录、更新工
 flowchart TD
     START(["本次改动待登记"]) --> R["Read 今日 work-log\n提取所有条目标题"]
     R --> Q1{"本次会话是否\n触发过 bug-doc-required?"}
-    Q1 -->|"是"| B1["用 bug 文档的标题\n查已有 Bx 条目"]
+    Q1 -->|"是"| B1["用问题主题或已有记录标题\n查已有 Bx 条目"]
     Q1 -->|"否"| Q2{"本次会话是否\n触发过 change-readiness?"}
     Q2 -->|"是"| F1["用设计文档标题\n查已有 Fx 条目"]
     Q2 -->|"否"| Q3{"用户给出主题名?"}
@@ -167,7 +167,7 @@ flowchart TD
 
 ### 判定优先级（从高到低）
 
-1. **bug-doc-required 已生成的 bug 文档** → 该 bug 文档标题就是 B 条目标题
+1. **Bug 问题主题或已有记录标题** → 作为 B 条目标题；没有 Bug 文档时从用户请求与诊断结论取主题，不为工作日志补建报告
 2. **change-readiness 已生成的设计文档** → 该设计文档需求名就是 F 条目标题
 3. **用户显式说的主题** → 用"给我记到 XX 这个功能下"
 4. **启发式判断** → 看 bug 信号（"修复"/"fix"/"报错"）还是功能信号（"加"/"新增"/"实现"）
@@ -313,7 +313,7 @@ change-readiness 代码定位模式
          ↓
 daily-work-log  ← 本 skill（每轮 Edit 后 或 会话结束前）
          ↓
-git-commit-standards（可选，提交时）
+git-commit-standards（作业完成后按规范自动提交）
          ↓
 dev-log（仅 team-standards 项目：会话结束前）
 ```

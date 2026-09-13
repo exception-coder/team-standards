@@ -36,8 +36,8 @@ flowchart TD
 | `change-readiness` | 方案审视 | 用户给出具体解法、目录策略或参考实现 |
 | `change-readiness` | 风险分档与设计 | 所有源码修改请求；S 档允许极简跳过文档 |
 | `change-readiness` | 代码定位 | 设计依据确认后、修改第一行代码前 |
-| `bug-doc-required` | 调查 | 用户只要求诊断或解释，不改源码 |
-| `bug-doc-required` | 修复 | 用户明确要求修复、对齐权威逻辑或删修复冗余 |
+| `bug-doc-required` | 调查 | 用证据解释问题，不改源码；简单问题直接回复，不另建报告 |
+| `bug-doc-required` | 修复 | 已授权修复：最小改动与回归；复杂或高风险问题复用持久记录 |
 | `backend-evidence` | 数据与运行事实 | DDL、真实数据库、SQL、日志、执行计划和性能问题 |
 | `backend-evidence` | 即时影响 | 修改状态、字段、事件或 API 前用新鲜 Graphify 查询；不回写手工索引 |
 | `backend-evidence` | 领域规格 | 状态密集业务缺少不变量、终态或下一动作证据 |
@@ -100,7 +100,7 @@ flowchart LR
 ## 冲突规则
 
 1. 同一 Skill 多次出现表示不同模式，不是重复触发。
-2. Bug 链路中 `bug-doc-required` 管根因和修复合同，`change-readiness` 管实施风险与代码坐标。
+2. Bug 链路中 `bug-doc-required` 管诊断证据和最小修复，`change-readiness` 管实施风险与代码坐标。简单 Bug 不以独立文档为前置条件；复杂问题优先复用已有 OpenSpec change、问题记录或项目文档，仅无合适载体且有沉淀必要时新建报告。代码定位消费会话证据与当前源码，工作日志按问题主题归并，不反向要求补文档。
 3. `coding-standards-common` 先于 Java、Dart 或 LLM 专属标准，专属标准只补充不替代。
 4. 后端即时影响与领域规格属于 `backend-evidence`，跨项目契约仍由实际项目或拓扑仓维护。
 5. 项目专属规范始终优先从项目内 Skill 或 `AGENTS.md` 读取；独立项目画像只是缺少入口时的可选导航，不承载规范正文。

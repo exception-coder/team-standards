@@ -35,7 +35,7 @@ flowchart TD
 主流程原则：
 
 1. `change-readiness` 是开发前唯一主门禁；项目启用 OpenSpec 后，M/L 变更自动匹配或创建 change，并在实施期间更新、验证、同步和判断归档。只有未启用 OpenSpec 的项目，或用户明确批准的单次降级，才使用兼容设计文档。
-2. `bug-doc-required` 是 Bug 唯一入口，覆盖调查、根因、修复约束和回归；未获修复授权时只调查。
+2. `bug-doc-required` 是 Bug 唯一入口，覆盖证据、根因、最小修复和回归；未获修复授权时只调查。简单 Bug 不另建报告，复杂或高风险问题复用唯一持久记录，图表和独立报告按需生成。
 3. `backend-evidence` 是单服务后端证据唯一入口；代码事实和反向影响使用 Graphify 即时查询，不维护第二套手工索引。
 4. `markdown-writing-standards` 覆盖写前查重、Markdown/Mermaid 结构和写后索引登记。
 5. `init-project-docs` 在当前目录幂等初始化六层 AI 工程入口、`.graphifyignore` 与 Graphify Git 共享边界，并覆盖通用项目 onboarding 与上下文状态；不生成平行事实投影。
@@ -100,7 +100,7 @@ flowchart TD
 |---|---|---|
 | `architecture-ddd-lite-fullstack` | 跨语言 DDD-lite 分层、Feature 边界、单向依赖和原子能力 | 项目具体分层例外由项目声明 |
 | `backend-evidence` | 单服务后端事实、DDL/SQL 正确性与性能、反向影响、领域规格 | 跨项目拓扑不归团队插件 |
-| `bug-doc-required` | Bug 证据、根因、修复合同、最小修复与回归 | 调查模式不改源码 |
+| `bug-doc-required` | Bug 证据、根因、修复合同、最小修复与回归 | 调查模式不改源码；简单问题不强制独立文档 |
 | `business-logic-orientation` | Graphify 优先的现状理解与业务语义核实 | 仅明确要求或需要长期基线时生成梳理文档 |
 | `coding-standards-common` | 跨语言命名、结构、异常、重复、测试和注释规则 | 所有源码改动必经 |
 | `coding-violation-log` | 记录用户纠正并在后续编码前回顾 | 只记录明确违规证据 |
@@ -133,8 +133,8 @@ flowchart TD
 | `skills/change-readiness/references/design-output-contract.md` | `change-readiness` | 适用概设详设视图、唯一正文与长期设计晋升 |
 | `skills/change-readiness/references/governance-checker.md` | `change-readiness` | 任务绑定、JSON 证据、写前/Stop/CI 检查与支持边界 |
 | `skills/business-logic-orientation/references/orientation-document-workflow.md` | `business-logic-orientation` | 仅在需要长期基线时加载的完整现状文档流程 |
-| `skills/bug-doc-required/template.md` | `bug-doc-required` | Bug 文档模板 |
-| `skills/bug-doc-required/references/repair-rules.md` | `bug-doc-required` | 修复期最小改动和源码规则 |
+| `skills/bug-doc-required/template.md` | `bug-doc-required` | 按需分析模板，不作为每次 Bug 的必填报告 |
+| `skills/bug-doc-required/references/repair-rules.md` | `bug-doc-required` | 最小修复与回归证据，编码风格复用 common |
 | `skills/backend-evidence/references/` | `backend-evidence` | 存储路由、更新、SQL 正确性、性能、反向影响和领域规格 |
 | `skills/markdown-writing-standards/references/document-index-workflow.md` | `markdown-writing-standards` | 写前查重与写后登记 |
 | `skills/init-project-docs/references/` | `init-project-docs` | onboarding、权威来源刷新与可选轻量画像流程 |

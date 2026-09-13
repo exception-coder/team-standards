@@ -7,13 +7,15 @@ description: "Internal document deduplication and index-registration rules loade
 
 ## 文档输出路径规则
 
-在创建任何 Markdown 文档目录或文件前，必须先确定输出路径。**默认所有 AI 生成 Markdown 都写入用户文档目录下的项目知识库，按主题归属，不写入项目仓库 `docs/`。**
+在创建任何 Markdown 文档目录或文件前，必须先确定输出路径。Bug 分析采用 [bug-doc-required](../../bug-doc-required/SKILL.md) 的载体规则：简单问题不新建文档；需要持久记录时优先已有共享载体，独立报告遵循项目约定，未约定时使用项目 `docs/bug/`。此例外优先于下述个人知识库默认路径，禁止为走索引流程而反向要求创建 Bug 文档。
+
+除上述 Bug 例外外，**默认所有 AI 生成 Markdown 都写入用户文档目录下的项目知识库，按主题归属，不写入项目仓库 `docs/`。**
 
 > **v1.20 起的关键变化：** 用户文档目录 `{USER_DOCUMENTS}/ai-docs/{project}/` 不再被视为「草稿堆」，而是承载本项目知识图谱、1-to-N 功能/方案设计文档、bug 分析、现状梳理等长期资产的**项目级知识库**。该目录下的索引体系（INDEX.md / 00_index.md）与项目 `docs/` 享有同等的 Phase-A / Phase-B 待遇，禁止跳过。
 
 ### 默认输出路径
 
-AI 生成的设计文档、Bug 分析、API 文档、知识图谱、现状梳理、扫描记录、对照表、排查笔记等，默认全部写入用户文档目录下当前项目的知识库：
+除 Bug 载体例外外，AI 生成的设计文档、API 文档、知识图谱、现状梳理、扫描记录、对照表、排查笔记等，默认全部写入用户文档目录下当前项目的知识库：
 
 ```text
 {USER_DOCUMENTS}/ai-docs/{project}/{type}/{topic_path}/{filename}
