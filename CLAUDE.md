@@ -101,7 +101,7 @@ flowchart TD
 | `coding-violation-log` | 记录用户纠正并在后续编码前回顾 | 只记录明确违规证据 |
 | `comment-cleanup` | 用户授权下批量清理存量违规注释 | 不顺手扩大到逻辑修改 |
 | `daily-work-log` | 业务项目个人工作日志 | 不用于 team-standards 自身决策 |
-| `dart-coding-standards` | Dart、Flutter、dartdoc 和 null-safety 规范 | 叠加 common |
+| `dart-coding-standards` | Dart、Flutter 专属编码规范 | 叠加 common |
 | `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
 | `design-system-bootstrap` | Registry/Profile 初始化、绑定、Preference Evidence 与 Pattern Mining | 只从证据晋升规则 |
 | `design-system-guardian` | UI 实现治理、复用策略与视觉评审 | 小文案/间距不跑完整循环 |

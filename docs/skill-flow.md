@@ -101,7 +101,7 @@ flowchart LR
 
 1. 同一 Skill 多次出现表示不同模式，不是重复触发。
 2. Bug 链路中 `bug-doc-required` 管诊断证据和最小修复，`change-readiness` 管实施风险与代码坐标。简单 Bug 不以独立文档为前置条件；复杂问题优先复用已有 OpenSpec change、问题记录或项目文档，仅无合适载体且有沉淀必要时新建报告。代码定位消费会话证据与当前源码，工作日志按问题主题归并，不反向要求补文档。
-3. `coding-standards-common` 先于 Java、Dart 或 LLM 专属标准，专属标准只补充不替代。
+3. `coding-standards-common` 先于 Java、Dart 或 LLM 专属标准，专属标准只补充不替代。Dart 不额外要求 dartdoc 或专用文档注释格式，必要注释沿用 common。
 4. 后端即时影响与领域规格属于 `backend-evidence`，跨项目契约仍由实际项目或拓扑仓维护。
 5. 项目专属规范始终优先从项目内 Skill 或 `AGENTS.md` 读取；独立项目画像只是缺少入口时的可选导航，不承载规范正文。
 

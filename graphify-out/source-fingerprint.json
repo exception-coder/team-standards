@@ -1,7 +1,7 @@
 {
   "files": {
-    "plugins/team-standards/.claude-plugin/plugin.json": "f9a4cfd9bd7cc6162f22842cf3851bed48f75e7f74448e27cbb8f5d79000f412",
-    "plugins/team-standards/.codex-plugin/plugin.json": "8dd10ee5a17ab5e5b0ceb5f50809d80372e72272d4a90157c20409c92a3a2f0c",
+    "plugins/team-standards/.claude-plugin/plugin.json": "3155fb8805047cc8c5c3106f55f299b9032c8f7f771ec14ec922fbf6cb63b97a",
+    "plugins/team-standards/.codex-plugin/plugin.json": "8fde56f48c222e36f8061f7cd7d4b9360eb8c160308f760cce22ce5cb787e934",
     "plugins/team-standards/hooks/benchmarks/check-hook-performance.js": "4d4514d1366b8a63058f5fac0314c69f63ecfb80fefdd55be2908e352513d242",
     "plugins/team-standards/hooks/change-input.js": "e89590d02f8e3984ee953ab80b932f3148e1a4222d023faa32540154e3c61b72",
     "plugins/team-standards/hooks/check-ai-doc-location.js": "5b2b08d91672ad71a800b74f2b544704aa43cf6400248cf7f281183e2c1a9d6b",
@@ -61,7 +61,7 @@
     "plugins/team-standards/skills/architecture-ddd-lite-fullstack/SKILL.md": "4cf15f24ed8464cf4968435c06af343fee98a95a46ec91680b0d9b5c25c007a4",
     "plugins/team-standards/skills/architecture-ddd-lite-fullstack/references/framework-rules.md": "bcd7d5c00b9cc4585dae536803e4f2e32982060036fd9e4e2e03aae6c03909f2",
     "plugins/team-standards/skills/architecture-ddd-lite-fullstack/references/layers-and-boundaries.md": "cdf8e6f4a0b55f893e7f220b2eb9ee0f0c352bb444632959a4a1f2f54d4ec64e",
-    "plugins/team-standards/skills/architecture-ddd-lite-fullstack/rules/structure-quality-gates.md": "71f65a41d8d299838f4a5bff900fdf08a1e43b9731a408d237d3a93d50c290c0",
+    "plugins/team-standards/skills/architecture-ddd-lite-fullstack/rules/structure-quality-gates.md": "539f0d520fa3f9fc76b84ccb43422faaaf113256ea35a349f7ccb9a10a128151",
     "plugins/team-standards/skills/backend-evidence/SKILL.md": "baced0cb9bc403e0079165cfe0c3da0b9e762e469fc020d40da1fef3bd595122",
     "plugins/team-standards/skills/backend-evidence/references/domain-spec-mining.md": "49c36904ecd843967c6b41793a3e115b06d8538bbbc1f9c80b03277b477d8f34",
     "plugins/team-standards/skills/backend-evidence/references/query-performance-gate.md": "8a45a40c9db35746d85dda700e2cb38bdc0de682ee0e543be55afea169f985be",
@@ -94,7 +94,7 @@
     "plugins/team-standards/skills/coding-violation-log/SKILL.md": "a686cd13dacf77d957de5fefe7330ffcd1b424281989e9d8e2d908bd4b47fe2a",
     "plugins/team-standards/skills/comment-cleanup/SKILL.md": "1bd5ba8284b9ee0d439f16c133c1f69d88aef562145ad9052de6570c6a039e07",
     "plugins/team-standards/skills/daily-work-log/SKILL.md": "aa9c99a3ce82a98f4cfe4c35ac8331e4d6bbafe58b3bdf77a23759c704d877c5",
-    "plugins/team-standards/skills/dart-coding-standards/SKILL.md": "b5ff195a0f3b57e75d3122c03f1b1713eefd98b68511c0eef8245331277dc1fd",
+    "plugins/team-standards/skills/dart-coding-standards/SKILL.md": "3525b30e69ce7ae93e3e99acb902adefa376830f0f33fdc9c1bb3acfbf306a80",
     "plugins/team-standards/skills/delivery-verification/SKILL.md": "a2cf55653d7f6631fc018cd0a9bb10497d5353ed2408444b26cbdbf1dc389709",
     "plugins/team-standards/skills/design-system-bootstrap/SKILL.md": "004a4c6d13a7c15fa9e065e03d96a661abfd3bff95b146762e76e90030116cd6",
     "plugins/team-standards/skills/design-system-bootstrap/assets/design.config.json": "6886d828186e61de6c6faf151ae6450421626aeee088d68c8574e60d7be5b1c8",

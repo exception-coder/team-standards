@@ -1,6 +1,6 @@
 # team-standards
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**2.8.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**2.8.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 ## 快速导航
 
@@ -41,7 +41,7 @@ flowchart LR
 | 架构编码 | `architecture-ddd-lite-fullstack` | 跨语言 DDD-lite 分层和依赖方向 |
 | 架构编码 | `coding-standards-common` | 通用命名、结构、异常、测试与注释规则 |
 | 架构编码 | `java-coding-standards` | Java 与关系数据库专属规范 |
-| 架构编码 | `dart-coding-standards` | Dart、Flutter 与 dartdoc 专属规范 |
+| 架构编码 | `dart-coding-standards` | Dart、Flutter 专属编码规范 |
 | 架构编码 | `llm-agent-coding-standards` | LLM/Agent 信任边界和循环安全 |
 | 前端设计 | `frontend-excellence` | 生产 Web 前端质量和浏览器验收 |
 | 前端设计 | `design-system-bootstrap` | Design Registry/Profile 和偏好学习 |
@@ -81,6 +81,8 @@ coding-standards-common              所有源码修改的公共基线
 ```
 
 `architecture-ddd-lite-fullstack` 位于编码规范之前，负责分层和依赖方向；语言 Skill 只补充专属规则，不复制或替代 common。
+
+Dart、Flutter 只沿用通用注释规则，不强制 dartdoc 或专用文档注释格式。
 
 ---
 
