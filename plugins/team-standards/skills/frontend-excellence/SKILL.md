@@ -26,6 +26,7 @@ Deliver a coherent product interface, not a runnable mock. Preserve the reposito
 5. Implement the complete experience.
    - Read [interaction-and-states.md](references/interaction-and-states.md) when the page can load, fail, be empty, reject input, deny access, or block the user's current workflow.
    - Cover responsive layout, content hierarchy, keyboard behavior, focus, motion preferences, and all relevant loading, empty, error, success, disabled, and permission states.
+   - For operational workspaces, trace the available width/height from the application shell through every wrapper to the working panels. Assign remaining space and scroll ownership explicitly; reading-column limits belong to readable content, not automatically to the workspace. Use the viewport checks in [quality-gates.md](references/quality-gates.md#workspace-viewport-contract).
    - Use real content shapes and realistic density. Keep fixtures centralized when live data is unavailable.
 6. Verify in a real browser.
    - Read [quality-gates.md](references/quality-gates.md) before declaring completion.

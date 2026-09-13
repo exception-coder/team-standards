@@ -29,6 +29,7 @@ flowchart TD
 7. Graphify 提供带新鲜度边界的当前实现事实，OpenSpec 提供项目行为规格与活动变更；Skill 只做意图路由和质量门禁，不复制图谱或建立平行规格。
 8. OpenSpec 文档按阶段准出和当前切片推进；change-readiness 维护概设详设、评审意见及交接，delivery-verification 提供真实验证。共享治理检查器检查绑定、范围、视图及证据新鲜度，默认报告试运行，实际宿主验收后启用 block；同步归档仍使用官方 OpenSpec。
 9. AI 原生作业将实现、受影响文档和提交作为同一交付单元：每次更新核对 README 与规则入口，验证通过后自动提交本次范围。文档影响规则归 markdown-writing-standards，自动提交及例外归 git-commit-standards；本地 commit 与 push 分别判断授权。
+10. 工作台响应式验收同时检查可用宽高、容器高度链及滚动归属，覆盖高屏、矮屏、窄屏和动态窗口变化；正文限宽不能默认限制整个操作区域。实施与真实浏览器证据统一归 `frontend-excellence` 的 [可用视口契约](plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract)，不新增仅匹配 CSS 类名的形式门禁。
 
 状态契约治理复用现有四个 Skill：change-readiness 登记状态与影响，backend-evidence 核对存储及不变量，business-logic-orientation 定位消费者，delivery-verification 检查实际执行证据。共享入口为 `plugins/team-standards/scripts/state-contract.js`；按 [接入协议](plugins/team-standards/skills/change-readiness/references/state-contract.md) 逐模块启用，不将静态检查等同业务正确。
 

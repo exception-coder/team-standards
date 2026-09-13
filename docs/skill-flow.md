@@ -48,6 +48,8 @@ flowchart TD
 
 ## 先分清四种目录
 
+工作台布局实施通过 `frontend-excellence` 追踪 Shell → 页面 → 中间容器 → 面板的可用宽高及滚动归属；真实浏览器检查高屏、矮屏、窄屏、动态窗口变化和长短内容，再由 delivery-verification 汇总实际证据。细则只维护在 [可用视口契约](../plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract)，不新增 Hook 或宣称已自动检测所有布局。
+
 本文链接指向可维护的源码仓。安装后的宿主从插件安装目录/缓存读取载荷；缓存路径随宿主和版本变化，以当次加载路径为准，不直接修改缓存代替源码修复。推送源码不等于所有会话立即升级。
 
 ```text

@@ -9,6 +9,7 @@ Run this review after the first complete browser render and repeat it after mate
 - Can any card or panel be replaced by spacing, typography, a divider, or a tonal change?
 - Is any card nested only because components were composed mechanically?
 - Does whitespace clarify the layout rather than make operational content unnecessarily sparse?
+- Do workspace panels reach their allocated boundaries at both tall and short viewport heights, with usable scrolling and reachable actions? Apply the [workspace viewport contract](quality-gates.md#workspace-viewport-contract); do not treat a prematurely ending panel as intentional whitespace.
 - Does removing a non-essential visual element make the page clearer?
 
 ---
