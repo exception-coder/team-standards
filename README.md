@@ -1,6 +1,6 @@
 # team-standards
 
-跨项目通用的工程治理插件。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**2.7.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 ## 快速导航
 
@@ -8,7 +8,7 @@
 - **查看能力清单** → [22 个 Skill](#22-个-skill)、[合并后的入口](#合并后的入口)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
-- **安装和维护** → [安装](#安装)、[维护与验证](#维护与验证)
+- **安装和维护** → [安装](#安装)、[维护与验证](#维护与验证)、[作业完成条件](#作业完成条件)
 
 ---
 
@@ -22,8 +22,8 @@ flowchart LR
     LOCATE --> GUARD["架构与编码门禁"]
     GUARD --> BUILD["实施"]
     BUILD --> VERIFY["真实验证与 PASS 门禁"]
-    VERIFY --> WRITEBACK["知识、索引与日志回写"]
-    WRITEBACK --> COMMIT["规范提交"]
+    VERIFY --> WRITEBACK["文档、知识、索引与日志同步"]
+    WRITEBACK --> COMMIT["自动本地提交"]
 ```
 
 详细模式与条件见 [Skill 流程图](docs/skill-flow.md)，完整触发表见 [CLAUDE.md](CLAUDE.md)。
@@ -55,7 +55,7 @@ flowchart LR
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，有限修复并以最新 PASS 放行 Done |
 | 日志交付 | `daily-work-log` | 业务项目个人工作日志 |
 | 日志交付 | `dev-log` | 插件决策型变更日志 |
-| 日志交付 | `git-commit-standards` | 可审查提交信息和提交前复核 |
+| 日志交付 | `git-commit-standards` | 作业完成后自动提交本次范围，保留文档、验证与真实作者要求，独立判断 push |
 
 ---
 
@@ -117,13 +117,23 @@ Claude Code：
 
 ---
 
+## 作业完成条件
+
+每次套件或项目更新，Agent 都必须核对并同步受影响的 README、用法、配置、Skill、规则入口和索引；文档与实现同次交付。确无文档影响时说明理由，不机械改写无关内容。中文与英文入口保持一致，生成的 AGENTS.md 从 CLAUDE.md 更新。
+
+本次任务的验证和文档检查通过后，默认自动创建本地 commit，只提交本次作业的文件或片段，不等待下一次提醒。用户明确禁止提交、项目要求人工确认、验证失败、无改动或范围无法安全分离时，按提交规范处理并报告。自动 commit 不等于自动 push；team-standards 源码仓库保留自动推送规则，业务项目推送须有独立授权。
+
+执行细则由 [文档同步规则](plugins/team-standards/skills/markdown-writing-standards/SKILL.md#作业交付时同步文档) 和 [提交规范](plugins/team-standards/skills/git-commit-standards/SKILL.md) 唯一维护。这是 Agent 工作流程约束，不代表已增加跨宿主强制 Hook。
+
+---
+
 ## 维护与验证
 
 `CLAUDE.md` 是 Claude/Codex 入口的单一来源，修改后运行：
 
 ```bash
 node scripts/sync-agents.js
-(cd hooks && npm test)
+(cd plugins/team-standards/hooks && npm test)
 node scripts/sync-agents.js --check
 node scripts/check-cross-refs.js
 node scripts/check-version-sync.js
@@ -132,8 +142,10 @@ node scripts/audit-skills.js --warnings --ci
 
 破坏性 Skill 删除或重命名递增 Major，并同步 marketplace、Claude plugin、Codex plugin 三处版本。
 
-## State contract governance / 状态契约治理
+---
 
-Version 2.6.0 adds a project-owned state contract schema, source-impact checks, a read-only Graphify adapter, and execution evidence bound to current inputs. Adopt per module through `.team-standards/state-contracts.json`; existing OpenSpec governance checks enrolled modules. Static checks do not prove business correctness or artifact provenance.
+## 状态契约治理
 
-See [接入协议与 CLI](plugins/team-standards/skills/change-readiness/references/state-contract.md). No new Skill or business-specific state constants are required.
+从 2.6.0 起提供项目自有状态契约 Schema、源码影响检查、只读 Graphify 适配器，以及绑定当前输入的执行证据。通过 `.team-standards/state-contracts.json` 逐模块接入，既有 OpenSpec 治理入口检查已登记模块。静态检查不证明业务正确性或部署制品来源。
+
+详见 [接入协议与 CLI](plugins/team-standards/skills/change-readiness/references/state-contract.md)。复用现有 Skill，不内置业务状态常量。

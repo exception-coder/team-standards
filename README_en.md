@@ -1,6 +1,6 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **2.7.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 ## Unified flow
 
@@ -11,13 +11,14 @@ flowchart LR
     IMPACT --> LOCATE["Precise code orientation"]
     LOCATE --> GUARD["Architecture and coding gates"]
     GUARD --> BUILD["Implementation and verification"]
-    BUILD --> WRITEBACK["Knowledge, index, and log write-back"]
-    WRITEBACK --> COMMIT["Commit standard"]
+    BUILD --> WRITEBACK["Documentation, knowledge, index, and log sync"]
+    WRITEBACK --> COMMIT["Automatic local commit"]
 ```
 
 The main consolidated entry points are:
 
 - `change-readiness`: automatically matches or creates an OpenSpec change, keeps its artifacts coherent through implementation, and performs proposal review, risk classification, and code orientation. OpenSpec-enabled M/L changes cannot silently fall back to legacy design docs.
+- `delivery-verification`: requires current execution evidence before completion, then routes documentation synchronization and automatic local commit.
 - `bug-doc-required`: evidence, root cause, repair contract, minimal fix, and regression.
 - `backend-evidence`: database/runtime truth, fresh Graphify impact queries, domain specifications, and query-performance gates; it does not maintain a parallel code index.
 - `markdown-writing-standards`: document deduplication, Markdown/Mermaid structure, and index registration.
@@ -25,13 +26,21 @@ The main consolidated entry points are:
 - `design-system-bootstrap`: registry/profile initialization and evidence-based preference learning.
 - `design-system-guardian`: UI implementation governance and visual review.
 
-See [README.md](README.md) for the complete 21-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+See [README.md](README.md) for the complete 22-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+
+## Task completion
+
+For AI-native projects, implementation, affected documentation, and a local commit form one delivery unit. Every suite or project update includes a documentation-impact check and updates affected README language versions, usage, configuration, rules, and indexes. Record a reason when no documentation change is needed.
+
+After current validation and documentation checks pass, automatically commit only the completed task changes, preserving unrelated work and staged content. Respect explicit no-commit or manual-confirmation instructions; report failed checks or inseparable changes, and do not create empty commits. Local commits do not authorize business-project pushes or deployment. The team-standards source repository retains its automatic-push exception. These are Agent workflow obligations, not a new cross-host enforcement hook.
+
+See the [documentation rules](plugins/team-standards/skills/markdown-writing-standards/SKILL.md) and [commit rules](plugins/team-standards/skills/git-commit-standards/SKILL.md).
 
 ## Validation
 
 ```bash
 node scripts/sync-agents.js
-(cd hooks && npm test)
+(cd plugins/team-standards/hooks && npm test)
 node scripts/sync-agents.js --check
 node scripts/check-cross-refs.js
 node scripts/check-version-sync.js

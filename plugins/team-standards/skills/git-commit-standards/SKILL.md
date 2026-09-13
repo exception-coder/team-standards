@@ -1,6 +1,6 @@
 ---
 name: git-commit-standards
-description: Use before every git commit or commit-message generation, including trivial changes and automatic finalization even when the user did not explicitly ask to commit. Applies the mandatory title, three-part Chinese body, and real Author format; automatic commit and push remain limited to the team-standards source repository.
+description: Use when a task has completed changes ready for automatic local commit, or before any git commit or commit-message generation. Requires synchronized documentation, current validation, scoped staging, a three-part Chinese body, and a real Author; push authorization is separate.
 ---
 
 # Git 提交规范
@@ -18,15 +18,16 @@ description: Use before every git commit or commit-message generation, including
 
 **提交前主动填写（所有提交强制）**：不得先执行 `git commit` 再等待 Hook 报错。必须先根据本轮会话填写标题和 `【改动】`、`【原因】`、`【结果】` 三段中文正文，调用 `scripts/build-commit-message.js` 读取 Git 作者并生成消息文件，随后统一使用 `git commit -F <消息文件>`。Hook 是遗漏兜底，不是正文生成器。
 
-**team-standards 特例（只作用于插件源码仓库）：** 仅当以下三项同时满足时，才自动完成 `git add` → `git commit` → `git push`：
+## 作业完成后自动提交
 
-1. 当前 git 仓库的目录名或 remote URL 明确指向 `team-standards` / `kpay-team-standards`。
-2. 本次变更对象属于插件自身文件：`skills/`、`hooks/`、`.claude-plugin/`、`.codex-plugin/`、`AGENTS.md`、`CLAUDE.md`、`README.md`、`docs/skill-flow*`、`docs/dev-log/`。
-3. 用户没有明确说"不要提交 / 不要 push / 只改不提交"。
+AI 原生项目把本次作业的实现、文档和提交作为同一交付单元。适用本规范的套件仓库及业务项目，任务完成且存在本次可提交改动时，默认主动 stage 并创建本地 commit，不等待用户再次说“提交”，不把已完成作业堆积到下次。
 
-业务项目即使安装了 team-standards plugin，也**绝不**触发自动 stage、自动 commit、自动 push 或自动版本号递增。业务项目提交必须走普通确认流程。
+1. 先按 [文档同步规则](../markdown-writing-standards/SKILL.md#作业交付时同步文档) 核对并更新受影响的 README、使用说明、规则入口和索引；可执行改动必须具备 delivery-verification 要求的最新通过证据，纯文档任务执行文档与引用检查。
+2. 任务开始记录工作区及暂存区基线，提交前以会话编辑记录和 diff 确定本次范围。只暂存本次文件或可独立分离的片段，禁止无差别 `git add -A`。已有无关暂存内容不能带入本次提交，也不能擅自取消暂存；混合片段无法可靠分离时报告具体阻碍。
+3. 用户明确要求不提交或项目明确要求人工提交时遵守该约束；用户当前明确授权优先于项目默认规则。“不要 push”只禁止推送，不禁止本地 commit。无改动不创建空提交，验证失败、作业未完成或作者缺失时不以完成名义自动提交，说明待办而非伪报完成。
+4. 多仓作业按仓库分别提交本次范围，最终报告提交号及剩余改动归属。非 Git 目录的产物报告为本地文件，不擅自初始化仓库或声称已纳入版本控制。
 
-**授权边界：** 自动 push 是本 skill 的行为规则，不等于可以绕过 Codex / Claude / IDE 宿主的命令审批。若宿主环境对 `git push` 启用了每次确认，仍会弹授权；只有宿主支持并保存了对应命令授权时，后续才可能免确认。
+**推送独立判断：** 本地自动 commit 不授予业务项目自动 push、发布或部署权限。用户已授权推送时按指定远端执行；保留 team-standards / kpay-team-standards 源码仓库插件自身改动的自动 push 特例，用户未禁止且目标远端明确时执行。目标不明或远端拒绝时保留已完成的本地提交并报告，不强推、不绕过分支保护。版本递增按仓库载荷规则执行，不因自动 commit 为业务项目自动升版。宿主审批仍须遵守。
 
 ---
 
@@ -73,14 +74,14 @@ Author: <姓名> <邮箱>
 
 ## 五步执行清单（每步完成后才能进入下一步）
 
-收到提交任务时，立即用 TodoWrite 创建以下五条待办项，逐条完成后标记：
+提交前依次完成以下五步；宿主有待办工具时可用于记录，工具缺失不阻碍执行：
 
 ```
 [ ] 第一步：读取 git config user.name / user.email
-[ ] 第二步：基于会话上下文确认改动范围；用 git diff --staged --name-only 兜底校验
+[ ] 第二步：确认文档、验证和本次改动范围；定向暂存并核对 staged diff
 [ ] 第三步：用会话已知的改动意图直接写 type / scope / body
-[ ] 第四步：输出完整提交信息；team-standards 自动收尾场景记录"自动确认"
-[ ] 第五步：执行 git commit；team-standards 自动收尾场景继续执行 git push
+[ ] 第四步：输出完整提交信息；默认按作业完成规则自动确认，遵守明确例外
+[ ] 第五步：执行 git commit 并核对提交范围；独立判断 push 授权
 ```
 
 ### 第一步：获取提交者信息
@@ -110,9 +111,9 @@ c) 比对 staged 文件列表 vs 你在本次会话改过的文件：
 
 | 情况 | 处理 |
 |------|------|
-| staged ⊆ 会话改过的文件 | 直接进第三步，不用读完整 diff |
-| 出现你没碰过的文件（用户在 IDE 手动改 / 之前残留的 stage） | 对**这部分文件**跑 `git diff --staged -- <file>`，必要时问用户是否要一起提 |
-| 工作区有未暂存变更 | team-standards 自动收尾场景执行 `git add -A` 后重新校验；其它场景**暂停**让用户先 `git add` |
+| staged 文件与片段均属于本次作业，且已与初始基线核对 | 进入第三步；不能仅凭文件名相同就认定全部片段属于本次任务 |
+| 出现你没碰过的文件或片段（用户在 IDE 手动改 / 之前残留的 stage） | 定向读取对应 staged diff，保留原有内容；不能可靠隔离时暂停本次提交并报告归属问题 |
+| 工作区有未暂存变更 | 仅对本次已完成且验证通过的文件或片段定向暂存，核对完整 staged diff；保留无关改动 |
 | 当前会话被压缩过（关键改动上下文已丢失） | 降级：跑完整 `git diff --staged` + `--stat` 重建上下文 |
 | 无任何变更 | 停止，不提交空 commit |
 
@@ -141,10 +142,10 @@ scope 从变更的包路径或模块名中提取（取最小公共前缀）。
 
 将完整提交信息输出给用户。
 
-- 普通场景：**明确询问"是否确认提交"**，收到确认后才能进入第五步。
-- team-standards 插件源码仓库自动收尾场景：记录"自动确认：team-standards 源码仓库收尾规则授权"，直接进入第五步。
+- 默认完成场景：记录“自动确认：作业完成后本地提交规则”，直接进入第五步，不重复请求确认。
+- 用户或项目明确要求人工确认的例外：在文档、验证、范围和完整提交信息已准备好后，仅询问缺少的确认；已有明确授权时直接执行。
 
-普通场景禁止在未收到用户确认的情况下执行 git commit。
+提交失败时保留改动并说明原因，不绕过 Hook，也不将失败表述为已提交。
 
 ### 第五步：生成消息文件并执行 git commit
 
@@ -182,9 +183,9 @@ Plugin 版本递增按**运行载荷**判定：`skills/`、运行时 `hooks/`、
 |------|------|
 | "我已经改完了，直接全量 git diff --staged 再读一遍才放心" | 第二步明确：会话上下文优先，diff 只兜底；全量读是重复劳动 |
 | "git config 肯定有值，跳过读取" | 必须执行命令确认，不能假设 |
-| "提交信息很简单，不用确认直接提交" | 普通场景第四步确认是刚性要求；只有 team-standards 仓库自动收尾才免确认 |
-| "业务项目安装了 team-standards，所以也自动提交推送" | 错。自动提交推送只作用于 team-standards 插件源码仓库 |
-| "team-standards 改完先放着下次一起提" | 插件源码仓库要求小步提交并自动 push，避免累计大包变更 |
+| "完成后等用户再说提交" | 默认主动完成文档、验证和本地 commit，明确禁止或人工确认约束除外 |
+| "自动 commit 就可以自动 push" | 本地提交与远端推送分别判断授权 |
+| "把整个工作区一起暂存最省事" | 只提交本次作业范围，不混入用户或其他任务改动 |
 | "加上 Co-Authored-By 是好习惯" | 这是明确禁止的行为，立即删除 |
 | "用户让我快点，可以省几步" | 用户说"提交"是 WHAT，流程是 HOW，不可跳过 |
 

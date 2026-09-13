@@ -28,8 +28,8 @@ flowchart TD
     K -->|"否"| M["实施"]
     L --> M
     M --> V["delivery-verification\n真实环境验证 + PASS 门禁"]
-    V --> N["知识 / 索引 / 日志回写"]
-    N --> O["git-commit-standards"]
+    V --> N["文档 / 知识 / 索引 / 日志同步"]
+    N --> O["git-commit-standards 自动本地提交"]
 ```
 
 主流程原则：
@@ -42,6 +42,7 @@ flowchart TD
 6. 小改按风险缩短流程，但不得跳过通用编码规范；项目专属规则由项目内 Skill 或 `AGENTS.md` 叠加。
 7. Graphify 提供带新鲜度边界的当前实现事实，OpenSpec 提供项目行为规格与活动变更；Skill 只做意图路由和质量门禁，不复制图谱或建立平行规格。
 8. OpenSpec 文档按阶段准出和当前切片推进；change-readiness 维护概设详设、评审意见及交接，delivery-verification 提供真实验证。共享治理检查器检查绑定、范围、视图及证据新鲜度，默认报告试运行，实际宿主验收后启用 block；同步归档仍使用官方 OpenSpec。
+9. AI 原生作业将实现、受影响文档和提交作为同一交付单元：每次更新核对 README 与规则入口，验证通过后自动提交本次范围。文档影响规则归 markdown-writing-standards，自动提交及例外归 git-commit-standards；本地 commit 与 push 分别判断授权。
 
 状态契约治理复用现有四个 Skill：change-readiness 登记状态与影响，backend-evidence 核对存储及不变量，business-logic-orientation 定位消费者，delivery-verification 检查实际执行证据。共享入口为 `plugins/team-standards/scripts/state-contract.js`；按 [接入协议](plugins/team-standards/skills/change-readiness/references/state-contract.md) 逐模块启用，不将静态检查等同业务正确。
 
@@ -62,7 +63,7 @@ flowchart TD
 | 初始化 Design Registry、绑定 Profile、记录或归纳审美反馈 | `design-system-bootstrap` |
 | 有意义的 UI 实现、视觉漂移或发布验收 | `design-system-guardian` |
 | 后端表、SQL、状态、字段、事件、API、领域闭环或查询性能 | `backend-evidence` |
-| 新建或结构性修改 Markdown、Mermaid、复杂表格 | `markdown-writing-standards` |
+| 套件或项目更新的文档同步；新建或结构性修改 Markdown、Mermaid、复杂表格 | `markdown-writing-standards` |
 | 术语缺失、歧义或命名不一致 | `glossary-required` |
 | 初始化 AI 工程结构/AI 目录；初始化新项目、一键 onboard、接入新系统；或刷新上下文状态 | `init-project-docs` |
 | 用户纠正 AI 编码规范错误；或项目前置违规表存在 | `coding-violation-log` |
@@ -70,7 +71,7 @@ flowchart TD
 | 可执行改动完成、准备最终回复 | `delivery-verification` |
 | 业务项目源码发生改动或要求记工作日志 | `daily-work-log` |
 | team-standards 发生决策型变更 | `dev-log` |
-| 任何 git commit 或生成提交信息 | `git-commit-standards` |
+| 本次作业完成且有可提交改动；任何 git commit 或生成提交信息 | `git-commit-standards` |
 
 ## 改动规模与流程档位
 
@@ -153,11 +154,12 @@ flowchart TD
 3. 破坏性删除或重命名递增 Major；三个 manifest 版本必须一致：marketplace、Claude plugin、Codex plugin。
 4. 项目专属编码规范、URL 路由、模块脚手架、架构 lint 和跨项目生态拓扑不进入本插件。
 5. 辅助细则放 `references/`，必要的可复用资产放 `templates/` 或 `assets/`；能够引用权威来源时不创建模板副本，只有用户意图级入口才建立独立 Skill。
+6. 每次套件更新按文档同步规则检查中文与英文 README、组件版本与数量、用法、流程和套件总览；受影响文档在同次作业中修正。完成验证后自动提交本次改动，不积压；明确禁止提交、无改动或验证失败等例外按提交 Skill 处理。
 
 ## 发版校验
 
 ```bash
-(cd hooks && npm test) && \
+(cd plugins/team-standards/hooks && npm test) && \
 node scripts/sync-agents.js --check && \
 node scripts/check-cross-refs.js && \
 node scripts/check-version-sync.js && \

@@ -23,8 +23,8 @@ flowchart TD
     J --> K["5. 架构与编码门禁"]
     K --> L["6. 实施"]
     L --> V["7. delivery-verification\n真实验证与 PASS 门禁"]
-    V --> M["8. 知识、索引、日志回写"]
-    M --> N["9. 提交规范"]
+    V --> M["8. 文档、知识、索引、日志同步"]
+    M --> N["9. 自动本地提交本次作业"]
 ```
 
 ---
@@ -41,11 +41,20 @@ flowchart TD
 | `backend-evidence` | 数据与运行事实 | DDL、真实数据库、SQL、日志、执行计划和性能问题 |
 | `backend-evidence` | 即时影响 | 修改状态、字段、事件或 API 前用新鲜 Graphify 查询；不回写手工索引 |
 | `backend-evidence` | 领域规格 | 状态密集业务缺少不变量、终态或下一动作证据 |
-| `markdown-writing-standards` | 写前 / 写中 / 写后 | 查重归属、结构与 Mermaid、索引登记 |
+| `markdown-writing-standards` | 文档同步 / 写前 / 写中 / 写后 | 套件或项目更新核对文档影响，查重归属、结构与 Mermaid、索引登记 |
+| `git-commit-standards` | 完成收尾 / 提交 | 文档和验证完成后自动提交本次范围；独立判断推送授权 |
 | `init-project-docs` | structure / onboard / init / refresh / status / profile | 当前目录 Agent/Docs/OpenSpec 入口、Graphify 输入与 Git 共享边界、九阶段接入、增量刷新、状态或可选画像 |
 | `design-system-bootstrap` | registry / preference | 建立设计资料或记录、归纳偏好证据 |
 | `design-system-guardian` | implementation / review | UI 实施和代表性渲染验收 |
 | `delivery-verification` | completion | 可执行改动完成后、最终回复前调用 Forge 并检查最新 PASS 证据 |
+
+---
+
+## 作业完成闭环
+
+本次作业完成前，按 [文档同步规则](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#作业交付时同步文档) 核对并更新受影响的说明、规则与索引；对最终输入完成适用验证后，按 [提交规范](../plugins/team-standards/skills/git-commit-standards/SKILL.md) 自动提交本次范围。纯文档作业执行文档检查后提交，不要求虚构 Runtime 证据。当前切片可独立完成时及时提交，不等待整个 OpenSpec change 归档。
+
+用户禁止提交、验证失败、归属混合等例外按提交规范处理并明确剩余项；push 独立判断授权。该闭环由 Agent 主动执行，现有 Hook 不保证覆盖全部宿主，也不证明文档语义正确。
 
 ---
 
@@ -102,6 +111,7 @@ flowchart LR
 
 | 变化 | 回写 |
 |---|---|
+| 套件或项目更新 | `markdown-writing-standards` 文档影响核对与同步 |
 | Markdown 新建或重组 | `markdown-writing-standards` 写后索引 |
 | 状态、字段、事件、API 变化 | `backend-evidence` Graphify 即时影响查询；协同项写入 OpenSpec |
 | 项目结构、API、数据访问变化 | `init-project-docs` refresh：更新 Graphify 本体，不生成 Markdown 镜像 |
@@ -109,7 +119,7 @@ flowchart LR
 | 用户纠正规范错误 | `coding-violation-log` |
 | team-standards 决策变化 | `dev-log` |
 | 可执行改动准备交付 | `delivery-verification`；优先 `forge_verify phase=all` |
-| 准备 commit | `git-commit-standards` |
+| 作业完成且有可提交改动 / 准备 commit | `git-commit-standards` 自动本地提交本次范围 |
 
 ## 状态契约治理扩展
 
