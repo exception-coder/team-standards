@@ -5,7 +5,7 @@
 ## 快速导航
 
 - **先看整套做什么** → [按领域的全景链路与节点字典](docs/suite-panorama.md)
-- **理解统一流程** → [主流程](#主流程)、[Skill 流程图](docs/skill-flow.md)
+- **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)
 - **查看能力清单** → [21 个 Skill](#21-个-skill)、[合并后的入口](#合并后的入口)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
