@@ -1,6 +1,6 @@
 ---
 name: architecture-ddd-lite-fullstack
-description: "Use before writing or reviewing business code in Java, Python, React, or Vue to choose layers, feature boundaries, reusable capabilities, and one-way dependencies."
+description: "Use before writing or reviewing business code in Java, Go, Python, React, or Vue to choose layers, feature boundaries, reusable capabilities, and one-way dependencies."
 ---
 
 # DDD-lite 全栈架构约束
@@ -28,7 +28,7 @@ Domain 不依赖 UI、Controller、数据库实现、HTTP 客户端或框架适�
 
 1. 确定改动属于哪个 feature，避免按纯技术类型向全局目录堆放业务代码。
 2. 将输入适配留在 presentation，将用例编排留在 application，将业务不变量留在 domain。
-3. Repository 在 domain 定义端口，在 infrastructure 提供实现。
+3. Repository 在 domain 定义端口，在 infrastructure 提供实现；Go 按消费方在 application/domain 定义小接口，见 framework-rules 的 Go 章节。
 4. 一个业务分支差异明显时拆成 focused service 或策略，不在单函数堆叠多场景条件。
 5. 跨聚合或跨服务操作明确事务边界、失败补偿、幂等和可观测性。
 6. 复用已有原子能力；不存在时以清晰业务动作命名新增能力。

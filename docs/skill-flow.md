@@ -110,6 +110,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [glossary-required](../plugins/team-standards/skills/glossary-required/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
 | [init-project-docs](../plugins/team-standards/skills/init-project-docs/SKILL.md) | [references/](../plugins/team-standards/skills/init-project-docs/references/)；[assets/](../plugins/team-standards/skills/init-project-docs/assets/)；[init-ai-structure.mjs](../plugins/team-standards/skills/init-project-docs/init-ai-structure.mjs)；[onboard-pipeline.mjs](../plugins/team-standards/skills/init-project-docs/onboard-pipeline.mjs) | 同时含初始化和 onboarding 可执行入口 |
 | [java-coding-standards](../plugins/team-standards/skills/java-coding-standards/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
+| [go-coding-standards](../plugins/team-standards/skills/go-coding-standards/SKILL.md) | 直接阅读主入口；架构复用 DDD-lite 的 Go 章节 | Go 语言规则；没有独立 Go Hook |
 | [llm-agent-coding-standards](../plugins/team-standards/skills/llm-agent-coding-standards/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
 | [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | [references/](../plugins/team-standards/skills/markdown-writing-standards/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [planning-evidence-discovery](../plugins/team-standards/skills/planning-evidence-discovery/SKILL.md) | [references/](../plugins/team-standards/skills/planning-evidence-discovery/references/) | 读取工具契约后调用外部规划证据平台 |
@@ -357,3 +358,7 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 | 按任务消费 | `project-domain-knowledge/src/consult-evidence.ts`、`src/topology-candidates.ts` | MCP 返回有限摘要、缺口与新鲜度，Agent 只补查相关部分 |
 
 格式与执行命令统一维护在 [知识引擎 README](../../project-domain-knowledge/README.md#项目图谱到候选知识的闭环)。文件指纹不涵盖新增文件和外部系统变化；Graphify 不可用允许模块扫描降级。CI、Semgrep、OTel 的各业务项目接入按需实施，不宣称已自动覆盖全部项目。
+
+## Go 编码链路
+
+Go 源码 → `coding-standards-common` + `go-coding-standards`；业务边界变更叠加 `architecture-ddd-lite-fullstack/references/framework-rules.md` 的 Go 章节。需求/修复仍复用原入口，SQL 复用 backend-evidence，交付使用项目 Go 工具链与 delivery-verification，最后同步文档和提交。包结构、接口归属和事务归 DDD-lite；错误、context、goroutine、资源释放与 Go 验证归 Go Skill。

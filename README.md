@@ -6,7 +6,7 @@
 
 - **先看整套做什么** → [按领域的全景链路与节点字典](docs/suite-panorama.md)
 - **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)
-- **查看能力清单** → [21 个 Skill](#21-个-skill)、[合并后的入口](#合并后的入口)
+- **查看能力清单** → [22 个 Skill](#22-个-skill)、[合并后的入口](#合并后的入口)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
 - **安装和维护** → [安装](#安装)、[维护与验证](#维护与验证)、[作业完成条件](#作业完成条件)、[Bug 处理与记录](#bug-处理与记录)
@@ -37,7 +37,7 @@ flowchart TD
 
 ---
 
-## 21 个 Skill
+## 22 个 Skill
 
 | 类别 | Skill | 核心价值 |
 |---|---|---|
@@ -48,6 +48,7 @@ flowchart TD
 | 架构编码 | `architecture-ddd-lite-fullstack` | 跨语言 DDD-lite 分层和依赖方向 |
 | 架构编码 | `coding-standards-common` | 通用命名、结构、异常、测试与注释规则 |
 | 架构编码 | `java-coding-standards` | Java 与关系数据库专属规范 |
+| 架构编码 | `go-coding-standards` | Go 整洁编码、错误、并发与验证；架构复用 DDD-lite |
 | 架构编码 | `llm-agent-coding-standards` | LLM/Agent 信任边界和循环安全 |
 | 前端设计 | `frontend-excellence` | 生产 Web 前端质量和浏览器验收 |
 | 前端设计 | `design-system-bootstrap` | Design Registry/Profile 和偏好学习 |
@@ -82,6 +83,7 @@ flowchart TD
 ```text
 coding-standards-common              所有源码修改的公共基线
 ├── java-coding-standards            Java 代码按需叠加
+├── go-coding-standards              Go 代码按需叠加
 └── llm-agent-coding-standards       接入 LLM / Agent 时按需叠加
 ```
 
@@ -204,3 +206,7 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 治理策略升级为 2：已有绑定需同会话重新 bind，保留基线、范围和重试数，再复核并记录证据；不会自动把旧 PASS 升级。详见 [迁移步骤](plugins/team-standards/skills/change-readiness/references/governance-checker.md#6-策略版本与升级) 和 [证据链源码对应](docs/skill-flow.md#最小证据链与产物去留)。
 
 知识初始化、Graphify 与两个 MCP 的源码对应关系见 [Skill Flow：项目知识候选链路](docs/skill-flow.md#项目知识候选链路与源码)。业务成熟度与实现证据新鲜度分别维护；日常任务复用已有知识，仅补查相关缺口。
+
+## Go 支持（3.5.0）
+
+新增 [Go 编码规范](plugins/team-standards/skills/go-coding-standards/SKILL.md)，共 22 个 Skill；[DDD-lite 技术栈规则](plugins/team-standards/skills/architecture-ddd-lite-fullstack/references/framework-rules.md#go按业务复杂度选择-ddd-lite) 补充消费方接口、用例事务和适配器边界。简单 Go 项目保持轻量包结构，不机械照搬 Java 类层次；没有新增 Go Hook 或强制框架依赖。

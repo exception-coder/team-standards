@@ -68,6 +68,7 @@ flowchart TD
 | 开始写业务代码 | `architecture-ddd-lite-fullstack` |
 | 任何源码 Edit/Write | `coding-standards-common` |
 | Java 源码 | `java-coding-standards` |
+| Go 源码 | `go-coding-standards`；业务代码叠加 DDD-lite 的 Go 章节 |
 | LLM SDK、Agent、Prompt、工具调用或结构化模型输出 | `llm-agent-coding-standards` |
 | 创建、重做或显著提升生产 Web 前端 | `frontend-excellence` |
 | 初始化 Design Registry、绑定 Profile、记录或归纳审美反馈 | `design-system-bootstrap` |
@@ -98,7 +99,7 @@ flowchart TD
 | 类别 | Skill |
 |---|---|
 | 分析与设计 | `change-readiness`、`bug-doc-required`、`business-logic-orientation`、`planning-evidence-discovery` |
-| 架构与编码 | `architecture-ddd-lite-fullstack`、`coding-standards-common`、`java-coding-standards`、`llm-agent-coding-standards` |
+| 架构与编码 | `architecture-ddd-lite-fullstack`、`coding-standards-common`、`java-coding-standards`、`go-coding-standards`、`llm-agent-coding-standards` |
 | 前端与设计治理 | `frontend-excellence`、`design-system-bootstrap`、`design-system-guardian` |
 | 知识与文档 | `backend-evidence`、`glossary-required`、`markdown-writing-standards`、`init-project-docs` |
 | 质量与反馈 | `coding-violation-log`、`comment-cleanup`、`delivery-verification` |
@@ -126,6 +127,7 @@ flowchart TD
 | `glossary-required` | 将业务术语路由到 domain knowledge，并用 Graphify 验证代码映射 | 不维护独立 glossary 候选池 |
 | `init-project-docs` | 当前目录 AI 结构初始化、通用项目接入、上下文刷新与状态检查 | structure 创建最小入口和 Graphify 输入/共享边界；init 再编排真实工具，不复制 Graphify/OpenSpec |
 | `java-coding-standards` | Java 与关系库独占规范 | 叠加 common |
+| `go-coding-standards` | Go 包、接口、错误、并发与验证规范 | 叠加 common；架构复用 DDD-lite |
 | `llm-agent-coding-standards` | LLM/Agent 信任边界、确定性契约和循环兜底 | 仅 LLM 集成代码触发 |
 | `markdown-writing-standards` | 唯一归属、Markdown/Mermaid 结构与必要导航 | 不强制新建索引或日报 |
 | `planning-evidence-discovery` | 跨项目规划证据、轨迹和完成性门禁 | 不拥有项目契约 |
