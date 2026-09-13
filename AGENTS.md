@@ -161,9 +161,14 @@ flowchart TD
 本地按 [delivery-verification](plugins/team-standards/skills/delivery-verification/SKILL.md) 的变更影响表选择检查；CI 保留以下完整回归。Skill 指令不是纯说明，资源移动需安装测试，影响不明时扩大验证。
 
 ```bash
-(cd plugins/team-standards/hooks && npm test) && \
+(cd plugins/team-standards/hooks && npm run test:full) && \
 node scripts/sync-agents.js --check && \
 node scripts/check-cross-refs.js && \
 node scripts/check-version-sync.js && \
 node scripts/audit-skills.js --warnings --ci
 ```
+
+
+日常快测使用 `npm run test:fast --prefix plugins/team-standards/hooks`，仅检查轻量契约，不能替代变更相关集成测试。维护脚本回归使用 `node --test scripts/tests/workspace-maintenance.test.mjs`。临时输出只放仓库根 `.logs/`、`.tmp/` 或系统临时目录，不放插件载荷和工程顶层。
+
+跨仓共享源与消费者路径唯一登记在 `scripts/shared-contracts.mjs`；先运行 `scripts/sync-shared-contracts.mjs --workspace <team-tools>` 预览，明确写入时加 `--write`，拒绝覆盖消费者未提交改动。消费者变更仍按自身运行载荷升版、验证和提交。维护根总览时先运行 `scripts/sync-workspace-overview.mjs --workspace <team-tools> --write`，再通过 `scripts/check-version-sync.js --workspace <team-tools>` 校验。详细边界以 README 维护章节为准。

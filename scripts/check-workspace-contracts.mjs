@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import crypto from 'node:crypto';
+import { contractFiles, multiRepositoryContracts } from './shared-contracts.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
@@ -10,76 +11,22 @@ const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const defaultWorkspace = path.resolve(scriptDirectory, '..', '..');
 const workspace = path.resolve(readOption('--workspace') || defaultWorkspace);
 
-const contractFiles = [
-  {
-    label: 'write input adapter',
-    team: 'team-standards/plugins/team-standards/hooks/change-input.js',
-    profile: 'project-coding-profiles/plugins/project-coding-profiles/hooks/change-input.js',
-  },
-  {
-    label: 'Golden Fixtures',
-    team: 'team-standards/plugins/team-standards/hooks/tests/fixtures/write-events.v1.json',
-    profile: 'project-coding-profiles/plugins/project-coding-profiles/hooks/tests/fixtures/write-events.v1.json',
-  },
-  {
-    label: 'contract integrity metadata',
-    team: 'team-standards/plugins/team-standards/hooks/tests/fixtures/contract-integrity.json',
-    profile: 'project-coding-profiles/plugins/project-coding-profiles/hooks/tests/fixtures/contract-integrity.json',
-  },
-  {
-    label: 'privacy-safe hook metrics helper',
-    team: 'team-standards/plugins/team-standards/hooks/hook-metrics.js',
-    profile: 'project-coding-profiles/plugins/project-coding-profiles/hooks/hook-metrics.js',
-  },
-  {
-    label: 'Hook Event v1 writer',
-    team: 'team-standards/plugins/team-standards/hooks/event-log.js',
-    profile: 'project-coding-profiles/plugins/project-coding-profiles/hooks/event-log.js',
-  },
-];
-
-const multiRepositoryContracts = [
-  {
-    label: 'plugin stale-version reminder',
-    files: [
-      'team-standards/plugins/team-standards/hooks/check-plugin-version-stale.js',
-      'project-coding-profiles/plugins/project-coding-profiles/hooks/check-plugin-version-stale.js',
-      'yoooni-daily-plugin/plugins/yoooni-daily-plugin/hooks/check-plugin-version-stale.js',
-    ],
-  },
-  {
-    label: 'Hook Event v1 schema',
-    files: [
-      'team-standards/plugins/team-standards/hooks/contracts/hook-event.v1.schema.json',
-      'project-coding-profiles/plugins/project-coding-profiles/hooks/contracts/hook-event.v1.schema.json',
-      'yoooni-daily-plugin/plugins/yoooni-daily-plugin/skills/yoooni-hook-report/contracts/hook-event.v1.schema.json',
-    ],
-  },
-];
-
-for (const contract of contractFiles) {
-  const teamPath = path.join(workspace, contract.team);
-  const profilePath = path.join(workspace, contract.profile);
-  assertFile(teamPath);
-  assertFile(profilePath);
-  const teamBytes = contractBytes(teamPath);
-  const profileBytes = contractBytes(profilePath);
-  if (!teamBytes.equals(profileBytes)) {
-    fail(`${contract.label} drifted:\n  ${teamPath}\n  ${profilePath}`);
-  }
-  console.log(`[contracts] ${contract.label}: ${sha256(teamBytes)}`);
-}
-
-for (const contract of multiRepositoryContracts) {
-  const files = contract.files.map((relativePath) => path.join(workspace, relativePath));
-  files.forEach(assertFile);
-  const canonicalBytes = contractBytes(files[0]);
-  for (const filePath of files.slice(1)) {
-    if (!canonicalBytes.equals(contractBytes(filePath))) {
-      fail(`${contract.label} drifted:\n${files.map((file) => `  ${file}`).join('\n')}`);
+if (!process.argv.includes('--canonical-only')) {
+  const groups = [
+    ...contractFiles.map(({ label, team, profile }) => ({ label, files: [team, profile] })),
+    ...multiRepositoryContracts,
+  ];
+  for (const contract of groups) {
+    const files = contract.files.map((file) => path.join(workspace, file));
+    files.forEach(assertFile);
+    const canonicalBytes = contractBytes(files[0]);
+    for (const file of files.slice(1)) {
+      if (!canonicalBytes.equals(contractBytes(file))) {
+        fail(`${contract.label} drifted:\n${files.map((item) => `  ${item}`).join('\n')}\nPreview repair with scripts/sync-shared-contracts.mjs --workspace <team-tools>.`);
+      }
     }
+    console.log(`[contracts] ${contract.label}: ${sha256(canonicalBytes)}`);
   }
-  console.log(`[contracts] ${contract.label}: ${sha256(canonicalBytes)}`);
 }
 
 const integrityPath = path.join(workspace, contractFiles[2].team);
@@ -90,7 +37,7 @@ if (integrity.changeInputSha256 !== adapterHash || integrity.writeEventsSha256 !
   fail('contract-integrity.json does not match the canonical adapter or fixture');
 }
 
-console.log('[contracts] workspace mirrors are in sync');
+console.log(process.argv.includes('--canonical-only') ? '[contracts] canonical integrity OK' : '[contracts] workspace mirrors are in sync');
 
 function readOption(name) {
   const index = process.argv.indexOf(name);

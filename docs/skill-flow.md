@@ -128,3 +128,6 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 ## 轻量交付
 
 本地检查按 [delivery-verification 的影响分级](../plugins/team-standards/skills/delivery-verification/SKILL.md) 选择，Forge 与 CI 门禁保持原约束。Markdown 格式细则和提交示例由对应 Skill 按需加载。业务日志在收尾时按主题合并，S 档默认免写，不按文件数累加工时；正常自动提交仅报告提交结果，不重复展示完整正文。
+
+
+套件维护复用 [README 的维护入口](../README.md#维护与验证)：快测只覆盖轻量契约，改动相关集成测试与完整 CI 继续执行；共享副本先预览再同步，消费者独立验证升版；发布前检查根总览元数据。此轮保持 21 个独立意图入口与现有 warn/block，清理架构 Skill 的 Dart 触发残留。

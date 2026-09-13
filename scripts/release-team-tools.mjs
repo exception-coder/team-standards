@@ -57,6 +57,7 @@ function plugin(repositoryName, pluginName) {
 
 function validateWorkspaceContracts() {
   run(process.execPath, [path.join(scriptDirectory, 'check-workspace-contracts.mjs'), '--workspace', workspace], workspace);
+  run(process.execPath, [path.join(scriptDirectory, 'sync-workspace-overview.mjs'), '--workspace', workspace], workspace);
 }
 
 function validateKnowledgeRepositories() {

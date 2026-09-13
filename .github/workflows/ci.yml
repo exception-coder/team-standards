@@ -38,7 +38,9 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: run hook tests
         working-directory: plugins/team-standards/hooks
-        run: npm test
+        run: npm run test:full
+      - name: verify workspace maintenance tools with isolated fixtures
+        run: node --test scripts/tests/workspace-maintenance.test.mjs
 
   hook-performance:
     name: hook performance budget

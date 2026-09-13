@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const VERBOSE = process.argv.includes('--verbose');
@@ -86,6 +87,16 @@ function main() {
   }
 
   console.log(`[check-version-sync] OK — all 3 manifests at ${versions[0]}`);
+  const workspaceIndex = process.argv.indexOf('--workspace');
+  if (workspaceIndex >= 0) {
+    const workspace = process.argv[workspaceIndex + 1];
+    if (!workspace || workspace.startsWith('--')) {
+      console.error('[check-version-sync] --workspace requires a path');
+      process.exit(1);
+    }
+    const result = spawnSync(process.execPath, [path.join(__dirname, 'sync-workspace-overview.mjs'), '--workspace', workspace], { stdio: 'inherit' });
+    if (result.error || result.status !== 0) process.exit(1);
+  }
 }
 
 main();

@@ -1,6 +1,6 @@
 # team-standards
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**3.1.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**3.2.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 ## 快速导航
 
@@ -135,13 +135,13 @@ Claude Code：
 
 ## 维护与验证
 
-3.1.0 按变更影响选择本地验证，高频 Skill 采用简短入口与按需细则；日志按主题收尾、S 档默认免写，自动提交不重复展示正文。保留 21 个 Skill 和 CI 完整回归。3.0.0 已移除 Dart 专属入口。
+3.2.0 增加共享契约单向同步、套件总览元数据检查和快测入口，保留 21 个 Skill、既有 warn/block 和 CI 完整回归。3.1.0 的按影响验证、日志批处理和按需细则继续生效。
 
 `CLAUDE.md` 是 Claude/Codex 入口的单一来源，修改后运行：
 
 ```bash
 node scripts/sync-agents.js
-(cd plugins/team-standards/hooks && npm test)
+npm run test:full --prefix plugins/team-standards/hooks
 node scripts/sync-agents.js --check
 node scripts/check-cross-refs.js
 node scripts/check-version-sync.js
@@ -149,6 +149,34 @@ node scripts/audit-skills.js --warnings --ci
 ```
 
 破坏性 Skill 删除或重命名递增 Major，并同步 marketplace、Claude plugin、Codex plugin 三处版本。
+
+日常确认输入适配、契约完整性与事件格式可用 `npm run test:fast --prefix plugins/team-standards/hooks`。它仅覆盖 8 项轻量契约测试，不覆盖 Hook 阻断、真实 Git、安装、OpenSpec 或状态场景；相关改动仍运行对应测试。`npm test` 与 `test:full` 均保持全量发现，新增测试不会默认漏入全量集合。耗时随机器变化，不以固定秒数替代验证范围。
+
+套件维护命令从本仓根目录执行，`..` 必须确为包含各组件的 team-tools 工作区：
+
+```bash
+node scripts/sync-shared-contracts.mjs --workspace ..
+node scripts/sync-shared-contracts.mjs --workspace .. --write
+node scripts/check-workspace-contracts.mjs --workspace ..
+node scripts/sync-workspace-overview.mjs --workspace .. --write
+node scripts/check-version-sync.js --workspace ..
+node --test scripts/tests/workspace-maintenance.test.mjs
+```
+
+共享路径只登记在 `scripts/shared-contracts.mjs`，team-standards 为主副本。同步默认预览，显式 `--write` 才复制；先检查全部目标，目标有未提交/已暂存改动、缺失文件或链接目录时拒绝，不自动覆盖本地工作。副本仍随插件独立分发，哈希保留作完整性检查；主副本适配器/fixture 改动后先更新经审阅的完整性元数据。消费者运行载荷发生变化仍需在对应仓库验证、升版和提交。
+
+根 README 工具只修改组件版本、工程治理 Skill 数量与导航、公共层总数，不生成或覆盖说明正文；数据来自三个插件 manifest、实际 Skill 目录和知识服务 package.json。跨仓检查显式使用 `--workspace`，单仓 CI 不要求存在兄弟仓库；发布预检始终检查根 README。组件用途、Skill 清单和行为说明仍须人工核对。
+
+临时日志使用仓库根 `.logs/` 或系统临时目录，禁止写到插件载荷目录或工程顶层。需要保存测试输出时，PowerShell 可执行：
+
+```powershell
+New-Item -ItemType Directory -Path .logs -Force | Out-Null
+npm run test:full --prefix plugins/team-standards/hooks *> .logs/hooks-full.log
+# 检查 $LASTEXITCODE；日志文件不是通过证据的替代品。
+```
+
+team-tools 根目录不是 Git 仓库，根 `.gitignore` 仅供工作区工具识别，不能约束嵌套仓库；本仓独立忽略 `.logs/`、`.tmp/` 和 `*.log`。历史根日志已归档，未删除；仓内未发现生成 replay/state-contract 根日志的固定脚本，临时命令须采用上述输出约定。
+
 
 ---
 

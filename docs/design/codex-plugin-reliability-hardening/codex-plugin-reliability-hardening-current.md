@@ -450,3 +450,10 @@ flowchart TD
 5. Hook 要求 transcript 能定位到本会话实际选择的完整 change；仓库中无关 change 和 legacy 文档不能为 OpenSpec 项目放行。
 6. verify 的 CRITICAL 结果、未完成任务、项目测试、DDL/数据库或发布证据缺失都会阻断团队层归档，即使 OpenSpec 自身只给出 warning。
 7. 只有项目未启用 OpenSpec，或用户明确批准当前变更单次降级时，才进入 legacy；CLI/Skill 故障必须显式阻断和修复。
+
+
+## 维护工具与工作区边界
+
+共享镜像路径集中于 `scripts/shared-contracts.mjs`，team-standards 为主副本；检查器与同步器消费同一清单。同步默认预览，显式写入前验证主副本完整性及全部目标无本地改动，拒绝链接路径；保持消费者独立打包和版本。不存在从消费者反向同步或自动改写完整性哈希的隐式行为。
+
+根 README 的元数据同步与内容编辑分开，写入只覆盖版本、数量及对应导航；发布预检验证根总览，单仓 CI 用隔离 fixture 验证工具。`test:fast` 仅为轻量输入/完整性/事件契约；`test:full` 与原 `npm test` 自动发现全部测试。临时日志留在仓库根 `.logs/` 或系统临时目录，避免进入安装载荷。详见 [维护命令](../../../README.md#维护与验证)。

@@ -1,6 +1,6 @@
 ---
 name: architecture-ddd-lite-fullstack
-description: "Use before writing or reviewing business code in Java, Python, Dart, React, or Vue to choose layers, feature boundaries, reusable capabilities, and one-way dependencies."
+description: "Use before writing or reviewing business code in Java, Python, React, or Vue to choose layers, feature boundaries, reusable capabilities, and one-way dependencies."
 ---
 
 # DDD-lite 全栈架构约束

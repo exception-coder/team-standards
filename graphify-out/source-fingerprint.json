@@ -1,7 +1,7 @@
 {
   "files": {
-    "plugins/team-standards/.claude-plugin/plugin.json": "45acc5aadc183d5bc419aab8507b86399de1c15143953b5165786085935c6a3f",
-    "plugins/team-standards/.codex-plugin/plugin.json": "4203f91a74f7ffc5b737576f908b74a1b2c0cd8a0246ee90df679a87fdd6c855",
+    "plugins/team-standards/.claude-plugin/plugin.json": "62a5d4bac89703fa4f0e682b67be25bfb489967ebc14c3cd279f47159496c56c",
+    "plugins/team-standards/.codex-plugin/plugin.json": "59c8f2545e476f003bcf9136ed08c4e5a2053bdc797199364fb0552bd5e684d8",
     "plugins/team-standards/hooks/benchmarks/check-hook-performance.js": "4d4514d1366b8a63058f5fac0314c69f63ecfb80fefdd55be2908e352513d242",
     "plugins/team-standards/hooks/change-input.js": "e89590d02f8e3984ee953ab80b932f3148e1a4222d023faa32540154e3c61b72",
     "plugins/team-standards/hooks/check-ai-doc-location.js": "5b2b08d91672ad71a800b74f2b544704aa43cf6400248cf7f281183e2c1a9d6b",
@@ -27,7 +27,7 @@
     "plugins/team-standards/hooks/governance/storage.js": "868726fe0acef637de1e116f320c4c8916513246db817c1ab49d240a132f3136",
     "plugins/team-standards/hooks/hook-metrics.js": "26d3062d15ba94022ac7ae6101f5a8d89dc4b6fdbfee0c4144959b275125d370",
     "plugins/team-standards/hooks/hooks.json": "9b316ec932111a2ba4b6fb3f18628a5184363e8e7d04ba97074a583f07067c40",
-    "plugins/team-standards/hooks/package.json": "9d2837211256c38f78c6c39a54fd6d108dbe456b5c7bbb39992a0389e29f1c20",
+    "plugins/team-standards/hooks/package.json": "895a7ae826f274adb1c9799a2620b2d2a0183bd1d640d3b17c3e0794006e26e6",
     "plugins/team-standards/hooks/prompt-signal-capture.js": "4efdf9c74744fd9cda90f8ff8ca06b44a9fe4f1c6e82053666df65d0d2f07e01",
     "plugins/team-standards/hooks/tests/ai-structure-initializer.test.mjs": "c602ecfa185e19ca5dde68c16aeda2cf8e508f67b310bc562a017cfd116da581",
     "plugins/team-standards/hooks/tests/build-commit-message.test.js": "192f7450586bded3052887b4f91a692ea7eb2cc4ab42e3cf7e32d535779a15f5",
@@ -58,7 +58,7 @@
     "plugins/team-standards/hooks/write-guard-dispatcher.js": "ef83ef215c4476b8b14009ff5f36f91d8c7400454075620b57a1782b4975c12e",
     "plugins/team-standards/scripts/openspec-governance.js": "61e04b77ed99d1201f5a4e79d885c357396e3366ac1500b78b8f8005c1f4623d",
     "plugins/team-standards/scripts/state-contract.js": "e22d30b04fc06663cdfec60493ad4fb7793b679ca9283f40ef5b58c8ed3002f7",
-    "plugins/team-standards/skills/architecture-ddd-lite-fullstack/SKILL.md": "4cf15f24ed8464cf4968435c06af343fee98a95a46ec91680b0d9b5c25c007a4",
+    "plugins/team-standards/skills/architecture-ddd-lite-fullstack/SKILL.md": "cf259ec32748c90ce4681b3996cd251e15457bc767313d84a0ff0743259ea292",
     "plugins/team-standards/skills/architecture-ddd-lite-fullstack/references/framework-rules.md": "bcd7d5c00b9cc4585dae536803e4f2e32982060036fd9e4e2e03aae6c03909f2",
     "plugins/team-standards/skills/architecture-ddd-lite-fullstack/references/layers-and-boundaries.md": "cdf8e6f4a0b55f893e7f220b2eb9ee0f0c352bb444632959a4a1f2f54d4ec64e",
     "plugins/team-standards/skills/architecture-ddd-lite-fullstack/rules/structure-quality-gates.md": "539f0d520fa3f9fc76b84ccb43422faaaf113256ea35a349f7ccb9a10a128151",
@@ -177,11 +177,15 @@
     "scripts/check-cross-refs.js": "5505baebf02c941a1baeb4289e62197a68bb4ec17be596f10612666ac4e65610",
     "scripts/check-graphify-freshness.mjs": "a12624bed895737622b084eeba1de19e6cbf1665ae6f3893f067a6b36c5d8f59",
     "scripts/check-runtime-version-bump.js": "5114b32c77134b618c312d9481ed1849c6812f60da6693b32f92c9812563bcf3",
-    "scripts/check-version-sync.js": "e9569b56782a76c0f85c03bcb5bb348ac0c2e08e568f06016b42b52188761c6c",
-    "scripts/check-workspace-contracts.mjs": "df20a1d04a72e25eb7af30722c89c49b37fd43912230a0d36253f8f134f5c0da",
-    "scripts/release-team-tools.mjs": "7cca531ce13a6148e7ae285c2bdc748cc5c97779e440a46d7e5e6271182a88ed",
+    "scripts/check-version-sync.js": "a3d24767cb05e96fd01aea91cc02959becf24fa30c890d5063de53ae53adaed1",
+    "scripts/check-workspace-contracts.mjs": "93ef3376ddbfd4808439b8839144f70b48f59fc997dfb67d8620cba700222e49",
+    "scripts/release-team-tools.mjs": "e69f784482d6385b4027cca809fced8634cfd99a9885beec5903ba771e9eecc7",
+    "scripts/shared-contracts.mjs": "de8dee6e756549ac6ca32f82fe1a3742b8cb3503accbd7de3817680436222390",
     "scripts/sync-agents.js": "a731d27df494fc1158a226c8bfefccf7ec72ee2248f72ad560195ae540d171f5",
+    "scripts/sync-shared-contracts.mjs": "62f67130428d03c91d1bdffe99e2f0e28f1c41de46ecb98eceecf7a9202c6219",
+    "scripts/sync-workspace-overview.mjs": "251e75f447c0d79ad41c3067d407f000826d76eb936c66e8cbb2161bff5df7df",
     "scripts/tests/check-runtime-version-bump.test.mjs": "4f4a342c9e97202204d8ec429bce6d491c91ac520fe2275e84e8c73f1cf7e87e",
-    "scripts/tests/release-team-tools.test.mjs": "89b77b4ab33589ea1d02dcc7cc9303957f9cc94ce1c0b2e3a4437361b6b98dd2"
+    "scripts/tests/release-team-tools.test.mjs": "89b77b4ab33589ea1d02dcc7cc9303957f9cc94ce1c0b2e3a4437361b6b98dd2",
+    "scripts/tests/workspace-maintenance.test.mjs": "c211e7457c34df9f2e3b244275c0b3f4d1d958d56fd122a3d9afdd8c512faedf"
   }
 }

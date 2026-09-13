@@ -2,3 +2,6 @@
 .idea/
 graphify-out/*
 !graphify-out/source-fingerprint.json
+.logs/
+.tmp/
+*.log

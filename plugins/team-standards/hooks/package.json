@@ -8,6 +8,8 @@
   },
   "scripts": {
     "test": "node --test",
-    "test:performance": "node benchmarks/check-hook-performance.js"
+    "test:performance": "node benchmarks/check-hook-performance.js",
+    "test:full": "node --test",
+    "test:fast": "node --test tests/change-input.test.js tests/contract-integrity.test.js tests/hook-event-contract.test.js"
   }
 }
