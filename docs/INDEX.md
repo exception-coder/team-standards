@@ -3,7 +3,7 @@
 | 目录/文件 | 说明 |
 |-----------|------|
 | [../plugins/team-standards/skills/bug-doc-required/SKILL.md](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | Bug 证据闭环与按风险记录，简单问题免独立报告 |
-| [skill-flow.md](skill-flow.md) | Skill 链路全景图（含按影响验证、日志批处理与自动提交闭环） |
+| [skill-flow.md](skill-flow.md) | Skill 链路全景图（含意图/授权分离、路由场景与交付闭环） |
 | [coding-violations.md](coding-violations.md) | 插件自身编码与规则维护违规记录 |
 | [anti-pattern-case-library.md](anti-pattern-case-library.md) | AI 与团队真实编码、架构和流程反模式案例库 |
 | [claude-config-mechanisms.md](claude-config-mechanisms.md) | CLAUDE.md / Commands / Skills 三种配置机制的设计原则与使用边界 |

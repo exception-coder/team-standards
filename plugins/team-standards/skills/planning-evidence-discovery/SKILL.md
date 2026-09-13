@@ -7,6 +7,8 @@ description: "Use when exploring an initial PRD idea, generating an initializati
 
 把初步想法转成有证据的初始化规格。由 Agent 决定查什么，由平台确定项目关系、真实路径、工具执行和完成性；不得用提示词或模型自述替代真实调用。
 
+纯可行性或价值咨询默认交付结论与证据，不因“迁移”“重构”字样创建实施 change、修改业务项目或另建报告；已有平台账本和服务端完成性协议仍遵守。生成初始化规格须来自用户请求或当前任务已有授权；不将探查阶段等同后续实施授权。
+
 ## 渐进读取
 
 - 调用项目前先完整读取 [references/tool-contracts.md](references/tool-contracts.md)。

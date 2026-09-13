@@ -28,7 +28,7 @@ description: "Use to investigate reported bugs, errors, timeouts, or unexpected 
 
 1. 读取相关项目规则与已接受行为；代码事实优先查询新鲜 Graphify，缺失或过期时用定向读取和 diff 补齐。只加载与当前问题有关的内容，不扫描整库或抄录完整类清单。
 2. 涉及 SQL、状态、数据关系或运行证据时使用 backend-evidence；对齐上游或云端时先确认权威来源和真实差异。
-3. 只问原因时先调查；用户要求修复时读取 [最小修复与回归约束](references/repair-rules.md)，按 [change-readiness](../change-readiness/SKILL.md) 判断实施风险和设计依据。Bug 模式不绕过已启用项目的 OpenSpec 要求，也不额外复制一套 Bug 设计文档；符合极简条件时走其已有简化路径。
+3. 没有既有修复授权且只问原因时仅调查；“查明并修复”已授权完整修复链路，证据与实施依据充分后继续，不因阶段或 M/L 档重复确认；新发现超出范围的操作或未决业务选择才补齐授权。用户要求修复时读取 [最小修复与回归约束](references/repair-rules.md)，按 [change-readiness](../change-readiness/SKILL.md) 判断实施风险和设计依据。Bug 模式不绕过已启用项目的 OpenSpec 要求，也不额外复制一套 Bug 设计文档；符合极简条件时走其已有简化路径。
 4. 修复后按 [delivery-verification](../delivery-verification/SKILL.md) 验证当前改动；文档检查与自动提交按 [git-commit-standards](../git-commit-standards/SKILL.md) 执行。同步受影响文档不等于每个 Bug 都新建文档。
 
 ## 完成标准

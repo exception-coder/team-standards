@@ -9,6 +9,12 @@ description: "Use to understand existing business logic before refactoring, rewr
 
 重构、复写或迁移前必须先理解现状，但默认不生成新的梳理文档或 AI 速查索引。
 
+## 探查边界
+
+独立现状理解或审查请求默认只分析，不自动改源码、刷新图谱文件或创建实施 change；当前证据不足时定向读取并说明缺口。若它是已授权重构或修复的前置阶段，证据充分后继续原任务，不重复请求实施授权。查询生产系统的负载、数据范围与权限单独评估，只读不代表低风险。
+
+异常调查优先 bug-doc-required；跨项目价值与工作量评估使用 planning-evidence-discovery；专业审查按对象选择规则。本 Skill 不把所有 Explore 请求收为同一执行流程。
+
 ## 上下文优先级
 
 1. 读取项目 `AGENTS.md` 和项目知识索引，确认业务边界及权威来源。

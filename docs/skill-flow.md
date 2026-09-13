@@ -8,33 +8,28 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 ```mermaid
 flowchart TD
-    A["1. 识别意图"] --> B{"需求、Bug、现状还是项目接入"}
-    B -->|"需求 / 方案"| C["change-readiness\n自动匹配或创建 OpenSpec change"]
-    B -->|"Bug"| D["bug-doc-required"]
-    B -->|"现状"| E["business-logic-orientation"]
-    B -->|"AI 目录初始化 / 新系统接入 / 上下文状态"| F["init-project-docs"]
-    C --> G["2. 建立证据与风险档位"]
-    D --> G
-    E --> G
-    G --> H{"3. 后端事实或共享契约?"}
-    H -->|"是"| I["backend-evidence"]
-    H -->|"否"| J["4. 精确代码定位"]
-    I --> J
-    J --> K["5. 架构与编码门禁"]
-    K --> L["6. 实施"]
-    L --> V["7. delivery-verification\n真实验证与 PASS 门禁"]
-    V --> M["8. 文档、知识、索引、日志同步"]
-    M --> N["9. 自动本地提交本次作业"]
+    A["目标意图：探查 / 修复 / 演进 / 接入"] --> B["结合已有授权，检查具体操作副作用"]
+    B --> C["评估环境、数据、契约与影响风险"]
+    C --> D["按问题对象选择主 Skill 和必要辅助能力"]
+    D --> E["收集当前阶段所需证据"]
+    E --> F{"请求是否包含已授权的实施?"}
+    F -->|"否"| G["交付结论、证据与缺口"]
+    F -->|"是"| H["检查实施依据与授权边界"]
+    H --> I["实施或初始化约定范围"]
+    I --> J["适用验证与受影响文档同步"]
+    J --> K["完成后按规范提交；推送独立判断"]
 ```
 
 ---
+
+意图与授权的权威规则见 [入口规范](../CLAUDE.md#意图授权与风险)。主 Skill 按问题对象选择；阶段推进不等于阶段审批。
 
 ## 入口模式
 
 | 主入口 | 模式 | 什么时候加载 |
 |---|---|---|
-| `change-readiness` | 方案审视 | 用户给出具体解法、目录策略或参考实现 |
-| `change-readiness` | 风险分档与设计 | 所有源码修改请求；S 档允许极简跳过文档 |
+| `change-readiness` | 方案审视 | 审视用户给出的解法；仅咨询时不创建实施 change |
+| `change-readiness` | 风险分档与设计 | 已授权源码修改；风险与 OpenSpec 简化条件按本 Skill 执行 |
 | `change-readiness` | 代码定位 | 设计依据确认后、修改第一行代码前 |
 | `bug-doc-required` | 调查 | 用证据解释问题，不改源码；简单问题直接回复，不另建报告 |
 | `bug-doc-required` | 修复 | 已授权修复：最小改动与回归；复杂或高风险问题复用持久记录 |
@@ -131,3 +126,21 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 
 
 套件维护复用 [README 的维护入口](../README.md#维护与验证)：快测只覆盖轻量契约，改动相关集成测试与完整 CI 继续执行；共享副本先预览再同步，消费者独立验证升版；发布前检查根总览元数据。此轮保持 21 个独立意图入口与现有 warn/block，清理架构 Skill 的 Dart 触发残留。
+
+
+## 易混淆请求的预期路由
+
+以下用于人工场景审视，不是关键词分类器或已运行的 Agent 准确率测试。
+
+| 请求与上下文 | 主入口 / 阶段 | 边界与交付 |
+|---|---|---|
+| 为什么报错（没有既有修复授权） | bug-doc-required / 调查 | 证据与原因，不自动改码 |
+| 查明原因并修复 | bug-doc-required / 调查 → 就绪 → 修复 → 验证 | 已授权范围连续推进，必要规格照常维护 |
+| 上轮已要求修复，本轮补充报错日志 | 继续原修复任务 | 不把最新短句视作撤销已有授权 |
+| 评估迁移是否值得 | 规划探查；跨项目用 planning-evidence-discovery | 默认回答，不因“迁移”创建实施 change |
+| 分析怎么重构 / 按方案重构 | 前者方案探查，后者 change-readiness / 纯重构 | 实施才进入设计生命周期，回归支持行为保持 |
+| 为什么 SQL 慢 / 优化 SQL | 前者后端探查，后者演进；已知性能退化归修复 | 查询负载与数据访问风险独立评估 |
+| 检查接入状态 / 初始化项目 | init-project-docs / status 或 init | status 不写入修复，init 仅改约定基线 |
+| 查线上订单金额不一致 | bug-doc-required 调查 + backend-evidence | 不将只读等同低风险，不默认授权修数据 |
+| 只更新 README / 提交已完成改动 | markdown-writing-standards / git-commit-standards | 直接进入专门动作，不新增需求生命周期 |
+| 已授权修复但发现需删除生产数据 | 继续安全调查，补齐具体操作授权 | 修复授权不自动覆盖破坏性数据操作 |

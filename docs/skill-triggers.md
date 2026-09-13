@@ -1,11 +1,13 @@
 # Skill 触发归属
 
+先遵守 [意图、授权与风险](../CLAUDE.md#意图授权与风险)，下表的信号不是单关键词触发器。纯咨询不自动创建 change；已有授权不因补充消息而失效。
+
 ## 主辅决策表
 
 | 信号 | 主 Skill | 按需叠加 |
 |---|---|---|
-| 具体方案、目录策略、参考实现 | `change-readiness` 方案审视模式 | `planning-evidence-discovery` |
-| 新需求、重构、源码修改 | `change-readiness`；OpenSpec 项目自动匹配/创建并维护 change | 架构、语言和领域 Skill |
+| 方案咨询或实施前审视（仅咨询不创建 change） | 按对象审查；必要时仅读 change-readiness 方案审视参考 | `planning-evidence-discovery` |
+| 已授权需求实施、重构、源码修改 | `change-readiness`；OpenSpec 项目自动匹配/创建并维护 change | 架构、语言和领域 Skill |
 | Bug、异常、超时、错误行为 | `bug-doc-required` | `change-readiness`、编码标准 |
 | 重构前理解现状 | `business-logic-orientation` | `backend-evidence` |
 | 表、SQL、状态、字段、事件、API、性能 | `backend-evidence` | `glossary-required` |

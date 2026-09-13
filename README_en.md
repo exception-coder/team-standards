@@ -1,23 +1,23 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **3.2.0**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **3.3.0**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 ## Unified flow
 
 ```mermaid
 flowchart LR
-    INTENT["Requirement / bug / analysis"] --> EVIDENCE["Evidence and design basis"]
-    EVIDENCE --> IMPACT["Backend facts and impact"]
-    IMPACT --> LOCATE["Precise code orientation"]
-    LOCATE --> GUARD["Architecture and coding gates"]
-    GUARD --> BUILD["Implementation and verification"]
-    BUILD --> WRITEBACK["Documentation, knowledge, index, and log sync"]
-    WRITEBACK --> COMMIT["Automatic local commit"]
+    A["Explore / Repair / Evolve / Bootstrap"] --> B["Existing authorization and operation side effects"]
+    B --> C["Impact and risk; select the relevant Skill"]
+    C --> D["Gather evidence"]
+    D --> E{"Implementation requested and authorized?"}
+    E -->|"No"| F["Deliver findings and gaps"]
+    E -->|"Yes"| G["Readiness, implementation and verification"]
+    G --> H["Sync affected documents and commit scoped work"]
 ```
 
 The main consolidated entry points are:
 
-- `change-readiness`: automatically matches or creates an OpenSpec change, keeps its artifacts coherent through implementation, and performs proposal review, risk classification, and code orientation. OpenSpec-enabled M/L changes cannot silently fall back to legacy design docs.
+- `change-readiness`: for authorized implementation, automatically matches or creates an OpenSpec change, keeps its artifacts coherent through implementation, and performs proposal review, risk classification, and code orientation. OpenSpec-enabled M/L changes cannot silently fall back to legacy design docs.
 - `delivery-verification`: requires current execution evidence before completion, then routes documentation synchronization and automatic local commit.
 - `bug-doc-required`: evidence-led investigation, minimal authorized fixes, and regression. Simple bugs do not require separate reports, diagrams, or fixed tables. Complex or high-risk bugs retain evidence in an existing issue, OpenSpec change, or project document; create a separate report only when needed. The existing invocation name remains compatible.
 - `backend-evidence`: database/runtime truth, fresh Graphify impact queries, domain specifications, and query-performance gates; it does not maintain a parallel code index.
@@ -65,3 +65,5 @@ Local verification follows the change-impact table in [delivery-verification](pl
 Version 3.2.0 adds `test:fast` (8 lightweight adapter/integrity/event tests); `npm test` and `test:full` retain full discovery. Fast checks do not replace affected integration tests. Run `node scripts/sync-shared-contracts.mjs --workspace ..` to preview canonical copies, adding `--write` to apply only when destinations are clean. Consumers remain independently packaged and versioned.
 
 Run `node scripts/sync-workspace-overview.mjs --workspace .. --write` to update only the root README metadata, then `node scripts/check-version-sync.js --workspace ..` to verify it. Release preflight checks the overview; standalone CI needs no sibling repositories. Store temporary output in the repository-root `.logs/` or the OS temporary directory, outside plugin payloads. The non-Git workspace root's ignore file does not govern nested repositories. See [maintenance details](README.md#维护与验证).
+
+Intent routing distinguishes Explore, Repair, Evolve and Bootstrap from authorization and risk. Choose the primary Skill by the problem, finish analysis without implicit implementation, and continue already authorized work across stages without repeated approval. Pure refactoring needs relevant regression evidence, not automatic specification exemption. See the [routing scenarios](docs/skill-flow.md#易混淆请求的预期路由).

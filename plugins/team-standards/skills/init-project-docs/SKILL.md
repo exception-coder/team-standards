@@ -17,6 +17,8 @@ flowchart LR
     D["领域知识 / DDL / 运行证据\n业务真理与数据事实"] --> E
 ```
 
+检查状态只进入 status，不因缺项自动执行 init/refresh；明确初始化或刷新请求才在约定范围写入，不能顺带修改业务代码、部署或扩大外部操作授权。已授权接入任务中的状态检查不撤销后续接入授权。
+
 ## 模式
 
 - `onboard`：新系统首次接入时读取 [references/onboard-workflow.md](references/onboard-workflow.md)，使用 `onboard-pipeline.mjs` 断点续跑。
