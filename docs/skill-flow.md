@@ -341,3 +341,17 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 不是所有知识都能由这三类工具恢复：业务术语、不变量、架构取舍、事故复盘和运行手册保留独有内容；已有历史文档不批量删除。长期文档仍在实现变化时同步。
 
 实际源码：文档规则见上方 references 表；旧 `hooks/check-ai-doc-location.js` 仅兼容旧宿主调用，当前 dispatcher 不再加载。`hooks/governance/evidence.js` 接受可选 dedup/handoff、无需正文的不适用视图及原始验证文件；`service.js` 执行策略版本迁移、范围和新鲜度检查。升级步骤见 [治理协议](../plugins/team-standards/skills/change-readiness/references/governance-checker.md#6-策略版本与升级)。
+
+## 项目知识候选链路与源码
+
+项目接入后先消费已有 MCP 上下文，缺口或已授权初始化才进入探索。初始化以各项目 Graphify 导航，源码核验后起草候选；不把代码事实直接提升成业务规则。
+
+| 环节 | 套件中的源码 | 输出与约束 |
+|---|---|---|
+| 模块候选 | `project-domain-knowledge/scripts/lib/module-bootstrap.mjs`、`graphify-input.mjs` | 模块节点、关联、源码指纹与覆盖缺口；图谱新鲜度未经证明为 unknown |
+| 业务挖掘 | `project-domain-knowledge/scripts/spec-mining.mjs` | 现有候选与评审；accepted 当前证据版本仅晋升 draft |
+| 拓扑候选 | `project-domain-knowledge/scripts/lib/topology-candidates.mjs` | 双方项目、环境、协议和契约唯一匹配；缺失/多义保留 unresolved |
+| 证据核对 | `project-domain-knowledge/src/evidence-provenance.ts`、`scripts/evidence-check.mjs` | 捕获文件字节指纹变化为 stale；不改变业务 stability |
+| 按任务消费 | `project-domain-knowledge/src/consult-evidence.ts`、`src/topology-candidates.ts` | MCP 返回有限摘要、缺口与新鲜度，Agent 只补查相关部分 |
+
+格式与执行命令统一维护在 [知识引擎 README](../../project-domain-knowledge/README.md#项目图谱到候选知识的闭环)。文件指纹不涵盖新增文件和外部系统变化；Graphify 不可用允许模块扫描降级。CI、Semgrep、OTel 的各业务项目接入按需实施，不宣称已自动覆盖全部项目。

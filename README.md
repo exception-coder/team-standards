@@ -200,3 +200,5 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 文档位置门禁退出写入分发，活动 Worker 从 8 项降到 7 项，旧入口保留为无副作用兼容调用。OpenSpec 治理保留场景、审阅、范围与验证指纹；查重/交接记录改为可选，不适用视图不再强写章节，验证可直接引用原始结果文件。检查器不执行测试，也不认证结果文件的真实性。
 
 治理策略升级为 2：已有绑定需同会话重新 bind，保留基线、范围和重试数，再复核并记录证据；不会自动把旧 PASS 升级。详见 [迁移步骤](plugins/team-standards/skills/change-readiness/references/governance-checker.md#6-策略版本与升级) 和 [证据链源码对应](docs/skill-flow.md#最小证据链与产物去留)。
+
+知识初始化、Graphify 与两个 MCP 的源码对应关系见 [Skill Flow：项目知识候选链路](docs/skill-flow.md#项目知识候选链路与源码)。业务成熟度与实现证据新鲜度分别维护；日常任务复用已有知识，仅补查相关缺口。
