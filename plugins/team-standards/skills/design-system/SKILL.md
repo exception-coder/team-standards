@@ -14,6 +14,10 @@ description: "Use for design-system initialization, profile binding, visual cons
 - **偏好记录**：用户明确接受、拒绝或比较设计时，读取 [evidence-capture.md](references/evidence-capture.md)；已有存储约定则保留最小证据，未配置时在当前任务说明，不自动创建全局 Registry。
 - **模式归纳**：用户要求归纳或已有证据需要整理时，读取 [pattern-mining.md](references/pattern-mining.md)；候选不能因出现次数多就自动变成团队硬规则。
 
+## 图表与看板协作
+
+业务图表、指标概览与看板的指标选择、业务状态解释、选图和信息层次由 [business-visualization-advisor](../business-visualization-advisor/SKILL.md) 负责；本 Skill 复用视觉 tokens、语义色与组件，frontend-excellence 负责页面实现和真实浏览器验收。单纯配色或样式评审不自动重做指标设计。
+
 ## 共同边界
 
 使用已配置 Registry 时读取 [resolver.md](references/resolver.md)，没有时以项目资产为准并说明证据来源。小文案、间距调整按影响验证，不强制完整视觉循环。保持批准/拒绝依据及偏好作用域，重大规则晋升需要明确确认；当前任务授权不因进入模式而重复申请。

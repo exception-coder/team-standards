@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.1.0] - 2026-09-14
+
+- Add business-visualization-advisor as the information-design layer for business charts and management dashboards; distribute 16 skills.
+- Route frontend work conditionally through metric semantics, insights and chart selection, then existing visual-system and implementation skills.
+- Preserve evidence boundaries, no-chart fallbacks, and existing chart stacks; no runtime recommendation engine or new hook.
+
 ## [4.0.0] - 2026-09-13
 
 - Breaking: distribute 15 skills; retire eight old names and add the unified design-system entry.

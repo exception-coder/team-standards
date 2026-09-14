@@ -1,10 +1,10 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.0.0**. The plugin exposes 15 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.1.0**. The plugin exposes 16 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Operational workspaces use the width and height allocated by their shell with explicit scroll ownership. Reading content may retain a readable maximum width. The [workspace viewport contract](plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract) requires real-browser checks of tall, short and narrow viewports, live resizing, and sparse/overflowing content; it does not imply an automatic layout checker exists.
 
-See the [suite panorama by engineering domain](docs/suite-panorama.md) for all 24 public Skills, evidence sources, hook checkpoints, maintenance tools and end-to-end task paths.
+See the [suite panorama by engineering domain](docs/suite-panorama.md) for all 19 public Skills, evidence sources, hook checkpoints, maintenance tools and end-to-end task paths.
 
 ## Unified flow
 
@@ -28,9 +28,10 @@ The main consolidated entry points are:
 - `markdown-writing-standards`: document ownership, Markdown/Mermaid structure, and affected existing navigation.
 - `init-project-docs`: idempotently initializes Agent entrypoints, document indexes, OpenSpec, `.graphifyignore`, and the Graphify Git sharing boundary, then routes project rules and evidence without duplicate fact projections.
 - `design-system`: registry/profile initialization and evidence-based preference learning.
-- `design-system`: UI implementation governance and visual review.
+- `business-visualization-advisor`: business-object and lifecycle driven metrics, insights, chart selection, and dashboard information design. Management dashboards connect targets, gaps, evidence-backed breakdowns, and actionable details.
+- `frontend-excellence`: UI implementation, responsive interactions, accessibility, and real-browser verification. It routes business charts to the advisor; design-system owns visual consistency. Ordinary pages do not load the full chart workflow.
 
-See [README.md](README.md) for the complete 15-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+See [README.md](README.md) for the complete 16-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
 
 ## Bug records
 

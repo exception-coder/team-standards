@@ -45,6 +45,10 @@ flowchart TD
 | J 验证与同步 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) + [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | Agent 调用实际可用验证工具/项目命令，随后同步受影响说明；Skill 本身不是测试执行器 |
 | K 提交 | [git-commit-standards](../plugins/team-standards/skills/git-commit-standards/SKILL.md) → [build-commit-message.js](../plugins/team-standards/skills/git-commit-standards/scripts/build-commit-message.js) → Git | 脚本生成经过校验的消息文件；Agent 定向暂存、执行 commit 并按授权推送 |
 
+## 前端设计的条件链路
+
+业务对象与状态证据 → business-visualization-advisor 确定指标、洞察、选图和看板层次 → design-system 复用视觉资产 → frontend-excellence 实施并做浏览器验收 → delivery-verification 汇总证据。前两者交接 Dashboard Spec 或简单图表决策，数值计算仍在项目可信计算层。图表评审可独立使用 advisor；普通页面与纯样式修改不强制走完整图表流程。
+
 ## 先分清四种目录
 
 工作台布局实施通过 `frontend-excellence` 追踪 Shell → 页面 → 中间容器 → 面板的可用宽高及滚动归属；真实浏览器检查高屏、矮屏、窄屏、动态窗口变化和长短内容，再由 delivery-verification 汇总实际证据。细则只维护在 [可用视口契约](../plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract)，不新增 Hook 或宣称已自动检测所有布局。
@@ -98,6 +102,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | [references/](../plugins/team-standards/skills/change-readiness/references/)；[rules/](../plugins/team-standards/skills/change-readiness/rules/) | 规则编排；OpenSpec 与治理程序见下一节 |
 | [coding-standards-common](../plugins/team-standards/skills/coding-standards-common/SKILL.md) | [references/](../plugins/team-standards/skills/coding-standards-common/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) | 直接阅读主入口；无上述下钻目录 | 读取规则后调用外部 Forge 或项目声明命令 |
+| [business-visualization-advisor](../plugins/team-standards/skills/business-visualization-advisor/SKILL.md) | [选图规则](../plugins/team-standards/skills/business-visualization-advisor/references/visual-rules.md)、[Dashboard Spec](../plugins/team-standards/skills/business-visualization-advisor/references/dashboard-spec.md) | Agent 探索业务事实并设计指标/图表，不是运行时图表引擎 |
 | [frontend-excellence](../plugins/team-standards/skills/frontend-excellence/SKILL.md) | [references/](../plugins/team-standards/skills/frontend-excellence/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [git-commit-standards](../plugins/team-standards/skills/git-commit-standards/SKILL.md) | [references/](../plugins/team-standards/skills/git-commit-standards/references/)；[scripts/](../plugins/team-standards/skills/git-commit-standards/scripts/) | scripts/build-commit-message.js 生成消息；Git 负责提交 |
 | [init-project-docs](../plugins/team-standards/skills/init-project-docs/SKILL.md) | [references/](../plugins/team-standards/skills/init-project-docs/references/)；[assets/](../plugins/team-standards/skills/init-project-docs/assets/)；[init-ai-structure.mjs](../plugins/team-standards/skills/init-project-docs/init-ai-structure.mjs)；[onboard-pipeline.mjs](../plugins/team-standards/skills/init-project-docs/onboard-pipeline.mjs) | 同时含初始化和 onboarding 可执行入口 |

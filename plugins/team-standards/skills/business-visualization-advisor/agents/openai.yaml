@@ -1,0 +1,6 @@
+interface:
+  display_name: "业务洞察与图表看板顾问"
+  short_description: "根据业务对象、生命周期与状态探索核心指标，设计清晰且可行动的 Web 图表看板"
+  default_prompt: "使用 $business-visualization-advisor，探索当前业务对象、状态与指标口径，选择最有业务价值的图表并设计清晰可行动的看板。"
+policy:
+  allow_implicit_invocation: true

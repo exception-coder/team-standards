@@ -1,7 +1,7 @@
 {
   "name": "team-standards",
-  "version": "4.0.0",
-  "description": "Team engineering governance with 15 unified skills for design, bugs, architecture, coding, UI governance, backend facts, documentation, and delivery.",
+  "version": "4.1.0",
+  "description": "Team engineering governance with 16 unified skills for design, bugs, architecture, coding, UI governance, backend facts, documentation, and delivery.",
   "author": {
     "name": "Zhang Kai",
     "url": "https://gitee.com/wyoooni"

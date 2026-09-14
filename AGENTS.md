@@ -78,8 +78,8 @@ flowchart TD
 | Java 源码 | `java-coding-standards` |
 | Go 源码 | `go-coding-standards`；业务代码叠加 DDD-lite 的 Go 章节 |
 | LLM SDK、Agent、Prompt、工具调用或结构化模型输出 | `llm-agent-coding-standards` |
-| 创建、重做或显著提升生产 Web 前端 | `design-system` | 设计复用、按需初始化、视觉评审和偏好证据 | 无 Registry 不阻断普通 UI 工作 |
-| `frontend-excellence` |
+| 创建、重做或显著提升生产 Web 前端 | `frontend-excellence`；视觉一致性复用 `design-system` |
+| Web 业务图表、指标概览、管理看板创建、改造或选图评审 | `business-visualization-advisor`；先业务语义与信息设计，再视觉系统和前端实现 |
 | 后端表、SQL、状态、字段、事件、API、领域闭环或查询性能 | `backend-evidence` |
 | 套件或项目更新的文档同步；新建或结构性修改 Markdown、Mermaid、复杂表格 | `markdown-writing-standards` |
 | 初始化 AI 工程结构/AI 目录；初始化新项目、一键 onboard、接入新系统；或刷新上下文状态 | `init-project-docs` |
@@ -100,7 +100,7 @@ flowchart TD
 
 - 分析：change-readiness、bug-doc-required、business-logic-orientation（含术语）。
 - 编码：architecture-ddd-lite-fullstack、coding-standards-common（含清理/反馈）、java-coding-standards、go-coding-standards、llm-agent-coding-standards。
-- 设计：frontend-excellence、design-system（含初始化/评审/偏好）。
+- 前端设计：business-visualization-advisor（指标与信息设计）、design-system（视觉系统）、frontend-excellence（实现与验收）；业务事实仍归现有证据入口。
 - 证据与接入：backend-evidence、init-project-docs、markdown-writing-standards。
 - 交付：delivery-verification、git-commit-standards（含按需工作汇总）。
 
@@ -119,6 +119,7 @@ flowchart TD
 | `coding-standards-common` | 跨语言命名、结构、异常、重复、测试和注释规则 | 所有源码改动必经 |
 | `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
 | `delivery-verification` | 完成前真实验证、有限修复循环与 PASS-only Done | 优先 `forge_verify phase=all`，修改后证据失效 |
+| `business-visualization-advisor` | 业务对象/状态、指标口径、洞察、选图与看板信息设计 | 不承担运行时引擎；普通页面不触发 |
 | `frontend-excellence` | 生产 Web 前端架构、视觉、响应式、可访问性和浏览器验收 | 不用于纯后端或无布局小改 |
 | `git-commit-standards` | 提交标题、中文三段正文和 Author | 每次 commit 前调用 |
 | `init-project-docs` | 当前目录 AI 结构初始化、通用项目接入、上下文刷新与状态检查 | structure 创建最小入口和 Graphify 输入/共享边界；init 再编排真实工具，不复制 Graphify/OpenSpec |

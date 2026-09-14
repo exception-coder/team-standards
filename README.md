@@ -1,12 +1,12 @@
 # team-standards
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**3.4.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.1.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 ## 快速导航
 
 - **先看整套做什么** → [按领域的全景链路与节点字典](docs/suite-panorama.md)
 - **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)
-- **查看能力清单** → [15 个 Skill](#15-个-skill)、[合并后的入口](#合并后的入口)
+- **查看能力清单** → [16 个 Skill](#16-个-skill)、[合并后的入口](#合并后的入口)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
 - **安装和维护** → [安装](#安装)、[维护与验证](#维护与验证)、[作业完成条件](#作业完成条件)、[Bug 处理与记录](#bug-处理与记录)
@@ -37,7 +37,7 @@ flowchart TD
 
 ---
 
-## 15 个 Skill
+## 16 个 Skill
 
 | 类别 | Skill | 核心价值 |
 |---|---|---|
@@ -50,12 +50,21 @@ flowchart TD
 | 架构编码 | `go-coding-standards` | Go 整洁编码、错误、并发与验证；架构复用 DDD-lite |
 | 架构编码 | `llm-agent-coding-standards` | LLM/Agent 信任边界和循环安全 |
 | 前端设计 | `design-system` | 复用项目设计；按需初始化、评审与偏好学习 |
+| 前端设计 | `business-visualization-advisor` | 业务对象与状态驱动的指标、洞察、选图及管理看板信息设计 |
 | 前端设计 | `frontend-excellence` | 生产 Web 前端质量和浏览器验收 |
 | 知识文档 | `backend-evidence` | 单服务数据事实、Graphify 即时影响、领域规格与查询性能 |
 | 知识文档 | `markdown-writing-standards` | 写前查重、Markdown/Mermaid 和写后索引 |
 | 知识文档 | `init-project-docs` | 在当前目录幂等初始化 Agent、文档索引、OpenSpec、`.graphifyignore` 与 Graphify Git 共享边界，再编排上下文状态 |
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，有限修复并以最新 PASS 放行 Done |
 | 日志交付 | `git-commit-standards` | 作业完成后自动提交本次范围，保留文档、验证与真实作者要求，独立判断 push |
+
+---
+
+## 前端设计分层
+
+业务图表与看板先由 [business-visualization-advisor](plugins/team-standards/skills/business-visualization-advisor/SKILL.md) 确定“看什么、怎么算、如何表达”；design-system 统一视觉语言，frontend-excellence 实现交互、响应式与浏览器验收。后端事实与业务语义复用现有证据入口。普通 CRUD 页面不加载整套图表规则。
+
+管理看板围绕目标与结果、差距与风险、原因分解和行动明细；目标、历史趋势和归因必须有证据，缺数据时选择摘要或明细。可直接提出“根据采购对象及状态设计领导看板”，也可调用 `$business-visualization-advisor`。这是 Agent 设计能力，不是已部署的自动看板服务。
 
 ---
 

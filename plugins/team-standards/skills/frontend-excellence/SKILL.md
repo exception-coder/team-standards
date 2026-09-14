@@ -17,6 +17,7 @@ Deliver a coherent product interface, not a runnable mock. Preserve the reposito
    - Use provided Figma selections, screenshots, brand assets, or written references as sources of truth.
    - If no visual reference exists, state a concise visual direction and its rationale before implementing it.
    - Separate durable product character from fashionable references. Translate references into hierarchy, typography, density, material, and motion decisions instead of imitating a named brand.
+   - For business charts, KPI overviews, or dashboards, read [business-visualization-advisor](../business-visualization-advisor/SKILL.md) before choosing metrics, chart types, or page composition. It owns information design and metric semantics; this skill owns implementation and browser verification. Ordinary pages do not require the chart workflow.
 3. Resolve architecture and state ownership.
    - Apply `architecture-ddd-lite-fullstack` for Feature boundaries and dependency direction.
    - Read [architecture-and-state.md](references/architecture-and-state.md) when adding routes, features, shared components, data fetching, forms, or state.

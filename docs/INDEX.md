@@ -3,7 +3,7 @@
 | 目录/文件 | 说明 |
 |-----------|------|
 | [../plugins/team-standards/skills/bug-doc-required/SKILL.md](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | Bug 证据闭环与按风险记录，简单问题免独立报告 |
-| [suite-panorama.md](suite-panorama.md) | 整套工具八个工程职责域、18 个 Skill、事实源、Hook 与任务全景 |
+| [suite-panorama.md](suite-panorama.md) | 整套工具八个工程职责域、19 个 Skill、事实源、Hook 与任务全景 |
 | [skill-flow.md](skill-flow.md) | Skill 链路与源码导航（A—K 节点、规则文件、执行调用链和目标目录） |
 | [coding-violations.md](coding-violations.md) | 插件自身编码与规则维护违规记录 |
 | [anti-pattern-case-library.md](anti-pattern-case-library.md) | AI 与团队真实编码、架构和流程反模式案例库 |
