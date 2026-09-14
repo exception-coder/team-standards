@@ -47,7 +47,7 @@ flowchart TD
 
 ## 前端设计的条件链路
 
-业务对象与状态证据 → business-visualization-advisor 确定指标、洞察、选图和看板层次 → design-system 复用视觉资产 → frontend-excellence 实施并做浏览器验收 → delivery-verification 汇总证据。前两者交接 Dashboard Spec 或简单图表决策，数值计算仍在项目可信计算层。图表评审可独立使用 advisor；普通页面与纯样式修改不强制走完整图表流程。
+业务对象与状态证据 → business-visualization-advisor 确定指标、洞察、选图和看板层次 → design-system 复用视觉资产 → frontend-excellence 实施并做浏览器验收 → delivery-verification 汇总证据。前两者交接 Dashboard Spec 或简单图表决策，数值计算仍在项目可信计算层。明确要求看板优化时，advisor 编码前交付候选与逐项选图决策；没有改变图表先说明理由，交付区分信息架构与图表化改造。登录阻断时尝试授权预览，替代预览不等于业务验收。图表评审可独立使用 advisor；普通页面与纯样式修改不强制走完整图表流程。
 
 ## 先分清四种目录
 

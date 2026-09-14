@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.1.1] - 2026-09-14
+
+- Require candidate visualization decisions before explicit dashboard optimization; explain unchanged charts before coding without adding approval gates.
+- Distinguish information architecture, chart changes and interactions; require honest visual preview evidence and fallback boundaries.
+
 ## [4.1.0] - 2026-09-14
 
 - Add business-visualization-advisor as the information-design layer for business charts and management dashboards; distribute 16 skills.
