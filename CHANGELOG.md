@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.1.2] - 2026-09-14
+
+- Require business goals and purpose–metric–visualization–action mappings before dashboard implementation.
+- Apply chart decisions to statistical-overview optimization and verify outcomes against business goals; cosmetic-only changes cannot count as dashboard optimization.
+
 ## [4.1.1] - 2026-09-14
 
 - Require candidate visualization decisions before explicit dashboard optimization; explain unchanged charts before coding without adding approval gates.

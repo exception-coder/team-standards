@@ -1,6 +1,6 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.1.1**. The plugin exposes 16 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.1.2**. The plugin exposes 16 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Operational workspaces use the width and height allocated by their shell with explicit scroll ownership. Reading content may retain a readable maximum width. The [workspace viewport contract](plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract) requires real-browser checks of tall, short and narrow viewports, live resizing, and sparse/overflowing content; it does not imply an automatic layout checker exists.
 
@@ -29,7 +29,7 @@ The main consolidated entry points are:
 - `init-project-docs`: idempotently initializes Agent entrypoints, document indexes, OpenSpec, `.graphifyignore`, and the Graphify Git sharing boundary, then routes project rules and evidence without duplicate fact projections.
 - `design-system`: registry/profile initialization and evidence-based preference learning.
 - `business-visualization-advisor`: business-object and lifecycle driven metrics, insights, chart selection, and dashboard information design. Management dashboards connect targets, gaps, evidence-backed breakdowns, and actionable details.
-- `frontend-excellence`: UI implementation, responsive interactions, accessibility, and real-browser verification. It routes business charts to the advisor; design-system owns visual consistency. Ordinary pages do not load the full chart workflow. Explicit dashboard optimization requires a visible candidate/decision list before coding, a rationale when charts remain unchanged, and delivery that distinguishes information architecture, visualization changes, and interactions. Preview limitations must be disclosed.
+- `frontend-excellence`: UI implementation, responsive interactions, accessibility, and real-browser verification. It routes business charts to the advisor; design-system owns visual consistency. Ordinary pages do not load the full chart workflow. Dashboard and statistical-overview optimization requires explicit users, discovery goals, actions and first-screen questions, plus purpose–metric–visualization–action mappings and a visible candidate/decision list before coding, a rationale when charts remain unchanged, and delivery that distinguishes information architecture, visualization changes, and interactions. Preview limitations must be disclosed. Completion requires evidence of improved decision-making, insights, comparisons, issue localization or drill-down, verified against business goals; cosmetic changes alone do not qualify.
 
 See [README.md](README.md) for the complete 16-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
 
