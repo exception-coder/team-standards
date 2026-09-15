@@ -1,6 +1,6 @@
 # team-standards
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.1.2**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.1.3**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 ## 快速导航
 
@@ -56,7 +56,7 @@ flowchart TD
 | 知识文档 | `markdown-writing-standards` | 写前查重、Markdown/Mermaid 和写后索引 |
 | 知识文档 | `init-project-docs` | 在当前目录幂等初始化 Agent、文档索引、OpenSpec、`.graphifyignore` 与 Graphify Git 共享边界，再编排上下文状态 |
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，有限修复并以最新 PASS 放行 Done |
-| 日志交付 | `git-commit-standards` | 作业完成后自动提交本次范围，保留文档、验证与真实作者要求，独立判断 push |
+| 日志交付 | `git-commit-standards` | 按最小完整逻辑单元实现、验证、提交；保留文档与真实作者要求，独立判断 push |
 
 ---
 
@@ -227,3 +227,7 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 | `design-system-bootstrap` / `design-system-guardian` | design-system → 初始化、评审、偏好模式 |
 
 保留历史日志与知识数据；不再强制个人 ai-docs、违规计数或无 Registry 时的初始化。Graphify、OpenSpec 和真实验证边界不变。平台协议只是移出通用分发，本轮没有假称已部署到 Forge。
+
+## 原子提交节奏
+
+按 `Task → Implement → Verify → Commit → Next Task` 推进；Task 指最小完整逻辑单元。多个独立问题分别提交，同一功能的前后端、数据、测试和必要文档保持闭环。提交数量不是质量指标，验证必须适用于待提交内容。完整边界与例外归 [Git 提交规范](plugins/team-standards/skills/git-commit-standards/SKILL.md)，现有 Hook 不证明语义原子性。

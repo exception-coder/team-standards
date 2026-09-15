@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.1.3] - 2026-09-14
+
+- Define atomic logical commits and per-unit implement, verify, commit cadence.
+- Keep complete feature layers together, split unrelated tasks, and require validation applicable to the committed snapshot.
+- Preserve user work, push authorization and explicit rollback boundaries; no new hook.
+
 ## [4.1.2] - 2026-09-14
 
 - Require business goals and purpose–metric–visualization–action mappings before dashboard implementation.

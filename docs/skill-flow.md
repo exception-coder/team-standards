@@ -226,7 +226,7 @@ hooks/check-openspec-governance.js                    宿主事件入口
 
 ## 作业完成闭环
 
-本次作业完成前，按 [文档同步规则](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#作业交付时同步文档) 核对并更新受影响的说明、规则与索引；对最终输入完成适用验证后，按 [提交规范](../plugins/team-standards/skills/git-commit-standards/SKILL.md) 自动提交本次范围。纯文档作业执行文档检查后提交，不要求虚构 Runtime 证据。当前切片可独立完成时及时提交，不等待整个 OpenSpec change 归档。
+本次作业完成前，按 [文档同步规则](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#作业交付时同步文档) 核对并更新受影响的说明、规则与索引；对最终输入完成适用验证后，按 [提交规范](../plugins/team-standards/skills/git-commit-standards/SKILL.md) 自动提交本次范围。纯文档作业执行文档检查后提交，不要求虚构 Runtime 证据。当前逻辑单元完成后执行验证与提交，再推进下一单元，不等待整个 OpenSpec change 归档。单元按业务目的与依赖划分，不按文件数或技术层；部分提交须核实待提交内容的验证，不借用无关未提交改动的 PASS。细则唯一归 git-commit-standards。
 
 用户禁止提交、验证失败、归属混合等例外按提交规范处理并明确剩余项；push 独立判断授权。该闭环由 Agent 主动执行，现有 Hook 不保证覆盖全部宿主，也不证明文档语义正确。
 

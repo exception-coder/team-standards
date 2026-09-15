@@ -1,6 +1,6 @@
 # team-standards
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.1.2**. The plugin exposes 16 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.1.3**. The plugin exposes 16 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Operational workspaces use the width and height allocated by their shell with explicit scroll ownership. Reading content may retain a readable maximum width. The [workspace viewport contract](plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract) requires real-browser checks of tall, short and narrow viewports, live resizing, and sparse/overflowing content; it does not imply an automatic layout checker exists.
 
@@ -38,6 +38,9 @@ See [README.md](README.md) for the complete 16-Skill catalog and [docs/skill-flo
 Prefer the existing authoritative record over duplicate reports. If an independent report is needed and no project location is defined, use a stable file under `docs/bug/`. The old document-location hook is retired; shared documents default to repository-native locations under project or user conventions. Investigation-only tasks do not modify source code or create empty commits.
 
 ## Task completion
+
+Use `Task → Implement → Verify → Commit → Next Task`, where Task means a complete logical unit. Split unrelated problems, keep a feature’s required layers, tests and documentation together, and validate the content being committed without relying on uncommitted work. Commit count is not a quality metric; hooks do not prove semantic atomicity.
+
 
 For AI-native projects, implementation, affected documentation, and a local commit form one delivery unit. Every suite or project update includes a documentation-impact check and updates affected README language versions, usage, configuration, rules, and indexes. Record a reason when no documentation change is needed.
 

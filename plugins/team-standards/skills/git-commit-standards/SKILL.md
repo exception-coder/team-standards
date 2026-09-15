@@ -1,13 +1,25 @@
 ---
 name: git-commit-standards
-description: "Use before committing completed work or when querying, summarizing, or explicitly recording work history. Requires scoped commits, synchronized documentation, current validation, a three-part Chinese body, and a real Author; push authorization is separate."
+description: "Use before committing completed work or when querying, summarizing, or explicitly recording work history. Requires atomic logical commits, synchronized documentation, current validation, a three-part Chinese body, and a real Author; push authorization is separate."
 ---
 
 # Git 提交规范
 
+## 原子提交与多任务节奏
+
+一个 Commit 对应一个最小、完整、可独立理解和验证、可说明回滚边界的逻辑变更。评价逻辑边界与质量，不以提交数量少为目标，也不按文件数、行数或技术层拆分。
+
+- 收到多个任务时，先按问题与依赖划分逻辑单元；默认执行 `Task → Implement → Verify → Commit → Next Task`。这里 Task 是逻辑单元，不是任意清单条目或整轮会话。每单元完成后主动提交，再推进下一单元，不默认全部改完后合成一个大提交。
+- 不同需求、不同 Bug，或可分别评审、验证、回滚且没有必要耦合的修改，原则上拆开；同模块、同文件或同一天不是合并理由。不能用一个笼统标题包装多个独立问题。
+- 同一功能闭环所需的前端、API、DTO、Service、SQL/Migration、必要测试与受影响文档一起提交，不机械拆成技术层。提交可依赖已存在的前序提交，但不能靠未来提交或未提交文件才能成立。独立基础重构可先提交并验证，再实现依赖它的功能。
+- 合理拆分无需新增审批或独立报告；在已有任务/变更记录或最终回复中关联“逻辑单元—验证结果—Commit”。并行任务各自隔离并按依赖顺序集成，不要求所有开发者串行，也不能用并行作为混合提交的理由。
+- 提交前审阅完整 staged diff：所有片段是否服务同一目的，能否单独解释正确性，撤销时影响哪些行为。数据库数据、外部副作用和跨仓发布另有恢复边界，`git revert` 不保证恢复运行状态；记录必要恢复策略，不为证明可回滚而实际执行破坏性回滚。
+- 当前工作区通过测试不自动证明待提交快照通过。存在其他未提交修改且可能影响验证时，在隔离目录/工作树中验证“基线 + 本次暂存内容”，或提供能明确排除该依赖的验证证据；缺少证据不将整个工作区 PASS 套给部分提交。不得擅自 stash、reset 或取消用户的暂存来制造干净环境。
+- 单元未完成、验证失败或范围不能安全分离时，保留现场并说明阻碍，不为追求提交节奏强行提交。保持用户不提交/人工提交约束；不擅自重写已发布历史。逻辑边界由 Agent 与评审判断，现有 Hook 和格式校验不证明原子性。
+
 ## 作业完成后自动提交
 
-AI 原生项目把本次作业的实现、文档和提交作为同一交付单元。适用本规范的套件仓库及业务项目，任务完成且存在本次可提交改动时，默认主动 stage 并创建本地 commit，不等待用户再次说“提交”，不把已完成作业堆积到下次。
+AI 原生项目把每个逻辑单元的实现、必要文档、验证和提交作为同一交付单元；一次作业可包含多个这样的单元。适用本规范的套件仓库及业务项目，任务完成且存在本次可提交改动时，默认主动 stage 并创建本地 commit，不等待用户再次说“提交”，不把已完成作业堆积到下次。
 
 1. 先按 [文档同步规则](../markdown-writing-standards/SKILL.md#作业交付时同步文档) 核对并更新受影响的 README、使用说明、规则入口和索引；可执行改动必须具备 delivery-verification 要求的最新通过证据，纯文档任务执行文档与引用检查。
 2. 任务开始记录工作区及暂存区基线，提交前以会话编辑记录和 diff 确定本次范围。只暂存本次文件或可独立分离的片段，禁止无差别 `git add -A`。已有无关暂存内容不能带入本次提交，也不能擅自取消暂存；混合片段无法可靠分离时报告具体阻碍。
@@ -20,7 +32,7 @@ AI 原生项目把本次作业的实现、文档和提交作为同一交付单�
 ## 提交步骤
 
 1. 读取当前仓库 `git config user.name` 和 `git config user.email`；缺失时报告具体缺项，不编造作者，不添加 AI 署名。
-2. 核对本次已完成改动、文档及最新验证，定向暂存并审阅 staged diff；保护用户和其他任务的未提交、已暂存内容。
+2. 核对当前逻辑单元的已完成改动、必要文档及适用于待提交快照的验证，定向暂存并审阅完整 staged diff；保护用户和其他任务的未提交、已暂存内容。
 3. 根据实际意图填写不超过 72 字符的 `type(scope): 标题`，以及依次排列的 `【改动】`、`【原因】`、`【结果】` 三段中文正文和真实 Author。type 使用 feat、fix、refactor、perf、docs、test、style、chore、ci 或 revert；scope 可选。
 4. 用下方脚本生成并核对消息文件，再执行 `git commit -F <消息文件>`。小改也不得省略正文或改用仅标题的 `-m`；正常自动提交不重复展示正文或要求确认，用户要求查看或缺少必要人工确认时才展示完整信息。
 5. 核对提交范围与提交号，按已有授权推送；失败保留改动并报告，禁止绕过 Hook、强推或伪报完成。
