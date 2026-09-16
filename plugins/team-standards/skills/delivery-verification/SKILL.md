@@ -33,6 +33,8 @@ description: "Use after executable project changes and before declaring completi
 
 ## 本地验证按影响选择
 
+已接入模块基线的项目，当前切片交付同时核对 [当前设计同步](../change-readiness/references/current-design-baseline.md)：受影响概设/详设、行为规格和具名审阅证据。验证仅覆盖已实现范围，未完成目标不晋升；代码版本与生产部署分开记录。相关输入指纹分别失效，文档措辞变化只重验必要文档检查，不无理由重跑无关运行测试。
+
 以下范围选择适用于验证计划，不取消项目明确门禁、Forge 阶段契约或 CI 要求。按实际行为和依赖选择，不能仅以扩展名或行数分档；混合变更取各类检查的并集。实施前列出验收行为、命令、覆盖风险和可复用证据；昂贵检查先说明成本与触发理由。
 
 | 改动 | 本地最低验证 |

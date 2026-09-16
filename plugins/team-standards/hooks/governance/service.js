@@ -4,6 +4,7 @@ const path = require('node:path');
 const storage = require('./storage');
 const repoApi = require('./repository');
 const openspec = require('./openspec');
+const baselines = require('./baselines');
 const { validatePlan } = require('./evidence');
 const { checkEnrolled } = require('../../state-contract/enrollment');
 const { requireValue, VERSION, POLICY_VERSION, CHECKER_VERSION, readJson, statePath, fingerprints, atomicUpdate, safePath } = storage;
@@ -20,7 +21,8 @@ function guarded(action) {
 function discover(options) {
   const repo = repoApi.repository(options.repo || process.cwd());
   const configured = fs.existsSync(path.join(repo.root, 'openspec', 'config.yaml'));
-  return result(configured ? 'PASS' : 'NOT_APPLICABLE', [], { repo: repo.root, head: repo.head, mode: configured ? 'openspec' : 'legacy' });
+  return result(configured ? 'PASS' : 'NOT_APPLICABLE', [], { repo: repo.root, head: repo.head,
+    mode: configured ? 'openspec' : 'legacy', baselines: baselines.inspect(repo.root) });
 }
 
 function readBinding(repo, session) {
@@ -35,24 +37,29 @@ function readBinding(repo, session) {
 
 function bind(options) {
   const repo = repoApi.repository(options.repo);
-  const context = openspec.loadContext(repo.root, options.change, options);
-  openspec.validate(repo.root, options.change, options);
   const plan = readJson(options.plan);
-  const references = validatePlan(repo.root, plan, context, 'preflight');
-  const current = executableScope(repoApi.changedFiles(repo.root, repo.head), context);
+  const context = loadContext(repo.root, options.change, plan, options);
+  const references = validatePlan(repo.root, plan, context, 'preflight', repo.head);
+  const changed = repoApi.changedFiles(repo.root, repo.head);
+  const current = executableScope(changed, context);
   const file = statePath(repo.root, options.session);
   const binding = atomicUpdate(file, previous => {
+    if (!previous) {
+      const targets = (plan.baselines || []).flatMap(item => item.reference ? [item.reference.path] : []);
+      requireValue(!changed.some(file => targets.includes(file)), 'DIRTY_BASELINE_OWNERSHIP',
+        '当前设计正文在任务开始前已修改；先用独立工作树分离，不能把他人正文差异记作本次 updated');
+    }
     if (previous) {
-      requireValue(previous.schemaVersion === VERSION && [1, POLICY_VERSION].includes(previous.policyVersion),
-        'VERSION_MISMATCH', '仅支持同结构的策略 1/2 绑定迁移，不能覆盖未知版本');
+      requireValue(previous.schemaVersion === VERSION && [1, 2, POLICY_VERSION].includes(previous.policyVersion),
+        'VERSION_MISMATCH', '仅支持同结构的策略 1/2/3 绑定迁移，不能覆盖未知版本');
       repoApi.verifyBaseline(repo, previous);
-      requireValue(previous.change === options.change, 'REBIND_CONFLICT', '同一会话已有不同 change 绑定，不按最近修改时间替换');
+      requireValue(previous.change === (options.change || null), 'REBIND_CONFLICT', '同一会话已有不同 change 绑定，不按最近修改时间替换');
       requireValue(previous.plan.files.every(item => plan.files.includes(item)), 'SCOPE_SHRINK', '不能通过缩小范围排除已绑定改动');
     }
     const initial = previous?.initial || fingerprints(repo.root, current);
     requireValue(plan.files.every(item => !Object.hasOwn(initial, item)), 'DIRTY_OWNERSHIP', '范围含任务开始前的脏文件；请先分离改动，不覆盖他人基线');
     return { schemaVersion: VERSION, policyVersion: POLICY_VERSION, repo: repo.root, branch: repo.branch,
-      base: previous?.base || repo.head, initial, change: options.change, session: options.session,
+      base: previous?.base || repo.head, initial, change: options.change || null, session: options.session,
       context, plan, references, retries: previous?.retries || 0, evidence: null };
   });
   return result('PASS', [], { change: binding.change, base: binding.base, binding: file });
@@ -85,7 +92,7 @@ function check(options) {
   checkRange(repo, binding, options.files || []);
   if (phase === 'preflight') {
     compareFingerprints(binding.context.artifacts, fingerprints(repo.root, Object.keys(binding.context.artifacts)), 'ARTIFACTS_STALE');
-    compareFingerprints(binding.references, validatePlan(repo.root, binding.plan, binding.context, phase), 'REVIEW_STALE');
+    compareFingerprints(binding.references, validatePlan(repo.root, binding.plan, binding.context, phase, binding.base), 'REVIEW_STALE');
   } else {
     requireValue(binding.evidence, 'EVIDENCE_REQUIRED', '缺少当前代码的交付证据；请完成验证后运行 record', 'NEEDS_WORK');
     const evidence = readJson(safePath(repo.root, binding.evidence));
@@ -107,17 +114,18 @@ function record(options) {
   const plan = readJson(options.plan);
   requireValue(JSON.stringify([...plan.files].sort()) === JSON.stringify([...binding.plan.files].sort())
     && JSON.stringify(plan.taskIds) === JSON.stringify(binding.plan.taskIds), 'RECORD_SCOPE', '记录范围必须与绑定一致，扩展先重新 bind');
-  const context = openspec.loadContext(repo.root, binding.change, options);
-  openspec.validate(repo.root, binding.change, options);
+  const context = loadContext(repo.root, binding.change, plan, options);
   const phase = options.phase || 'delivery';
   checkEnrolled(repo.root, phase);
   requireValue(['delivery', 'archive'].includes(phase), 'PHASE_INVALID', 'record 只接受 delivery 或 archive');
-  const references = validatePlan(repo.root, plan, context, phase);
+  const references = validatePlan(repo.root, plan, context, phase, binding.base);
+  validateSmallChange(repo.root, plan, context, binding.base);
   const evidence = { schemaVersion: VERSION, policyVersion: POLICY_VERSION, checkerVersion: CHECKER_VERSION, phase,
     bindingId: storage.hash(`${repo.root}\n${options.session}`),
     change: binding.change, base: binding.base, context, plan, references,
     inputs: fingerprints(repo.root, plan.files) };
-  const destination = `${context.changeDir}/governance-evidence.json`;
+  const destination = binding.change ? `${context.changeDir}/governance-evidence.json`
+    : `.team-standards/evidence/${storage.hash(options.session)}.json`;
   atomicUpdate(safePath(repo.root, destination), previous => {
     requireValue(!previous || previous.bindingId === evidence.bindingId, 'EVIDENCE_CONCURRENT', '同一 change 已有其它任务的证据；请先合并交付范围再记录');
     return evidence;
@@ -134,10 +142,11 @@ function verifyEvidence(root, evidence, phase) {
   requireValue(evidence.schemaVersion === VERSION && evidence.policyVersion === POLICY_VERSION
     && evidence.checkerVersion === CHECKER_VERSION, 'VERSION_MISMATCH', '证据版本不兼容');
   requireValue(evidence.change === evidence.context.change, 'EVIDENCE_CHANGE', '证据与工件 change 不匹配');
+  validateSmallChange(root, evidence.plan, evidence.context, evidence.base);
   requireValue(phase !== 'archive' || evidence.phase === 'archive', 'ARCHIVE_EVIDENCE', '归档检查缺少同步及长期设计晋升证据', 'NEEDS_WORK');
   compareFingerprints(evidence.inputs, fingerprints(root, evidence.plan.files), 'CODE_STALE');
   compareFingerprints(evidence.context.artifacts, fingerprints(root, Object.keys(evidence.context.artifacts)), 'ARTIFACTS_STALE');
-  compareFingerprints(evidence.references, validatePlan(root, evidence.plan, evidence.context, phase), 'REVIEW_STALE');
+  compareFingerprints(evidence.references, validatePlan(root, evidence.plan, evidence.context, phase, evidence.base), 'REVIEW_STALE');
 }
 
 function checkCi(options) {
@@ -170,9 +179,41 @@ function snapshot(options) {
   const repo = repoApi.repository(options.repo);
   const binding = readBinding(repo, options.session);
   checkRange(repo, binding);
-  const inputs = fingerprints(repo.root, binding.plan.files);
+  const files = options.files ? (Array.isArray(options.files) ? options.files : options.files.split(',')) : binding.plan.files;
+  requireValue(files.every(file => binding.plan.files.includes(file)), 'SNAPSHOT_SCOPE', 'snapshot 输入必须属于绑定范围');
+  const inputs = fingerprints(repo.root, files);
   return result('PASS', [], { inputs, inputFingerprint: storage.hash(JSON.stringify(inputs)),
     note: '只读取验证输入；未执行测试或审阅，须在实际验证时关联本结果' });
+}
+
+function loadContext(root, change, plan, options) {
+  if (change) {
+    const context = openspec.loadContext(root, change, options);
+    openspec.validate(root, change, options);
+    return context;
+  }
+  requireValue(plan.smallChange && typeof plan.smallChange.reason === 'string' && plan.smallChange.reason.trim()
+    && plan.smallChange.behaviorUnchanged === true && plan.files?.length <= 2,
+  'SMALL_CHANGE_REQUIRED', '无 change 仅支持具名审阅的 S 类：最多两文件，明确行为/契约不变理由');
+  return { change: null, changeDir: '.team-standards/evidence', schema: 'small-change', tasks: [{ id: 'small', done: true }], artifacts: {} };
+}
+
+function validateSmallChange(root, plan, context, base) {
+  if (context.schema !== 'small-change') return;
+  loadContext(root, null, plan, {});
+  const diff = repoApi.git(root, ['diff', '--numstat', '--no-renames', repoApi.resolveRevision(root, base), '--', ...plan.files]);
+  let lines = 0;
+  for (const row of diff.trim().split('\n').filter(Boolean)) {
+    const [added, deleted] = row.split('\t');
+    requireValue(/^\d+$/.test(added) && /^\d+$/.test(deleted), 'SMALL_CHANGE_SCOPE', 'S 类不接受二进制变化');
+    lines += Number(added) + Number(deleted);
+  }
+  for (const file of plan.files) {
+    if (!repoApi.git(root, ['ls-files', '--', file]).trim() && fs.existsSync(safePath(root, file))) {
+      lines += storage.readText(safePath(root, file)).split('\n').length;
+    }
+  }
+  requireValue(lines <= 30, 'SMALL_CHANGE_SCOPE', 'S 类最多 30 行；超出后使用独立 change');
 }
 
 module.exports = { guarded, result, discover, readBinding, bind, check, record, doctor, snapshot };

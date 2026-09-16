@@ -7,8 +7,8 @@ const os = require('node:os');
 const MAX_BYTES = 4 * 1024 * 1024;
 const MAX_FILES = 1000;
 const VERSION = 1;
-const POLICY_VERSION = 2;
-const CHECKER_VERSION = 2;
+const POLICY_VERSION = 3;
+const CHECKER_VERSION = 3;
 
 class GovernanceError extends Error {
   constructor(rule, message, status = 'CONTEXT_REQUIRED') {

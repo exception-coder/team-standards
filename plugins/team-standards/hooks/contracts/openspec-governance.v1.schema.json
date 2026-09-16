@@ -63,6 +63,10 @@
           "required": ["query", "decision"],
           "properties": {
             "query": {"type": "string", "minLength": 1},
+            "selection": {"enum": ["new", "continue", "small"]},
+            "originalGoal": {"type": "string", "minLength": 1},
+            "acceptanceBoundary": {"type": "string", "minLength": 1},
+            "stage": {"type": "string", "minLength": 1},
             "decision": {"type": "string", "minLength": 1},
             "reference": {"$ref": "#/$defs/reference"}
           }
@@ -77,6 +81,9 @@
             "reference": {"$ref": "#/$defs/reference"}
           }
         },
+        "baselines": {"type":"array","items":{"type":"object","required":["module","id","disposition","reason"],"properties":{"module":{"type":"string"},"id":{"enum":["overview","detailed"]},"disposition":{"enum":["updated","already-covered","not-applicable"]},"reason":{"type":"string","minLength":1},"reference":{"$ref":"#/$defs/reference"},"implemented":{"type":"boolean"},"codeVersion":{"type":"string","minLength":1}}}},
+        "conflicts": {"type":"array","items":{"type":"object","required":["change","order","reason"],"properties":{"change":{"type":"string","minLength":1},"order":{"type":"string","minLength":1},"reason":{"type":"string","minLength":1}}}},
+        "smallChange": {"type":"object","required":["reason","behaviorUnchanged"],"properties":{"reason":{"type":"string","minLength":1},"behaviorUnchanged":{"const":true}}},
         "verifications": {
           "type": "array",
           "minItems": 1,
@@ -86,6 +93,7 @@
             "properties": {
               "id": {"type": "string", "minLength": 1},
               "command": {"type": "string", "minLength": 1},
+              "files": {"$ref": "#/$defs/strings"},
               "environment": {"type": "string", "minLength": 1},
               "result": {"const": "PASS"},
               "reference": {"$ref": "#/$defs/verificationReference"},
@@ -100,8 +108,8 @@
       "required": ["schemaVersion", "policyVersion", "checkerVersion", "status", "findings"],
       "properties": {
         "schemaVersion": {"const": 1},
-        "policyVersion": {"const": 2},
-        "checkerVersion": {"const": 2},
+        "policyVersion": {"const": 3},
+        "checkerVersion": {"const": 3},
         "status": {"enum": ["PASS", "NOT_APPLICABLE", "NEEDS_WORK", "CONTEXT_REQUIRED", "CHECK_ERROR"]},
         "findings": {
           "type": "array",
@@ -130,21 +138,21 @@
       ],
       "properties": {
         "schemaVersion": {"const": 1},
-        "policyVersion": {"const": 2},
-        "checkerVersion": {"const": 2},
+        "policyVersion": {"const": 3},
+        "checkerVersion": {"const": 3},
         "bindingId": {"$ref": "#/$defs/digest"},
         "phase": {"enum": ["delivery", "archive"]},
-        "change": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+        "change": {"type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9-]*$"},
         "base": {"type": "string", "pattern": "^[a-f0-9]{40,64}$"},
         "context": {
           "type": "object",
           "required": ["change", "changeDir", "schema", "tasks", "artifacts"],
           "properties": {
-            "change": {"type": "string"},
+            "change": {"type": ["string", "null"]},
             "changeDir": {"type": "string"},
             "schema": {"type": "string"},
             "tasks": {"type": "array", "items": {"type": "object", "required": ["id", "done"]}},
-            "artifacts": {"$ref": "#/$defs/fingerprints"}
+            "artifacts": {"type": "object", "additionalProperties": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]}}
           }
         },
         "plan": {"$ref": "#/$defs/plan", "required": ["verifications"]},

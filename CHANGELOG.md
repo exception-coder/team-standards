@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.2.0] - 2026-09-16
+
+- Add versioned current-design module bindings and delivery-slice baseline checks using existing governance records.
+- Add read-only discovery and plan/apply adoption, preserve project bytes, support reviewed small changes and verification input subsets.
+- Policy/checker 3 invalidates older evidence; rebind preserves the original Git base. Host activation and business-project adoption remain separately verified.
+
 ## [4.1.3] - 2026-09-14
 
 - Define atomic logical commits and per-unit implement, verify, commit cadence.

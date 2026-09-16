@@ -21,6 +21,8 @@ flowchart LR
 
 ## 模式
 
+当前设计接入时读取 [AI 原生项目适配指引](references/design-baseline-adoption.md)，复用 `init-ai-structure.mjs status/plan/apply --baselines`。只读盘点、候选计划与授权应用分开；已有正文/配置按字节保留，存量缺口登记责任和治理计划，宿主与 CI 接线分别验证。
+
 - `onboard`：新系统首次接入时读取 [references/onboard-workflow.md](references/onboard-workflow.md)，使用 `onboard-pipeline.mjs` 断点续跑。
 - `structure`：用户要求初始化 AI 工程结构、AI 目录或默认项目解析结构时，读取 [references/initialization-output.md](references/initialization-output.md)，在当前目录执行 `init-ai-structure.mjs`，建立六层职责入口、Graphify 输入边界和 Git 共享边界。
 - `init`：读取 [references/initialization-output.md](references/initialization-output.md)，先执行 `structure`，再构建或校验 Graphify、严格校验 OpenSpec，并报告领域知识与运行证据连接状态。

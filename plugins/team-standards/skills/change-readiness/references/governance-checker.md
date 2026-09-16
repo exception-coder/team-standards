@@ -2,11 +2,11 @@
 
 ## 1. 能力与接入边界
 
-入口为插件根下 `scripts/openspec-governance.js`，Node 18+；本地真实 CLI 集成验证使用 OpenSpec 1.13.0 与当前 Node。CLI 只读状态与工件路径来自 [官方 agent contract](https://github.com/Fission-AI/OpenSpec/blob/main/docs/agent-contract.md)，不硬编码 proposal/design/tasks 的 schema 依赖。
+入口为插件根下 `scripts/openspec-governance.js`，Node 18+；4.2.0 本地真实 CLI 集成验证使用 OpenSpec 1.6.0、Node 24.16.0、Windows；既有 1.13.0 记录不等于本轮重验。CLI 只读状态与工件路径来自 [官方 agent contract](https://github.com/Fission-AI/OpenSpec/blob/main/docs/agent-contract.md)，不硬编码 proposal/design/tasks 的 schema 依赖。
 
-本地状态存入用户 `.local/share/team-standards/governance`，可用 `TEAM_STANDARDS_GOVERNANCE_DATA` 指向宿主可写目录。仓库证据为当前 change 的 `governance-evidence.json`。无需项目治理配置文件；引用的业务文档仍由项目自行维护。
+本地状态存入用户 `.local/share/team-standards/governance`，可用 `TEAM_STANDARDS_GOVERNANCE_DATA` 指向宿主可写目录。仓库证据为当前 change 的 `governance-evidence.json`。未接入当前设计治理时无需模块清单；接入后使用 [当前设计基线协议](current-design-baseline.md) 的单一绑定文件，正文仍由项目维护。
 
-Hook 默认 `warn` 试运行，保留原 change-readiness 与 delivery-verification 行为。项目试点验证后，在启动会话前设置 `TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK=block`，OpenSpec 分支使用共享检查；`off` 只关闭新增检查，不关闭原门禁。既有批准的单次 legacy 降级仍按原规则执行，不能伪称启用强制治理。S 档在试运行阶段沿用原分流；当前 block 检查面向已绑定 change 的任务，尚无无 change 的结构化 S 豁免入口，不将其宣传为全档位接入完成。
+Hook 默认 `warn` 试运行，保留原 change-readiness 与 delivery-verification 行为。项目试点验证后，在启动会话前设置 `TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK=block`，OpenSpec 分支使用共享检查；`off` 只关闭新增检查，不关闭原门禁。既有批准的单次 legacy 降级仍按原规则执行，不能伪称启用强制治理。S 档可省略 --change 并按当前设计基线协议提供 smallChange、small 任务与真实审阅验证；不强迫纯样式创建 OpenSpec change。
 
 ---
 
@@ -86,4 +86,4 @@ CI 不依赖本地会话缓存；检查输入必须全部处于目标提交。�
 
 ## 6. 策略版本与升级
 
-3.4.0 使用 schemaVersion 1、policyVersion 2、checkerVersion 2。旧计划字段仍可读取，但旧绑定和交付证据不会被静默视为新策略 PASS。更新计划后对同一 session/change 重新 bind：保留起始基线、脏文件归属、已有范围和重试数，清除已交付标记；未知版本拒绝迁移。复核适用内容与真实验证后重新 record，CI 必须固定匹配的插件版本。不要通过删除状态或换会话绕过基线。
+4.2.0 使用 schemaVersion 1、policyVersion 3、checkerVersion 3，增加模块当前设计绑定与切片同步检查。旧计划字段仍可读取，但旧绑定和交付证据不会被静默视为新策略 PASS。更新计划后对同一 session/change 重新 bind：保留起始基线、脏文件归属、已有范围和重试数，清除已交付标记；未知版本拒绝迁移。复核适用内容与真实验证后重新 record，CI 必须固定匹配的插件版本。不要通过删除状态或换会话绕过基线。

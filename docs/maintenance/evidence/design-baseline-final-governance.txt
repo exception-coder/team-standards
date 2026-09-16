@@ -1,0 +1,42 @@
+✔ baseline A3/A8/A9: shared long-lived file, independent slice delivery, pending change cannot archive (6160.9207ms)
+✔ baseline A5/A9/A10: unbound, ambiguous, shared and change references (765.0541ms)
+✔ baseline A6/A7: timestamp-only sync and unimplemented promotion are rejected (4842.8292ms)
+✔ baseline A11: concurrent Requirement and baseline targets require explicit ordering (2607.2309ms)
+✔ baseline A12: committed diff persists; changed baseline evidence becomes stale (7024.9574ms)
+✔ baseline A12: preexisting baseline edits cannot be claimed as this slice update (1785.7963ms)
+✔ baseline A13: wording edits preserve runtime input fingerprint (5047.8664ms)
+✔ baseline A5/A15: explicit legacy gap may plan but cannot deliver; unknown versions fail (3662.9868ms)
+✔ baseline A4: reviewed small change uses existing governance without an OpenSpec change (3570.6572ms)
+✔ baseline A14: initializer status/plan are read-only; apply preserves existing bytes (1794.0652ms)
+✔ baseline A10: removing old ownership cannot hide renamed/deleted inputs (3290.6021ms)
+✔ baseline A13: verification subsets cannot omit input coverage (4241.2625ms)
+✔ baseline A18: bounded registry and explicit small-change limits fail closed (3460.6298ms)
+✔ baseline A16: Hook process keeps warn/off distinct from block without a host session ID (2223.6133ms)
+✔ bind → implement → record → delivery: clean committed changes remain checked and CI needs no local cache (7089.5873ms)
+✔ missing binding and transcript text never authorize implementation (1202.7267ms)
+✔ dirty owned files are rejected; unrelated initial edits are retained (4026.0865ms)
+✔ code, design and review changes invalidate only current evidence (6415.892ms)
+✔ a view cannot cover unrelated source files or an empty design heading (1516.3456ms)
+✔ partial slice may deliver, whole-change archive remains blocked (4684.8331ms)
+✔ failed verification and blocked handoff cannot produce delivery evidence (3669.8475ms)
+✔ Stop repair budget survives plan updates and changing findings (6545.0913ms)
+✔ unbound Stop and documentation repair remain non-blocking (876.2832ms)
+✔ delete and rename check both source and destination scope (3737.9066ms)
+✔ CLI missing, malformed JSON and unsafe paths fail closed (1137.7706ms)
+✔ concurrent binding lock cannot be treated as success (2309.0503ms)
+✔ CLI emits one JSON result and nonzero exit on unresolved context (920.0281ms)
+✔ real OpenSpec CLI parses planning, selected tasks and strict validation (13840.0618ms)
+✔ minimal plan delivers with existing design and a real raw test result, without validation Markdown (5457.493ms)
+✔ not-applicable views need a reason but no duplicate chapter; applicable views still require references (2573.6609ms)
+✔ optional dedup and handoff accept inline facts but still reject blockers and malformed records (2389.3335ms)
+✔ raw verification rejects empty files, unsafe paths and ambiguous supplied headings (504.8702ms)
+✔ policy migration preserves baseline, scope and retries without promoting old PASS evidence (7034.2216ms)
+✔ archive records not-applicable promotion without duplicate prose and rejects missing applicable references (589.8256ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 127100.8102

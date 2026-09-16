@@ -31,6 +31,8 @@ openspec validate <change> --strict --json --no-interactive
 
 ## 自动匹配或创建
 
+先读模块当前设计和主规格；候选必须同时匹配原目标、验收边界与阶段。同模块不构成复用理由，可独立评审/验证/交付的新目标创建独立 change；澄清、修复、验收遗漏与会话恢复沿用原 change。具体绑定、冲突与证据规则见 [当前设计基线协议](current-design-baseline.md)。
+
 1. 运行 `openspec list --json` 获取活动 changes。
 2. 依据需求目标、受影响 capability 和变更边界筛选候选；对候选运行 `show` 与 `status`，不得只按最近更新时间选择。
 3. 恰好一个候选匹配时，公开回显 `Using change: <name>`，并记录本次读取的状态和 artifact 路径。
@@ -41,6 +43,8 @@ openspec validate <change> --strict --json --no-interactive
 查重同时读取相关主规格、活动 changes，必要时追溯归档。主规格已覆盖的需求先核对实现缺失或偏离，不重复添加同名 Requirement。有需要解释的取舍时写入现有 proposal，不强制查重章节，恢复会话优先沿用原绑定。
 
 ## 文档推进与阶段准出
+
+每个已验证且可独立验收的切片在交付前同步受影响当前概设/详设和可接受的主规格，不等待整个 change 归档；其它未完成目标仍留在 change。内部尚未开放切片只说明可证实实现范围。只有受影响正文需要修改，已有覆盖/不适用记录具体理由，归档再复核全量条件。
 
 | 阶段 | 最小内容及位置 | 准出条件 |
 |---|---|---|

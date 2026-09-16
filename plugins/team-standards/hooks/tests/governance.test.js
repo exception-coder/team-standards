@@ -10,6 +10,7 @@ const { handle } = require('../check-openspec-governance');
 const cliEntry = path.resolve(__dirname, '../../scripts/openspec-governance.js');
 const change = 'add-greeting';
 const changeDir = `openspec/changes/${change}`;
+const baselines = require('../governance/baselines');
 
 function runGit(root, args) {
   const output = spawnSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true });
@@ -95,6 +96,185 @@ function implement(f) {
   f.plan.verifications[0].inputFingerprint = inputFingerprint;
   f.save();
 }
+
+function enrollBaseline(f) {
+  write(f.root, 'docs/current.md', '## Overview\n\nThe greeting module owns the synchronous greeting operation and has no external dependencies.\n\n## Detailed\n\nThe current implementation returns the old greeting to every caller without accessing storage.\n');
+  const registry = { schemaVersion: 1, managed: ['src/'], modules: [{ id: 'greeting', scopes: ['src/'],
+    capabilities: ['greeting'], owner: 'fixture maintainer', status: 'active', codeVersion: 'fixture baseline',
+    overview: { path: 'docs/current.md', heading: '## Overview' }, detailed: { path: 'docs/current.md', heading: '## Detailed' } }] };
+  write(f.root, baselines.REGISTRY, JSON.stringify(registry));
+  runGit(f.root, ['add', '.']);
+  runGit(f.root, ['commit', '-qm', 'bind current design']);
+  f.plan.dedup = { ...f.plan.dedup, selection: 'new', originalGoal: 'Replace old greeting', acceptanceBoundary: 'Greeting caller receives hello', stage: 'planning' };
+  f.plan.baselines = ['overview', 'detailed'].map(id => ({ module: 'greeting', id,
+    disposition: id === 'overview' ? 'already-covered' : 'updated', reason: 'Only the greeting result changes; ownership stays stable.',
+    reference: registry.modules[0][id], implemented: true, codeVersion: 'bound baseline plus this verified slice' }));
+  f.plan.sync = { status: 'not-applicable', reason: 'Internal slice; not yet accepted as a public capability.', reference: f.ref('validation.md', '## Sync'), targets: [] };
+  f.save();
+  return registry;
+}
+
+function syncBaseline(f) {
+  const target = path.join(f.root, 'docs/current.md');
+  fs.writeFileSync(target, fs.readFileSync(target, 'utf8').replace('returns the old greeting', 'returns the hello greeting'));
+}
+
+test('baseline A3/A8/A9: shared long-lived file, independent slice delivery, pending change cannot archive', t => {
+  const f = fixture(t); enrollBaseline(f);
+  service.bind(f.options); implement(f); syncBaseline(f);
+  service.record(f.options);
+  assert.equal(service.check(f.options).status, 'PASS');
+  assert.equal(service.guarded(() => service.record({ ...f.options, phase: 'archive' })).findings[0].rule, 'CHANGE_INCOMPLETE');
+});
+
+test('baseline A5/A9/A10: unbound, ambiguous, shared and change references', t => {
+  const f = fixture(t); const registry = enrollBaseline(f);
+  registry.modules[0].scopes = ['src/other/'];
+  assert.throws(() => baselines.affected(registry, ['src/greet.js']), { rule: 'MODULE_UNBOUND' });
+  registry.modules[0].scopes = ['src/'];
+  registry.modules.push({ ...registry.modules[0], id: 'consumer' });
+  assert.throws(() => baselines.affected(registry, ['src/greet.js']), { rule: 'MODULE_AMBIGUOUS' });
+  registry.modules.forEach(module => { module.shared = true; });
+  assert.equal(baselines.affected(registry, ['src/greet.js']).length, 2);
+  registry.modules[0].overview = f.ref('design.md', '## Design');
+  assert.throws(() => baselines.validateRegistry(f.root, registry), { rule: 'BASELINE_REFERENCE' });
+});
+
+test('baseline A6/A7: timestamp-only sync and unimplemented promotion are rejected', t => {
+  const f = fixture(t); enrollBaseline(f); service.bind(f.options); implement(f);
+  fs.appendFileSync(path.join(f.root, 'docs/current.md'), '\n更新时间：2026-09-16\n## Empty\n');
+  assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'BASELINE_NO_CHANGE');
+  syncBaseline(f); f.plan.baselines[1].implemented = false; f.save();
+  assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'BASELINE_UNVERIFIED');
+});
+
+test('baseline A11: concurrent Requirement and baseline targets require explicit ordering', t => {
+  const f = fixture(t); enrollBaseline(f);
+  write(f.root, 'openspec/changes/other/specs/greeting/spec.md', '### Requirement: Stable greeting\nA second change modifies this same requirement.\n');
+  assert.equal(service.guarded(() => service.bind(f.options)).findings[0].rule, 'BASELINE_CONFLICT');
+  f.plan.conflicts = [{ change: 'other', order: 'this change before other', reason: 'Other must rebase and revalidate its behavior and design after this delivery.' }];
+  f.save(); assert.equal(service.bind(f.options).status, 'PASS');
+});
+
+test('baseline A12: committed diff persists; changed baseline evidence becomes stale', t => {
+  const f = fixture(t); enrollBaseline(f); service.bind(f.options); implement(f); syncBaseline(f);
+  const recorded = service.record(f.options); const base = runGit(f.root, ['rev-parse', 'HEAD']);
+  runGit(f.root, ['add', '.']); runGit(f.root, ['commit', '-qm', 'verified slice']);
+  const head = runGit(f.root, ['rev-parse', 'HEAD']);
+  assert.equal(service.check({ repo: f.root, evidence: recorded.evidence, base, head }).status, 'PASS');
+  fs.appendFileSync(path.join(f.root, 'docs/current.md'), '\nThe documented behavior has now changed independently.\n');
+  assert.equal(service.guarded(() => service.check(f.options)).findings[0].rule, 'REVIEW_STALE');
+});
+
+test('baseline A12: preexisting baseline edits cannot be claimed as this slice update', t => {
+  const f = fixture(t); enrollBaseline(f);
+  syncBaseline(f);
+  assert.equal(service.guarded(() => service.bind(f.options)).findings[0].rule, 'DIRTY_BASELINE_OWNERSHIP');
+  assert.match(fs.readFileSync(path.join(f.root, 'docs/current.md'), 'utf8'), /hello greeting/);
+});
+
+test('baseline A13: wording edits preserve runtime input fingerprint', t => {
+  const f = fixture(t); enrollBaseline(f); service.bind(f.options); implement(f); syncBaseline(f);
+  service.record(f.options);
+  const before = f.plan.verifications[0].inputFingerprint;
+  fs.appendFileSync(path.join(f.root, 'docs/current.md'), '\nClarification: this describes code and does not assert a production deployment.\n');
+  assert.equal(service.record(f.options).status, 'PASS');
+  assert.equal(f.plan.verifications[0].inputFingerprint, before);
+});
+
+test('baseline A5/A15: explicit legacy gap may plan but cannot deliver; unknown versions fail', t => {
+  const f = fixture(t); const registry = enrollBaseline(f);
+  registry.modules[0].status = 'gap'; registry.modules[0].plan = 'maintainer completes both views before strict delivery';
+  write(f.root, baselines.REGISTRY, JSON.stringify(registry));
+  runGit(f.root, ['add', '.']); runGit(f.root, ['commit', '-qm', 'register baseline debt']);
+  service.bind(f.options); implement(f);
+  assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'BASELINE_MISSING');
+  registry.schemaVersion = 99;
+  assert.throws(() => baselines.validateRegistry(f.root, registry), { rule: 'BASELINE_VERSION' });
+});
+
+test('baseline A4: reviewed small change uses existing governance without an OpenSpec change', t => {
+  const f = fixture(t);
+  delete f.options.change;
+  f.plan.taskIds = ['small']; f.plan.scenarios[0].taskIds = ['small'];
+  f.plan.smallChange = { reason: 'Restore the already accepted greeting behavior.', behaviorUnchanged: true };
+  f.save(); service.bind(f.options); implement(f);
+  const recorded = service.record(f.options);
+  assert.match(recorded.evidence, /^\.team-standards\/evidence\//);
+  assert.equal(service.check(f.options).status, 'PASS');
+});
+
+test('baseline A14: initializer status/plan are read-only; apply preserves existing bytes', async t => {
+  const f = fixture(t); const registry = enrollBaseline(f);
+  const { baselineEnrollment } = await import('../../skills/init-project-docs/init-ai-structure.mjs');
+  const candidate = path.join(f.home, 'bindings.json'); fs.writeFileSync(candidate, JSON.stringify(registry));
+  const target = path.join(f.root, baselines.REGISTRY); fs.unlinkSync(target);
+  const opts = { root: f.root, bindings: candidate };
+  assert.equal(baselineEnrollment({ ...opts, command: 'plan' }).action, 'create');
+  assert.equal(fs.existsSync(target), false);
+  assert.equal(baselineEnrollment({ ...opts, command: 'apply' }).changes.length, 1);
+  const bytes = fs.readFileSync(target);
+  registry.modules[0].owner = 'different proposed owner'; fs.writeFileSync(candidate, JSON.stringify(registry));
+  assert.equal(baselineEnrollment({ ...opts, command: 'apply' }).proposedDifference, true);
+  assert.deepEqual(fs.readFileSync(target), bytes);
+  assert.equal(baselineEnrollment({ ...opts, command: 'status' }).changes.length, 0);
+  const cli = path.resolve(__dirname, '../../skills/init-project-docs/init-ai-structure.mjs');
+  for (const command of ['status', 'plan', 'apply']) {
+    const output = spawnSync(process.execPath, [cli, command, '--root', f.root, '--baselines', '--bindings', candidate, '--json'], { encoding: 'utf8', windowsHide: true });
+    assert.equal(output.status, 0, output.stderr);
+    assert.equal(JSON.parse(output.stdout).changes.length, 0);
+    assert.deepEqual(fs.readFileSync(target), bytes);
+  }
+});
+
+test('baseline A10: removing old ownership cannot hide renamed/deleted inputs', t => {
+  const f = fixture(t); const registry = enrollBaseline(f); service.bind(f.options); implement(f); syncBaseline(f);
+  registry.managed = ['other/'];
+  write(f.root, baselines.REGISTRY, JSON.stringify(registry));
+  assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'SCOPE_GAP');
+  const refs = [];
+  assert.throws(() => baselines.validateBaselines(f.root, f.plan, { artifacts: {} }, 'delivery',
+    runGit(f.root, ['rev-parse', 'HEAD']), ref => refs.push(ref)), { rule: 'MODULE_MIGRATION' });
+});
+
+test('baseline A13: verification subsets cannot omit input coverage', t => {
+  const f = fixture(t); service.bind(f.options); implement(f);
+  f.plan.verifications[0].files = ['unrelated.js']; f.save();
+  assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'VERIFICATION_SCOPE_GAP');
+  f.plan.verifications[0].files = ['src/greet.js'];
+  f.plan.verifications[0].inputFingerprint = service.snapshot({ ...f.options, files: 'src/greet.js' }).inputFingerprint;
+  f.save(); assert.equal(service.record(f.options).status, 'PASS');
+});
+
+test('baseline A18: bounded registry and explicit small-change limits fail closed', t => {
+  const f = fixture(t); const registry = enrollBaseline(f);
+  registry.modules = Array.from({ length: 1001 }, (_, index) => ({ ...registry.modules[0], id: `module-${index}` }));
+  assert.throws(() => baselines.validateRegistry(f.root, registry), { rule: 'BASELINE_FORMAT' });
+  fs.unlinkSync(path.join(f.root, baselines.REGISTRY));
+  runGit(f.root, ['add', '.']); runGit(f.root, ['commit', '-qm', 'remove enrollment for S fixture']);
+  delete f.options.change; delete f.plan.baselines;
+  f.plan.taskIds = ['small']; f.plan.scenarios[0].taskIds = ['small'];
+  f.plan.smallChange = { reason: 'Only wording changes', behaviorUnchanged: true }; f.save();
+  service.bind(f.options); implement(f);
+  write(f.root, 'src/greet.js', Array.from({length: 35}, (_, index) => `// line ${index}`).join('\n'));
+  const digest = service.snapshot(f.options).inputFingerprint;
+  f.plan.review.inputFingerprint = digest; f.plan.verifications[0].inputFingerprint = digest; f.save();
+  assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'SMALL_CHANGE_SCOPE');
+});
+
+test('baseline A16: Hook process keeps warn/off distinct from block without a host session ID', t => {
+  const f = fixture(t);
+  const hook = path.resolve(__dirname, '../check-openspec-governance.js');
+  const payload = { cwd: f.root, tool_name: 'Edit', tool_input: { file_path: 'src/greet.js' } };
+  for (const mode of ['warn', 'off', 'block']) {
+    const output = spawnSync(process.execPath, [hook], { encoding: 'utf8', windowsHide: true,
+      input: JSON.stringify(payload), env: { ...process.env, TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK: mode,
+        TEAM_STANDARDS_GOVERNANCE_SESSION: 'explicit-task-id' } });
+    assert.equal(output.status, mode === 'block' ? 2 : 0, output.stderr);
+    if (mode !== 'off') assert.match(output.stderr, /BINDING_REQUIRED/);
+    else assert.equal(output.stderr, '');
+  }
+});
 
 test('bind → implement → record → delivery: clean committed changes remain checked and CI needs no local cache', t => {
   const f = fixture(t);
@@ -242,12 +422,14 @@ test('real OpenSpec CLI parses planning, selected tasks and strict validation', 
   skip: !process.env.OPENSPEC_TEST_CLI,
 }, t => {
   const f = fixture(t, process.env.OPENSPEC_TEST_CLI);
+  enrollBaseline(f);
   const context = require('../governance/openspec').loadContext(f.root, change, f.options);
   f.plan.taskIds = [context.tasks[0].id];
   f.plan.scenarios[0].taskIds = [...f.plan.taskIds];
   f.save();
   service.bind(f.options);
   implement(f);
+  syncBaseline(f);
   service.record(f.options);
   assert.equal(service.check(f.options).status, 'PASS');
 });
@@ -272,7 +454,7 @@ test('minimal plan delivers with existing design and a real raw test result, wit
   f.save();
   const recorded = service.record(f.options);
   assert.equal(service.check(f.options).status, 'PASS');
-  assert.equal(recorded.policyVersion, 2);
+  assert.equal(recorded.policyVersion, 3);
   assert.equal(fs.existsSync(path.join(f.root, changeDir, 'validation.md')), false);
   // The recorded result cannot survive changes to its underlying raw evidence.
   write(f.root, `${changeDir}/test-result.log`, 'different execution result');

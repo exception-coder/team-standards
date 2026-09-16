@@ -33,6 +33,8 @@ OpenSpec 的结构校验通过只证明 artifacts 合法，不证明代码、DDL
 
 ## 渐进读取
 
+功能迭代、模块设计影响、独立目标匹配或切片交付时，读取 [当前设计基线与独立增量](references/current-design-baseline.md)。先读模块当前概设/详设与主规格，再核对原目标、验收边界和阶段；可独立交付的新目标新建 change，原目标修正/恢复沿用。规划目标留在 change，已验证切片交付前同步受影响当前正文。
+
 - 用户给出具体方案、现有代码或要求照某路径实施时，先读取 [references/solution-review.md](references/solution-review.md)，分离目标与候选方案并审视生产风险。
 - 需要判断档位、模板类型或合法例外时，读取 [references/classification.md](references/classification.md)。
 - 项目启用 OpenSpec，或需要匹配、创建、更新、验证、同步、归档 change 时，读取 [references/openspec-lifecycle.md](references/openspec-lifecycle.md)。

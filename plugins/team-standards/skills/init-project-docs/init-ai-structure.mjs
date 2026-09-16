@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import baselineApi from '../../hooks/governance/baselines.js';
+import storage from '../../hooks/governance/storage.js';
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATE_ROOT = path.join(SCRIPT_DIR, 'assets', 'project-ai-structure');
@@ -46,6 +48,8 @@ function parseArguments(argv) {
     root: path.resolve(readOption(argv, '--root') || process.cwd()),
     projectName: readOption(argv, '--name'),
     json: argv.includes('--json'),
+    baselines: argv.includes('--baselines'),
+    bindings: readOption(argv, '--bindings'),
   };
 }
 
@@ -155,6 +159,12 @@ function summarize(result, command) {
 function run(argv = process.argv.slice(2)) {
   const options = parseArguments(argv);
   assertSafeRoot(options.root);
+  if (options.baselines) {
+    const output = baselineEnrollment(options);
+    process.stdout.write(`${JSON.stringify(output, null, 2)}\n`);
+    if (options.command === 'status' && output.state !== 'bound') process.exitCode = 2;
+    return output;
+  }
   const projectName = resolveProjectName(options.root, options.projectName);
   const result = options.command === 'apply'
     ? applyStructure(options.root, projectName)
@@ -166,6 +176,28 @@ function run(argv = process.argv.slice(2)) {
   return result;
 }
 
+function baselineEnrollment(options) {
+  const candidate = options.bindings ? storage.readJson(path.resolve(options.bindings)) : null;
+  if (candidate) baselineApi.validateRegistry(options.root, candidate);
+  const target = storage.safePath(options.root, baselineApi.REGISTRY);
+  const existing = fs.existsSync(target);
+  const current = existing ? baselineApi.loadRegistry(options.root) : null;
+  const action = existing ? 'preserved' : candidate ? 'create' : 'needs-bindings';
+  if (options.command === 'apply') {
+    storage.requireValue(candidate || existing, 'BINDINGS_REQUIRED', '先按计划提供 --bindings，接入器不猜测业务模块');
+    if (!existing) {
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.writeFileSync(target, `${JSON.stringify(candidate, null, 2)}\n`, { flag: 'wx' });
+    }
+  }
+  return { ...baselineApi.inspect(options.root, options.command === 'status' ? current : current || candidate), action,
+    changes: options.command === 'apply' && !existing ? [baselineApi.REGISTRY] : [],
+    proposedDifference: Boolean(existing && candidate && JSON.stringify(current) !== JSON.stringify(candidate)),
+    wiring: { cli: 'openspec-governance.js check', ci: 'requires committed evidence and explicit --base/--head',
+      hook: 'UNVERIFIED; default warn; project must verify its host before enabling block' },
+    note: '已有绑定和正文按字节保留；差异需项目审阅后原位合并，不自动覆盖或同步历史 changes' };
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     run();
@@ -175,4 +207,4 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   }
 }
 
-export { GRAPHIFY_BLOCK, TEMPLATE_TARGETS, applyStructure, inspectStructure, run };
+export { GRAPHIFY_BLOCK, TEMPLATE_TARGETS, applyStructure, inspectStructure, baselineEnrollment, run };

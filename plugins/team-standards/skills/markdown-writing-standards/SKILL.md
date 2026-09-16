@@ -11,6 +11,8 @@ description: "Use when delivering suite or project updates to synchronize affect
 
 ## 作业交付时同步文档
 
+模块当前概设/详设与活动 change 分别承担现状和目标增量，不属于禁止维护的重复正文。按 [当前设计基线协议](../change-readiness/references/current-design-baseline.md) 原位更新受影响当前章节、移除失效表述并维护必要导航；不以开发日志、空标题或刷新日期代替同步，不将未实现目标写为当前能力。
+
 AI 原生项目的文档是后续 Agent 与成员工作的输入。套件或项目更新必须在同次作业中核对文档影响；受影响内容与实现一起更新、验证和提交，不能留到用户追问，也不能仅以 commit body 或开发日志替代现行说明。
 
 1. 开始时从仓库入口和现有索引确定权威文档；结束时对照本次 diff 与实际行为检查 README、已维护的语言版本、安装用法、配置、能力数量、版本、契约、规则和示例。只更新受影响段落；确无文档影响时在提交正文或交付说明中写明理由，不制造无意义改动。

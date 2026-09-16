@@ -80,6 +80,9 @@ function validateScenarios(root, plan, remember, delivery) {
       requireValue(Array.isArray(scenario.verificationIds) && scenario.verificationIds.length > 0
         && scenario.verificationIds.every(id => plan.verifications?.some(item => item.id === id && item.result === 'PASS')),
       'VERIFICATION_GAP', `${scenario.id} 缺少通过的验证记录`, 'NEEDS_WORK');
+      requireValue(scenario.files.every(file => plan.verifications.some(item => scenario.verificationIds.includes(item.id)
+        && (item.files || plan.files).includes(file))), 'VERIFICATION_SCOPE_GAP',
+      `${scenario.id} 的验证输入没有覆盖场景文件`, 'NEEDS_WORK');
     }
   }
   requireValue(plan.files.every(file => plan.scenarios.some(item => item.files.includes(file)))
@@ -112,13 +115,19 @@ function validateReview(root, plan, remember, delivery) {
     requireValue(text(item.id) && !ids.has(item.id) && text(item.command) && text(item.environment) && item.result === 'PASS',
       'VERIFICATION_FAILED', '验证必须记录唯一 ID、实际命令/操作、环境与通过结果', 'NEEDS_WORK');
     ids.add(item.id);
-    requireValue(item.inputFingerprint === inputFingerprint, 'VERIFICATION_INPUTS_STALE',
+    const files = item.files || plan.files;
+    requireValue(Array.isArray(files) && files.length > 0 && files.every(file => plan.files.includes(file)),
+      'VERIFICATION_SCOPE', '验证输入范围必须属于当前切片', 'NEEDS_WORK');
+    const expected = hash(JSON.stringify(fingerprints(root, files)));
+    requireValue(item.inputFingerprint === expected, 'VERIFICATION_INPUTS_STALE',
       '验证输入已变化；重新验证后记录当时的 snapshot.inputFingerprint，不能仅重新 record', 'NEEDS_WORK');
     remember(reference(root, item.reference, true));
   }
+  requireValue(plan.files.every(file => plan.verifications.some(item => (item.files || plan.files).includes(file))),
+    'VERIFICATION_SCOPE_GAP', '验证记录未覆盖全部切片输入', 'NEEDS_WORK');
 }
 
-function validatePlan(root, plan, context, phase) {
+function validatePlan(root, plan, context, phase, base) {
   const delivery = phase !== 'preflight';
   const references = {};
   const remember = ({ key, digest }) => { references[key] = digest; };
@@ -126,6 +135,7 @@ function validatePlan(root, plan, context, phase) {
   validateViews(root, plan, remember);
   validateScenarios(root, plan, remember, delivery);
   validateReview(root, plan, remember, delivery);
+  require('./baselines').validateBaselines(root, plan, context, phase, base, remember);
   if (delivery) requireValue(plan.taskIds.every(id => context.tasks.find(task => task.id === id)?.done === true),
     'TASKS_INCOMPLETE', '本次切片的 OpenSpec tasks 尚未完成', 'NEEDS_WORK');
   if (phase === 'archive') validateArchive(root, plan, context, remember);

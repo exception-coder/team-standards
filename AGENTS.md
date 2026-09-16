@@ -40,6 +40,8 @@ flowchart TD
 
 ## 最小文档与证据
 
+模块当前概设/详设与活动 change 分别维护已实现基线和独立目标增量。每次功能变更核对影响，已验证切片交付前同步相关当前章节；模块绑定、指纹和接入统一采用 [当前设计基线协议](plugins/team-standards/skills/change-readiness/references/current-design-baseline.md)，不把整模块追加到永久 change，也不把规划或代码完成写成生产部署。
+
 默认复用新鲜 Graphify 的实现关系、OpenSpec 的行为与活动变更、实际测试/运行结果；领域知识、架构决策及运行手册保留独有事实。未启用 OpenSpec 时只维护一份仓内设计，不生成独立 coding 摘要、ai-ref 或个人目录 Phase-A/B 索引；历史文档按需读，不自动迁移、删除或刷新 00–10 树。Git 是日常作业日志，日报仅按明确约定生成。具体归属与例外由 markdown-writing-standards 维护。
 
 ## 意图、授权与风险

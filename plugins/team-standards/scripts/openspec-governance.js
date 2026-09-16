@@ -8,7 +8,7 @@ function parse(argv) {
   requireValue(['discover', 'bind', 'record', 'check', 'doctor', 'snapshot'].includes(command),
     'COMMAND_INVALID', '命令：discover | bind | snapshot | record | check | doctor');
   const options = { repo: process.cwd() };
-  const allowed = new Set(['repo', 'session', 'change', 'plan', 'phase', 'base', 'head', 'evidence', 'cli']);
+  const allowed = new Set(['repo', 'session', 'change', 'plan', 'phase', 'base', 'head', 'evidence', 'cli', 'files']);
   for (let index = 0; index < args.length; index += 2) {
     const key = args[index].replace(/^--/, '');
     requireValue(args[index].startsWith('--') && allowed.has(key) && args[index + 1]
