@@ -84,6 +84,8 @@ openspec validate <change> --strict --json --no-interactive
 
 任务只有在对应代码、测试或其它声明证据真实存在后才能勾选。实现修改不自动证明 task 完成，OpenSpec 校验也不替代项目测试、数据库、DDL、运行证据或发布制品验证。
 
+生成验证任务时按 [delivery-verification](../../delivery-verification/SKILL.md) 选择影响范围：S/M/L 决定工件深度，不决定全仓测试范围；每项 Scenario 是验收义务，不是一项独立测试配额，等价行为可共享充分证据。任务写明风险、命令及复用条件，最终任务审核受影响范围的证据；不得默认追加“交付/归档前全仓测试”。既有全量任务核对实际触发理由，明确项目门禁仍须执行。
+
 ## 完成、同步与归档
 
 完成实现后按顺序执行：

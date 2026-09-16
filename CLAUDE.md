@@ -113,7 +113,7 @@ flowchart TD
 | `business-logic-orientation` | Graphify 优先的现状理解与业务语义核实 | 仅明确要求或需要长期基线时生成梳理文档 |
 | `coding-standards-common` | 跨语言命名、结构、异常、重复、测试和注释规则 | 所有源码改动必经 |
 | `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
-| `delivery-verification` | 完成前真实验证、有限修复循环与 PASS-only Done | 优先 `forge_verify phase=all`，修改后证据失效 |
+| `delivery-verification` | 完成前真实验证、有限修复循环与 PASS-only Done | 按影响范围选择真实验证，复用覆盖输入未变的证据 |
 | `business-visualization-advisor` | 业务对象/状态、指标口径、洞察、选图与看板信息设计 | 不承担运行时引擎；普通页面不触发 |
 | `frontend-excellence` | 生产 Web 前端架构、视觉、响应式、可访问性和浏览器验收 | 不用于纯后端或无布局小改 |
 | `git-commit-standards` | 提交标题、中文三段正文和 Author | 每次 commit 前调用 |

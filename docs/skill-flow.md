@@ -42,7 +42,7 @@ flowchart TD
 | G 分析交付 | 对应调查/现状/规划 Skill 的输出约定 | 默认直接回复结论与证据；没有必须运行的“生成报告.js” |
 | H 变更就绪 | [change-readiness/SKILL.md](../plugins/team-standards/skills/change-readiness/SKILL.md)；其 `references/` 中的方案、分类、OpenSpec 与代码定位规则 | Agent 核对依据；OpenSpec 已接入时调用其官方能力，团队治理工具负责绑定与检查 |
 | I 实施/初始化 | 架构、编码和 UI Skill；接入用 [init-ai-structure.mjs](../plugins/team-standards/skills/init-project-docs/init-ai-structure.mjs) / [onboard-pipeline.mjs](../plugins/team-standards/skills/init-project-docs/onboard-pipeline.mjs) | 业务实现写入目标项目；初始化脚本按指定模式处理约定基线 |
-| J 验证与同步 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) + [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | Agent 调用实际可用验证工具/项目命令，随后同步受影响说明；Skill 本身不是测试执行器 |
+| J 验证与同步 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) + [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | Agent 按影响范围选择实际验证并复用新鲜证据，随后同步说明；交付/归档不自动扩大到全仓，显式 Hook/CI 门禁仍遵守 |
 | K 提交 | [git-commit-standards](../plugins/team-standards/skills/git-commit-standards/SKILL.md) → [build-commit-message.js](../plugins/team-standards/skills/git-commit-standards/scripts/build-commit-message.js) → Git | 脚本生成经过校验的消息文件；Agent 定向暂存、执行 commit 并按授权推送 |
 
 ## 前端设计的条件链路
