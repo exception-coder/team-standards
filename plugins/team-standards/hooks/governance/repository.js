@@ -56,7 +56,7 @@ function fileAt(root, revision, file) {
 
 function revisionFingerprints(root, revision, files) {
   const resolved = resolveRevision(root, revision);
-  return Object.fromEntries(files.map(file => [file, fileAt(root, resolved, file)]));
+  return Object.fromEntries([...new Set(files)].sort().map(file => [file, fileAt(root, resolved, file)]));
 }
 
 module.exports = { git, repository, resolveRevision, changedFiles, isExecutable, verifyBaseline, revisionFingerprints };

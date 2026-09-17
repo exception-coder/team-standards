@@ -1,5 +1,7 @@
 # AI 原生项目适配：当前设计基线
 
+普通开发任务由[自动设计维护流程](../../change-readiness/references/automatic-design-maintenance.md)在内部完成准备、业务写作和绑定合并，不要求用户提供候选 JSON。下方 --bindings 流程保留为显式接入/旧流程兼容入口；其“不覆盖已有清单”不限制新 upsert 对已确认模块的安全合并。
+
 ## 输入与授权范围
 
 适配 Agent 先读取项目 AGENTS、现有索引、主规格、活动 change 和套件 [正式协议](../../change-readiness/references/current-design-baseline.md)。本指引只接入项目实际路径与验证入口，不要求项目重新设计协议。套件升级不代表项目已接入；仅 status 请求不授权 apply，不改业务代码、不部署、不自动同步/归档历史 changes。
@@ -115,4 +117,4 @@ node $governance check --repo $project --session $session --phase delivery
 
 Yoooni One 试点先固定已提交来源，避免占用并行工作区改动；整理样衣概设首页及功能详设，逐一确认状态与证据，再邀请领导/产品/研发/测试按各自问题阅读验收。完成一次新增功能的独立 change → 已验证切片 → 当前正文同步，检查无重复正文、旧描述或失效引用。套件示例与自动测试不等于业务试点已验收，更不自动授予业务代码或部署权限。
 
-策略/检查器现为 4；旧 session 同名重新 bind 后 record，保留起始基线及历史证据。内容检查报 CONTENT_* 时修正真实缺口，不通过改标题、删功能索引或降级 enforce 规避。
+策略/检查器现为 5；旧 session 同名重新 bind 后 record，保留起始基线及历史证据。内容检查报 CONTENT_* 时修正真实缺口，不通过改标题、删功能索引或降级 enforce 规避。

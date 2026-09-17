@@ -1,9 +1,13 @@
 ---
 name: change-readiness
-description: "Use before implementing a requirement, feature, refactor, concrete solution, architecture change, or source-code modification. Automatically routes OpenSpec-enabled projects through a matching or newly created change, keeps its artifacts current, reviews risk, and resolves precise implementation coordinates."
+description: "Use before implementing a requirement, feature, refactor, concrete solution, architecture change, or source-code modification. Automatically discovers, creates and synchronizes module designs and bindings during development, routes OpenSpec-enabled projects through the matching change, reviews risk, and resolves implementation coordinates."
 ---
 
 # 变更实施就绪门禁
+
+## 自动设计维护
+
+已授权新增或修改业务模块时，必须执行[自动设计维护流程](references/automatic-design-maintenance.md)：首次项目写入前保存任务起点，识别模块、查找权威设计，缺失时主动补建真实正文并维护绑定，实施中同步，交付前验证。缺少 design-baselines.json 不是前置阻碍，不让用户另行初始化或填写 JSON；项目不需要复制一段触发规则。纯咨询只读，已有授权与明确范围限制优先。
 
 ## 核心规则
 
@@ -50,7 +54,7 @@ OpenSpec 的结构校验通过只证明 artifacts 合法，不证明代码、DDL
 3. 从项目 `AGENTS.md`/README 获取规则入口；当前实现按需查询新鲜 Graphify，目标行为查询 OpenSpec，业务语义查询 Domain Knowledge。兼容旧项目时可读取已有 `00_project_overview.md`，但不得要求新建或刷新该文档树。
 4. 按 `references/classification.md` 判定极简、轻量或完整档位，并向用户回显结论和理由。
 5. 极简档可以不新建 change，但必须回显为何不改变可观察行为或契约；OpenSpec 模式自动匹配或创建 change，完成 planning artifacts 并严格校验后再实现；legacy 模式查找或创建稳定设计文档。
-6. legacy 各档复用一份稳定设计，按影响补充细节；不生成独立编码摘要或接口摘要副本。
+6. 按自动设计维护流程复用或补建模块正文并 upsert 绑定；legacy 各档复用稳定设计，按影响补充细节，不生成独立摘要。新模块目标与已验证当前能力分开，存量只处理本次影响并记录余下缺口。
 7. 设计依据没有未决高风险决策时，用户的实施请求即构成继续授权；存在业务选择、破坏性迁移或范围歧义时才暂停确认。随后结合新鲜 Graphify 或定向源码读取执行代码定位，回显精确修改坐标、影响符号、调用方和约束，再开始实施。
 8. OpenSpec 模式实施期间持续维护同一 change；结束前检查任务证据、严格校验和实现一致性。未满足归档条件时保持 change 活动并回显剩余项，禁止伪造完成状态。
 9. 按生命周期参考的阶段准出规则维护规格、适用概设详设、评审意见及交接；试点启用治理检查器时，在首次源码写入前 bind 当前会话与切片，真实验证后 record，再执行 delivery/archive 检查。机器结果只证明结构、范围和新鲜度，不替代内容审阅。

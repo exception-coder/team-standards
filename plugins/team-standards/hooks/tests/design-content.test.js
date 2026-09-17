@@ -130,6 +130,17 @@ test('content: one business function may link scenarios from multiple requiremen
   assert.doesNotThrow(() => content.inspectModule(f.root, f.module));
 });
 
+test('content: legacy projects reuse local acceptance references without initializing OpenSpec', t => {
+  const f = fixture(t); f.module.content.specMode = 'local';
+  f.write('docs/acceptance.md', '## Greeting rules\n\nCallers receive a stable greeting from this local feature.\n\n### Greeting accepted\n\nCall the feature and assert that its greeting matches the accepted result.\n');
+  f.module.content.functions[0].requirement = { path: 'docs/acceptance.md', heading: '## Greeting rules' };
+  f.module.content.functions[0].scenarios[0].reference = { path: 'docs/acceptance.md', heading: '### Greeting accepted' };
+  assert.doesNotThrow(() => content.inspectModule(f.root, f.module));
+  assert.equal(fs.existsSync(path.join(f.root, 'openspec/config.yaml')), false);
+  f.write('openspec/config.yaml', 'schema: spec-driven\n');
+  assert.throws(() => content.inspectModule(f.root, f.module), { rule: 'CONTENT_SPEC_MODE' });
+});
+
 test('content: an old evidence link cannot replace current slice verification', t => {
   const f = fixture(t); f.update(); f.review();
   f.plan.verifications[0].reference = { path: 'docs/other-evidence.md', heading: '## Test' };

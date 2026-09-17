@@ -1,0 +1,18 @@
+✔ automatic design: discover is read-only and missing registry is not an error (3323.0929ms)
+✔ automatic design: blank module prepares, binds real documents, and repeats idempotently (3963.9155ms)
+✔ automatic design: existing unbound shared document is discovered and reused without rewriting (3112.9485ms)
+✔ automatic design: another module and historical evidence survive targeted merge (3368.7561ms)
+✔ automatic design: dirty documents cannot be claimed by preparation or repeated prepare (4405.0482ms)
+✔ automatic design: concurrent registry changes are preserved and rejected (4788.7866ms)
+✔ automatic design: repair an invalid heading binding with confirmed real heading (3429.7216ms)
+✔ automatic design: retired modules are not silently reactivated (3588.4379ms)
+✔ automatic design: empty prose, missing preparation, early code and stale documents fail (10977.7453ms)
+✔ automatic design: CLI discovery works with spaces; unsupported arguments do not mutate (3672.7793ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44894.5842

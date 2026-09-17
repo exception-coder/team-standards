@@ -454,7 +454,7 @@ test('minimal plan delivers with existing design and a real raw test result, wit
   f.save();
   const recorded = service.record(f.options);
   assert.equal(service.check(f.options).status, 'PASS');
-  assert.equal(recorded.policyVersion, 4);
+  assert.equal(recorded.policyVersion, 5);
   assert.equal(fs.existsSync(path.join(f.root, changeDir, 'validation.md')), false);
   // The recorded result cannot survive changes to its underlying raw evidence.
   write(f.root, `${changeDir}/test-result.log`, 'different execution result');
@@ -570,4 +570,49 @@ test('content integration: snapshot, slice sync, named review, stale references 
   assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'SCOPE_GAP');
   assert.throws(() => baselines.validateBaselines(f.root, f.plan, { change }, 'delivery', runGit(f.root, ['rev-parse', 'HEAD']), () => {}),
     { rule: 'CONTENT_DOWNGRADE' });
+});
+
+test('automatic preparation feeds governance bind and delivery without a user-authored registry', t => {
+  const f = fixture(t);
+  const prepare = require('../governance/design-preparation');
+  prepare.prepare({ root: f.root, session: f.options.session, module: 'greeting' });
+  const docs = require('./helpers/design-content').setup(f.root, changeDir + '/specs/greeting/spec.md');
+  docs.module.content.functions[0].scenarios[0].verification = f.ref('validation.md', '## Verification');
+  const contentFile = path.join(f.home, 'content.json');
+  fs.writeFileSync(contentFile, JSON.stringify(docs.module.content));
+  prepare.upsert({ root: f.root, session: f.options.session, module: 'greeting', scopes: ['src/'], capabilities: ['greeting'],
+    owner: 'fixture owner', overview: 'docs/current.md', overviewHeading: '## Overview', detailed: 'docs/current.md', detailedHeading: '## Detailed',
+    codeVersion: 'planned slice, not deployed', content: contentFile });
+  f.plan.files.push(baselines.REGISTRY); f.plan.views[0].files.push(baselines.REGISTRY); f.plan.scenarios[0].files.push(baselines.REGISTRY);
+  f.plan.baselines = ['overview', 'detailed'].map(id => ({ module: 'greeting', id, disposition: 'updated', reason: 'New baseline for this accepted slice.',
+    reference: docs.module[id], implemented: true, codeVersion: 'verified fixture slice' }));
+  f.plan.dedup = { ...f.plan.dedup, selection: 'new', originalGoal: 'Greeting behavior', acceptanceBoundary: 'Return hello', stage: 'design' };
+  f.plan.sync = { status: 'not-applicable', reason: 'Internal fixture slice, not a published capability.', reference: f.ref('validation.md', '## Sync'), targets: [] };
+  f.plan.functionImpacts = [{ module: 'greeting', id: 'GS-001', disposition: 'added', reason: 'First accepted function.', scenarioIds: ['greeting-requested'] }];
+  f.save(); assert.equal(service.bind(f.options).status, 'PASS');
+  implement(f); docs.update();
+  f.plan.review.content = [{ module: 'greeting', result: 'PASS', reason: 'Named fixture content review.', inputFingerprint: service.snapshot(f.options).contentFingerprints.greeting }];
+  f.save(); const recorded = service.record(f.options); assert.equal(service.check(f.options).status, 'PASS');
+  const base = runGit(f.root, ['rev-parse', 'HEAD']);
+  runGit(f.root, ['add', '.']); runGit(f.root, ['commit', '-qm', 'verified automatic preparation']);
+  const head = runGit(f.root, ['rev-parse', 'HEAD']);
+  assert.equal(service.check({ repo: f.root, evidence: recorded.evidence, base, head }).status, 'PASS');
+});
+
+test('automatic migration synchronizes the current slice while preserving explicit legacy content gaps', t => {
+  const f = fixture(t); enrollBaseline(f);
+  const prepare = require('../governance/design-preparation');
+  prepare.prepare({ root: f.root, session: f.options.session, module: 'greeting' });
+  syncBaseline(f);
+  prepare.upsert({ root: f.root, session: f.options.session, module: 'greeting',
+    migrationReason: 'This slice updates the greeting result; legacy functional chapter and ID inventory remain to be reviewed.',
+    migrationDue: 'Before module-wide strict enrollment' });
+  f.plan.files.push(baselines.REGISTRY); f.plan.views[0].files.push(baselines.REGISTRY); f.plan.scenarios[0].files.push(baselines.REGISTRY);
+  f.save(); service.bind(f.options); implement(f); service.record(f.options);
+  assert.equal(service.check(f.options).status, 'PASS');
+  const inspection = baselines.inspect(f.root);
+  assert.equal(inspection.contentCoverage[0].mode, 'migrate');
+  assert.equal(inspection.state, 'needs-work');
+  assert.match(inspection.contentCoverage[0].migration.reason, /legacy functional chapter/);
+  assert.match(fs.readFileSync(path.join(f.root, 'docs/current.md'), 'utf8'), /hello greeting/);
 });

@@ -31,6 +31,10 @@ description: "Use after executable project changes and before declaring completi
 7. OpenSpec 项目同时按 change-readiness 的 [治理检查器协议](../change-readiness/references/governance-checker.md) 记录本切片的验证、设计视图和 Scenario 映射，再检查 delivery。完成当前任务不等于整个 change 可归档；记录命令不执行验证，不能用 record 代替前述真实检查。
 8. 按 [文档同步规则](../markdown-writing-standards/SKILL.md#作业交付时同步文档) 更新受影响文档并核对引用；若改变验证输入，重新验证。通过后进入 [git-commit-standards](../git-commit-standards/SKILL.md) 自动提交当前逻辑单元，再推进下一单元，报告单元、验证与提交号对应关系。部分提交不得依赖未提交改动的测试结果，快照验证边界见提交 Skill。纯文档任务通过文档检查后也进入提交流程，不伪造 Runtime 验证。
 
+## 自动设计交付核对
+
+新增或修改业务模块必须核对[自动设计维护流程](../change-readiness/references/automatic-design-maintenance.md)结果：权威概设/详设和绑定已维护，本次功能影响、规格、验证及状态一致。缺少绑定由 Agent 补齐，不要求用户初始化。新模块交付前完成适用内容；存量迁移只补本次影响，明确余下缺口并具名审阅，不伪报严格检查通过。已有并行改动保持归属，部署/归档/宿主阻断不因设计自动化扩大授权。
+
 ## 本地验证按影响选择
 
 已接入模块基线的项目，当前切片交付同时核对 [当前设计同步](../change-readiness/references/current-design-baseline.md)：受影响概设/详设、行为规格和具名审阅证据。验证仅覆盖已实现范围，未完成目标不晋升；代码版本与生产部署分开记录。相关输入指纹分别失效，文档措辞变化只重验必要文档检查，不无理由重跑无关运行测试。

@@ -1,5 +1,7 @@
 # 当前设计基线与独立增量
 
+开发任务自动执行[发现、补建、绑定与交付同步](automatic-design-maintenance.md)，不以 JSON 存在为前置条件。脚本负责安全合并，Agent 负责真实业务内容；只读任务不写入。
+
 ## 职责与实施规则
 
 当前概设描述已实现模块边界、职责、数据所有权、上下游、核心流程与运行约束；当前详设描述已实现接口、状态、权限、事务、异常和兼容规则。OpenSpec 主规格描述已接受行为，活动 change 只承载本次目标、差异、取舍、任务与证据，归档 change/ADR 保留历史理由。当前基线与独立增量职责不同，不属于禁止维护的同主题重复正文；不得复制完整旧设计、用变更日志代替现状，或把目标写成已实现能力。
@@ -106,7 +108,7 @@ S 类可以省略 bind 的 `--change`，plan 增加 `smallChange:{reason,behavio
 
 CLI 始终报告真实诊断：PASS/NOT_APPLICABLE=0，缺口=2，执行错误=1。warn/off 只控制宿主 Hook 是否阻断，不把失败变成 PASS。默认 Hook warn；项目实际验证后显式设置 `TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK=block`。未配置宿主、CI 或分支保护仍是未启用强制门禁。
 
-未接入模块清单的项目保持既有治理行为，discover 明确 not-enrolled；不能据此声称已检查设计基线。check/doctor/discover、接入 status/plan 只读；bind/record 与明确 apply 才写入。当前协议为 schemaVersion 1、policyVersion 4、checkerVersion 4。策略 1/2/3 绑定可在同一 session/change 重新 bind，保留原基线及脏文件归属，清除旧交付标记；旧证据必须重新核验并 record，未知版本拒绝。回退固定旧套件并恢复匹配旧策略证据，不删除项目正文或历史记录。
+未接入模块清单的项目保持既有治理行为，discover 明确 not-enrolled；不能据此声称已检查设计基线。check/doctor/discover、接入 status/plan 只读；bind/record 与明确 apply 才写入。当前协议为 schemaVersion 1、policyVersion 5、checkerVersion 5。策略 1/2/3/4 绑定可在同一 session/change 重新 bind，保留原基线及脏文件归属，清除旧交付标记；旧证据必须重新核验并 record，未知版本拒绝。回退固定旧套件并恢复匹配旧策略证据，不删除项目正文或历史记录。
 
 每次最多 1000 输入文件、每文件 4 MiB、Git/CLI 单命令 5 秒；冲突扫描最多 100 个活动 change，接入盘点最多 50000 文件。超限返回具体诊断；收窄真实交付单元或安排分阶段治理，不能缩小证据范围逃避检查。外部 store、远程 CI 制品解析不支持；证据与正文必须位于同一 Git 根并可随提交获取。单条 CI 命令仅验一个 change，多 change 聚合明确报范围缺口，需分开交付基线。
 

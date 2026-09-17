@@ -110,8 +110,8 @@
       "required": ["schemaVersion", "policyVersion", "checkerVersion", "status", "findings"],
       "properties": {
         "schemaVersion": {"const": 1},
-        "policyVersion": {"const": 4},
-        "checkerVersion": {"const": 4},
+        "policyVersion": {"const": 5},
+        "checkerVersion": {"const": 5},
         "status": {"enum": ["PASS", "NOT_APPLICABLE", "NEEDS_WORK", "CONTEXT_REQUIRED", "CHECK_ERROR"]},
         "findings": {
           "type": "array",
@@ -140,8 +140,8 @@
       ],
       "properties": {
         "schemaVersion": {"const": 1},
-        "policyVersion": {"const": 4},
-        "checkerVersion": {"const": 4},
+        "policyVersion": {"const": 5},
+        "checkerVersion": {"const": 5},
         "bindingId": {"$ref": "#/$defs/digest"},
         "phase": {"enum": ["delivery", "archive"]},
         "change": {"type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9-]*$"},

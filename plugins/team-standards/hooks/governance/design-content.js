@@ -13,6 +13,7 @@ const need = (ok, rule, message) => requireValue(ok, rule, message, 'NEEDS_WORK'
 function validateConfig(content) {
   if (content === undefined) return;
   need(content?.version === 1 && ['migrate', 'enforce'].includes(content.mode), 'CONTENT_CONFIG', '内容协议须为 version:1，mode:migrate/enforce');
+  need(content.specMode === undefined || ['openspec', 'local'].includes(content.specMode), 'CONTENT_CONFIG', 'specMode 仅支持 openspec/local');
   if (content.mode === 'migrate') need(text(content.migration?.owner) && text(content.migration?.due) && text(content.migration?.reason),
     'CONTENT_MIGRATION', '迁移须记录责任人、完成节点及具体缺口');
   need(Array.isArray(content.functions) && content.functions.length <= 1000, 'CONTENT_CONFIG', 'functions 须为至多 1000 项的功能引用索引');
@@ -84,14 +85,17 @@ function anchor(heading) {
   return heading.replace(/^#+ /, '').toLowerCase().replace(/[^\p{L}\p{N}_\-\s]/gu, '').replace(/\s/g, '-');
 }
 
-function requirementBody(root, ref, remember) {
-  need(/^openspec\/(?:specs|changes\/(?!archive\/)[^/]+\/specs)\/.+\.md$/.test(ref?.path || '')
-    && /^### Requirement: .+/.test(ref?.heading || ''), 'CONTENT_REQUIREMENT', '功能须关联 OpenSpec Requirement');
+function requirementBody(root, ref, remember, local = false) {
+  need(local ? ref?.path && !ref.path.startsWith('openspec/') && /^#{1,5} .+/.test(ref.heading || '')
+    : /^openspec\/(?:specs|changes\/(?!archive\/)[^/]+\/specs)\/.+\.md$/.test(ref?.path || '')
+    && /^### Requirement: .+/.test(ref?.heading || ''), 'CONTENT_REQUIREMENT', '功能须关联当前规格模式下的真实规则章节');
   return referenceBody(root, ref, remember);
 }
 
 function inspectModule(root, module, remember = () => {}) {
   validateConfig(module.content);
+  const local = module.content.specMode === 'local';
+  need(!local || !fs.existsSync(safePath(root, 'openspec/config.yaml')), 'CONTENT_SPEC_MODE', '已启用或正在接入 OpenSpec 的项目不能用 local 旁路');
   const overview = referenceBody(root, module.overview, remember);
   const detailed = referenceBody(root, module.detailed, remember);
   chapters(overview, module.overview.heading, OVERVIEW);
@@ -115,15 +119,16 @@ function inspectModule(root, module, remember = () => {}) {
     try { fragment = decodeURIComponent(target?.[1] || ''); } catch { fragment = ''; }
     need(target?.length === 2 && path.posix.normalize(path.posix.join(path.posix.dirname(module.overview.path), target[0] || path.posix.basename(module.overview.path))) === module.detailed.path
       && fragment === anchor(item.heading), 'CONTENT_DETAIL_LINK', `${item.id} 的全景链接未指向绑定详设`);
-    const requirement = requirementBody(root, item.requirement, remember);
+    const requirement = requirementBody(root, item.requirement, remember, local);
     const verified = ['已验证', '已上线'].includes(row[6]);
     const seen = new Set();
     for (const scenario of item.scenarios) {
       const ref = scenario.reference;
       const owner = scenario.requirement || item.requirement;
-      const ownerBody = scenario.requirement ? requirementBody(root, owner, remember) : requirement;
+      const ownerBody = scenario.requirement ? requirementBody(root, owner, remember, local) : requirement;
       const key = `${ref?.path}#${ref?.heading}`;
-      need(ref?.path === owner.path && /^#### Scenario: .+/.test(ref?.heading || '') && !seen.has(key),
+      const scenarioHeading = local ? new RegExp(`^#{${owner.heading.indexOf(' ') + 1}} .+`) : /^#### Scenario: .+/;
+      need(ref?.path === owner.path && scenarioHeading.test(ref?.heading || '') && !seen.has(key),
         'CONTENT_SCENARIO', `${item.id} 的 Scenario 须唯一且属于关联 Requirement`);
       seen.add(key);
       need(substantive(section(ownerBody, ref.heading)), 'CONTENT_SCENARIO', `${item.id} 的 Scenario 不属于 Requirement`);
@@ -131,7 +136,8 @@ function inspectModule(root, module, remember = () => {}) {
       if (verified) referenceBody(root, scenario.verification, remember);
     }
     if (!verified) {
-      need(/^openspec\/changes\/(?!archive\/)[^/]+\/.+\.md$/.test(item.change?.path || ''), 'CONTENT_PLAN', `${item.id} 未交付目标须关联活动 change`);
+      need(local ? item.change?.path && !item.change.path.startsWith('openspec/')
+        : /^openspec\/changes\/(?!archive\/)[^/]+\/.+\.md$/.test(item.change?.path || ''), 'CONTENT_PLAN', `${item.id} 未交付目标须关联活动目标设计`);
       referenceBody(root, item.change, remember);
       need(body.includes(row[6]), 'CONTENT_PLAN', `${item.id} 详设须显式标记 ${row[6]}，不能混入当前能力`);
     }

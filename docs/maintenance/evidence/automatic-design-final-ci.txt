@@ -1,0 +1,11 @@
+✔ baseline A12: committed diff persists; changed baseline evidence becomes stale (12306.3538ms)
+✔ bind → implement → record → delivery: clean committed changes remain checked and CI needs no local cache (13739.2918ms)
+✔ automatic preparation feeds governance bind and delivery without a user-authored registry (14550.3793ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 40743.8466

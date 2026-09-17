@@ -104,6 +104,15 @@
 
 ## 升级兼容
 
-4.3.0 保持 registry schemaVersion 1，新增可选 content v1；治理 policy/checker 升为 4，历史证据原样保留可查，但不冒充新策略 PASS。旧 session 使用原 session/change 重新 bind，保留代码起始基线和已有范围；复核计划后重新 record。未接入内容契约的模块无需拆文档或补九项才能继续旧治理。官方 OpenSpec 的同步、归档机制不变。
+当前协议保持 registry schemaVersion 1，新增可选 content v1；治理 policy/checker 升为 5，历史证据原样保留可查，但不冒充新策略 PASS。旧 session 使用原 session/change 重新 bind，保留代码起始基线和已有范围；复核计划后重新 record。未接入内容契约的模块无需拆文档或补九项才能继续旧治理。官方 OpenSpec 的同步、归档机制不变。
 
 项目接入命令、warn 试点与 CI 接线沿用[基线接入指引](../../init-project-docs/references/design-baseline-adoption.md)。
+
+
+## 自动准备与 legacy 规格
+
+开发任务采用[自动设计维护流程](automatic-design-maintenance.md)，由 Agent 主动补建正文并通过内部 upsert 建立或更新绑定，不要求用户先填写本配置。原 --bindings 接入方式保留兼容。
+
+没有 openspec/config.yaml 的项目可在 content 中设置 specMode: local：requirement 指向已有稳定设计的真实规则标题，scenario.reference 指向该规则的直接下级验收标题，不要求使用英文 Requirement/Scenario 名称；目标 change 引用指向本地目标设计。不得创建一套假 OpenSpec。已有 OpenSpec 配置时禁止 local 旁路；默认 specMode 仍为 openspec。
+
+准备状态只解决本任务设计/绑定的归属；内容检查、真实验证、具名审阅和实际宿主接线仍分别成立。策略 5 修正 CI 输入摘要的排序一致性，计划文件顺序不应造成提交后误报。

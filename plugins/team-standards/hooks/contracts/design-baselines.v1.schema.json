@@ -303,6 +303,12 @@
                     }
                   }
                 }
+              },
+              "specMode": {
+                "enum": [
+                  "openspec",
+                  "local"
+                ]
               }
             },
             "allOf": [

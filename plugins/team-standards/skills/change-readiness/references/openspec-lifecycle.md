@@ -1,5 +1,7 @@
 # OpenSpec 自动生命周期
 
+开发任务自动执行[发现、补建、绑定与交付同步](automatic-design-maintenance.md)，不以 JSON 存在为前置条件。脚本负责安全合并，Agent 负责真实业务内容；只读任务不写入。
+
 ## 目标与边界
 
 本参考把开发者的自然语言需求自动路由到 OpenSpec，不要求开发者手工发起命令。它只编排 OpenSpec 官方 Skill 和 CLI，不复制 artifact schema、模板、同步算法或归档实现。

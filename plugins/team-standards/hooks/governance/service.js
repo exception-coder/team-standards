@@ -46,17 +46,19 @@ function bind(options) {
   const binding = atomicUpdate(file, previous => {
     if (!previous) {
       const targets = (plan.baselines || []).flatMap(item => item.reference ? [item.reference.path] : []);
-      requireValue(!changed.some(file => targets.includes(file)), 'DIRTY_BASELINE_OWNERSHIP',
+      const prepared = require('./design-preparation').bindingPreparation(repo, options.session, targets, current);
+      requireValue(prepared || !changed.some(file => targets.includes(file)), 'DIRTY_BASELINE_OWNERSHIP',
         '当前设计正文在任务开始前已修改；先用独立工作树分离，不能把他人正文差异记作本次 updated');
+      if (prepared) options.designPreparation = prepared;
     }
     if (previous) {
-      requireValue(previous.schemaVersion === VERSION && [1, 2, 3, POLICY_VERSION].includes(previous.policyVersion),
-        'VERSION_MISMATCH', '仅支持同结构的策略 1/2/3 绑定迁移，不能覆盖未知版本');
+      requireValue(previous.schemaVersion === VERSION && [1, 2, 3, 4, POLICY_VERSION].includes(previous.policyVersion),
+        'VERSION_MISMATCH', '仅支持已知同结构策略绑定迁移，不能覆盖未知版本');
       repoApi.verifyBaseline(repo, previous);
       requireValue(previous.change === (options.change || null), 'REBIND_CONFLICT', '同一会话已有不同 change 绑定，不按最近修改时间替换');
       requireValue(previous.plan.files.every(item => plan.files.includes(item)), 'SCOPE_SHRINK', '不能通过缩小范围排除已绑定改动');
     }
-    const initial = previous?.initial || fingerprints(repo.root, current);
+    const initial = previous?.initial || options.designPreparation?.initial || fingerprints(repo.root, current);
     requireValue(plan.files.every(item => !Object.hasOwn(initial, item)), 'DIRTY_OWNERSHIP', '范围含任务开始前的脏文件；请先分离改动，不覆盖他人基线');
     return { schemaVersion: VERSION, policyVersion: POLICY_VERSION, repo: repo.root, branch: repo.branch,
       base: previous?.base || repo.head, initial, change: options.change || null, session: options.session,

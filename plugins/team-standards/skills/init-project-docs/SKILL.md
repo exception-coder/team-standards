@@ -141,3 +141,8 @@ Graphify 产物缺失属于 `pending`，不是脚本伪造文件的理由；Open
 ## 业务设计内容升级
 
 存量项目先盘点业务读者、八章概设/九项功能详设与功能编号链路。按[基线接入指引](references/design-baseline-adoption.md)渐进迁移，明确责任、节点和缺口；保留同文件双章节与历史证据，不批量重写正文。未接入或仅结构检查通过不能宣称设计合格。
+
+
+## 开发任务内部调用
+
+新增或修改业务模块时由 change-readiness 自动调用[设计准备与绑定流程](../change-readiness/references/automatic-design-maintenance.md)，无需用户另开初始化任务。内部入口为 scripts/design-baseline.js：discover 只读发现；prepare 保存不可重置的任务起点；upsert 按已确认文件/标题幂等合并单个模块。Agent 负责业务写作和真实功能索引，脚本不生成空设计，也不运行全项目结构初始化或自动创建 OpenSpec。
