@@ -33,6 +33,8 @@ openspec validate <change> --strict --json --no-interactive
 
 ## 自动匹配或创建
 
+创建 Capability 与 Delta 前按[已有规格解析](existing-spec-resolution.md)逐项找回 Requirement；主规格、活动变更与 Graphify 的事实边界保持独立。已配置 resolver 门禁时必须使用当前输入与当前版本的结果。
+
 先读模块当前设计和主规格；候选必须同时匹配原目标、验收边界与阶段。同模块不构成复用理由，可独立评审/验证/交付的新目标创建独立 change；澄清、修复、验收遗漏与会话恢复沿用原 change。具体绑定、冲突与证据规则见 [当前设计基线协议](current-design-baseline.md)。
 
 1. 运行 `openspec list --json` 获取活动 changes。

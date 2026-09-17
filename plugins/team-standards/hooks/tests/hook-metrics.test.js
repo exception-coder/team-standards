@@ -40,6 +40,7 @@ function runDispatcher(extraEnvironment) {
     input: JSON.stringify({ tool_name: 'noop', tool_input: {} }),
     env: {
       ...process.env,
+      TEAM_STANDARDS_SPEC_RESOLUTION_HOOK: 'off',
       TEAM_STANDARDS_CHANGE_READINESS_HOOK: 'off',
       TEAM_STANDARDS_ARCH_BOUNDARY_HOOK: 'off',
       TEAM_STANDARDS_BACKEND_EVIDENCE_HOOK: 'off',

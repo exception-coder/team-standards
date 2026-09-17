@@ -40,3 +40,7 @@
 - 编码摘要：`codex-plugin-reliability-hardening/codex-plugin-reliability-hardening-coding.md`
 - 摘要：统一 Hook 与插件契约，收敛 Skill/事实源，建立六层 AI 工程结构初始化入口，并将 OpenSpec 变更生命周期自动纳入开发门禁。
 - 大纲：目标与边界 / Hook 架构与安全 / 发布和共享契约 / OpenSpec 与 Graphify 门禁 / Skill 与事实源收敛 / 项目接入轻量化 / AI 工程结构初始化 / OpenSpec 自动生命周期 / Graphify 初始化输入与 Git 共享边界
+
+## 已有规格解析 Hook
+
+[设计与边界](spec-resolution-hook.md)：写前、提交前和归档后的薄 Forge 适配；测试与配置复用技能协议。

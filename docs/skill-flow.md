@@ -367,3 +367,7 @@ Go 源码 → `coding-standards-common` + `go-coding-standards`；业务边界�
 | git-commit-standards | references/work-summary.md | 按需查询汇总，不自动写日报 |
 
 Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成区](platform-integrations/planning-evidence-discovery/SKILL.md) 保留；只有实际平台接入才使用，不阻断一般跨项目分析。本仓决策流程见 [维护规则](maintenance/decision-log.md)。旧入口与迁移表以 README 的 4.0.0 章节为准。
+
+## 已有规格解析
+
+需求原子化 → 正式 Requirement/Scenario 召回 → Graphify 实现关联与新鲜度核对 → 具名语义决策 → 完整 Delta → 官方校验 → readiness。详见[协议](../plugins/team-standards/skills/change-readiness/references/existing-spec-resolution.md)。Hook 只在生命周期调用服务，未知语义保持未确认。
