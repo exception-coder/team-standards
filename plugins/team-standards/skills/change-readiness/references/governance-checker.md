@@ -86,4 +86,4 @@ CI 不依赖本地会话缓存；检查输入必须全部处于目标提交。�
 
 ## 6. 策略版本与升级
 
-4.2.0 使用 schemaVersion 1、policyVersion 3、checkerVersion 3，增加模块当前设计绑定与切片同步检查。旧计划字段仍可读取，但旧绑定和交付证据不会被静默视为新策略 PASS。更新计划后对同一 session/change 重新 bind：保留起始基线、脏文件归属、已有范围和重试数，清除已交付标记；未知版本拒绝迁移。复核适用内容与真实验证后重新 record，CI 必须固定匹配的插件版本。不要通过删除状态或换会话绕过基线。
+4.3.0 使用 schemaVersion 1、policyVersion 4、checkerVersion 4，在模块基线与切片同步上增加可选[业务内容治理](design-content-governance.md)。旧计划字段仍可读取，但旧绑定和交付证据不会被静默视为新策略 PASS。更新计划后对同一 session/change 重新 bind：保留起始基线、脏文件归属、已有范围和重试数，清除已交付标记；未知版本拒绝迁移。复核适用内容与真实验证后重新 record，CI 必须固定匹配的插件版本。不要通过删除状态或换会话绕过基线。

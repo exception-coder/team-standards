@@ -136,3 +136,8 @@ Graphify 产物缺失属于 `pending`，不是脚本伪造文件的理由；Open
 - `change-readiness` 以 OpenSpec/兼容设计为变更依据，以 Graphify/源码为实现坐标。
 - `markdown-writing-standards` 只在实际写 Markdown 时叠加。
 - `git-commit-standards` 可提示上下文过期，但不强制每次提交重建。
+
+
+## 业务设计内容升级
+
+存量项目先盘点业务读者、八章概设/九项功能详设与功能编号链路。按[基线接入指引](references/design-baseline-adoption.md)渐进迁移，明确责任、节点和缺口；保留同文件双章节与历史证据，不批量重写正文。未接入或仅结构检查通过不能宣称设计合格。

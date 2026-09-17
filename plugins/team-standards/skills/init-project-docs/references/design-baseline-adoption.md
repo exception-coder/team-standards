@@ -93,3 +93,26 @@ warn 试点应故意制造一次缺口，确认宿主真实写前/Stop 事件调
 ## 项目交回结果
 
 报告绑定覆盖、基线缺口、实际验证命令与结果、CLI/CI/宿主真实启用状态、warn/block 策略及试点提交。Yoooni One 下一阶段再整理样衣已验收基线，把独立新目标留给独立 change；本套件开发不替业务项目执行这些步骤。
+
+
+## 4.3 业务内容盘点与渐进迁移
+
+先只读盘点原概设/详设的目标读者、章节、功能编号、状态及规格/证据关联，确认权威正文与重复历史。保留已有同文件双章节和历史链接，先列出缺口，不自动全量重写或移动文档。依据[内容契约](../../change-readiness/references/design-output-contract.md)和[完整样衣示例](../../change-readiness/references/examples/garment-sample-overview.md)核对业务阅读结构。
+
+未接入模块显示 not-enrolled，不能回报内容已合格。准备迁移时向已有模块登记 content version 1、mode migrate、migration.owner/due/reason；具体字段见[内容治理协议](../../change-readiness/references/design-content-governance.md)。每次独立切片补齐受影响业务功能，余下缺口仍保留计划；完成全模块结构、关联和具名审阅后改 enforce。原 initializer apply 只创建缺失绑定，不覆盖已有清单；已有项目应审阅差异后定向修改 registry，再用 status 复核，不能指望 --bindings 自动覆盖旧文件。
+
+执行沿用上面的真实路径变量：
+
+```powershell
+node $initializer status --root $project --baselines --json
+node $governance discover --repo $project
+# 完成实际文档同步及验证后，使用既有 session 获取内容审阅摘要。
+node $governance snapshot --repo $project --session $session
+# 将真实具名审阅写入 plan.review.content，功能影响写入 functionImpacts。
+node $governance record --repo $project --session $session --plan $plan --phase delivery
+node $governance check --repo $project --session $session --phase delivery
+```
+
+Yoooni One 试点先固定已提交来源，避免占用并行工作区改动；整理样衣概设首页及功能详设，逐一确认状态与证据，再邀请领导/产品/研发/测试按各自问题阅读验收。完成一次新增功能的独立 change → 已验证切片 → 当前正文同步，检查无重复正文、旧描述或失效引用。套件示例与自动测试不等于业务试点已验收，更不自动授予业务代码或部署权限。
+
+策略/检查器现为 4；旧 session 同名重新 bind 后 record，保留起始基线及历史证据。内容检查报 CONTENT_* 时修正真实缺口，不通过改标题、删功能索引或降级 enforce 规避。

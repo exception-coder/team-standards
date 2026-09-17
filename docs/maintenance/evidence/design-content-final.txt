@@ -1,0 +1,26 @@
+✔ content: shared-file binding validates eight overview chapters and nine functional chapters (1872.3806ms)
+✔ content: deeply bound detailed design accepts valid level-six functional subsections (1230.64ms)
+✔ content: missing business chapter and fenced pseudo-heading are rejected (1014.8452ms)
+✔ content: empty subsection and unexplained not-applicable do not count (1031.8368ms)
+✔ content: panorama ID and detail links must resolve to the authoritative function (1120.0175ms)
+✔ content: scenario in another requirement cannot satisfy traceability (1116.4344ms)
+✔ content: verified requires verification; production additionally requires release evidence (1058.2527ms)
+✔ content: planned function needs active change and explicit target label (1102.7118ms)
+✔ content: changing unrelated overview or timestamps cannot satisfy a functional update (1664.419ms)
+✔ content: named review must cover current documents and evidence (4036.5934ms)
+✔ content: all scoped scenarios need a functional mapping (1597.316ms)
+✔ content: one business function may link scenarios from multiple requirements (1109.6852ms)
+✔ content: an old evidence link cannot replace current slice verification (1566.8624ms)
+✔ content: changed functional body cannot be declared unchanged (1757.5265ms)
+✔ content: deleting a function requires removal impact and no live references (4436.3318ms)
+✔ content: legacy not-enrolled stays compatible, migration explicitly reports its gaps (1379.0353ms)
+✔ content: adding an independently accepted function synchronizes inventory and detailed body (2571.3448ms)
+✔ content: shipped garment example passes structural inspection without claiming business verification (1299.7478ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31109.8533

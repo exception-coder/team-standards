@@ -1,5 +1,7 @@
 # team-standards 插件开发规范
 
+概设按业务读者组织八章，详设按稳定功能编号组织九项；固定结构按影响裁剪深度，规划、实现、验证与上线分开。业务内容治理沿用既有绑定与生命周期，可选 content v1 渐进接入；机器检查结构、关联与新鲜度，具名审阅判断业务表达及设计正确性。详见[内容契约与完整样衣示例](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)。
+
 > 每次操作 Skill 前先读本文件。团队插件只保留跨项目稳定能力；项目特有架构、路由、脚手架和拓扑规则必须由实际项目声明。
 
 ## 统一主流程

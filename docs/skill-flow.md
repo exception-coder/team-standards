@@ -1,5 +1,7 @@
 # Skill 链路全景图
 
+概设按业务读者组织八章，详设按稳定功能编号组织九项；固定结构按影响裁剪深度，规划、实现、验证与上线分开。业务内容治理沿用既有绑定与生命周期，可选 content v1 渐进接入；机器检查结构、关联与新鲜度，具名审阅判断业务表达及设计正确性。详见[内容契约与完整样衣示例](../plugins/team-standards/skills/change-readiness/references/design-output-contract.md)。
+
 模块当前概设/详设与活动 change 分别维护已实现基线和独立目标增量。每次功能变更核对影响，已验证切片交付前同步相关当前章节；模块绑定、指纹和接入统一采用 [当前设计基线协议](../plugins/team-standards/skills/change-readiness/references/current-design-baseline.md)，不把整模块追加到永久 change，也不把规划或代码完成写成生产部署。
 
 本文件将任务链路映射到实际源码：每一步读哪些规则、哪些入口会执行、结果落在哪里。它是源码导航，不是另一套运行时路由器；执行规则以各 Skill 的 `SKILL.md` 为准。

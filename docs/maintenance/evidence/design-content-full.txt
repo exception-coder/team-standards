@@ -1,0 +1,292 @@
+
+> team-standards-hooks@0.1.0 test:full
+> node --test
+
+✔ plan reports the structure without writing files (246.6918ms)
+✔ apply creates the minimal six-layer entry structure (431.9279ms)
+✔ apply is idempotent and preserves existing project documents (1221.2369ms)
+✔ status fails when required entry files are missing and succeeds after apply (2038.8837ms)
+✔ 生成标题、中文正文和 Git 作者组成的完整消息 (1.6374ms)
+✔ 拒绝缺少正文或三段式语义不完整 (0.7855ms)
+✔ 在 Git 目录写入可供 git commit -F 使用的消息文件 (3004.4683ms)
+✔ Claude Write/Edit/MultiEdit normalize to one change (2.8813ms)
+✔ Codex multi-file patch preserves operation, paths, additions, and removals (1.9572ms)
+✔ unknown and malformed payloads safely produce no changes (0.2128ms)
+✔ Write permits a shared Bug record without requiring a personal copy (608.403ms)
+✔ Write permits repository-native documents through the retired compatibility entry (1925.9399ms)
+✔ apply_patch permits a shared Bug record without requiring a personal copy (1284.5003ms)
+✔ apply_patch permits repository-native documents through the retired compatibility entry (1785.7183ms)
+✔ existing project documents remain editable (478.1635ms)
+✔ blocks a direct dependency between tool modules (315.634ms)
+✔ allows platform module dependencies (406.4438ms)
+✔ blocks imports of another feature internal path (904.8457ms)
+✔ allows imports through another feature public API (316.4158ms)
+✔ warns but does not block growth of an existing giant file (531.8744ms)
+✔ warn mode never blocks objective boundary violations (553.7204ms)
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+✔ 放行：非 Write/Edit/MultiEdit 工具 (317.9913ms)
+✔ 放行：目标文件不在后端业务白名单（如 UI 文件） (460.7317ms)
+✔ 放行：测试文件即使在白名单路径下也跳过 (898.0108ms)
+✔ 放行：env=off 完全跳过 (9035.2397ms)
+✔ warn 模式（默认）：后端文件 + 未读图谱 + 非小改 → exit 0 + 提示 (7776.6207ms)
+✔ block 模式：后端文件 + 未读图谱 + 非小改 → exit 2 + 提示 (3807.0023ms)
+✔ 放行：已读过 knowledge-graph/00_index.md（transcript 命中） (3212.1581ms)
+✔ 放行：小改（≤1 文件 ∧ ≤20 行）即使未读图谱 (2839.5189ms)
+✔ 放行：非 JSON stdin 不崩溃 (154.4858ms)
+✔ 命中 backendv2 路径（refund 模块惯用结构） (2092.8394ms)
+✔ 放行：已读过 knowledge-graph/ddl-baseline.md（DDL 基线也算已读图谱） (2403.1788ms)
+✔ 兼容：旧 TEAM_STANDARDS_BACKEND_KG_HOOK=off 仍可跳过 (1740.8783ms)
+✔ 放行：Java 后端已查询 Graphify 且 manifest 覆盖目标版本 (1919.1008ms)
+✔ 阻断：Java 后端查询的 Graphify manifest 早于目标文件 (1951.6769ms)
+✔ 放行：非 Write/Edit/MultiEdit 工具 (386.4539ms)
+✔ 放行：非源码扩展名 (.md) (1213.9614ms)
+✔ 放行：非源码扩展名 (.json / .yml) (6148.2327ms)
+✔ 放行：测试文件 (_test / .test / .spec / /test/ / /tests/) (8440.8569ms)
+✔ 放行：Dockerfile / Makefile (916.188ms)
+✔ 放行：TEAM_STANDARDS_CHANGE_READINESS_HOOK=off 一次性绕过 (323.5535ms)
+✔ 放行：项目内 docs/design/ 存在 .md (659.7748ms)
+✔ 放行：项目内 docs/<subdir> 含 "design" 关键字的 .md (656.8111ms)
+✔ 兼容：旧 TEAM_STANDARDS_DESIGN_DOC_HOOK=off 仍可绕过 (408.478ms)
+✔ 放行：OpenSpec 有真实 context 和完整活动 change artifacts (545.6765ms)
+✔ 阻断：OpenSpec 项目不能用无关活动 change 或 legacy 文档静默放行 (795.1244ms)
+✔ 放行：用户在进程启动前明确批准 OpenSpec legacy 兼容 (436.3782ms)
+✔ 阻断：OpenSpec 只有空模板或 change artifacts 不完整 (570.8196ms)
+✔ 阻断：源码改动且无设计文档 (565.0819ms)
+✔ 阻断：MultiEdit 改动源码且无设计文档 (473.5647ms)
+✔ 放行：Maven 多模块 — .git 在仓根，深层 pom.xml 不应被当作项目根 (513.5311ms)
+✔ 放行：monorepo 前端子包 — .git 在仓根，frontend/package.json 不应被当作项目根 (433.0005ms)
+✔ 放行：.team-standards-project.json#aiDocsProject 覆盖 ai-docs 子目录名 (555.3683ms)
+✔ 阻断：无 .git 时回退到第一个构建文件标记（向后兼容） (493.6367ms)
+✔ 放行：.team-standards-project.json 损坏时不应崩溃，退回 basename 行为 (481.7338ms)
+✔ 放行：非 Write/Edit/MultiEdit 工具 (309.1625ms)
+✔ 放行：非源码扩展名（.md） (381.7811ms)
+✔ 放行：干净注释（当前职责 1 行 WHY） (848.9155ms)
+✔ 命中：变更标记 [BUGFIX]（默认 block → exit 2） (584.1688ms)
+✔ 命中：[DEPRECATED] 标记 (487.6257ms)
+✔ 命中：注释里的日期 (797.1792ms)
+✔ 命中：中文年月日期 (569.6179ms)
+✔ 命中：工单/PR 引用 (389.3832ms)
+✔ 命中：工单编号 KP-789 (410.557ms)
+✔ 命中：带个人/日期的 TODO (803.3253ms)
+✔ 命中：带元信息的分节线注释 (426.4802ms)
+✔ 命中：版本流水措辞 (514.4539ms)
+✔ 命中：超长注释块（> 默认 6 行） (1169.3878ms)
+✔ 默认 block：long-block 单独命中只提示不阻断（exit 0） (944.029ms)
+✔ 默认 block：客观红线（工单号）→ exit 2 (808.7148ms)
+✔ warn 模式降级：客观红线命中仅提示（exit 0） (1346.7006ms)
+✔ 放行：注释块未超阈值（5 行 ≤ 6） (926.7604ms)
+✔ 阈值可调：MAX_BLOCK=3 时 4 行注释块命中 (982.4311ms)
+✔ 不误报：字符串字面量里的标记/URL 不算注释 (357.509ms)
+✔ 不误报：UTF-8 / ISO-8601 不当作工单编号 (720.1585ms)
+✔ block 模式：命中 → exit 2 (648.5175ms)
+✔ off 模式：完全跳过 (648.7684ms)
+✔ Write 工具：扫 content (435.3108ms)
+✔ MultiEdit 工具：扫所有 edits 的 new_string (382.4779ms)
+✔ Codex apply_patch：检查多文件补丁中的后续危险文件 (538.6116ms)
+✔ Python 文件：# 注释也识别 (595.3708ms)
+✔ 命中：版本标记 vN 新增 (351.6624ms)
+✔ 命中：版本标记 vN 起 (292.4731ms)
+✔ 命中：版本标记 vN 及以前 (543.7478ms)
+✔ 不误报：vN 协议/IPv6 等非版本标记 (607.0569ms)
+✔ 放行：非 JSON stdin 不崩溃 (276.6235ms)
+✔ 放行：标题、中文正文和 Author 完整 (344.396ms)
+✔ 阻断：只有标题 (1183.7819ms)
+✔ 阻断：有正文但缺少 Author (725.1012ms)
+✔ 阻断：正文不含中文 (499.9165ms)
+✔ 阻断：正文缺少结果段 (946.1431ms)
+✔ 放行：从 -F 文件读取完整提交信息 (651.0992ms)
+✔ 放行：heredoc 形式的完整提交信息 (388.6394ms)
+✔ 阻断：完整结构中仍含 AI 署名 (751.7466ms)
+✔ warn 模式只提示不阻断 (464.9685ms)
+✔ 放行：非 git commit 命令 (463.2763ms)
+✔ 放行纯文档改动 (2457.0936ms)
+✔ 阻止有源码改动但没有验证证据的完成 (2088.6566ms)
+✔ 放行最后一次编辑后的 all 阶段 PASS (2601.1198ms)
+✔ 阻止验证后再次编辑 (3610.588ms)
+✔ warn 模式只提示不阻断 (3528.4202ms)
+✔ 放行会话开始前遗留的源码改动 (2407.9517ms)
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f0.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'f4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'new.txt', LF will be replaced by CRLF the next time Git touches it
+✔ 放行：非 Bash 工具 (313.216ms)
+✔ 放行：Bash 但非 git commit 命令 (854.5192ms)
+✔ 放行：git push 不再门禁(只拦 commit) (341.3599ms)
+✔ 放行：小改 git commit（≤2 文件 ∧ ≤30 行 ∧ 仅 M 修改） (10200.4647ms)
+✔ 阻断：大改 git commit 但 transcript 无 skill 调用 (6819.6569ms)
+✔ 放行：大改 git commit 且 transcript 已含 skill 调用 (3652.3827ms)
+✔ 放行：大改 git commit 且 transcript 含裸名 skill 调用(无 team-standards: 前缀) (2899.2797ms)
+✔ 阻断：新增文件（A 状态）即使行数少也不算 trivial (2297.0554ms)
+✔ 放行：非 JSON stdin 不崩溃 (174.6082ms)
+✔ stale-version hook derives plugin identity and reminds only once (1412.5339ms)
+✔ common and legacy environment switches disable reminders (1122.973ms)
+✔ 提醒：无界聚合缺少明显数据边界 (551.3268ms)
+✔ 提醒：LIMIT 只限制聚合结果，不构成扫描边界 (785.5038ms)
+✔ 提醒：循环内逐条调用 Mapper (621.1604ms)
+✔ 提醒：集合过滤后在应用层分页 (518.4642ms)
+✔ 放行：带 WHERE 的有界聚合 (943.2501ms)
+✔ 放行：测试文件 (680.0201ms)
+✔ 放行：off 模式完全静默 (383.0443ms)
+✔ 放行：非 JSON 输入不崩溃 (782.9448ms)
+✔ 提醒：JOIN 查询的 SELECT 中存在未限定字段 (483.7809ms)
+✔ 提醒：JOIN 查询使用通配投影 (816.0817ms)
+✔ 放行：JOIN 查询全部字段已限定 (577.8605ms)
+✔ 放行：单表查询允许未限定字段 (477.0217ms)
+✔ 放行：测试文件 (1106.7855ms)
+✔ 放行：off 模式完全静默 (573.6217ms)
+✔ 放行：非 JSON 输入不崩溃 (359.5937ms)
+✔ adapter and Golden Fixtures match contract v1 integrity hashes (3.3709ms)
+✔ content: shared-file binding validates eight overview chapters and nine functional chapters (7007.2598ms)
+✔ content: missing business chapter and fenced pseudo-heading are rejected (4415.8955ms)
+✔ content: empty subsection and unexplained not-applicable do not count (3230.6365ms)
+✔ content: panorama ID and detail links must resolve to the authoritative function (2086.0028ms)
+✔ content: scenario in another requirement cannot satisfy traceability (2145.6065ms)
+✔ content: verified requires verification; production additionally requires release evidence (1867.6076ms)
+✔ content: planned function needs active change and explicit target label (1749.7708ms)
+✔ content: changing unrelated overview or timestamps cannot satisfy a functional update (2385.4772ms)
+✔ content: named review must cover current documents and evidence (5586.235ms)
+✔ content: all scoped scenarios need a functional mapping (1988.6821ms)
+✔ content: one business function may link scenarios from multiple requirements (1130.896ms)
+✔ content: an old evidence link cannot replace current slice verification (1961.0022ms)
+✔ content: changed functional body cannot be declared unchanged (1824.0854ms)
+✔ content: deleting a function requires removal impact and no live references (3630.8712ms)
+✔ content: legacy not-enrolled stays compatible, migration explicitly reports its gaps (1465.1468ms)
+▶ versioned Golden Fixtures define the write-event contract
+  ✔ claude-write-add (2.9785ms)
+  ✔ claude-multi-edit (0.5085ms)
+  ✔ codex-all-operations (1.1994ms)
+  ✔ malformed-payload (0.4772ms)
+✔ versioned Golden Fixtures define the write-event contract (11.9412ms)
+✔ baseline A3/A8/A9: shared long-lived file, independent slice delivery, pending change cannot archive (26204.647ms)
+✔ baseline A5/A9/A10: unbound, ambiguous, shared and change references (2033.5365ms)
+✔ baseline A6/A7: timestamp-only sync and unimplemented promotion are rejected (9775.3101ms)
+✔ baseline A11: concurrent Requirement and baseline targets require explicit ordering (5333.5336ms)
+✔ baseline A12: committed diff persists; changed baseline evidence becomes stale (11275.427ms)
+✔ baseline A12: preexisting baseline edits cannot be claimed as this slice update (3347.4272ms)
+✔ baseline A13: wording edits preserve runtime input fingerprint (9254.9925ms)
+✔ baseline A5/A15: explicit legacy gap may plan but cannot deliver; unknown versions fail (8225.8745ms)
+✔ baseline A4: reviewed small change uses existing governance without an OpenSpec change (5815.4592ms)
+✔ baseline A14: initializer status/plan are read-only; apply preserves existing bytes (2678.4586ms)
+✔ baseline A10: removing old ownership cannot hide renamed/deleted inputs (5764.3553ms)
+✔ baseline A13: verification subsets cannot omit input coverage (8194.9258ms)
+✔ baseline A18: bounded registry and explicit small-change limits fail closed (6864.8632ms)
+✔ baseline A16: Hook process keeps warn/off distinct from block without a host session ID (4035.951ms)
+✔ bind → implement → record → delivery: clean committed changes remain checked and CI needs no local cache (13791.4602ms)
+✔ missing binding and transcript text never authorize implementation (3122.0888ms)
+✔ dirty owned files are rejected; unrelated initial edits are retained (11055.3194ms)
+✔ code, design and review changes invalidate only current evidence (13019.6191ms)
+✔ a view cannot cover unrelated source files or an empty design heading (4332.7616ms)
+✔ partial slice may deliver, whole-change archive remains blocked (10881.6995ms)
+✔ failed verification and blocked handoff cannot produce delivery evidence (10512.7459ms)
+✔ Stop repair budget survives plan updates and changing findings (12245.4566ms)
+✔ unbound Stop and documentation repair remain non-blocking (1464.2778ms)
+✔ delete and rename check both source and destination scope (6621.3231ms)
+✔ CLI missing, malformed JSON and unsafe paths fail closed (2272.1602ms)
+✔ concurrent binding lock cannot be treated as success (4213.6743ms)
+✔ CLI emits one JSON result and nonzero exit on unresolved context (1581.2963ms)
+﹣ real OpenSpec CLI parses planning, selected tasks and strict validation (0.1038ms) # SKIP
+✔ minimal plan delivers with existing design and a real raw test result, without validation Markdown (11307.1639ms)
+✔ not-applicable views need a reason but no duplicate chapter; applicable views still require references (3743.6005ms)
+✔ optional dedup and handoff accept inline facts but still reject blockers and malformed records (4715.7911ms)
+✔ raw verification rejects empty files, unsafe paths and ambiguous supplied headings (1122.1583ms)
+✔ policy migration preserves baseline, scope and retries without promoting old PASS evidence (13595.7932ms)
+✔ archive records not-applicable promotion without duplicate prose and rejects missing applicable references (1186.2785ms)
+✔ content integration: snapshot, slice sync, named review, stale references and downgrade guard (22293.1613ms)
+✔ buildHookEvent emits only the v1 whitelist and protects system fields (6.691ms)
+✔ buildHookEvent rejects missing fields and unsupported modes (0.4053ms)
+✔ logHookEvent writes one valid JSONL record and skips invalid input (16.7582ms)
+✔ logHookEvent supports an isolated directory through environment (9.6574ms)
+✔ hook metrics create no files by default (451.2753ms)
+✔ opt-in hook metrics contain only the approved minimal fields (836.4548ms)
+✔ isolated installed layout discovers and executes every configured hook (7354.1233ms)
+✔ Codex CLI installs the local plugin from an isolated personal marketplace (4832.5697ms)
+✔ plan creates the nine-stage onboarding state (523.108ms)
+✔ mark migrates a legacy state and preserves completed stages (1684.4251ms)
+✔ mark rejects unknown stages and lifecycle statuses without changing state (3131.1331ms)
+✔ status exposes review and evidence gaps as the next unfinished work (5147.7986ms)
+✔ verify cannot complete until every preceding gate is closed (1218.3723ms)
+✔ redacts secrets and omits cwd/session/user/host fields (532.9969ms)
+✔ skips low-value prompts by default and truncates captured questions (1468.862ms)
+✔ distributed skill modes resolve local references without repository-only dependencies (154.3312ms)
+✔ retired entrypoints are not distributed and replacement modes are reachable (5.6582ms)
+✔ two different domains execute real lifecycle commands with reusable checker (1944.1084ms)
+✔ old ACTIVE-only dispatch fails static bindings and real lifecycle test (1888.7481ms)
+✔ new unregistered consumer and declared value removal are detected (95.0163ms)
+✔ evidence invalidates on source, spec, test and checker changes (5300.3761ms)
+✔ malformed contracts, duplicates and missing required test kinds fail (56.904ms)
+✔ path traversal, absolute paths and empty enrollment do not pass (49.3446ms)
+✔ enrolled governance requires fresh actual executions (1157.0639ms)
+✔ Graphify adapter is read-only and reports candidates, including unavailable fallback (29.302ms)
+✔ CLI writes execution evidence and rejects changed input and shell interpolation (2966.1882ms)
+✔ inputs changing during a successful command cannot produce PASS (753.379ms)
+✔ unknown transitions and ordinary consumers of legacy states are rejected (48.569ms)
+✔ missing executable and fake execution omissions do not pass (971.6831ms)
+✔ dispatcher forwards one payload and preserves a blocking result (1108.7223ms)
+✔ dispatcher skips guards explicitly set to off (944.815ms)
+ℹ tests 215
+ℹ suites 0
+ℹ pass 214
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 266704.3854

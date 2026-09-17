@@ -50,7 +50,7 @@ function bind(options) {
         '当前设计正文在任务开始前已修改；先用独立工作树分离，不能把他人正文差异记作本次 updated');
     }
     if (previous) {
-      requireValue(previous.schemaVersion === VERSION && [1, 2, POLICY_VERSION].includes(previous.policyVersion),
+      requireValue(previous.schemaVersion === VERSION && [1, 2, 3, POLICY_VERSION].includes(previous.policyVersion),
         'VERSION_MISMATCH', '仅支持同结构的策略 1/2/3 绑定迁移，不能覆盖未知版本');
       repoApi.verifyBaseline(repo, previous);
       requireValue(previous.change === (options.change || null), 'REBIND_CONFLICT', '同一会话已有不同 change 绑定，不按最近修改时间替换');
@@ -182,7 +182,14 @@ function snapshot(options) {
   const files = options.files ? (Array.isArray(options.files) ? options.files : options.files.split(',')) : binding.plan.files;
   requireValue(files.every(file => binding.plan.files.includes(file)), 'SNAPSHOT_SCOPE', 'snapshot 输入必须属于绑定范围');
   const inputs = fingerprints(repo.root, files);
+  const baselineApi = require('./baselines');
+  const registry = baselineApi.loadRegistry(repo.root);
+  const contentFingerprints = {};
+  for (const module of registry ? baselineApi.affected(registry, binding.plan.files) : []) {
+    if (module.content?.mode === 'enforce') contentFingerprints[module.id] = require('./design-content').fingerprint(repo.root, module);
+  }
   return result('PASS', [], { inputs, inputFingerprint: storage.hash(JSON.stringify(inputs)),
+    contentFingerprints,
     note: '只读取验证输入；未执行测试或审阅，须在实际验证时关联本结果' });
 }
 

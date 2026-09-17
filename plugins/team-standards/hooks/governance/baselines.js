@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { requireValue, readJson, readText, safePath, hash, MAX_FILES } = require('./storage');
 const { git, resolveRevision } = require('./repository');
+const content = require('./design-content');
 
 const REGISTRY = '.team-standards/design-baselines.json';
 const nonempty = value => typeof value === 'string' && value.trim().length > 0;
@@ -29,6 +30,7 @@ function validateRegistry(root, registry) {
       && nonempty(module.owner) && ['active', 'gap', 'retired'].includes(module.status),
     'MODULE_FORMAT', '模块必须有唯一 ID、范围、capabilities、责任人与有效状态');
     ids.add(module.id);
+    content.validateConfig(module.content);
     if (module.shared !== undefined) requireValue(typeof module.shared === 'boolean', 'MODULE_FORMAT', 'shared 必须是布尔值');
     if (module.status !== 'active') requireValue(nonempty(module.plan), 'BASELINE_GAP_PLAN', '存量缺口/停用必须登记具体治理或迁移计划');
     if (module.status === 'active') {
@@ -141,6 +143,8 @@ function validateBaselines(root, plan, context, phase, base, remember) {
   for (const prior of previous ? affected(previous, plan.files) : []) {
     requireValue(modules.some(module => module.id === prior.id), 'MODULE_MIGRATION',
       `旧范围属于 ${prior.id}；保留停用/迁移绑定并核对旧位置及消费者，不能缩小受管范围`, 'NEEDS_WORK');
+    requireValue(prior.content?.mode !== 'enforce' || modules.find(module => module.id === prior.id)?.content?.mode === 'enforce',
+      'CONTENT_DOWNGRADE', '已强制接入的模块不能通过删除 content 或切换 migrate 绕过当前切片检查', 'NEEDS_WORK');
   }
   if (!modules.length) return;
   requireValue(plan.dedup && nonempty(plan.dedup.query) && nonempty(plan.dedup.decision)
@@ -182,6 +186,7 @@ function validateBaselines(root, plan, context, phase, base, remember) {
           'BASELINE_NO_CHANGE', 'updated 没有相关正文差异；时间戳、空标题不能抵扣同步', 'NEEDS_WORK');
       }
     }
+    content.validateDelivery(root, module, plan, phase, base, remember);
   }
   if (phase !== 'preflight') {
     requireValue(plan.sync && ['synced', 'not-applicable'].includes(plan.sync.status) && nonempty(plan.sync.reason),
@@ -208,11 +213,18 @@ function inspect(root, candidate) {
   }
   for (const module of registry.modules) {
     if (module.status !== 'active') findings.push({ rule: 'BASELINE_GAP', message: `${module.id}: ${module.status}; ${module.owner}; ${module.plan}` });
-    else for (const view of ['overview', 'detailed']) {
-      try { currentSection(root, module[view]); } catch (error) { findings.push({ rule: error.rule, message: error.message }); }
+    else {
+      for (const view of ['overview', 'detailed']) {
+        try { currentSection(root, module[view]); } catch (error) { findings.push({ rule: error.rule, message: error.message }); }
+      }
+      if (module.content) {
+        try { content.inspectModule(root, module); } catch (error) { findings.push({ rule: error.rule, message: `${module.id}: ${error.message}` }); }
+      }
     }
   }
   return { state: findings.length ? 'needs-work' : 'bound', path: REGISTRY, modules: registry.modules, findings,
+    contentCoverage: registry.modules.map(module => ({ module: module.id, mode: module.content?.mode || 'not-enrolled',
+      migration: module.content?.migration, semanticQuality: 'UNVERIFIED: requires named content review' })),
     freshness: 'UNVERIFIED: run delivery with slice evidence and explicit Git base', host: 'UNVERIFIED' };
 }
 

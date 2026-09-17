@@ -106,10 +106,21 @@ S 类可以省略 bind 的 `--change`，plan 增加 `smallChange:{reason,behavio
 
 CLI 始终报告真实诊断：PASS/NOT_APPLICABLE=0，缺口=2，执行错误=1。warn/off 只控制宿主 Hook 是否阻断，不把失败变成 PASS。默认 Hook warn；项目实际验证后显式设置 `TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK=block`。未配置宿主、CI 或分支保护仍是未启用强制门禁。
 
-未接入模块清单的项目保持既有治理行为，discover 明确 not-enrolled；不能据此声称已检查设计基线。check/doctor/discover、接入 status/plan 只读；bind/record 与明确 apply 才写入。当前协议为 schemaVersion 1、policyVersion 3、checkerVersion 3。策略 1/2 绑定可在同一 session/change 重新 bind，保留原基线及脏文件归属，清除旧交付标记；旧证据必须重新核验并 record，未知版本拒绝。回退固定旧套件并恢复匹配旧策略证据，不删除项目正文或历史记录。
+未接入模块清单的项目保持既有治理行为，discover 明确 not-enrolled；不能据此声称已检查设计基线。check/doctor/discover、接入 status/plan 只读；bind/record 与明确 apply 才写入。当前协议为 schemaVersion 1、policyVersion 4、checkerVersion 4。策略 1/2/3 绑定可在同一 session/change 重新 bind，保留原基线及脏文件归属，清除旧交付标记；旧证据必须重新核验并 record，未知版本拒绝。回退固定旧套件并恢复匹配旧策略证据，不删除项目正文或历史记录。
 
 每次最多 1000 输入文件、每文件 4 MiB、Git/CLI 单命令 5 秒；冲突扫描最多 100 个活动 change，接入盘点最多 50000 文件。超限返回具体诊断；收窄真实交付单元或安排分阶段治理，不能缩小证据范围逃避检查。外部 store、远程 CI 制品解析不支持；证据与正文必须位于同一 Git 根并可随提交获取。单条 CI 命令仅验一个 change，多 change 聚合明确报范围缺口，需分开交付基线。
 
 ## 实践依据
 
 2026-09-16 核对 [arc42 文档同步建议](https://faq.arc42.org/questions/H-3/) 与 [GitLab 文档工作流](https://docs.gitlab.com/development/documentation/workflow/)：按影响维护适量文档、明确责任并随代码交付。上述字段、阶段和门禁是本套件协议，不冒称这些框架规定统一格式。真实接入步骤见 [AI 原生项目适配指引](../../init-project-docs/references/design-baseline-adoption.md)。
+
+
+## 业务阅读结构与稳定功能编号
+
+概设面向领导、产品和技术负责人，详设按业务功能服务产品、研发和测试，固定八章/九项采用[内容契约](design-output-contract.md)。每模块默认一份概设、一份详设，现有同文件双章节保持兼容。功能编号稳定且不重复使用；全景表、功能详设、Requirement/Scenario 和验证证据沿该编号关联。
+
+当前正文只描述已接受、已验证能力；功能尚在规划中/实现中时明确分区、状态与活动 change，不把目标语气当作现状。已验证不等于已上线，上线必须引实际发布证据。业务价值指标缺依据标待确认并明确责任，不编造提升比例。
+
+新增/调整功能同步全景、对应正文及关联证据；删除/替代功能清理当前入口、旧描述和消费者引用，历史保留在 Git/change。已验证切片交付时更新，归档时复核完整性。机器结构 PASS 与具名内容审阅分别成立，不把指纹一致等同设计正确。
+
+4.3.0 通过可选 content v1 渐进接入，配置、影响记录及审阅摘要见[内容治理协议](design-content-governance.md)。旧模块不强制迁移，明确列为 not-enrolled；迁移计划须含责任人、节点和缺口。原绑定、证据历史和同文件结构不删除。

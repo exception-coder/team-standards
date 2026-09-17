@@ -454,7 +454,7 @@ test('minimal plan delivers with existing design and a real raw test result, wit
   f.save();
   const recorded = service.record(f.options);
   assert.equal(service.check(f.options).status, 'PASS');
-  assert.equal(recorded.policyVersion, 3);
+  assert.equal(recorded.policyVersion, 4);
   assert.equal(fs.existsSync(path.join(f.root, changeDir, 'validation.md')), false);
   // The recorded result cannot survive changes to its underlying raw evidence.
   write(f.root, `${changeDir}/test-result.log`, 'different execution result');
@@ -546,4 +546,28 @@ test('archive records not-applicable promotion without duplicate prose and rejec
   assert.doesNotThrow(() => validatePlan(f.root, f.plan, context, 'archive'));
   f.plan.promotion[0].disposition = 'updated';
   assert.throws(() => validatePlan(f.root, f.plan, context, 'archive'), /唯一标题/);
+});
+
+
+test('content integration: snapshot, slice sync, named review, stale references and downgrade guard', t => {
+  const f = fixture(t);
+  const registry = enrollBaseline(f);
+  const contentFixture = require('./helpers/design-content').setup(f.root, changeDir + '/specs/greeting/spec.md');
+  registry.modules[0] = contentFixture.module;
+  contentFixture.module.content.functions[0].scenarios[0].verification = f.ref('validation.md', '## Verification');
+  write(f.root, baselines.REGISTRY, JSON.stringify(registry));
+  runGit(f.root, ['add', '.']); runGit(f.root, ['commit', '-qm', 'enroll content contract']);
+  f.plan.functionImpacts = [{ module: 'greeting', id: 'GS-001', disposition: 'updated', reason: 'Change greeting result.', scenarioIds: ['greeting-requested'] }];
+  f.save(); service.bind(f.options); implement(f); contentFixture.update();
+  assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'CONTENT_REVIEW');
+  f.plan.review.content = [{ module: 'greeting', result: 'PASS', reason: 'Agent reviewed business reading and design correctness.',
+    inputFingerprint: service.snapshot(f.options).contentFingerprints.greeting }];
+  f.save(); service.record(f.options);
+  assert.equal(service.check(f.options).status, 'PASS');
+  fs.appendFileSync(path.join(f.root, 'docs/current.md'), '\nAdditional business clarification changes the reviewed content.\n');
+  assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'CONTENT_REVIEW');
+  delete registry.modules[0].content; write(f.root, baselines.REGISTRY, JSON.stringify(registry));
+  assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'SCOPE_GAP');
+  assert.throws(() => baselines.validateBaselines(f.root, f.plan, { change }, 'delivery', runGit(f.root, ['rev-parse', 'HEAD']), () => {}),
+    { rule: 'CONTENT_DOWNGRADE' });
 });

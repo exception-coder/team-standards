@@ -47,6 +47,7 @@
             }
           }
         },
+        "functionImpacts": {"type":"array","items":{"type":"object","required":["module","id","disposition","reason","scenarioIds"],"additionalProperties":false,"properties":{"module":{"type":"string","minLength":1},"id":{"type":"string","minLength":1},"disposition":{"enum":["added","updated","removed","unchanged"]},"reason":{"type":"string","minLength":1},"scenarioIds":{"$ref":"#/$defs/strings"},"replacedBy":{"type":"string","minLength":1}}}},
         "review": {
           "type": "object",
           "required": ["type", "actor", "result", "reference"],
@@ -55,7 +56,8 @@
             "actor": {"type": "string", "minLength": 1},
             "result": {"const": "PASS"},
             "reference": {"$ref": "#/$defs/reference"},
-            "inputFingerprint": {"$ref": "#/$defs/digest"}
+            "inputFingerprint": {"$ref": "#/$defs/digest"},
+            "content": {"type":"array","items":{"type":"object","required":["module","inputFingerprint","result","reason"],"additionalProperties":false,"properties":{"module":{"type":"string","minLength":1},"inputFingerprint":{"$ref":"#/$defs/digest"},"result":{"const":"PASS"},"reason":{"type":"string","minLength":1}}}}
           }
         },
         "dedup": {
@@ -108,8 +110,8 @@
       "required": ["schemaVersion", "policyVersion", "checkerVersion", "status", "findings"],
       "properties": {
         "schemaVersion": {"const": 1},
-        "policyVersion": {"const": 3},
-        "checkerVersion": {"const": 3},
+        "policyVersion": {"const": 4},
+        "checkerVersion": {"const": 4},
         "status": {"enum": ["PASS", "NOT_APPLICABLE", "NEEDS_WORK", "CONTEXT_REQUIRED", "CHECK_ERROR"]},
         "findings": {
           "type": "array",
@@ -138,8 +140,8 @@
       ],
       "properties": {
         "schemaVersion": {"const": 1},
-        "policyVersion": {"const": 3},
-        "checkerVersion": {"const": 3},
+        "policyVersion": {"const": 4},
+        "checkerVersion": {"const": 4},
         "bindingId": {"$ref": "#/$defs/digest"},
         "phase": {"enum": ["delivery", "archive"]},
         "change": {"type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9-]*$"},
