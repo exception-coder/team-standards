@@ -2,6 +2,8 @@
 // 写前与 Stop 适配；只在绑定范围检查，不在 Hook 中调用模型、构建或归档。
 const fs = require('node:fs');
 const path = require('node:path');
+const { createHash } = require('node:crypto');
+const { checkProject } = require('./check-spec-resolution');
 const { normalizeChanges } = require('./change-input');
 const service = require('./governance/service');
 const { repository, isExecutable } = require('./governance/repository');
@@ -35,6 +37,12 @@ function handle(payload) {
     if (!hasConfig(cwd)) continue;
     const output = service.guarded(() => {
       const repo = repository(cwd);
+      const executionBinding = session && path.join(repo.root, '.forge', 'spec-resolution', `execution-session-${createHash('sha256').update(session).digest('hex')}.json`);
+      if (executionBinding && fs.existsSync(executionBinding)) {
+        const execution = checkProject(repo.root, files, stop ? 'commit' : 'write', 'block', process.env, session);
+        if (execution.code !== 0) return { status: 'NEEDS_WORK', findings: [{ rule: 'EXECUTION_NOT_READY', message: execution.stderr }] };
+        if (execution.executionPolicy?.spec === 'NO_SPEC_CHANGE') return service.result('NOT_APPLICABLE');
+      }
       if (stop && (!session || !fs.existsSync(statePath(repo.root, session)))) return service.result('NOT_APPLICABLE');
       return service.check({ repo: repo.root, session, phase: stop ? 'delivery' : 'preflight', files });
     });

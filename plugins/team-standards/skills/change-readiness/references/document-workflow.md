@@ -1,6 +1,6 @@
 # 设计文档工作流
 
-开发任务自动执行[发现、补建、绑定与交付同步](automatic-design-maintenance.md)，不以 JSON 存在为前置条件。脚本负责安全合并，Agent 负责真实业务内容；只读任务不写入。
+先按[影响判定](impact-routing.md)确定需要维护的设计层次，仅该范围执行[发现、补建、绑定与交付同步](automatic-design-maintenance.md)。无需设计变化不因缺少 JSON 或正文而补建；脚本负责安全合并，Agent 负责真实内容，只读任务不写入。
 
 ## 唯一载体
 

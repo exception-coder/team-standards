@@ -4,7 +4,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.6.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.7.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 完整内容规范及样衣示例见[设计输出契约](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)，配置与检查边界见[内容治理协议](plugins/team-standards/skills/change-readiness/references/design-content-governance.md)。
 
@@ -44,6 +44,8 @@ flowchart TD
 ---
 
 ## 16 个 Skill
+
+4.7.1 增加[按影响执行](plugins/team-standards/skills/change-readiness/references/impact-routing.md)：先探索既有规格和 Graphify，分别判断规格、概设、详设及验证；行为保持不建空 Change，相关任务默认共享分支。薄 Hook 优先调用 Forge execution 检查，旧治理仅在实时确认 NO_SPEC_CHANGE 后分流。默认 warn，实际宿主覆盖与服务部署需单独验收。
 
 | 类别 | Skill | 核心价值 |
 |---|---|---|

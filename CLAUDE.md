@@ -1,6 +1,6 @@
 # team-standards 插件开发规范
 
-已授权业务开发自动执行[设计发现、补建、绑定、同步与验证](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)，无需用户另行初始化或填写 JSON。Agent 负责真实内容，内部入口安全合并绑定；纯咨询只读，项目不需要复制通用触发规则。
+已授权业务开发先执行[按影响判定](plugins/team-standards/skills/change-readiness/references/impact-routing.md)：规格、概设、详设与验证分别决定。仅受影响设计进入发现、补建、绑定和同步；不因业务代码修改或历史文档缺失补齐全模块，不要求用户填写 JSON。相关任务默认共享分配分支，以原子 Commit 隔离。
 
 概设按业务读者组织八章，详设按稳定功能编号组织九项；固定结构按影响裁剪深度，规划、实现、验证与上线分开。业务内容治理沿用既有绑定与生命周期，可选 content v1 渐进接入；机器检查结构、关联与新鲜度，具名审阅判断业务表达及设计正确性。详见[内容契约与完整样衣示例](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)。
 
@@ -24,7 +24,7 @@ flowchart TD
 
 主流程原则：
 
-1. `change-readiness` 是开发前唯一主门禁；项目启用 OpenSpec 后，M/L 变更自动匹配或创建 change，并在实施期间更新、验证、同步和判断归档。只有未启用 OpenSpec 的项目，或用户明确批准的单次降级，才使用兼容设计文档。
+1. `change-readiness` 是开发前唯一主门禁；先探索既有规格与实现，再判断行为影响。行为变化复用或创建相关 change，行为保持且有证据时无需空 change；M/L 风险不自动要求全部文档，概设与详设独立按影响维护。
 2. `bug-doc-required` 是 Bug 唯一入口，覆盖证据、根因、最小修复和回归；未获修复授权时只调查。简单 Bug 不另建报告，复杂或高风险问题复用唯一持久记录，图表和独立报告按需生成。
 3. `backend-evidence` 是单服务后端证据唯一入口；代码事实和反向影响使用 Graphify 即时查询，不维护第二套手工索引。
 4. `markdown-writing-standards` 维护唯一文档归属、Markdown/Mermaid 结构与受影响的已有导航。
@@ -93,7 +93,7 @@ flowchart TD
 |---|---|---|
 | S | 不超过 2 个文件、30 行，仅局部修改，不动接口/状态/枚举/字段/事件 | `change-readiness` 极简判断 → 编码标准 → 验证 |
 | M | 单 Feature、最多 6 个文件和 200 行，不改共享契约 | 设计依据 → 架构与编码标准 → 实施验证 → 提交 |
-| L | 跨模块/项目，或改接口、状态机、枚举、字段、事件、数据模型 | 完整设计 → 后端事实/影响分析 → 精确定位 → 实施验证 → 知识回写 |
+| L | 跨模块/项目，或改接口、状态机、枚举、字段、事件、数据模型 | 深入影响分析 → 受影响规格/设计 → 精确定位 → 实施验证 → 必要知识回写 |
 
 风险优先于行数：生产故障、高风险金额/库存/订单状态、不可逆迁移直接按 L 档处理。
 
@@ -118,7 +118,7 @@ flowchart TD
 | `bug-doc-required` | Bug 证据、根因、修复合同、最小修复与回归 | 调查模式不改源码；简单问题不强制独立文档 |
 | `business-logic-orientation` | Graphify 优先的现状理解与业务语义核实 | 仅明确要求或需要长期基线时生成梳理文档 |
 | `coding-standards-common` | 跨语言命名、结构、异常、重复、测试和注释规则 | 所有源码改动必经 |
-| `change-readiness` | OpenSpec change 自动生命周期、方案审视、风险分档和代码定位 | 已启用 OpenSpec 的 M/L 变更禁止静默 legacy 降级 |
+| `change-readiness` | 规格/设计/验证独立判定、既有资产复用和代码定位 | 行为保持允许无需 Change；相关任务默认共享分支 |
 | `delivery-verification` | 完成前真实验证、有限修复循环与 PASS-only Done | 按影响范围选择真实验证，复用覆盖输入未变的证据 |
 | `business-visualization-advisor` | 业务对象/状态、指标口径、洞察、选图与看板信息设计 | 不承担运行时引擎；普通页面不触发 |
 | `frontend-excellence` | 生产 Web 前端架构、视觉、响应式、可访问性和浏览器验收 | 不用于纯后端或无布局小改 |

@@ -33,7 +33,7 @@ description: "Use after executable project changes and before declaring completi
 
 ## 自动设计交付核对
 
-新增或修改业务模块必须核对[自动设计维护流程](../change-readiness/references/automatic-design-maintenance.md)结果：权威概设/详设和绑定已维护，本次功能影响、规格、验证及状态一致。缺少绑定由 Agent 补齐，不要求用户初始化。新模块交付前完成适用内容；存量迁移只补本次影响，明确余下缺口并具名审阅，不伪报严格检查通过。已有并行改动保持归属，部署/归档/宿主阻断不因设计自动化扩大授权。
+先核对[影响判定](../change-readiness/references/impact-routing.md)。仅受影响概设/详设进入[自动设计维护流程](../change-readiness/references/automatic-design-maintenance.md)及绑定检查；无需设计变化则核对依据，不补建旧模块全套文档。无需 OpenSpec Change 的执行不强制 bind/record/archive，仍须真实回归。已有项目明确门禁保持有效，必要时修改其策略后再验证，不能伪造 PASS。
 
 ## 本地验证按影响选择
 

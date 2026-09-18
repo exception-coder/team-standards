@@ -2,6 +2,8 @@
 
 ## 工作流
 
+前置入口为[按影响判定](impact-routing.md)：Forge `discover_execution → assess_execution` 无需 changeId。行为保持走无需 Change 的执行；只有行为变化才进入下面 Delta 链路。绑定执行的会话使用 `check_execution_readiness`，其优先于旧的 change-only 路由，提交前还要求真实、未过期的适用验证。
+
 在新建 Capability 或撰写 Delta 前，将需求拆为独立原子项，保留原文与稳定 externalId。先查询正式 `openspec/specs` 的 Requirement/Scenario，再核对活动 changes；Graphify 只补充实现坐标，检查其新鲜度，不把代码事实当作已接受行为。
 
 已安装的项目 resolver 提供结构化结果时，复用它的候选、原文、证据和内容版本。Forge MCP 使用可选 `intake_spec_requirements` 拆分并审阅原文追踪 → `resolve_specs` → Agent 审阅 → `confirm_spec_resolution` → 写入返回草稿 → 官方 OpenSpec 严格校验 → `check_change_readiness`。resolve 传真实宿主 sessionId，confirm 传 implementationFiles 项目相对路径。工具不可用时可用正式规格与 Graphify 定向检索完成同等审阅，不能绕过已启用的 block Hook，也不能将手工审阅冒充机器 PASS。

@@ -12,7 +12,7 @@ function projectRoot(directory) {
   let cursor = path.resolve(directory);
   while (true) {
     if (fs.existsSync(path.join(cursor, 'openspec', 'config.yaml'))) return cursor;
-    if (fs.existsSync(path.join(cursor, '.git'))) return null;
+    if (fs.existsSync(path.join(cursor, '.git'))) return fs.existsSync(path.join(cursor, '.forge', 'spec-resolution')) ? cursor : null;
     const parent = path.dirname(cursor);
     if (parent === cursor) return null;
     cursor = parent;
@@ -27,6 +27,7 @@ function handle(payload, env = process.env) {
   if (!['warn', 'block'].includes(mode)) return outcome('block', 'CONFIG_INVALID: mode must be warn/block/off');
   const command = payload.tool_input?.command || payload.tool_input?.cmd || '';
   const commit = ['Bash', 'exec_command'].includes(payload.tool_name) && /\bgit\s+(?:-[^\s]+\s+[^\s]+\s+)*commit\b/.test(command);
+  const gitOperation = ['Bash', 'exec_command'].includes(payload.tool_name) && /\bgit(?:\.exe)?\b[^\r\n]*\b(?:switch|checkout|worktree|branch|symbolic-ref|update-ref)\b/i.test(command);
   const archive = payload.hook_event_name === 'PostToolUse' && /\bopenspec\s+archive\b/.test(command);
   if (payload.hook_event_name === 'PostToolUse' && !archive) return { code: 0 };
   const normalizedPayload = payload.tool_name === 'apply_patch' ? { ...payload, tool_input: {
@@ -35,7 +36,7 @@ function handle(payload, env = process.env) {
   const changes = normalizeChanges(normalizedPayload).flatMap(change => change.previousFilePath
     ? [change.filePath, change.previousFilePath] : [change.filePath]);
   const roots = new Map();
-  if (commit || archive) { const root = projectRoot(payload.cwd || process.cwd()); if (root) roots.set(root, []); }
+  if (commit || archive || gitOperation) { const root = projectRoot(payload.tool_input?.workdir || payload.cwd || process.cwd()); if (root) roots.set(root, []); }
   for (const file of changes) {
     const root = projectRoot(path.dirname(file));
     if (!root) continue;
@@ -44,7 +45,7 @@ function handle(payload, env = process.env) {
     roots.set(root, [...(roots.get(root) || []), relative]);
   }
   const outputs = [...roots].map(([root, files]) => {
-    const result = checkProject(root, files, archive ? 'archive' : commit ? 'commit' : 'write', mode, env, payload.session_id);
+    const result = checkProject(root, files, archive ? 'archive' : commit ? 'commit' : gitOperation ? 'git' : 'write', mode, env, payload.session_id, command);
     if (result.stderr) {
       const logged = logHookEvent({ plugin: 'team-standards', hook: 'check-spec-resolution',
         rule: result.stderr.match(/Spec Resolution: ([A-Z_]+)/)?.[1] || 'CHECK_ERROR',
@@ -57,7 +58,10 @@ function handle(payload, env = process.env) {
   return { code: outputs.some(result => result.code === 2) ? 2 : 0,
     stderr: outputs.map(result => result.stderr || '').join('') };
 }
-function checkProject(root, files, operation, mode, env, sessionId) {
+function checkProject(root, files, operation, mode, env, sessionId, command = '') {
+  const execution = Boolean(fs.existsSync(path.join(root, '.forge', 'spec-resolution', 'execution-writer.json'))
+    || (sessionId && fs.existsSync(path.join(root, '.forge', 'spec-resolution', `execution-session-${createHash('sha256').update(sessionId).digest('hex')}.json`))));
+  if (operation === 'git' && !execution) return { code: 0 };
   let cli = env.FORGE_SPEC_RESOLUTION_CLI;
   if (!cli) {
     const runtime = path.join(env.USERPROFILE || env.HOME || os.homedir(), '.kai-toolbox', 'forge-spec-resolution.json');
@@ -67,10 +71,10 @@ function checkProject(root, files, operation, mode, env, sessionId) {
         const config = JSON.parse(fs.readFileSync(runtime, 'utf8'));
         if (config.protocolVersion !== 1) throw new Error('unsupported protocol');
         cli = config.cli;
-      } catch { return outcome(mode, 'FORGE_CONFIG_INVALID: 无法读取本机 Forge runtime 配置'); }
+      } catch { return outcome(execution ? 'block' : mode, 'FORGE_CONFIG_INVALID: 无法读取本机 Forge runtime 配置'); }
     }
   }
-  const failureMode = env.TEAM_STANDARDS_SPEC_RESOLUTION_FAILURE === 'warn' ? 'warn' : mode;
+  const failureMode = env.TEAM_STANDARDS_SPEC_RESOLUTION_FAILURE === 'warn' ? 'warn' : execution ? 'block' : mode;
   if (!cli || !path.isAbsolute(cli) || !fs.existsSync(cli)) return outcome(failureMode,
     'FORGE_UNAVAILABLE: 配置 FORGE_SPEC_RESOLUTION_CLI 为 Forge 编译后的 specResolution/cli.js 绝对路径');
   let changeId = env.FORGE_OPENSPEC_CHANGE;
@@ -83,21 +87,21 @@ function checkProject(root, files, operation, mode, env, sessionId) {
         const context = JSON.parse(fs.readFileSync(binding, 'utf8'));
         if (fs.realpathSync(context.project) !== fs.realpathSync(root)) throw new Error('project mismatch');
         changeId = context.changeId; branch = context.branch;
-      } catch { return outcome(mode, 'CHANGE_CONTEXT_MISMATCH: 会话绑定无效；重新 resolve_specs'); }
+      } catch { return outcome(execution ? 'block' : mode, 'CHANGE_CONTEXT_MISMATCH: 会话绑定无效；重新 resolve_specs'); }
     }
   }
-  if (!changeId && operation !== 'archive') return outcome(mode, 'CHANGE_CONTEXT_MISMATCH: 通过 FORGE_OPENSPEC_CHANGE 绑定当前 change');
-  const result = spawnSync(process.execPath, [cli, operation === 'archive' ? 'refresh_spec_index' : 'check_change_readiness'], {
+  if (!changeId && !execution && operation !== 'archive') return outcome(mode, 'CHANGE_CONTEXT_MISMATCH: 先 discover_execution / assess_execution，或通过 FORGE_OPENSPEC_CHANGE 绑定已有 change');
+  const result = spawnSync(process.execPath, [cli, operation === 'archive' ? 'refresh_spec_index' : execution ? 'check_execution_readiness' : 'check_change_readiness'], {
     cwd: root, env, windowsHide: true, encoding: 'utf8', timeout: 10000, maxBuffer: 1024 * 1024,
-    input: JSON.stringify({ project: root, changeId, branch, operation: operation === 'commit' ? 'BEFORE_COMMIT' : 'BEFORE_IMPLEMENTATION', files }),
+    input: JSON.stringify({ project: root, sessionId, command, changeId, branch, operation: operation === 'commit' ? 'BEFORE_COMMIT' : 'BEFORE_IMPLEMENTATION', files }),
   });
   if (result.error || result.signal) return outcome(failureMode, `FORGE_UNAVAILABLE: ${result.error?.message || result.signal}`);
   let response;
   try { response = JSON.parse(result.stdout); } catch { return outcome(failureMode, 'FORGE_RESPONSE_INVALID: 需要 JSON 响应'); }
   if (operation === 'archive' && result.status === 0 && /^[a-f0-9]{64}$/.test(response.specRevision)) return { code: 0 };
-  if (result.status === 0 && response.allowed === true && response.code === 'PASS') return { code: 0 };
+  if (result.status === 0 && response.allowed === true && response.code === 'PASS') return { code: 0, executionPolicy: execution ? response.policy : undefined };
   if (response.allowed !== false || typeof response.code !== 'string') return outcome(failureMode, 'FORGE_RESPONSE_INVALID: 缺少 allowed/code');
-  return outcome(mode, `${response.code}: ${response.message || ''} ${(response.actions || []).join('; ')}`);
+  return outcome(execution ? 'block' : mode, `${response.code}: ${response.message || ''} ${(response.actions || []).join('; ')}`);
 }
 if (require.main === module) {
   let raw = '';
@@ -111,4 +115,4 @@ if (require.main === module) {
     catch (error) { process.stderr.write(`Spec Resolution CHECK_ERROR: ${error.message}\n`); process.exitCode = 2; }
   });
 }
-module.exports = { handle, projectRoot };
+module.exports = { handle, projectRoot, checkProject };
