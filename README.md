@@ -4,7 +4,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.5.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.6.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 完整内容规范及样衣示例见[设计输出契约](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)，配置与检查边界见[内容治理协议](plugins/team-standards/skills/change-readiness/references/design-content-governance.md)。
 
@@ -101,7 +101,7 @@ coding-standards-common              所有源码修改的公共基线
 
 ## Hook 边界
 
-4.5.0 增加[已有规格解析](plugins/team-standards/skills/change-readiness/references/existing-spec-resolution.md)：先定位 Requirement 再写 Delta；写前/提交前薄 Hook 调用已配置的 Forge JSON CLI，归档后刷新索引。默认 warn，不替代语义审阅与原有验证。配置和宿主覆盖边界见该协议。
+4.6.0 完善[已有规格解析](plugins/team-standards/skills/change-readiness/references/existing-spec-resolution.md)：本机自动发现 Forge CLI，按宿主 session 绑定项目、分支与 change，支持 Codex apply_patch/exec_command；提交前检查已确认文件范围，归档后刷新索引。模型草稿仍需审阅。默认 warn，配置和宿主覆盖边界见该协议。
 
 OpenSpec 文档推进增加阶段准出、专家意见回写、概设详设和续跑交接，并提供共享治理检查器。新增检查默认 `warn` 试运行，保留原门禁；通过项目宿主验收后设置 `TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK=block`，按会话绑定 change 和文件范围，真实验证后记录内容指纹，写前/Stop/CI 使用同一检查结果。Stop 补齐最多两轮，退出循环仍可能未完成。详见 [治理检查器协议与当前支持边界](plugins/team-standards/skills/change-readiness/references/governance-checker.md)。
 

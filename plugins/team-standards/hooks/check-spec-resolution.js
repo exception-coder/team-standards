@@ -2,6 +2,8 @@
 // Thin lifecycle adapter. Forge owns resolution, freshness and Delta decisions.
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
+const { createHash } = require('node:crypto');
 const { spawnSync } = require('node:child_process');
 const { normalizeChanges } = require('./change-input');
 const { logHookEvent } = require('./event-log');
@@ -27,7 +29,10 @@ function handle(payload, env = process.env) {
   const commit = ['Bash', 'exec_command'].includes(payload.tool_name) && /\bgit\s+(?:-[^\s]+\s+[^\s]+\s+)*commit\b/.test(command);
   const archive = payload.hook_event_name === 'PostToolUse' && /\bopenspec\s+archive\b/.test(command);
   if (payload.hook_event_name === 'PostToolUse' && !archive) return { code: 0 };
-  const changes = normalizeChanges(payload).flatMap(change => change.previousFilePath
+  const normalizedPayload = payload.tool_name === 'apply_patch' ? { ...payload, tool_input: {
+    command: typeof payload.tool_input === 'string' ? payload.tool_input : payload.tool_input?.command || payload.tool_input?.patch || payload.tool_input?.input,
+  } } : payload;
+  const changes = normalizeChanges(normalizedPayload).flatMap(change => change.previousFilePath
     ? [change.filePath, change.previousFilePath] : [change.filePath]);
   const roots = new Map();
   if (commit || archive) { const root = projectRoot(payload.cwd || process.cwd()); if (root) roots.set(root, []); }
@@ -39,7 +44,7 @@ function handle(payload, env = process.env) {
     roots.set(root, [...(roots.get(root) || []), relative]);
   }
   const outputs = [...roots].map(([root, files]) => {
-    const result = checkProject(root, files, archive ? 'archive' : commit ? 'commit' : 'write', mode, env);
+    const result = checkProject(root, files, archive ? 'archive' : commit ? 'commit' : 'write', mode, env, payload.session_id);
     if (result.stderr) {
       const logged = logHookEvent({ plugin: 'team-standards', hook: 'check-spec-resolution',
         rule: result.stderr.match(/Spec Resolution: ([A-Z_]+)/)?.[1] || 'CHECK_ERROR',
@@ -52,16 +57,39 @@ function handle(payload, env = process.env) {
   return { code: outputs.some(result => result.code === 2) ? 2 : 0,
     stderr: outputs.map(result => result.stderr || '').join('') };
 }
-function checkProject(root, files, operation, mode, env) {
-  const cli = env.FORGE_SPEC_RESOLUTION_CLI;
+function checkProject(root, files, operation, mode, env, sessionId) {
+  let cli = env.FORGE_SPEC_RESOLUTION_CLI;
+  if (!cli) {
+    const runtime = path.join(env.USERPROFILE || env.HOME || os.homedir(), '.kai-toolbox', 'forge-spec-resolution.json');
+    if (fs.existsSync(runtime)) {
+      try {
+        if (fs.statSync(runtime).size > 16384) throw new Error('runtime config too large');
+        const config = JSON.parse(fs.readFileSync(runtime, 'utf8'));
+        if (config.protocolVersion !== 1) throw new Error('unsupported protocol');
+        cli = config.cli;
+      } catch { return outcome(mode, 'FORGE_CONFIG_INVALID: 无法读取本机 Forge runtime 配置'); }
+    }
+  }
   const failureMode = env.TEAM_STANDARDS_SPEC_RESOLUTION_FAILURE === 'warn' ? 'warn' : mode;
   if (!cli || !path.isAbsolute(cli) || !fs.existsSync(cli)) return outcome(failureMode,
     'FORGE_UNAVAILABLE: 配置 FORGE_SPEC_RESOLUTION_CLI 为 Forge 编译后的 specResolution/cli.js 绝对路径');
-  const changeId = env.FORGE_OPENSPEC_CHANGE;
+  let changeId = env.FORGE_OPENSPEC_CHANGE;
+  let branch;
+  if (!changeId && sessionId) {
+    const binding = path.join(root, '.forge', 'spec-resolution', `session-${createHash('sha256').update(sessionId).digest('hex')}.json`);
+    if (fs.existsSync(binding)) {
+      try {
+        if (fs.statSync(binding).size > 16384) throw new Error('binding too large');
+        const context = JSON.parse(fs.readFileSync(binding, 'utf8'));
+        if (fs.realpathSync(context.project) !== fs.realpathSync(root)) throw new Error('project mismatch');
+        changeId = context.changeId; branch = context.branch;
+      } catch { return outcome(mode, 'CHANGE_CONTEXT_MISMATCH: 会话绑定无效；重新 resolve_specs'); }
+    }
+  }
   if (!changeId && operation !== 'archive') return outcome(mode, 'CHANGE_CONTEXT_MISMATCH: 通过 FORGE_OPENSPEC_CHANGE 绑定当前 change');
   const result = spawnSync(process.execPath, [cli, operation === 'archive' ? 'refresh_spec_index' : 'check_change_readiness'], {
     cwd: root, env, windowsHide: true, encoding: 'utf8', timeout: 10000, maxBuffer: 1024 * 1024,
-    input: JSON.stringify({ project: root, changeId, operation: operation === 'commit' ? 'BEFORE_COMMIT' : 'BEFORE_IMPLEMENTATION', files }),
+    input: JSON.stringify({ project: root, changeId, branch, operation: operation === 'commit' ? 'BEFORE_COMMIT' : 'BEFORE_IMPLEMENTATION', files }),
   });
   if (result.error || result.signal) return outcome(failureMode, `FORGE_UNAVAILABLE: ${result.error?.message || result.signal}`);
   let response;
