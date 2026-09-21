@@ -162,6 +162,8 @@ flowchart TD
 
 | 时点 | 节点 | 检查或记录什么 |
 |---|---|---|
+| 会话启动 | session-init | protocol v2 下只读获取 Forge 能力与执行归属；不创建 Change 或写入锁 |
+| 写入/提交前 | check-spec-resolution + forge/client | 将事件交给 Forge 统一裁决；旧 runtime 在 legacy-v1 适配 |
 | 用户输入 | prompt-signal-capture | 按配置筛选、脱敏并登记有价值的提示/纠正信号 |
 | 用户输入 | check-plugin-version-stale | 提醒插件版本可能过期，不等于自动更新 |
 | 文件修改前 | change-input + write-guard-dispatcher | 适配写入事件，把同一输入分发到启用的检查器并汇总结果 |
@@ -177,7 +179,7 @@ flowchart TD
 | Bash 提交前 | check-git-commit-skill | 需要重审的提交是否进入提交 Skill |
 | Bash 提交前 | check-commit-no-ai-signature | 标题、三段正文、真实 Author 与 AI 署名约束 |
 | 完成前 | check-delivery-verification | 当前相关可执行改动是否有有效验证证据 |
-| 完成前 | check-openspec-governance | 已接入 OpenSpec 治理的绑定、范围、阶段与证据条件 |
+| 完成前 | check-openspec-governance | Forge v2 执行就绪检查及按需兼容设计证据；Stop 不释放执行 |
 | 按配置记录 | hook-metrics / event-log | 最小化性能指标与结构化 Hook 事件；为排查和反馈提供数据 |
 
 注册来源：[hooks.json](../plugins/team-standards/hooks/hooks.json)；八个写入检查来源：[dispatcher](../plugins/team-standards/hooks/write-guard-dispatcher.js)。Shell、外部工具与未支持事件可能不受这些检查覆盖，仍需宿主权限、访问凭据和具体操作判断。

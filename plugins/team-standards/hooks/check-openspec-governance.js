@@ -2,8 +2,7 @@
 // 写前与 Stop 适配；只在绑定范围检查，不在 Hook 中调用模型、构建或归档。
 const fs = require('node:fs');
 const path = require('node:path');
-const { createHash } = require('node:crypto');
-const { checkProject } = require('./check-spec-resolution');
+const { checkGovernance, runtime } = require('./forge/client');
 const { normalizeChanges } = require('./change-input');
 const service = require('./governance/service');
 const { repository, isExecutable } = require('./governance/repository');
@@ -34,15 +33,13 @@ function handle(payload) {
   }
   if (stop) roots.set(path.resolve(payload.cwd || process.cwd()), []);
   for (const [cwd, files] of roots) {
-    if (!hasConfig(cwd)) continue;
+    if (!hasConfig(cwd) && runtime(process.env).protocolVersion !== 2) continue;
     const output = service.guarded(() => {
       const repo = repository(cwd);
-      const executionBinding = session && path.join(repo.root, '.forge', 'spec-resolution', `execution-session-${createHash('sha256').update(session).digest('hex')}.json`);
-      if (executionBinding && fs.existsSync(executionBinding)) {
-        const execution = checkProject(repo.root, files, stop ? 'commit' : 'write', 'block', process.env, session);
-        if (execution.code !== 0) return { status: 'NEEDS_WORK', findings: [{ rule: 'EXECUTION_NOT_READY', message: execution.stderr }] };
-        if (execution.executionPolicy?.spec === 'NO_SPEC_CHANGE') return service.result('NOT_APPLICABLE');
-      }
+      const execution = checkGovernance(repo.root, files, stop ? 'stop' : 'write', mode, process.env, session);
+      if (execution.code !== 0) return { status: 'NEEDS_WORK', strict: execution.enforcement === 'block', findings: [{ rule: 'EXECUTION_NOT_READY', message: execution.stderr }] };
+      if (execution.legacyGovernanceRequired === false) return service.result('NOT_APPLICABLE');
+      if (!hasConfig(cwd)) return service.result('NOT_APPLICABLE');
       if (stop && (!session || !fs.existsSync(statePath(repo.root, session)))) return service.result('NOT_APPLICABLE');
       return service.check({ repo: repo.root, session, phase: stop ? 'delivery' : 'preflight', files });
     });
@@ -51,7 +48,7 @@ function handle(payload) {
   if (outcomes.length === 0) return { code: 0 };
   const message = `[team-standards] OpenSpec 文档推进未完成：${outcomes.flatMap(item => item.findings)
     .map(item => `${item.rule}: ${item.message}`).join('\n')}\n`;
-  if (mode === 'warn') return { code: 0, stderr: message };
+  if (mode === 'warn' && !outcomes.some(item => item.strict)) return { code: 0, stderr: message };
   if (!stop) return { code: 2, stderr: message };
   return stopDecision(payload, session, message);
 }

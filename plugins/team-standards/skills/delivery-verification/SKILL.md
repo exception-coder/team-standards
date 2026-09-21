@@ -5,6 +5,10 @@ description: "Use after executable project changes and before declaring completi
 
 # 真实交付验证门禁
 
+## 策略与方法边界
+
+Forge 负责必需检查类别、证据有效性和完成裁决；本 Skill 负责选择有真实断言的验证、解释失败并修复。已绑定执行时使用返回策略，不独立重算分支或任务状态；接口及兼容方式见[执行适配协议](../change-readiness/references/execution-adapter.md)。以下影响表用于选择具体检查方法，不能放宽项目或 Forge 已要求的检查。
+
 ## 核心规则
 
 源码、构建配置、SQL、Migration、API 契约、测试或基础设施配置发生变化后，在最终回复前验证当前工作区。MCP 注册只表示工具可用；本 Skill 负责完成前调用和结果裁决。

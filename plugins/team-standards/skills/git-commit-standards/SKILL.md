@@ -9,7 +9,7 @@ description: "Use before committing completed work or when querying, summarizing
 
 一个 Commit 对应一个最小、完整、可独立理解和验证、可说明回滚边界的逻辑变更。评价逻辑边界与质量，不以提交数量少为目标，也不按文件数、行数或技术层拆分。
 
-Branch 属于 Change 或相关执行批次，Commit 属于 Task。默认保持分配分支，任务隔离不自动授权创建 branch/worktree。重叠任务顺序执行，共享工作区单写入者；独立发布、实验或并行分支由宿主明确授权。用于验证的隔离目录优先采用普通临时快照，不能把下文“隔离验证”解释成自动建分支授权。
+分支分配、并发和写入权消费 Forge/宿主的执行策略，调用方式见[执行适配协议](../change-readiness/references/execution-adapter.md)。本 Skill 只负责提交的组织、验证快照和消息格式；隔离验证优先使用普通临时快照，不能把验证方法当作创建分支授权。
 
 - 收到多个任务时，先按问题与依赖划分逻辑单元；默认执行 `Task → Implement → Verify → Commit → Next Task`。这里 Task 是逻辑单元，不是任意清单条目或整轮会话。每单元完成后主动提交，再推进下一单元，不默认全部改完后合成一个大提交。
 - 不同需求、不同 Bug，或可分别评审、验证、回滚且没有必要耦合的修改，原则上拆开；同模块、同文件或同一天不是合并理由。不能用一个笼统标题包装多个独立问题。

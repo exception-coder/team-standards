@@ -1,5 +1,7 @@
 # OpenSpec 治理检查器协议
 
+4.8.0 起本检查器保留历史设计/审阅证据兼容职责。Forge v2 的执行状态与策略归 Forge，Hook 依据 `legacyGovernanceRequired` 调用此检查器；不再从私有执行文件猜测治理分流。未接入 Forge 的旧项目保持本协议。见[执行适配协议](execution-adapter.md)。
+
 ## 1. 能力与接入边界
 
 入口为插件根下 `scripts/openspec-governance.js`，Node 18+；4.2.0 本地真实 CLI 集成验证使用 OpenSpec 1.6.0、Node 24.16.0、Windows；既有 1.13.0 记录不等于本轮重验。CLI 只读状态与工件路径来自 [官方 agent contract](https://github.com/Fission-AI/OpenSpec/blob/main/docs/agent-contract.md)，不硬编码 proposal/design/tasks 的 schema 依赖。
@@ -60,7 +62,7 @@ node <plugin>/scripts/openspec-governance.js check --repo <repo> --session <sess
 
 ## 4. 基线、并发与新鲜度
 
-绑定保存真实仓库/worktree、分支、初始 HEAD、初始可执行脏文件指纹和精确范围。开始前已脏且与任务重叠的文件返回 DIRTY_OWNERSHIP；其它初始改动保留，发生变化则返回 MIXED_CHANGES。当前实现保守拒绝混合归属，未提供自动 hunk 拆分；可先使用独立 worktree 分离任务。
+绑定保存真实仓库/worktree、分支、初始 HEAD、初始可执行脏文件指纹和精确范围。开始前已脏且与任务重叠的文件返回 DIRTY_OWNERSHIP；其它初始改动保留，发生变化则返回 MIXED_CHANGES。当前实现保守拒绝混合归属，未提供自动 hunk 拆分；先由宿主协调已有改动；额外 worktree 需按 Forge/项目分支策略分配，不能将恢复建议当作自行创建许可。
 
 已提交改动仍按起始基线检查，工作区干净不等于任务无变化。新增未绑定可执行文件触发 SCOPE_GAP。代码、工件、正文引用变化触发 CODE_STALE/ARTIFACTS_STALE/REVIEW_STALE；单纯更新时间不能抵扣失效。现阶段按文件或引用章节失效，不声称精确理解语义依赖。
 

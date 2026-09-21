@@ -14,6 +14,18 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 整套组件、工程职责域及全部节点的输入输出见 [套件全景](suite-panorama.md)；本文保留任务路由和阶段规则。
 
+## 执行适配源码导航
+
+4.8.0 的运行时调用方法以[执行适配协议](../plugins/team-standards/skills/change-readiness/references/execution-adapter.md)为准。认知与任务方法留在 Skill，组织执行策略归 Forge，宿主 Hook 只适配事件与协议。纯咨询通过只读会话/候选查询结束，不创建执行绑定。
+
+| 维护对象 | 源码入口 |
+|---|---|
+| 启动上下文 | `hooks/session-init.js` → Forge `session_init` |
+| 候选探索 | Agent → Forge `resolve_execution_context`，定位后保存 discovery |
+| 写前/提交前策略 | `hooks/check-spec-resolution.js` → `hooks/forge/client.js` → Forge `check_execution_event` |
+| Stop 与兼容设计检查 | `hooks/check-openspec-governance.js` 消费 Forge 的 `legacyGovernanceRequired` |
+| 旧 Forge runtime | `hooks/forge/legacy-v1.js`，不向新版分支继续复制状态读取 |
+
 ## 总流程
 
 ```mermaid

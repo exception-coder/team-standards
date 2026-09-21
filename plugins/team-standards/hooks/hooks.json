@@ -1,6 +1,17 @@
 {
   "description": "Team Standards hooks: Bash commit guards; a concurrent Write/Edit/MultiEdit guard dispatcher compatible with Claude Code and Codex apply_patch payloads; and privacy-preserving prompt signal plus stale-version reminders. Individual guards remain configurable through their documented TEAM_STANDARDS_* environment variables.",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-init.js\"",
+            "async": false
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash|exec_command",

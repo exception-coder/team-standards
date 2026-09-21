@@ -2,6 +2,12 @@
 
 本文交接 Team Standards 当前能力、真实边界和下一阶段优化目标。接手人应以源码与实际宿主证据为准，继续完善现有流程，不另建一套平行治理体系。
 
+## 2026-09-21 源码维护进展
+
+本轮源码升级为 4.8.0：Forge 执行核心从规格解析拆为独立 `execution/`，增加只读 Session Init、Context Resolve 和统一生命周期决策；Team Standards 精简主 Skill 并以 v2 client 接入，v1 私有状态兼容隔离保留。当前接口与维护入口见[执行适配协议](../../plugins/team-standards/skills/change-readiness/references/execution-adapter.md)。
+
+下方 4.7.1 表格保留为原交接基线，不代表本轮安装或运行状态。源码验证、插件安装、新会话加载、真实宿主触发与服务运行仍分别验收；H1/H2 等实际 Agent 场景不因新增单元测试或 Hook 注册自动勾选。任务调度、跨会话接管和设计夜间整合仍未实现。
+
 ## 快速导航
 
 - **先了解现状** → [当前基线](#当前基线)、[已经完成的能力](#已经完成的能力)

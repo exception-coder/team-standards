@@ -4,7 +4,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.7.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.8.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 完整内容规范及样衣示例见[设计输出契约](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)，配置与检查边界见[内容治理协议](plugins/team-standards/skills/change-readiness/references/design-content-governance.md)。
 
@@ -18,6 +18,17 @@
 - **安装和维护** → [安装](#安装)、[维护与验证](#维护与验证)、[作业完成条件](#作业完成条件)、[Bug 处理与记录](#bug-处理与记录)
 
 ---
+
+## 维护分层
+
+4.8.0 将执行策略与宿主适配分开：Agent 管理解与实施，Skill 管方法，Forge 管上下文、状态和策略，Hook/MCP 管接入。接口和升级规则见[执行适配协议](plugins/team-standards/skills/change-readiness/references/execution-adapter.md)。
+
+- 修改调查/设计/验证方法：对应 Skill。
+- 修改分支、写入权、执行状态或验证类别：Forge `execution/`。
+- 修改宿主事件/载荷：Hook；CLI 传输在 `hooks/forge/client.js`。
+- 旧 runtime 私有状态兼容只留在 `hooks/forge/legacy-v1.js`，历史设计审阅检查继续保留。
+
+新增只读 `session_init`、`resolve_execution_context` 和统一 `check_execution_event`；SessionStart 已注册，实际宿主触发仍需独立验收。配置、可调用、授权与强制覆盖分别报告；v2 连接故障默认失败关闭，旧 runtime 保留 v1 路径。不自动升级安装、迁移历史状态或重启服务。
 
 ## 主流程
 
@@ -107,7 +118,7 @@ coding-standards-common              所有源码修改的公共基线
 
 OpenSpec 文档推进增加阶段准出、专家意见回写、概设详设和续跑交接，并提供共享治理检查器。新增检查默认 `warn` 试运行，保留原门禁；通过项目宿主验收后设置 `TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK=block`，按会话绑定 change 和文件范围，真实验证后记录内容指纹，写前/Stop/CI 使用同一检查结果。Stop 补齐最多两轮，退出循环仍可能未完成。详见 [治理检查器协议与当前支持边界](plugins/team-standards/skills/change-readiness/references/governance-checker.md)。
 
-Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。OpenSpec 项目要求当前会话明确选择并读取一个完整活动 change，仓库中的无关 change 或 legacy 设计文档不再自动放行；未启用 OpenSpec 的项目继续认可兼容设计文档。验证计划按影响范围选择并复用新鲜证据；M/L、交付或归档不自动触发全仓。现有完成前 Hook 仍要求可执行改动后的 `forge_verify phase=all` 或项目 Forge CLI PASS，不能把范围策略误称为 Hook 已支持定向证据；启用该 Hook 的项目仍遵守其契约。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
+Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。行为变化的 OpenSpec 执行要求明确选择并读取相关活动 change，行为保持按 Forge 策略无需空 change；未启用 OpenSpec 的项目继续认可兼容设计文档。验证计划按影响范围选择并复用新鲜证据；M/L、交付或归档不自动触发全仓。现有完成前 Hook 仍要求可执行改动后的 `forge_verify phase=all` 或项目 Forge CLI PASS，不能把范围策略误称为 Hook 已支持定向证据；启用该 Hook 的项目仍遵守其契约。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
 
 ---
 
@@ -118,7 +129,7 @@ Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义�
 - Domain knowledge 保存经确认、跨变更稳定的业务真理和术语。
 - `team-standards` 只负责意图路由与质量门禁，不复制图谱或建立平行规格。
 
-项目的 OpenSpec 配置包含真实上下文后，M/L 变更由 `change-readiness` 自动匹配或创建 change，并复用 OpenSpec 官方 Skill/CLI 完成 artifacts、apply 上下文、update、verify、sync 与 archive 判定。没有相关 change 或生成 Skill 缺失不再是 legacy 降级理由；CLI 正常时继续走官方 agent 协议。Graphify 查询前还必须校验其对 HEAD 和工作区改动的新鲜度。具体职责矩阵见 [Skill 流程图](docs/skill-flow.md#graphify-与-openspec-接入边界)。
+项目的 OpenSpec 配置包含真实上下文后，行为变化由 `change-readiness` 自动匹配或创建 change，并复用 OpenSpec 官方 Skill/CLI 完成 artifacts、apply 上下文、update、verify、sync 与 archive 判定。没有相关 change 或生成 Skill 缺失不再是 legacy 降级理由；CLI 正常时继续走官方 agent 协议。Graphify 查询前还必须校验其对 HEAD 和工作区改动的新鲜度。具体职责矩阵见 [Skill 流程图](docs/skill-flow.md#graphify-与-openspec-接入边界)。
 
 ---
 

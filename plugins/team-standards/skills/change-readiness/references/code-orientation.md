@@ -17,6 +17,10 @@ description: "Internal implementation-orientation rules loaded by change-readine
 4. **核对修改边界。** 确认入口、受影响调用方、关键条件和相关测试。涉及后端事实时按 backend-evidence 取证，不把代码推断当成数据库或业务真理。
 5. **简短回显后实施。** 说明关键文件或符号、修改目的和必须保持的约束；简单 Bug 可用几句话，不为定位另建报告、索引或 Mermaid 图。
 
+## 停止探索条件
+
+相关执行路径已理解、控制实现已定位、修改位置明确且没有阻塞本次变更的关键未知时，开始实施。只补与未决问题有关的证据；Graphify 与 Forge 返回候选，Agent 对照原文判断，不为了提高主观信心继续遍历整个系统。
+
 ## 与 Bug 流程的衔接
 
 bug-doc-required 提供诊断证据，change-readiness 判断实施准备，本参考核实当前代码位置。修复后由 delivery-verification 验证，再按 git-commit-standards 同步受影响说明并提交。问题记录存在时直接复用，不因其缺失而要求简单 Bug 补文档。
