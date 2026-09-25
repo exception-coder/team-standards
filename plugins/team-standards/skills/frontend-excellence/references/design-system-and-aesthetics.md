@@ -36,6 +36,7 @@ page -> card -> nested card -> component
 ```
 
 Use whitespace, alignment, typography, dividers, and tonal differences before adding containers. Add a card or raised surface only when the content is an independent object, needs a clear interaction boundary, participates in side-by-side comparison, or must sit above another layer.
+At one visual level, choose one principal container pattern. A nested card must represent a separate state, action, or ownership boundary; otherwise use a section and a divider. This is a composition review, not a ban on cards.
 
 Keep the primary reading path obvious. Avoid mechanical centering when left alignment or the surrounding workflow provides stronger context. For operational products, preserve comfortable information density: users should be able to scan, understand, and act without the page becoming either crowded or theatrically sparse.
 
@@ -52,7 +53,7 @@ Define semantic tokens for:
 
 Components consume semantic roles such as `surface-raised` or `text-muted`, not raw palette names or copied hexadecimal values. Keep primitive palette values behind semantic aliases.
 
-When the project has no established system, begin from a restrained default rather than inventing arbitrary values:
+Keep interaction accents (primary action, selection, focus) distinct from semantic business states (success, pending, danger, neutral). Status must have a text or symbol cue. When the project has no established system, begin from a restrained default rather than inventing arbitrary values:
 
 - spacing rhythm: `4 / 8 / 12 / 16 / 24 / 32 / 48 / 64`;
 - compact controls: approximately `6-10px` radius;

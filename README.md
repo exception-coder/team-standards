@@ -4,7 +4,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.8.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.8.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 完整内容规范及样衣示例见[设计输出契约](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)，配置与检查边界见[内容治理协议](plugins/team-standards/skills/change-readiness/references/design-content-governance.md)。
 
@@ -51,6 +51,8 @@ flowchart TD
 详细模式与条件见 [Skill 流程图](docs/skill-flow.md)，完整触发表见 [CLAUDE.md](CLAUDE.md)。
 
 工作台必须利用 Shell 分配的可用宽高，并明确面板滚动归属；阅读正文可按可读性限宽。高屏、矮屏、窄屏、动态 resize 与长短内容的浏览器验收统一见 [可用视口契约](plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract)。这由 Agent 执行真实验收，不代表已有自动布局检查器。
+
+4.8.1 从 Yoooni One 的移动检索、卡片密度、滚动、看板、权限和登录页纠错提交提炼[企业 UI 失败模式与 Eval](plugins/team-standards/skills/frontend-excellence/references/enterprise-ui-failure-patterns.md)。现有 `frontend-excellence` 承接 Page Anatomy、密度、移动首屏与审查，`business-visualization-advisor` 承接 NO CHART 决策；确定性 Gate 仍为待试点方案。
 
 ---
 

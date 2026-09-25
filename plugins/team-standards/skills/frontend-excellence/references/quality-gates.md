@@ -17,12 +17,14 @@ When no target sizes are supplied, use approximately 375 pixels wide for a mobil
 
 ## Responsive checks
 
+- For list-heavy mobile pages, inspect the initial view: primary task, search/essential filters, and first useful object. Record why any large header or navigation stack is necessary; do not use a universal pixel threshold.
 - No accidental horizontal scrolling.
 - Reading order remains logical when columns collapse.
 - Navigation, tables, filters, dialogs, sticky regions, and action bars remain usable.
 - Touch targets are appropriately sized and separated.
 - Long labels, large numbers, localization expansion, and validation messages do not break layout.
 - Content does not hide behind fixed headers, footers, or device safe areas.
+- Record the vertical scroll owner at each breakpoint and verify that the last item is reachable, sticky elements do not overlap actions, and the wheel/touch scroll does not trap the user between nested regions.
 
 ## Workspace viewport contract
 

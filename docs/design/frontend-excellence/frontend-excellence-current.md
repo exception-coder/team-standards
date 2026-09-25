@@ -201,6 +201,7 @@ sequenceDiagram
 | 响应式是布局规则 | 不以简单缩放桌面稿代替移动端信息重排和交互调整。 |
 | 可访问性内建 | 使用语义结构、键盘路径、可见焦点、合理对比度和减少动效支持。 |
 | 视觉验收必做 | 至少验证桌面与移动关键视口；存在参考图时必须对照迭代。 |
+| 作业界面先定结构与密度 | 重大新建或改造先写 Page Anatomy、比较对象数和密度模式；移动端重新决定首屏内容、导航与滚动归属。案例、审查与 Eval 见[企业 UI 失败模式](../../../plugins/team-standards/skills/frontend-excellence/references/enterprise-ui-failure-patterns.md)。 |
 | 禁止演示稿式源码 | 不用单文件 HTML、巨型页面组件、随机内联样式或假数据散落作为正式交付。 |
 
 ## 6. 编码落点

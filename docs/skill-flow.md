@@ -8,6 +8,8 @@
 
 本文件将任务链路映射到实际源码：每一步读哪些规则、哪些入口会执行、结果落在哪里。它是源码导航，不是另一套运行时路由器；执行规则以各 Skill 的 `SKILL.md` 为准。
 
+生产 Web UI 的页面层级、信息密度、移动首屏、容器与滚动审查由 `frontend-excellence` 的[企业 UI 失败模式和 Eval](../plugins/team-standards/skills/frontend-excellence/references/enterprise-ui-failure-patterns.md)承接；业务图表与 NO CHART 由 `business-visualization-advisor` 判定。历史提交提供案例，不构成已部署机械 Gate 的证据。
+
 导航：[总流程](#总流程) · [节点与源码](#总图节点对应哪些源码) · [目录结构](#先分清四种目录) · [Skill 文件索引](#全部-skill-的规则文件索引) · [执行调用链](#真正执行程序的调用链) · [目标项目与外部服务](#目标项目与外部服务中的内容) · [修改入口速查](#想改某个行为时从哪里下手) · [路由场景](#易混淆请求的预期路由)
 
 OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/team-standards/skills/change-readiness/references/openspec-lifecycle.md) 统一维护阶段准出、评审回写、设计视图及续跑交接。delivery-verification 完成真实验证后，按 [治理检查器协议](../plugins/team-standards/skills/change-readiness/references/governance-checker.md) 记录并检查本切片；同步与归档继续调用官方 OpenSpec。新增 Hook 默认报告试运行，宿主验收后才启用阻断。

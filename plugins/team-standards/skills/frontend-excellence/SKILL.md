@@ -14,6 +14,7 @@ Deliver a coherent product interface, not a runnable mock. Preserve the reposito
    - Reuse established capabilities unless the user explicitly requests a redesign or migration.
 2. Establish the product intent.
    - Identify audience, primary task, content hierarchy, brand cues, target viewports, and accessibility expectations.
+   - For operational workspaces and material redesigns, sketch Page Anatomy, comparison task, density mode, mobile first useful content, and scroll owner before coding. Read [enterprise-ui-failure-patterns.md](references/enterprise-ui-failure-patterns.md) for observed corrections, review questions, and Eval cases; keep this compact in the current task or design rather than creating a new report.
    - Use provided Figma selections, screenshots, brand assets, or written references as sources of truth.
    - If no visual reference exists, state a concise visual direction and its rationale before implementing it.
    - Separate durable product character from fashionable references. Translate references into hierarchy, typography, density, material, and motion decisions instead of imitating a named brand.
@@ -29,9 +30,11 @@ Deliver a coherent product interface, not a runnable mock. Preserve the reposito
    - Cover responsive layout, content hierarchy, keyboard behavior, focus, motion preferences, and all relevant loading, empty, error, success, disabled, and permission states.
    - For operational workspaces, trace the available width/height from the application shell through every wrapper to the working panels. Assign remaining space and scroll ownership explicitly; reading-column limits belong to readable content, not automatically to the workspace. Use the viewport checks in [quality-gates.md](references/quality-gates.md#workspace-viewport-contract).
    - Use real content shapes and realistic density. Keep fixtures centralized when live data is unavailable.
+   - On configuration screens, reveal current state and applicable source or inheritance before editing; show the pending difference and recovery path. For rule-driven results, layer result, business reason, and inspectable evidence.
 6. Verify in a real browser.
    - Read [quality-gates.md](references/quality-gates.md) before declaring completion.
    - Run [visual-review-checklist.md](references/visual-review-checklist.md) after the first complete render and again after material visual revisions.
+   - For list-heavy mobile pages, inspect whether the first useful business object appears in the initial view and whether navigation, search, and filters crowd it out. Verify scroll ownership and the final item in short and long content.
    - Run the project's build, lint, type, and test commands that are relevant to the change.
    - Inspect at least one mobile and one desktop viewport. Exercise the primary interaction and one failure or empty path.
    - Compare against supplied references and iterate until material differences are resolved or explicitly documented.
