@@ -137,7 +137,7 @@ flowchart TD
 
 | Skill | 核心职责 | 关键模式或边界 |
 |---|---|---|
-| `architecture-ddd-lite-fullstack` | 跨语言 DDD-lite 分层、Feature 边界、单向依赖和原子能力 | 项目具体分层例外由项目声明 |
+| `architecture-ddd-lite-fullstack` | 跨语言 DDD-lite 分层、Feature 边界、语义分包、单向依赖和原子能力 | 项目具体分层例外由项目声明 |
 | `backend-evidence` | 单服务后端事实、DDL/SQL 正确性与性能、反向影响、领域规格 | 跨项目拓扑不归团队插件 |
 | `bug-doc-required` | Bug 证据、根因、修复合同、最小修复与回归 | 调查模式不改源码；简单问题不强制独立文档 |
 | `business-logic-orientation` | Graphify 优先的现状理解与业务语义核实 | 仅明确要求或需要长期基线时生成梳理文档 |

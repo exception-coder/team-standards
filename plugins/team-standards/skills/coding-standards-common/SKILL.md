@@ -25,6 +25,7 @@ description: "Use when writing, reviewing, or modifying source code, explicitly 
 
 - 修改范围聚焦当前任务，不夹带无关重构。
 - 新代码沿用项目已确认的命名、目录和错误处理约定，但不复制明显反模式。
+- 新增文件前检查目标目录；多个稳定职责簇混在同层时按语义分包，单一职责簇保持扁平，不按文件数机械拆包。业务代码的完整判定见 [架构结构质量规则](../architecture-ddd-lite-fullstack/rules/structure-quality-gates.md#目录即索引按稳定语义分包)。
 - 外部 API 或不熟悉的库先查项目依赖和官方契约，不凭记忆臆造。
 - 新增全局名称、路由、事件、注册键或配置键前先查重。
 - 为核心分支、失败路径和边界条件提供与风险相称的验证。
@@ -33,6 +34,7 @@ description: "Use when writing, reviewing, or modifying source code, explicitly 
 ## 完成前自检
 
 - 名称是否能独立说明职责？
+- 目录路径是否足以定位职责，还是把不同能力、渠道或适配器继续堆在同一层？
 - 函数是否混合多个业务动作或场景？
 - 函数体是否超过 80 行，参数是否超过 4 个，嵌套是否超过 3 层？
 - 是否引入反向依赖、魔法值、静默异常或重复规则？

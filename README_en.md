@@ -4,7 +4,9 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.8.1**. The plugin exposes 16 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.8.2**. The plugin exposes 16 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+
+The architecture and common coding Skills now require semantic package navigation: split a layer when it contains distinct, stable responsibility clusters, while keeping cohesive directories flat and avoiding low-information nesting.
 
 The [enterprise UI failure patterns and Evals](plugins/team-standards/skills/frontend-excellence/references/enterprise-ui-failure-patterns.md) distill observed Yoooni One corrections into design, review, and candidate diagnostic checks. `frontend-excellence` owns page anatomy, density, mobile task layout, and scroll review; `business-visualization-advisor` owns the decision to use a chart or NO CHART. Automated UI blocking is not enabled by this release.
 

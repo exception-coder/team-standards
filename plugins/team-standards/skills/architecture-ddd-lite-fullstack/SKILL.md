@@ -13,7 +13,7 @@ description: "Use before writing or reviewing business code in Java, Go, Python,
 
 - 需要判断层职责、feature 结构、聚合或事务边界时，读取 [references/layers-and-boundaries.md](references/layers-and-boundaries.md)。
 - 根据技术栈，只读取 [references/framework-rules.md](references/framework-rules.md) 中对应章节。
-- 扩展既有 Service、Controller、Page、Widget，新增跨 feature 调用，或目标文件已呈现多职责、巨型文件、跨分支编排迹象时，**必须**读取 [rules/structure-quality-gates.md](rules/structure-quality-gates.md)。该文件是 focused service、跨 feature 公开边界和旧骨架增量治理的硬规则源。
+- 扩展既有 Service、Controller、Page、Widget，新增跨 feature 调用，目标目录混放多个职责簇，或目标文件已呈现多职责、巨型文件、跨分支编排迹象时，**必须**读取 [rules/structure-quality-gates.md](rules/structure-quality-gates.md)。该文件是语义分包、focused service、跨 feature 公开边界和旧骨架增量治理的规则源。
 
 ## 基本依赖方向
 
@@ -27,6 +27,7 @@ Domain 不依赖 UI、Controller、数据库实现、HTTP 客户端或框架适�
 ## 实施判断
 
 1. 确定改动属于哪个 feature，避免按纯技术类型向全局目录堆放业务代码。
+   检查目标层内是否已有多个稳定职责簇；有则按语义分包，单一职责簇保持扁平。
 2. 将输入适配留在 presentation，将用例编排留在 application，将业务不变量留在 domain。
 3. Repository 在 domain 定义端口，在 infrastructure 提供实现；Go 按消费方在 application/domain 定义小接口，见 framework-rules 的 Go 章节。
 4. 一个业务分支差异明显时拆成 focused service 或策略，不在单函数堆叠多场景条件。

@@ -12,6 +12,27 @@
 - 方法应围绕一个步骤或一个业务判断，复杂流程拆成有语义的私有方法或原子能力。
 - 新增代码必须能从目录位置看出所属 feature、层级和责任边界。
 
+### 目录即索引：按稳定语义分包
+
+目录和 package 应帮助人和 AI 在打开文件前缩小检索范围。新增文件前先查看目标目录：若同层混放多个可稳定命名的职责簇（业务能力、外部渠道、技术适配等），复用或建立简短的语义子包，不继续堆在一级目录。包名应回答一个明确问题，例如“属于什么能力”“通过什么渠道”“用什么技术实现”。
+
+```text
+infrastructure/
+  LarkMessageReceiver.java
+  LarkReplySender.java
+  AgentScopeConsultation.java
+  ProgressQueryTool.java
+
+→ infrastructure/lark/       # 渠道适配
+  infrastructure/agentscope/ # Agent 框架适配
+  infrastructure/progress/   # 进度数据适配
+```
+
+- 判断依据是稳定职责边界，不是文件数量。只有一个内聚职责簇时保持扁平；不为单个类或临时步骤造目录。
+- 不为形式整齐制造 `lark/channel/inbound/handler/event/` 这类低信息量深层目录；使用足以定位职责的最短路径。
+- 分包不改变层级职责与依赖方向。移动既有类时同步修正包声明、引用、测试及组件扫描，并验证行为不变。
+- 编码前自检：看到目录名能否排除大部分无关文件？新增类属于现有职责簇，还是暴露了应单独命名的职责簇？
+
 ## 易于维护
 
 - 新逻辑必须有明确变更点，避免把多个不相关规则揉在同一个 if/else 或 switch 中。
