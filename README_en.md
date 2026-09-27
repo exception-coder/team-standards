@@ -4,7 +4,7 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.9.0**. The plugin exposes 17 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.9.1**. The plugin exposes 17 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 The architecture and common coding Skills now require semantic package navigation: split a layer when it contains distinct, stable responsibility clusters, while keeping cohesive directories flat and avoiding low-information nesting.
 
@@ -111,3 +111,5 @@ Version 3.5.0 adds [Go coding standards](plugins/team-standards/skills/go-coding
 ## 4.0.0 migration
 
 The distributed plugin now has 15 skills. Comment cleanup and coding feedback become common-coding modes; terminology becomes a business-orientation mode; work summaries become a commit mode. Design bootstrap and review share one design-system entry. Suite decision logging is repository-local; the Forge planning contract lives under docs/platform-integrations and is not distributed. Update old invocations using the Chinese README migration table. Existing logs and registries are preserved.
+
+Version 4.9.1 aligns ER nodes with modeled entities, uses self-relations for hierarchies, labels external references, and requires both ends of association entities. Logical entities do not imply one physical table each.
