@@ -211,6 +211,7 @@ readEvents(directory): { events, invalidRecords }
 
 ## 18. OpenSpec 自动生命周期坐标
 
+- `hooks/project-scope.js` 为设计依据与 OpenSpec 写前检查共用项目归属判断：解析实际路径，排除当前目录之外、无 Git/构建/治理标记的系统临时文件。`temporary-write-scope.test.js` 覆盖四类写入载荷、分发入口、项目内脚本、临时真实项目、混合补丁、目录链接和移出原项目的路径检查。
 - `change-readiness/SKILL.md`：OpenSpec 已启用时，M/L 变更强制进入 change；移除“无相关 change 或 CLI 不可用即自动 legacy”的路由。
 - `change-readiness/references/openspec-lifecycle.md`：维护官方 Skill/CLI 选择、change 匹配与创建、schema-driven artifacts、实施 update、验证、sync 和 archive 判定。
 - `check-change-readiness.js#readSelectedOpenSpecChanges(transcriptPath)`：从当前 transcript 中提取实际读取或通过 `--change` 选择的 change ID。

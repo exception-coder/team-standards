@@ -4,7 +4,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.8.2**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.8.3**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 完整内容规范及样衣示例见[设计输出契约](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)，配置与检查边界见[内容治理协议](plugins/team-standards/skills/change-readiness/references/design-content-governance.md)。
 
@@ -115,6 +115,8 @@ coding-standards-common              所有源码修改的公共基线
 ---
 
 ## Hook 边界
+
+设计依据与 OpenSpec 写前检查不再将项目外、无所属项目的系统临时文件归入当前项目；一次性文档辅助脚本可保留 `.py` 扩展名。项目内 `.tmp/` 脚本、系统临时目录中的真实项目、指向项目的目录链接仍执行原检查；混合补丁逐文件判断，移动文件同时检查原路径。此边界不豁免其他内容检查，也不覆盖脚本执行产生的副作用。
 
 4.6.0 完善[已有规格解析](plugins/team-standards/skills/change-readiness/references/existing-spec-resolution.md)：本机自动发现 Forge CLI，按宿主 session 绑定项目、分支与 change，支持 Codex apply_patch/exec_command；提交前检查已确认文件范围，归档后刷新索引。模型草稿仍需审阅。默认 warn，配置和宿主覆盖边界见该协议。
 

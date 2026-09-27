@@ -4,7 +4,7 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.8.2**. The plugin exposes 16 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.8.3**. The plugin exposes 16 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 The architecture and common coding Skills now require semantic package navigation: split a layer when it contains distinct, stable responsibility clusters, while keeping cohesive directories flat and avoiding low-information nesting.
 
@@ -17,6 +17,8 @@ See the [suite panorama by engineering domain](docs/suite-panorama.md) for all 1
 Version 4.3 adds eight business overview chapters, nine sections per detailed function, stable function IDs, specification/evidence links, delivery states and named content reviews. Existing bindings remain compatible through gradual adoption. Machine coverage does not establish business correctness; see the [content contract and garment-sample examples](plugins/team-standards/skills/change-readiness/references/design-output-contract.md) and [checker protocol](plugins/team-standards/skills/change-readiness/references/design-content-governance.md).
 
 ## Maintenance boundaries
+
+Design-readiness and OpenSpec write checks exclude system temporary files outside the working directory only when no owning project is detected. Document helpers can retain their `.py` extension. Project-local temporary scripts, real projects under the system temporary directory, and directory links into projects remain guarded. Mixed patches are checked per file; moves also check their original path. Other content checks and script execution side effects are outside this exemption.
 
 Version 4.8 separates Agent reasoning, Skill procedures, Forge execution policy/state, and runtime adapters. Read-only `session_init` and `resolve_execution_context` expose capabilities and source-grounded candidates; `check_execution_event` owns lifecycle routing. Hooks consume versioned decisions through `hooks/forge/client.js`; private v1 state compatibility stays in `hooks/forge/legacy-v1.js`. Existing design evidence checks remain compatible.
 

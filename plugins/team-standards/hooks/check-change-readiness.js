@@ -4,14 +4,14 @@
 //
 // 触发时机: matcher = "Write|Edit|MultiEdit"，且目标文件后缀属于源码扩展名集合
 //
-// 项目根识别（v1.30.3 修复 monorepo / Maven 多模块）：
+// 项目根识别：
 //   1) 优先全程向上查找 `.git`（含 worktree 的 .git 文件），命中即返回该目录 —— 这是 git 仓库根，
 //      在 Maven 多模块 / npm monorepo / 单仓多语言项目中保证不会被子模块的 pom.xml / package.json
-//      过早截胡（旧实现会把 tools/tool-treesize/pom.xml 当作项目根，导致去找
-//      ai-docs/tool-treesize 而不是 ai-docs/<repo-name>）。
-//   2) 找不到 .git 时，再按构建文件标记找第一个匹配（向后兼容）：
+//      过早被识别为项目根。
+//   2) 找不到 .git 时，再按构建或治理标记找第一个匹配：
 //      pom.xml / build.gradle{.kts} / package.json / pubspec.yaml /
-//      Cargo.toml / go.mod / pyproject.toml / setup.py / Gemfile / composer.json
+//      Cargo.toml / go.mod / pyproject.toml / setup.py / Gemfile / composer.json /
+//      openspec/config.yaml / .team-standards-project.json
 //   3) 仍找不到时退回 payload.cwd
 //
 // 项目名覆盖：
@@ -29,6 +29,7 @@
 //   <projectName> = .team-standards-project.json#aiDocsProject ?? path.basename(projectRoot)
 //
 // 不触发(放行,不检查):
+//   - 当前目录之外、且不属于任何可识别项目的系统临时文件
 //   - 非源码扩展名 (.md / .json / .yml / .yaml / .lock / .gitignore / .txt / .toml)
 //   - 测试文件 (路径含 /test/ / /tests/ / __tests__ / 文件名 *_test.ext / *.test.ext / *.spec.ext)
 //   - 配置/脚本 (.sh / .cmd / .bat / .ps1 / Dockerfile / Makefile / *.yml)
@@ -48,6 +49,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { normalizeChanges } = require('./change-input');
+const { findProjectRoot, isExternalTemporaryFile } = require('./project-scope');
 
 const MODE = process.env.TEAM_STANDARDS_CHANGE_READINESS_HOOK
   || process.env.TEAM_STANDARDS_DESIGN_DOC_HOOK
@@ -73,13 +75,6 @@ const TEST_PATH_PATTERNS = [
   /(_test|\.test|\.spec)\.[a-z]+$/i,
 ];
 
-// 构建文件标记。仅在 `.git` 未命中时作为回退使用。
-const BUILD_FILE_MARKERS = [
-  'pom.xml', 'build.gradle', 'build.gradle.kts',
-  'package.json', 'pubspec.yaml', 'Cargo.toml', 'go.mod',
-  'pyproject.toml', 'setup.py', 'Gemfile', 'composer.json',
-];
-
 let raw = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { raw += chunk; });
@@ -96,10 +91,12 @@ process.stdin.on('end', () => {
   if (outcome.stderr) process.stderr.write(outcome.stderr);
   if (outcome.code) process.exit(outcome.code);
 
-  const changes = normalizeChanges(payload).filter((change) => (
+  const changes = normalizeChanges(payload).flatMap(change => change.previousFilePath
+    ? [change, { ...change, filePath: change.previousFilePath }] : [change]).filter((change) => (
     change.operation !== 'delete' &&
     isSourceFile(change.filePath) &&
-    !isTestOrConfigFile(change.filePath)
+    !isTestOrConfigFile(change.filePath) &&
+    !isExternalTemporaryFile(change.filePath, payload.cwd || process.cwd())
   ));
 
   for (const change of changes) {
@@ -147,45 +144,6 @@ ${openSpecConfigured ? `项目已启用 OpenSpec，但本会话未选择并读�
   }
   process.exit(0);
 });
-
-/**
- * 从目标文件路径向上查找项目根。
- * 优先策略：全程向上查找 `.git`（git 文件或目录均可），命中即返回该目录。
- * 这样 Maven 多模块 / monorepo 下不会被深层子模块的构建文件过早截胡。
- * 回退策略：未找到 `.git` 时，再走构建文件标记。
- * 跨平台：使用 path.parse(dir).root 作为停止条件（Windows 'C:\\' / POSIX '/'）。
- */
-function findProjectRoot(filePath) {
-  const startDir = path.dirname(filePath);
-  const fsRoot = path.parse(startDir).root;
-
-  let cursor = startDir;
-  while (cursor && cursor !== fsRoot) {
-    try {
-      if (fs.existsSync(path.join(cursor, '.git'))) {
-        return cursor;
-      }
-    } catch (e) { /* skip */ }
-    const parent = path.dirname(cursor);
-    if (parent === cursor) break;
-    cursor = parent;
-  }
-
-  cursor = startDir;
-  while (cursor && cursor !== fsRoot) {
-    for (const marker of BUILD_FILE_MARKERS) {
-      try {
-        if (fs.existsSync(path.join(cursor, marker))) {
-          return cursor;
-        }
-      } catch (e) { /* skip */ }
-    }
-    const parent = path.dirname(cursor);
-    if (parent === cursor) break;
-    cursor = parent;
-  }
-  return null;
-}
 
 /**
  * 解析 ai-docs 子目录名。优先读取 projectRoot/.team-standards-project.json#aiDocsProject，

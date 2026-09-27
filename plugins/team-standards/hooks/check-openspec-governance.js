@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { checkGovernance, runtime } = require('./forge/client');
 const { normalizeChanges } = require('./change-input');
+const { isExternalTemporaryFile } = require('./project-scope');
 const service = require('./governance/service');
 const { repository, isExecutable } = require('./governance/repository');
 const { statePath, atomicUpdate, relativePath, MAX_BYTES, MAX_FILES, requireValue } = require('./governance/storage');
@@ -21,6 +22,7 @@ function handle(payload) {
   const outcomes = [];
   const roots = new Map();
   for (const change of changes) {
+    if (isExternalTemporaryFile(change.filePath, payload.cwd || process.cwd())) continue;
     const folder = nearestExisting(path.dirname(path.resolve(payload.cwd || process.cwd(), change.filePath)));
     const candidate = service.guarded(() => repository(folder));
     if (candidate.root) {
@@ -29,7 +31,7 @@ function handle(payload) {
       if (/^openspec\/(?:config\.yaml$|schemas\/|changes\/[^/]+\/(?:\.openspec\.yaml|governance-evidence\.json)$)/.test(relative)) continue;
       files.push(relative);
       roots.set(candidate.root, files);
-    } else if (hasConfig(payload.cwd || process.cwd())) outcomes.push(candidate);
+    } else if (hasConfig(folder) || hasConfig(payload.cwd || process.cwd())) outcomes.push(candidate);
   }
   if (stop) roots.set(path.resolve(payload.cwd || process.cwd()), []);
   for (const [cwd, files] of roots) {
