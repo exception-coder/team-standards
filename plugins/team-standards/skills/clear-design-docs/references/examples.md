@@ -12,10 +12,20 @@
 
 ```mermaid
 erDiagram
+    person["人员 (person)"] {
+        string personId "人员标识"
+    }
+    department["部门 (department)"] {
+        string departmentId "部门标识"
+    }
+    position["岗位 (position)"] {
+        string positionId "岗位标识"
+    }
     person ||..o{ assignment : "具有任职记录"
     department ||..o{ assignment : "接收任职"
     position ||..o{ assignment : "定义岗位职责"
-    assignment {
+    assignment["任职记录 (assignment)"] {
+        string assignmentId "任职标识"
         string personId "人员"
         string departmentId "部门"
         string positionId "岗位"
@@ -23,6 +33,8 @@ erDiagram
         datetime validTo "结束时间"
     }
 ```
+
+图内 string 与 datetime 仅示意逻辑字段类别，不指定物理列类型。
 
 读图说明：一个人员可以没有任职，也可以有多条当前或历史任职；每条任职引用一个人员、部门和岗位。连线是逻辑关系，不要求建立物理外键；若项目允许任职不指定岗位，应同步调整基数与文字。
 
@@ -81,8 +93,14 @@ erDiagram
 
 ```mermaid
 erDiagram
-    menu["菜单 (menu)"]
+    menu["菜单 (menu)"] {
+        id menuId "菜单标识"
+        id parentMenuId "父菜单标识，根为空"
+        code state "菜单状态"
+    }
     menu |o..o{ menu : "parentMenuId 父子关系"
 ```
 
 若授权记录通过 resourceType（资源类型）与 resourceId（资源标识）选择应用、菜单或操作，每条记录只指向其中一种。分图时可重复真实的 application、menu、action_resource，但不能新增并不存在的 resource 实体；各目标连线用零或一，并在图旁说明合计恰好一个目标。关联必须连全，不能只画“角色—角色权限”而省略资源端。
+
+上图的 id 与 code 仅表示逻辑字段类别，不指定数据库类型或物理键。阅读时应能从 parentMenuId 找到同对象的 menuId；完整字段及规则保留在字段表。只有“菜单”空方框不足以说明关联，但也不需把排序、审计和全部展示属性塞进此图。未知字段不为满足图示要求而补造。

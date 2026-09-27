@@ -4,7 +4,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.9.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.9.2**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 完整内容规范及样衣示例见[设计输出契约](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)，配置与检查边界见[内容治理协议](plugins/team-standards/skills/change-readiness/references/design-content-governance.md)。
 
@@ -261,3 +261,5 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 按 `Task → Implement → Verify → Commit → Next Task` 推进；Task 指最小完整逻辑单元。多个独立问题分别提交，同一功能的前后端、数据、测试和必要文档保持闭环。提交数量不是质量指标，验证必须适用于待提交内容。完整边界与例外归 [Git 提交规范](plugins/team-standards/skills/git-commit-standards/SKILL.md)，现有 Hook 不证明语义原子性。
 
 4.9.1 补充 ER 对象一致性：同表父子关系画自关联，外部对象注明归属，关联表连全两端；分图不虚构实体，不将逻辑模型直接等同物理表。
+
+4.9.2 明确 ER 方框内保留标识、关联及必要状态/有效期字段并附中文说明；不以图外字段表替代，不虚构物理键或列类型。

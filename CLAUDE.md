@@ -8,7 +8,7 @@
 
 生产 Web UI 的重大新建或改造由 `frontend-excellence` 先明确 Page Anatomy、比较密度、移动端首个有用内容与滚动归属；业务看板由 `business-visualization-advisor` 决定是否使用图表。证据、审查与 Eval 见[企业 UI 失败模式](plugins/team-standards/skills/frontend-excellence/references/enterprise-ui-failure-patterns.md)，不把个别项目尺寸写成通用阈值。
 
-概设详设的清晰表达统一使用 [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md)：逐段试讲、复杂对象配关系图、ER 对象与模型一致且同表层级用自关联、接口字段有中文说明、简化措辞保持语义。结构和生命周期继续遵循设计内容契约。
+概设详设的清晰表达统一使用 [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md)：逐段试讲、复杂对象配关系图、ER 对象与模型一致、同表层级用自关联且框内保留关键字段中文说明、接口字段有中文说明、简化措辞保持语义。结构和生命周期继续遵循设计内容契约。
 
 ## 分层维护入口
 
