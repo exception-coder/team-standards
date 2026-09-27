@@ -385,3 +385,7 @@ Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成�
 ## 已有规格解析
 
 需求原子化 → 正式 Requirement/Scenario 召回 → Graphify 实现关联与新鲜度核对 → 具名语义决策 → 完整 Delta → 官方校验 → readiness。详见[协议](../plugins/team-standards/skills/change-readiness/references/existing-spec-resolution.md)。Hook 只在生命周期调用服务，未知语义保持未确认。
+
+## 设计表达与结构的分工
+
+编写或评审概设详设时，由 change-readiness 的内容契约确定结构与生命周期，再使用 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 完成逐段试讲、关系图、字段说明与语义核对。markdown-writing-standards 检查格式和导航，delivery-verification 核对受影响设计的实际审读范围。纯设计咨询不自动实施；普通文字编辑不要求启动设计治理。

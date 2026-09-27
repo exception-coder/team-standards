@@ -34,6 +34,7 @@ Agent 阅读证据、判断业务影响、编写规格与设计并实施；本 S
 
 - 风险描述与兼容档位：[classification](references/classification.md)。风险决定验证深度，不直接决定文档数量。
 - 文档发现和命名：[document-workflow](references/document-workflow.md)。优先原位复用唯一正文，不为流程新建 coding 摘要或个人索引。
+- 概设/详设表达：编写、精简和评审时使用 [clear-design-docs](../clear-design-docs/SKILL.md)，检查通俗用词、对象关系图、字段中文说明及语义保持。结构和生命周期仍归下述内容契约。
 - 概设/详设写作：[内容契约](references/design-output-contract.md)；历史绑定和内容检查：[内容治理](references/design-content-governance.md)。规划、实现、验证与上线分别记录。
 - 既有项目的绑定、视图和审阅证据：[兼容治理检查器](references/governance-checker.md)。仅在 Forge 要求兼容设计检查或项目使用旧治理时加载，不并行维护第二套执行状态。
 - 状态、迁移、筛选与按钮条件变化：[状态契约](references/state-contract.md)，复用现有检查器与登记，不猜数据库事实。

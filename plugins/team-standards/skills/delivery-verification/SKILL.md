@@ -39,6 +39,8 @@ Forge 负责必需检查类别、证据有效性和完成裁决；本 Skill 负�
 
 先核对[影响判定](../change-readiness/references/impact-routing.md)。仅受影响概设/详设进入[自动设计维护流程](../change-readiness/references/automatic-design-maintenance.md)及绑定检查；无需设计变化则核对依据，不补建旧模块全套文档。无需 OpenSpec Change 的执行不强制 bind/record/archive，仍须真实回归。已有项目明确门禁保持有效，必要时修改其策略后再验证，不能伪造 PASS。
 
+受影响设计的内容审读采用 [clear-design-docs](../clear-design-docs/SKILL.md)，核对关系图、字段说明和简化前后的含义；报告实际审读范围，不把结构 PASS 当成内容易懂或人工认可。
+
 ## 本地验证按影响选择
 
 已接入模块基线的项目，当前切片交付同时核对 [当前设计同步](../change-readiness/references/current-design-baseline.md)：受影响概设/详设、行为规格和具名审阅证据。验证仅覆盖已实现范围，未完成目标不晋升；代码版本与生产部署分开记录。相关输入指纹分别失效，文档措辞变化只重验必要文档检查，不无理由重跑无关运行测试。

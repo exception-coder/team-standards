@@ -9,6 +9,8 @@ description: "Use when delivering suite or project updates to synchronize affect
 
 创建或结构性修改项目文档、设计文档、Bug 文档或用户知识库 Markdown 时，先读取 [references/document-index-workflow.md](references/document-index-workflow.md)：优先更新唯一权威载体，写后只维护受影响的已有导航。不要求 Phase-A / Phase-B、个人目录索引或另建 INDEX.md。
 
+概设、详设的编写、精简与评审同时使用 [clear-design-docs](../clear-design-docs/SKILL.md)；普通 Markdown 润色不触发设计流程。内容结构及绑定仍遵循设计内容契约，本 Skill 负责格式和导航。
+
 ## 作业交付时同步文档
 
 模块当前概设/详设与活动 change 分别承担现状和目标增量，不属于禁止维护的重复正文。按 [当前设计基线协议](../change-readiness/references/current-design-baseline.md) 原位更新受影响当前章节、移除失效表述并维护必要导航；不以开发日志、空标题或刷新日期代替同步，不将未实现目标写为当前能力。
