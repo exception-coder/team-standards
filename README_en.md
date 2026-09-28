@@ -4,7 +4,7 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.9.2**. The plugin exposes 17 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.9.3**. The plugin exposes 18 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 The architecture and common coding Skills now require semantic package navigation: split a layer when it contains distinct, stable responsibility clusters, while keeping cohesive directories flat and avoiding low-information nesting.
 
@@ -16,7 +16,9 @@ See the [suite panorama by engineering domain](docs/suite-panorama.md) for all 2
 
 Version 4.3 adds eight business overview chapters, nine sections per detailed function, stable function IDs, specification/evidence links, delivery states and named content reviews. Existing bindings remain compatible through gradual adoption. Machine coverage does not establish business correctness; see the [content contract and garment-sample examples](plugins/team-standards/skills/change-readiness/references/design-output-contract.md) and [checker protocol](plugins/team-standards/skills/change-readiness/references/design-content-governance.md).
 
-Version 4.9 adds [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md) for plain-language design reviews, relationship diagrams, Chinese field descriptions and meaning-preserving simplification. Existing design structure, bindings and review lifecycle remain authoritative; no new automated gate is introduced. Update the host plugin before retiring a same-name personal skill; pushing source does not update running sessions.
+Version 4.9 adds [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md) for plain-language design writing, relationship diagrams, Chinese field descriptions and meaning-preserving simplification. Existing design structure, bindings and review lifecycle remain authoritative; no new automated gate is introduced. Update the host plugin before retiring a same-name personal skill; pushing source does not update running sessions.
+
+Version 4.9.3 adds [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) for independent overview, detailed-design and technical-plan reviews. It prioritizes material contradictions, current-scope gaps and minimal remedies; speculative scale and rare scenarios remain advisory unless confirmed requirements or correctness risks make them relevant.
 
 ## Maintenance boundaries
 

@@ -2,7 +2,7 @@
 
 开发任务自动执行[发现、补建、绑定与交付同步](automatic-design-maintenance.md)，不以 JSON 存在为前置条件。脚本负责安全合并，Agent 负责真实业务内容；只读任务不写入。
 
-编写或评审本契约下的设计时，配合 [clear-design-docs](../../clear-design-docs/SKILL.md) 检查表达与模型图示。本契约负责结构、状态和审阅，写作技能负责让读者看懂；不新增独立审批，不以格式检查替代语义审读。
+编写本契约下的设计时，配合 [clear-design-docs](../../clear-design-docs/SKILL.md) 检查表达与模型图示；独立审查方案问题时使用 [reviewing-design-plainly](../../reviewing-design-plainly/SKILL.md)。本契约负责结构、状态和审阅要求，两个 Skill 分别负责清晰表达与问题判断；不新增独立审批，不以格式检查替代语义审读。
 
 ## 读者、定位与事实边界
 

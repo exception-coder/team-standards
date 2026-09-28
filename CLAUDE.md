@@ -10,6 +10,8 @@
 
 概设详设的清晰表达统一使用 [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md)：逐段试讲、复杂对象配关系图、ER 对象与模型一致、同表层级用自关联且框内保留关键字段中文说明、接口字段有中文说明、简化措辞保持语义。结构和生命周期继续遵循设计内容契约。
 
+独立审查概设、详设或技术方案使用 [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md)：核实当前事实，只指出本期实质缺口、矛盾与未决选择；未来规模和冷门场景以提醒为主，不以扩展设计充当评审结果。表达问题按需叠加 clear-design-docs；不新增机器阻断或审批。
+
 ## 分层维护入口
 
 Agent 负责证据理解和实施，Skill 提供操作方法，Forge 负责上下文、执行状态、策略和硬约束，Hook/MCP 连接宿主。全局认知原则与本仓维护约定分开；本文件保留项目入口，不复制 Forge 实现。
@@ -103,7 +105,8 @@ flowchart TD
 | 创建、重做或显著提升生产 Web 前端 | `frontend-excellence`；视觉一致性复用 `design-system` |
 | Web 业务图表、指标概览、管理看板创建、改造或选图评审 | `business-visualization-advisor`；先业务语义与信息设计，再视觉系统和前端实现；优化统计总览/看板时编码前形成目的—指标—图表—行动映射及选图清单，完成前反向验证业务改善 |
 | 后端表、SQL、状态、字段、事件、API、领域闭环或查询性能 | `backend-evidence` |
-| 编写、精简或评审概设详设 | `clear-design-docs` 配合现有设计内容契约 |
+| 编写或精简概设详设 | `clear-design-docs` 配合现有设计内容契约 |
+| 独立评审概设、详设、技术方案或实施方案 | `reviewing-design-plainly`；表达与图示问题按需叠加 `clear-design-docs` |
 | 套件或项目更新的文档同步；新建或结构性修改 Markdown、Mermaid、复杂表格 | `markdown-writing-standards` |
 | 初始化 AI 工程结构/AI 目录；初始化新项目、一键 onboard、接入新系统；或刷新上下文状态 | `init-project-docs` |
 | 可执行改动完成、准备最终回复 | `delivery-verification` |
@@ -121,7 +124,7 @@ flowchart TD
 
 ## Skill 分类
 
-- 分析：change-readiness、bug-doc-required、business-logic-orientation（含术语）。
+- 分析：change-readiness、reviewing-design-plainly、bug-doc-required、business-logic-orientation（含术语）。
 - 编码：architecture-ddd-lite-fullstack、coding-standards-common（含清理/反馈）、java-coding-standards、go-coding-standards、llm-agent-coding-standards。
 - 前端设计：business-visualization-advisor（指标与信息设计）、design-system（视觉系统）、frontend-excellence（实现与验收）；业务事实仍归现有证据入口。
 - 证据与接入：backend-evidence、init-project-docs、markdown-writing-standards。
@@ -150,6 +153,7 @@ flowchart TD
 | `go-coding-standards` | Go 包、接口、错误、并发与验证规范 | 叠加 common；架构复用 DDD-lite |
 | `llm-agent-coding-standards` | LLM/Agent 信任边界、确定性契约和循环兜底 | 仅 LLM 集成代码触发 |
 | `clear-design-docs` | 通俗表达、关系图、字段中文说明与语义保持 | 不覆盖设计结构、生命周期或授权边界 |
+| `reviewing-design-plainly` | 当前范围内的矛盾、关键缺口、未决前提与过度设计审查 | 未来规模与冷门场景默认提醒，不新增硬门禁 |
 | `markdown-writing-standards` | 唯一归属、Markdown/Mermaid 结构与必要导航 | 不强制新建索引或日报 |
 
 ## 辅助资源索引

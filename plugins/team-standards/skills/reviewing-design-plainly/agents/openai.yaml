@@ -1,0 +1,6 @@
+interface:
+  display_name: "务实设计评审"
+  short_description: "审查概设、详设和技术方案的关键矛盾与本期缺口"
+  default_prompt: "使用 $reviewing-design-plainly 评审这份设计文档。先核实当前范围和依据，只指出影响本期实施或验收的问题；未来规模与冷门场景作为提醒。"
+policy:
+  allow_implicit_invocation: true
