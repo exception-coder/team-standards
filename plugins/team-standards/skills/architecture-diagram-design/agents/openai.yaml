@@ -1,0 +1,6 @@
+interface:
+  display_name: "架构图信息设计"
+  short_description: "绘制易读的产品能力、领域边界和系统协作图"
+  default_prompt: "使用 $architecture-diagram-design 重绘这张架构图，先确定它要回答的问题，再整理主线、分组和视觉层级。"
+policy:
+  allow_implicit_invocation: true
