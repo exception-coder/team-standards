@@ -4,7 +4,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.10.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.10.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 完整内容规范及样衣示例见[设计输出契约](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)，配置与检查边界见[内容治理协议](plugins/team-standards/skills/change-readiness/references/design-content-governance.md)。
 
@@ -13,6 +13,8 @@
 4.9.3 增加 [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md)：独立审查概设、详设和技术方案的本期矛盾、关键缺口、待决策前提与过度设计，按事实给最小修正建议。未来高流量和冷门场景默认只提醒，不增加机器门禁。
 
 4.10.0 增加 [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md)：绘制产品能力、领域能力和系统协作图前，先确定图要回答的问题，分开语义视角，设计清晰阅读路径，并以实际渲染检查交付。具体 draw.io 操作仍由专项工具 Skill 承担。
+
+4.10.1 调整 [Git 提交规范](plugins/team-standards/skills/git-commit-standards/SKILL.md)：保留兼容的三段格式，要求用大白话说清原问题、关键技术或业务处理及实际结果；文件清单、版本号和测试通过只作补充。机器仍只检查格式，不把措辞质量伪装成自动门禁。
 
 ## 快速导航
 
@@ -86,7 +88,7 @@ flowchart TD
 | 知识文档 | `markdown-writing-standards` | 写前查重、Markdown/Mermaid 和写后索引 |
 | 知识文档 | `init-project-docs` | 在当前目录幂等初始化 Agent、文档索引、OpenSpec、`.graphifyignore` 与 Graphify Git 共享边界，再编排上下文状态 |
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，有限修复并以最新 PASS 放行 Done |
-| 日志交付 | `git-commit-standards` | 按最小完整逻辑单元实现、验证、提交；保留文档与真实作者要求，独立判断 push |
+| 日志交付 | `git-commit-standards` | 按最小完整逻辑单元实现、验证、提交；正文讲清原问题、关键做法与实际结果，独立判断 push |
 
 ---
 

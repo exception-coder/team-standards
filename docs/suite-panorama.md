@@ -125,7 +125,7 @@ flowchart TD
 |---|---|---|---|
 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) | 本次可执行改动与项目验证配置 | 优先调用可用 Forge；否则按声明与影响执行原生验证，判断实际执行和最新证据，失败时有限修复 | 明确通过/失败/环境缺口；静态与运行结果分开 |
 | Forge / 项目测试与运行环境 | 已登记验证场景、当前构建与配置 | 真正运行检查、测试、数据库或浏览器场景 | 可核验执行记录；工具注册不等于执行完成 |
-| [git-commit-standards](../plugins/team-standards/skills/git-commit-standards/SKILL.md) | 已完成、验证过的本次文件/片段 | 核对文档、范围和真实作者，生成三段正文并自动本地提交 | 可审查 commit；不混入无关暂存内容 |
+| [git-commit-standards](../plugins/team-standards/skills/git-commit-standards/SKILL.md) | 已完成、验证过的本次文件/片段 | 核对原问题、关键做法和实际结果，用大白话写入三段正文并自动本地提交 | 可审查 commit；机器格式通过不代表内容讲清楚 |
 | 推送 / 部署 | 已有明确授权、目标与项目流程 | 推送指定远端或执行项目自己的发布流程 | 远端提交或经验证的发布结果；本地 commit 不自动授权部署 |
 
 本地测试按影响选择；快测只提供对应契约证据，不能替代集成场景。纯文档交付做文档检查，不编造运行证据。完整门禁与命令见 [维护与验证](../README.md#维护与验证)。

@@ -150,7 +150,7 @@ flowchart TD
 | `delivery-verification` | 完成前真实验证、有限修复循环与 PASS-only Done | 按影响范围选择真实验证，复用覆盖输入未变的证据 |
 | `business-visualization-advisor` | 业务对象/状态、指标口径、洞察、选图与看板信息设计 | 不承担运行时引擎；普通页面不触发 |
 | `frontend-excellence` | 生产 Web 前端架构、视觉、响应式、可访问性和浏览器验收 | 不用于纯后端或无布局小改 |
-| `git-commit-standards` | 提交标题、中文三段正文和 Author | 每次 commit 前调用 |
+| `git-commit-standards` | 让提交用大白话记录原问题、关键做法、实际结果及真实 Author | 每次 commit 前调用；机器只检查三段结构，内容由提交者核实 |
 | `init-project-docs` | 当前目录 AI 结构初始化、通用项目接入、上下文刷新与状态检查 | structure 创建最小入口和 Graphify 输入/共享边界；init 再编排真实工具，不复制 Graphify/OpenSpec |
 | `java-coding-standards` | Java 与关系库独占规范 | 叠加 common |
 | `go-coding-standards` | Go 包、接口、错误、并发与验证规范 | 叠加 common；架构复用 DDD-lite |

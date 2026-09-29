@@ -4,7 +4,7 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.10.0**. The plugin exposes 19 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.10.1**. The plugin exposes 19 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 The architecture and common coding Skills now require semantic package navigation: split a layer when it contains distinct, stable responsibility clusters, while keeping cohesive directories flat and avoiding low-information nesting.
 
@@ -12,7 +12,7 @@ The [enterprise UI failure patterns and Evals](plugins/team-standards/skills/fro
 
 Operational workspaces use the width and height allocated by their shell with explicit scroll ownership. Reading content may retain a readable maximum width. The [workspace viewport contract](plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract) requires real-browser checks of tall, short and narrow viewports, live resizing, and sparse/overflowing content; it does not imply an automatic layout checker exists.
 
-See the [suite panorama by engineering domain](docs/suite-panorama.md) for all 20 public Skills, evidence sources, hook checkpoints, maintenance tools and end-to-end task paths.
+See the [suite panorama by engineering domain](docs/suite-panorama.md) for all 22 public Skills, evidence sources, hook checkpoints, maintenance tools and end-to-end task paths.
 
 Version 4.3 adds eight business overview chapters, nine sections per detailed function, stable function IDs, specification/evidence links, delivery states and named content reviews. Existing bindings remain compatible through gradual adoption. Machine coverage does not establish business correctness; see the [content contract and garment-sample examples](plugins/team-standards/skills/change-readiness/references/design-output-contract.md) and [checker protocol](plugins/team-standards/skills/change-readiness/references/design-content-governance.md).
 
@@ -21,6 +21,8 @@ Version 4.9 adds [clear-design-docs](plugins/team-standards/skills/clear-design-
 Version 4.9.3 adds [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) for independent overview, detailed-design and technical-plan reviews. It prioritizes material contradictions, current-scope gaps and minimal remedies; speculative scale and rare scenarios remain advisory unless confirmed requirements or correctness risks make them relevant.
 
 Version 4.10.0 adds [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md) for product capability maps, domain boundaries, and system collaboration diagrams. It separates viewpoints, establishes a reading path, and requires rendered visual review; format-specific editing remains with the relevant diagram tool.
+
+Version 4.10.1 keeps the three-part [commit format](plugins/team-standards/skills/git-commit-standards/SKILL.md) while asking the author to explain the former problem, decisive business or technical change, and observed result in plain language. File lists, version bumps, and test results supplement that explanation; the existing Hook still checks structure only.
 
 ## Maintenance boundaries
 
