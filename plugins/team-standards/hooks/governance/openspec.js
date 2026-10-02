@@ -4,6 +4,16 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { MAX_BYTES, requireValue, relativePath, fingerprints } = require('./storage');
 
+function cliTimeoutMs() {
+  const configured = process.env.TEAM_STANDARDS_OPENSPEC_TIMEOUT_MS;
+  if (configured === undefined) return 30000;
+  const timeout = Number(configured);
+  requireValue(/^\d+$/.test(configured) && Number.isSafeInteger(timeout)
+    && timeout >= 1000 && timeout <= 120000, 'CLI_TIMEOUT_INVALID',
+    'TEAM_STANDARDS_OPENSPEC_TIMEOUT_MS 必须为 1000–120000 毫秒的整数', 'CHECK_ERROR');
+  return timeout;
+}
+
 function executable(override) {
   const configured = override || process.env.TEAM_STANDARDS_OPENSPEC_CLI;
   if (configured) return /\.[cm]?js$/i.test(configured)
@@ -20,11 +30,15 @@ function executable(override) {
 
 function call(root, args, options = {}) {
   const cli = executable(options.cli);
+  const timeout = cliTimeoutMs();
   const result = spawnSync(cli.command, [...cli.prefix, ...args], { cwd: root,
-    encoding: 'utf8', windowsHide: true, timeout: 5000, maxBuffer: MAX_BYTES,
+    encoding: 'utf8', windowsHide: true, timeout, maxBuffer: MAX_BYTES,
     env: { ...process.env, OPENSPEC_TELEMETRY: '0' } });
   requireValue(!result.error && result.status === 0, 'CLI_ERROR',
-    `OpenSpec ${args[0]} 失败或超时；请直接运行相同命令查看诊断`, 'CHECK_ERROR');
+    result.error?.code === 'ETIMEDOUT'
+      ? `OpenSpec ${args[0]} 超过 ${timeout} 毫秒；请直接运行相同命令查看诊断`
+      : `OpenSpec ${args[0]} 执行失败（${result.error?.code ?? result.status ?? 'unknown'}）；请直接运行相同命令查看诊断`,
+    'CHECK_ERROR');
   return JSON.parse(result.stdout);
 }
 
