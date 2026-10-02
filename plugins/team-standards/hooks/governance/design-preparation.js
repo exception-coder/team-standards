@@ -14,11 +14,13 @@ const text = value => typeof value === 'string' && value.trim().length > 0;
 function discover(options) {
   const repo = repoApi.repository(options.root);
   const registry = baselines.loadRegistry(repo.root);
-  const all = repoApi.git(repo.root, ['ls-files', '--cached', '--others', '--exclude-standard', '-z']).split('\0').filter(Boolean);
+  const tracked = repoApi.git(repo.root, ['ls-files', '--cached', '-z']).split('\0').filter(Boolean);
+  const untrackedDocs = repoApi.git(repo.root, ['ls-files', '--others', '--exclude-standard', '-z', '--',
+    ':(glob)docs/**/*.md', ':(glob)*.md']).split('\0').filter(Boolean);
+  const all = [...new Set([...tracked, ...untrackedDocs])];
   need(all.length <= 50000, 'DESIGN_SCAN_LIMIT', '超过 50000 文件；先明确模块范围再定向读取');
   const documents = [...new Set(all)].filter(file => /\.md$/i.test(file)
     && !/^(?:openspec\/changes\/|node_modules\/|graphify-out\/)/.test(file));
-  need(documents.length <= 1000, 'DESIGN_SCAN_LIMIT', '设计候选超过 1000 文档；使用项目索引定向确认，不静默截断');
   const candidates = [];
   for (const file of documents) {
     const target = safePath(repo.root, file);
@@ -34,6 +36,7 @@ function discover(options) {
       candidates.push({ path: file, headings, moduleHint: Boolean(options.module && (file.includes(options.module) || body.includes(options.module))) });
     }
   }
+  need(candidates.length <= 1000, 'DESIGN_SCAN_LIMIT', '设计候选超过 1000 文档；使用项目索引定向确认，不静默截断');
   return { ...repo, mode: fs.existsSync(path.join(repo.root, 'openspec/config.yaml')) ? 'openspec' : 'legacy',
     registry: registry || null, entries: all.filter(file => /^(?:AGENTS|CLAUDE|README)\.md$|^docs\/(?:README|INDEX)\.md$/.test(file)),
     candidates, note: '候选不代表权威归属；Agent 结合入口、引用、规格及代码确认。discover 不写文件。' };
@@ -45,7 +48,8 @@ function prepare(options) {
   const repo = repoApi.repository(options.root);
   const state = atomicUpdate(stateFile(repo.root, options.session), previous => {
     if (previous) { validateState(repo, previous); return previous; }
-    const dirty = repoApi.changedFiles(repo.root, repo.head);
+    const dirty = repoApi.changedFiles(repo.root, repo.head, undefined,
+      discovery.candidates.map(candidate => candidate.path));
     return { version: 1, repo: repo.root, branch: repo.branch, base: repo.head, session: options.session,
       initial: fingerprints(repo.root, dirty), registryHash: fingerprint(repo.root, baselines.REGISTRY), documents: {} };
   });
@@ -127,7 +131,8 @@ function bindingPreparation(repo, session, targets, current) {
   if (!fs.existsSync(stateFile(repo.root, session))) return null;
   const state = readPreparation(repo, session);
   need(fingerprint(repo.root, baselines.REGISTRY) === state.registryHash, 'DESIGN_REGISTRY_CONCURRENT', '准备后绑定发生变化，需重新核对');
-  for (const target of targets) if (repoApi.changedFiles(repo.root, repo.head).includes(target)) {
+  const changed = repoApi.changedFiles(repo.root, repo.head, undefined, targets);
+  for (const target of targets) if (changed.includes(target)) {
     need(Object.hasOwn(state.documents, target) && fingerprint(repo.root, target) === state.documents[target],
       'DESIGN_DOCUMENT_STALE', `${target} 未由本任务准备或准备后已变化；重新审阅正文并 upsert`);
   }

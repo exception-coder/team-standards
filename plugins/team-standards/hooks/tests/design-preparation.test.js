@@ -42,6 +42,15 @@ test('automatic design: discover is read-only and missing registry is not an err
   assert.equal(fs.existsSync(path.join(f.home, 'state')), false);
 });
 
+test('automatic design: many ordinary Markdown files do not exhaust candidate limit', t => {
+  const f = fixture(t);
+  const docs = path.join(f.root, 'docs'); fs.mkdirSync(docs);
+  for (let i = 0; i < 1002; i++) fs.writeFileSync(path.join(docs, `note-${i}.md`), '# Meeting notes\nNo module design.\n');
+  f.commit();
+  const result = api.discover(f.options);
+  assert.equal(result.candidates.length, 0);
+});
+
 test('automatic design: blank module prepares, binds real documents, and repeats idempotently', t => {
   const f = fixture(t); api.prepare(f.options); f.docs();
   assert.equal(api.upsert(f.options).action, 'created');

@@ -304,6 +304,9 @@ test('missing binding and transcript text never authorize implementation', t => 
 
 test('dirty owned files are rejected; unrelated initial edits are retained', t => {
   const f = fixture(t);
+  write(f.root, 'src/other.js', 'baseline');
+  runGit(f.root, ['add', 'src/other.js']);
+  runGit(f.root, ['commit', '-qm', 'track unrelated source']);
   write(f.root, 'src/other.js', 'unrelated content');
   service.bind(f.options);
   implement(f);
@@ -588,14 +591,34 @@ test('unrelated untracked junction does not block, explicit input still fails', 
   const linked = '.codex-work/node_modules/.modules.yaml';
   assert.match(runGit(f.root, ['ls-files', '--others', '--exclude-standard']), /\.modules\.yaml/);
   assert.ok(!repoApi.changedFiles(f.root, runGit(f.root, ['rev-parse', 'HEAD'])).includes(linked));
-  const binding = service.guarded(() => service.bind(f.options));
-  assert.equal(binding.status, 'PASS');
-  assert.equal(binding.findings[0].rule, 'ENVIRONMENT_PATH');
-  assert.match(binding.findings[0].message, /真实目标：/);
+  assert.equal(service.guarded(() => service.bind(f.options)).status, 'PASS');
   assert.throws(() => storage.fingerprints(f.root, [linked]), error => error.rule === 'PATH_SYMLINK');
   write(f.root, '.gitignore', '.codex-work/\n');
   assert.equal(runGit(f.root, ['ls-files', '--others', '--exclude-standard']).includes('.modules.yaml'), false);
   assert.throws(() => storage.fingerprints(f.root, [linked]), error => error.rule === 'PATH_SYMLINK');
+});
+
+test('large unrelated untracked cache stays outside preparation and task baseline', t => {
+  const f = fixture(t);
+  const cache = path.join(f.root, '.codex-work', 'dependencies');
+  fs.mkdirSync(cache, { recursive: true });
+  for (let i = 0; i < 1002; i++) fs.writeFileSync(path.join(cache, `generated-${i}.js`), 'generated');
+  const prepare = require('../governance/design-preparation');
+  const prepared = prepare.prepare({ root: f.root, session: f.options.session });
+  assert.deepEqual(prepared.preparation.initialDirty, []);
+  assert.equal(service.guarded(() => service.bind(f.options)).status, 'PASS');
+  assert.equal(service.guarded(() => service.check({ ...f.options, phase: 'preflight' })).status, 'PASS');
+});
+
+test('preexisting untracked task input still cannot be claimed by a new binding', t => {
+  const f = fixture(t);
+  const file = 'src/new.js';
+  write(f.root, file, 'existing work');
+  f.plan.files = [file];
+  f.plan.views[0].files = [file];
+  f.plan.scenarios[0].files = [file];
+  f.save();
+  assert.equal(service.guarded(() => service.bind(f.options)).findings[0].rule, 'DIRTY_OWNERSHIP');
 });
 
 test('staged external symlink remains a hard failure', t => {

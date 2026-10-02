@@ -22,27 +22,20 @@ function resolveRevision(root, revision) {
   return git(root, ['rev-parse', '--verify', `${revision}^{commit}`]).trim();
 }
 
-function changedFiles(root, base, head) {
+function changedFiles(root, base, head, untrackedScope = []) {
   const revision = resolveRevision(root, base);
   const args = ['diff', '--name-only', '--no-renames', '-z', revision];
   if (head) args.push(resolveRevision(root, head));
   args.push('--');
   const tracked = git(root, args).split('\0').filter(Boolean);
-  const untracked = head ? [] : git(root, ['ls-files', '--others', '--exclude-standard', '-z']).split('\0').filter(Boolean);
-  // Git 已跟踪的变化（含暂存、删除和重命名两端）必须检查；未跟踪的
-  // 外部目录联接可能只是无关环境产物，只有进入显式输入时才严格检查。
+  // 未跟踪文件没有 Git 提交归属，只读取任务显式声明的路径；已暂存文件
+  // 始终由 diff 覆盖。避免把依赖缓存及其它任务产物纳入基线。
+  const scope = [...new Set(untrackedScope)];
+  scope.forEach(file => safePath(root, file, '任务声明的未跟踪输入'));
+  const untracked = head || !scope.length ? []
+    : git(root, ['ls-files', '--others', '--exclude-standard', '-z', '--', ...scope]).split('\0').filter(Boolean);
   tracked.forEach(file => safePath(root, file, 'Git 已跟踪的变更'));
-  const environmentRisks = [];
-  const localUntracked = untracked.filter(file => {
-    try { safePath(root, file); return true; }
-    catch (error) {
-      if (error.rule === 'PATH_SYMLINK') { environmentRisks.push({ file, detail: error.message }); return false; }
-      throw error;
-    }
-  });
-  const files = [...new Set([...tracked, ...localUntracked])].sort();
-  Object.defineProperty(files, 'environmentRisks', { value: environmentRisks });
-  return files;
+  return [...new Set([...tracked, ...untracked])].sort();
 }
 
 function isExecutable(file) {
