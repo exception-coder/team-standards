@@ -50,14 +50,16 @@ function canonicalPath(file) {
   return path.join(fs.realpathSync.native(existing), ...suffix);
 }
 
-function safePath(root, relative) {
+function safePath(root, relative, reason = '显式输入或引用') {
   requireValue(typeof relative === 'string' && relative.length > 0 && !path.isAbsolute(relative),
     'PATH_SCOPE', '必须使用范围内的相对路径');
   const absolute = path.resolve(root, relative);
   requireValue(inside(root, absolute) && absolute !== root, 'PATH_SCOPE', `路径越界：${relative}`);
   let existing = absolute;
   while (!fs.existsSync(existing)) existing = path.dirname(existing);
-  requireValue(inside(canonicalPath(root), canonicalPath(existing)), 'PATH_SYMLINK', `链接越界：${relative}`);
+  const target = canonicalPath(existing);
+  requireValue(inside(canonicalPath(root), target), 'PATH_SYMLINK',
+    `链接越界：${relative}；真实目标：${target}；纳入原因：${reason}；请改用仓库内路径或移除该输入的外部链接`);
   return absolute;
 }
 

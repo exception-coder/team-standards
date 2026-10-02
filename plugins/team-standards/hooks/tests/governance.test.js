@@ -11,6 +11,7 @@ const cliEntry = path.resolve(__dirname, '../../scripts/openspec-governance.js')
 const change = 'add-greeting';
 const changeDir = `openspec/changes/${change}`;
 const baselines = require('../governance/baselines');
+const repoApi = require('../governance/repository');
 
 function runGit(root, args) {
   const output = spawnSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true });
@@ -570,6 +571,65 @@ test('content integration: snapshot, slice sync, named review, stale references 
   assert.equal(service.guarded(() => service.record(f.options)).findings[0].rule, 'SCOPE_GAP');
   assert.throws(() => baselines.validateBaselines(f.root, f.plan, { change }, 'delivery', runGit(f.root, ['rev-parse', 'HEAD']), () => {}),
     { rule: 'CONTENT_DOWNGRADE' });
+});
+
+test('unrelated untracked junction does not block, explicit input still fails', t => {
+  const f = fixture(t);
+  const external = path.join(f.home, 'external-dependencies');
+  fs.mkdirSync(external);
+  fs.writeFileSync(path.join(external, '.modules.yaml'), 'outside: true\n');
+  const junction = path.join(f.root, '.codex-work', 'node_modules');
+  fs.mkdirSync(path.dirname(junction), { recursive: true });
+  try { fs.symlinkSync(external, junction, process.platform === 'win32' ? 'junction' : 'dir'); }
+  catch (error) {
+    if (['EPERM', 'EACCES'].includes(error.code)) return t.skip('directory links unavailable');
+    throw error;
+  }
+  const linked = '.codex-work/node_modules/.modules.yaml';
+  assert.match(runGit(f.root, ['ls-files', '--others', '--exclude-standard']), /\.modules\.yaml/);
+  assert.ok(!repoApi.changedFiles(f.root, runGit(f.root, ['rev-parse', 'HEAD'])).includes(linked));
+  const binding = service.guarded(() => service.bind(f.options));
+  assert.equal(binding.status, 'PASS');
+  assert.equal(binding.findings[0].rule, 'ENVIRONMENT_PATH');
+  assert.match(binding.findings[0].message, /真实目标：/);
+  assert.throws(() => storage.fingerprints(f.root, [linked]), error => error.rule === 'PATH_SYMLINK');
+  write(f.root, '.gitignore', '.codex-work/\n');
+  assert.equal(runGit(f.root, ['ls-files', '--others', '--exclude-standard']).includes('.modules.yaml'), false);
+  assert.throws(() => storage.fingerprints(f.root, [linked]), error => error.rule === 'PATH_SYMLINK');
+});
+
+test('staged external symlink remains a hard failure', t => {
+  const f = fixture(t);
+  const external = path.join(f.home, 'external-dependencies');
+  fs.mkdirSync(external);
+  const linked = 'src/deps/external.txt';
+  fs.writeFileSync(path.join(external, 'external.txt'), 'outside');
+  try { fs.symlinkSync(external, path.join(f.root, 'src', 'deps'), process.platform === 'win32' ? 'junction' : 'dir'); }
+  catch (error) {
+    if (['EPERM', 'EACCES'].includes(error.code)) return t.skip('directory links unavailable');
+    throw error;
+  }
+  const blob = runGit(f.root, ['hash-object', '-w', path.join(external, 'external.txt')]);
+  runGit(f.root, ['update-index', '--add', '--cacheinfo', `100644,${blob},${linked}`]);
+  assert.throws(() => repoApi.changedFiles(f.root, runGit(f.root, ['rev-parse', 'HEAD'])),
+    error => error.rule === 'PATH_SYMLINK');
+});
+
+test('in-repo linked input fingerprint changes with its target', t => {
+  const f = fixture(t);
+  const target = path.join(f.root, 'shared');
+  fs.mkdirSync(target);
+  fs.writeFileSync(path.join(target, 'input.txt'), 'before');
+  const linked = path.join(f.root, 'src', 'shared-link');
+  try { fs.symlinkSync(target, linked, process.platform === 'win32' ? 'junction' : 'dir'); }
+  catch (error) {
+    if (['EPERM', 'EACCES'].includes(error.code)) return t.skip('directory links unavailable');
+    throw error;
+  }
+  const file = 'src/shared-link/input.txt';
+  const before = storage.fingerprint(f.root, file);
+  fs.writeFileSync(path.join(target, 'input.txt'), 'after');
+  assert.notEqual(storage.fingerprint(f.root, file), before);
 });
 
 test('automatic preparation feeds governance bind and delivery without a user-authored registry', t => {

@@ -4,7 +4,9 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.10.1**. The plugin exposes 19 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.10.3**. The plugin exposes 19 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+
+The compatibility governance checker reports unrelated, untracked external directory links as environment risks without blocking the task. Tracked changes and explicitly referenced task, design, specification, or verification inputs still receive strict path checks.
 
 The architecture and common coding Skills now require semantic package navigation: split a layer when it contains distinct, stable responsibility clusters, while keeping cohesive directories flat and avoiding low-information nesting.
 

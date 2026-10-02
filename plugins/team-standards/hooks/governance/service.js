@@ -13,6 +13,11 @@ function result(status, findings = [], extra = {}) {
   return { schemaVersion: VERSION, policyVersion: POLICY_VERSION, checkerVersion: CHECKER_VERSION, status, findings, ...extra };
 }
 
+function environmentFindings(changed) {
+  return (changed.environmentRisks || []).slice(0, 10).map(risk => ({ rule: 'ENVIRONMENT_PATH',
+    message: `未跟踪的外部链接未纳入当前变更扫描：${risk.file}；${risk.detail}；如用于构建或验证，请声明为输入并接受路径检查` }));
+}
+
 function guarded(action) {
   try { return action(); }
   catch (error) { return result(error.status || 'CHECK_ERROR', [{ rule: error.rule || 'CHECK_FAILED', message: error.message }]); }
@@ -64,7 +69,7 @@ function bind(options) {
       base: previous?.base || repo.head, initial, change: options.change || null, session: options.session,
       context, plan, references, retries: previous?.retries || 0, evidence: null };
   });
-  return result('PASS', [], { change: binding.change, base: binding.base, binding: file });
+  return result('PASS', environmentFindings(changed), { change: binding.change, base: binding.base, binding: file });
 }
 
 function compareFingerprints(expected, actual, rule) {
@@ -77,6 +82,7 @@ function checkRange(repo, binding, incoming = []) {
   const relevant = [...new Set([...executableScope(changed, binding.context), ...incoming])];
   const gaps = relevant.filter(file => !Object.hasOwn(binding.initial, file) && !binding.plan.files.includes(file));
   requireValue(gaps.length === 0, 'SCOPE_GAP', `出现未绑定文件：${gaps.join(', ')}`, 'NEEDS_WORK');
+  return environmentFindings(changed);
 }
 
 function executableScope(files, context) {
@@ -91,7 +97,7 @@ function check(options) {
   const phase = options.phase || 'delivery';
   checkEnrolled(repo.root, phase);
   requireValue(['preflight', 'delivery', 'archive'].includes(phase), 'PHASE_INVALID', '不支持的检查阶段');
-  checkRange(repo, binding, options.files || []);
+  const environment = checkRange(repo, binding, options.files || []);
   if (phase === 'preflight') {
     compareFingerprints(binding.context.artifacts, fingerprints(repo.root, Object.keys(binding.context.artifacts)), 'ARTIFACTS_STALE');
     compareFingerprints(binding.references, validatePlan(repo.root, binding.plan, binding.context, phase, binding.base), 'REVIEW_STALE');
@@ -105,14 +111,14 @@ function check(options) {
     'EVIDENCE_BINDING', '证据不属于当前绑定的交付切片', 'NEEDS_WORK');
     verifyEvidence(repo.root, evidence, phase);
   }
-  return result('PASS', [], { phase, change: binding.change, scope: binding.plan.files,
+  return result('PASS', environment, { phase, change: binding.change, scope: binding.plan.files,
     assurance: '结构、范围和新鲜度通过；语义结论来自证据中的具名审阅' });
 }
 
 function record(options) {
   const repo = repoApi.repository(options.repo);
   const binding = readBinding(repo, options.session);
-  checkRange(repo, binding);
+  const environment = checkRange(repo, binding);
   const plan = readJson(options.plan);
   requireValue(JSON.stringify([...plan.files].sort()) === JSON.stringify([...binding.plan.files].sort())
     && JSON.stringify(plan.taskIds) === JSON.stringify(binding.plan.taskIds), 'RECORD_SCOPE', '记录范围必须与绑定一致，扩展先重新 bind');
@@ -136,7 +142,7 @@ function record(options) {
     requireValue(JSON.stringify(current) === JSON.stringify(binding), 'BINDING_CONCURRENT', '绑定已被其它操作修改，请重试');
     return { ...binding, evidence: destination, retries: 0 };
   });
-  return result('PASS', [], { evidence: destination, phase, change: binding.change });
+  return result('PASS', environment, { evidence: destination, phase, change: binding.change });
 }
 
 function verifyEvidence(root, evidence, phase) {

@@ -29,8 +29,19 @@ function changedFiles(root, base, head) {
   args.push('--');
   const tracked = git(root, args).split('\0').filter(Boolean);
   const untracked = head ? [] : git(root, ['ls-files', '--others', '--exclude-standard', '-z']).split('\0').filter(Boolean);
-  const files = [...new Set([...tracked, ...untracked])].sort();
-  files.forEach(file => safePath(root, file));
+  // Git 已跟踪的变化（含暂存、删除和重命名两端）必须检查；未跟踪的
+  // 外部目录联接可能只是无关环境产物，只有进入显式输入时才严格检查。
+  tracked.forEach(file => safePath(root, file, 'Git 已跟踪的变更'));
+  const environmentRisks = [];
+  const localUntracked = untracked.filter(file => {
+    try { safePath(root, file); return true; }
+    catch (error) {
+      if (error.rule === 'PATH_SYMLINK') { environmentRisks.push({ file, detail: error.message }); return false; }
+      throw error;
+    }
+  });
+  const files = [...new Set([...tracked, ...localUntracked])].sort();
+  Object.defineProperty(files, 'environmentRisks', { value: environmentRisks });
   return files;
 }
 
