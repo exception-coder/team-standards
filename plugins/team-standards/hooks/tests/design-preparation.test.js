@@ -145,3 +145,36 @@ test('automatic design: CLI discovery works with spaces; unsupported arguments d
   const invalid = spawnSync(process.execPath, [cli, 'upsert', '--unknown', 'x', '--root', f.root], { encoding: 'utf8', windowsHide: true });
   assert.equal(invalid.status, 2); assert.equal(f.git(['status', '--porcelain']), '');
 });
+
+test('automatic design: initial unrelated registry edits survive module upsert and retry', t => {
+  const f = fixture(t); f.docs(); f.commit();
+  api.prepare(f.options); api.upsert({ ...f.options, module: 'other', scopes: ['other/'] }); f.commit();
+  const file = path.join(f.root, baselines.REGISTRY);
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  data.modules[0].owner = 'other task uncommitted owner';
+  fs.writeFileSync(file, JSON.stringify(data));
+  const options = { ...f.options, session: 'second-task' };
+  api.prepare(options);
+  const beforeRepo = { root: fs.realpathSync.native(f.root), branch: f.git(['rev-parse', '--abbrev-ref', 'HEAD']), head: f.git(['rev-parse', 'HEAD']) };
+  assert.throws(() => api.bindingPreparation(beforeRepo, options.session, ['docs/current.md'], [baselines.REGISTRY]), { rule: 'DESIGN_DIRTY_REGISTRY' });
+  assert.equal(api.upsert(options).action, 'created');
+  assert.deepEqual(baselines.loadRegistry(f.root).modules[0], data.modules[0]);
+  assert.equal(api.upsert(options).action, 'unchanged');
+  const repo = { root: fs.realpathSync.native(f.root), branch: f.git(['rev-parse', '--abbrev-ref', 'HEAD']), head: f.git(['rev-parse', 'HEAD']) };
+  const prepared = api.bindingPreparation(repo, options.session, ['docs/current.md'], [baselines.REGISTRY]);
+  assert.equal(Object.hasOwn(prepared.initial, baselines.REGISTRY), false);
+});
+
+test('automatic design: initial edits to the requested module are never claimed', t => {
+  const f = fixture(t); f.docs(); f.commit();
+  api.prepare(f.options); api.upsert(f.options); f.commit();
+  const file = path.join(f.root, baselines.REGISTRY);
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  data.modules[0].owner = 'another owner';
+  fs.writeFileSync(file, JSON.stringify(data));
+  const before = fs.readFileSync(file);
+  const options = { ...f.options, session: 'second-task' };
+  api.prepare(options);
+  assert.throws(() => api.upsert(options), { rule: 'DESIGN_DIRTY_REGISTRY' });
+  assert.deepEqual(fs.readFileSync(file), before);
+});

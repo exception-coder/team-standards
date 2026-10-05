@@ -75,6 +75,19 @@ function readPreparation(repo, session, targets = []) {
   return state;
 }
 
+function verifyInitialModule(repo, state, registry, moduleId) {
+  if (!Object.hasOwn(state.initial, baselines.REGISTRY)) return;
+  if (state.ownedModules?.includes(moduleId)) return;
+  const exists = repoApi.git(repo.root, ['ls-tree', '-z', state.base, '--', baselines.REGISTRY]);
+  const baseline = exists
+    ? JSON.parse(repoApi.git(repo.root, ['show', `${state.base}:${baselines.REGISTRY}`]))
+    : { modules: [] };
+  const original = baseline.modules.find(item => item.id === moduleId);
+  const current = registry.modules.find(item => item.id === moduleId);
+  need(JSON.stringify(original) === JSON.stringify(current), 'DESIGN_DIRTY_REGISTRY',
+    `模块 ${moduleId} 在任务开始前已有绑定改动，不能合并认领；其它模块改动可保留`);
+}
+
 function upsert(options) {
   const repo = repoApi.repository(options.root);
   need(text(options.session), 'SESSION_REQUIRED', '缺少任务 session');
@@ -84,6 +97,7 @@ function upsert(options) {
     validateState(repo, state);
     need(fingerprint(repo.root, baselines.REGISTRY) === state.registryHash, 'DESIGN_REGISTRY_CONCURRENT', '绑定在准备后被其它任务修改；重新审阅合并，不能覆盖');
     const registry = baselines.loadRegistry(repo.root) || { schemaVersion: 1, managed: [], modules: [] };
+    verifyInitialModule(repo, state, registry, options.module);
     const prior = registry.modules.find(item => item.id === options.module);
     need(prior?.status !== 'retired', 'DESIGN_RETIRED', '已停用模块不能自动恢复；先核对替代模块及迁移记录');
     const module = { ...prior, id: options.module,
@@ -103,7 +117,7 @@ function upsert(options) {
     }
     const next = { ...registry, managed: [...new Set([...registry.managed, ...(module.scopes || [])])],
       modules: prior ? registry.modules.map(item => item.id === module.id ? module : item) : [...registry.modules, module] };
-    validateState(repo, state, [baselines.REGISTRY, module.overview.path, module.detailed.path]);
+    validateState(repo, state, [module.overview.path, module.detailed.path]);
     baselines.validateRegistry(repo.root, next);
     for (const scope of module.scopes) baselines.affected(next, [scope]);
     for (const ref of [module.overview, module.detailed]) {
@@ -114,7 +128,6 @@ function upsert(options) {
     }
     const changed = JSON.stringify(registry) !== JSON.stringify(next);
     if (changed) {
-      need(!Object.hasOwn(state.initial, baselines.REGISTRY), 'DESIGN_DIRTY_REGISTRY', '任务开始前已有绑定改动，不能合并认领');
       atomicUpdate(safePath(repo.root, baselines.REGISTRY), () => {
         need(fingerprint(repo.root, baselines.REGISTRY) === state.registryHash, 'DESIGN_REGISTRY_CONCURRENT', '绑定发生并行变化，停止覆盖');
         return next;
@@ -123,7 +136,8 @@ function upsert(options) {
     const documents = { ...state.documents, ...fingerprints(repo.root, [module.overview.path, module.detailed.path]) };
     output = { action: changed ? prior ? 'updated' : 'created' : 'unchanged', module, registry: baselines.REGISTRY,
       content: module.content.mode, note: '只合并已确认模块；正文由 Agent 维护。准备不等于内容验收或启用宿主阻断。' };
-    return { ...state, registryHash: fingerprint(repo.root, baselines.REGISTRY), documents };
+    return { ...state, registryHash: fingerprint(repo.root, baselines.REGISTRY), documents,
+      ownedModules: [...new Set([...(state.ownedModules || []), module.id])] };
   });
   return output;
 }
@@ -131,8 +145,10 @@ function upsert(options) {
 // 首次治理 bind 只接纳本任务准备阶段的正文和绑定，不豁免提前修改业务代码。
 function bindingPreparation(repo, session, targets, current) {
   if (!fs.existsSync(stateFile(repo.root, session))) return null;
-  const state = readPreparation(repo, session, [...targets, baselines.REGISTRY, ...current]);
+  const state = readPreparation(repo, session, [...targets, ...current].filter(file => file !== baselines.REGISTRY));
   need(fingerprint(repo.root, baselines.REGISTRY) === state.registryHash, 'DESIGN_REGISTRY_CONCURRENT', '准备后绑定发生变化，需重新核对');
+  need(!Object.hasOwn(state.initial, baselines.REGISTRY) || state.ownedModules?.length,
+    'DESIGN_DIRTY_REGISTRY', '初始登记改动须先经过目标模块 upsert 核验，不能直接认领');
   const changed = repoApi.changedFiles(repo.root, repo.head, undefined, targets);
   for (const target of targets) if (changed.includes(target)) {
     need(Object.hasOwn(state.documents, target) && fingerprint(repo.root, target) === state.documents[target],
@@ -140,7 +156,7 @@ function bindingPreparation(repo, session, targets, current) {
   }
   need(current.every(file => Object.hasOwn(state.initial, file) || file === baselines.REGISTRY),
     'DESIGN_EARLY_CODE', '自动设计准备只接纳文档和绑定；业务代码必须在治理 bind 后修改');
-  return { initial: Object.fromEntries(Object.entries(state.initial).filter(([file]) => repoApi.isExecutable(file))), base: state.base };
+  return { initial: Object.fromEntries(Object.entries(state.initial).filter(([file]) => file !== baselines.REGISTRY && repoApi.isExecutable(file))), base: state.base };
 }
 
 module.exports = { discover, prepare, upsert, bindingPreparation };

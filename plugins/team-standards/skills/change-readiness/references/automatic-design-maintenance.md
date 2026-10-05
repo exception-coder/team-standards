@@ -37,7 +37,7 @@ node $design upsert --root $project --session $session --module $module `
 
 --scope、--capability 可重复；合并范围只增加不静默删除。已绑定模块未传的字段原样保留。新绑定尚未具备完整内容索引时使用 migrate 并写真实缺口；Agent 完成索引后以 `--content <Agent生成的临时索引文件>` 传入 content 对象。新模块必须在本次交付前补齐适用内容、关联和审阅，不可把 migrate 当永久豁免。功能索引不复制业务正文。
 
-准备状态保存在治理用户数据目录，和 session 绑定分开命名；重复 prepare 保留起始 HEAD 与已有脏文件，不重置归属。起始脏文件指纹只在本次目标文档、绑定文件或执行输入进入检查范围时校验；无关文件变化不阻断当前模块。upsert 不写正文、不创建 OpenSpec、不修改 Hook/CI。原 initializer 的 --baselines/--bindings 兼容入口保留，供旧流程使用；新自动开发流程无需用户另外调用它。
+准备状态保存在治理用户数据目录，和 session 绑定分开命名；重复 prepare 保留起始 HEAD 与已有脏文件，不重置归属。起始脏文件指纹只在本次目标文档、绑定文件或执行输入进入检查范围时校验；无关文件变化不阻断当前模块。登记文件在起点已有其它模块改动时，upsert 对比起始 HEAD 的目标模块条目，仅允许目标条目未被他人修改的定向合并，并保留其它模块；目标模块已有改动或准备后登记文件再次变化仍拒绝覆盖。重复登记沿用本任务已确认的条目，不能据此认领其它模块。upsert 不写正文、不创建 OpenSpec、不修改 Hook/CI。原 initializer 的 --baselines/--bindings 兼容入口保留，供旧流程使用；新自动开发流程无需用户另外调用它。
 
 ## 实施、同步与交付
 
