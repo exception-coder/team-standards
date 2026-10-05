@@ -101,25 +101,25 @@ function checkConflicts(root, plan, context) {
   if (!fs.existsSync(folder)) return;
   const targets = new Set((plan.baselines || []).filter(item => item.reference)
     .map(item => `${item.reference.path}#${item.reference.heading}`));
-  const requirements = new Set();
+  const requirements = new Map();
   for (const file of Object.keys(context.artifacts || {}).filter(file => /\/specs\/.+\.md$/.test(file))) {
     const capability = file.split('/specs/')[1];
-    for (const title of readText(safePath(root, file)).matchAll(/^### Requirement: (.+)$/gm)) requirements.add(`${capability}#${title[1]}`);
+    const titles = requirements.get(capability) || new Set();
+    for (const title of readText(safePath(root, file)).matchAll(/^### Requirement: (.+)$/gm)) titles.add(`### Requirement: ${title[1]}`);
+    requirements.set(capability, titles);
   }
   const entries = fs.readdirSync(folder, { withFileTypes: true }).filter(entry => entry.isDirectory() && entry.name !== 'archive');
-  requireValue(entries.length <= 100, 'BASELINE_SCAN_LIMIT', '活动 change 超过 100；拆分检查范围或归档已完成项，不能静默漏查');
   const conflicts = new Set();
   for (const entry of entries) {
     if (entry.name === context.change) continue;
     const evidencePath = `openspec/changes/${entry.name}/governance-evidence.json`;
-    if (fs.existsSync(safePath(root, evidencePath))) {
+    if (targets.size && fs.existsSync(safePath(root, evidencePath))) {
       const other = readJson(safePath(root, evidencePath));
       if ((other.plan?.baselines || []).some(item => item.reference && targets.has(`${item.reference.path}#${item.reference.heading}`))) conflicts.add(entry.name);
     }
-    for (const requirement of requirements) {
-      const [file, title] = requirement.split('#');
+    for (const [file, titles] of requirements) {
       const target = safePath(root, `openspec/changes/${entry.name}/specs/${file}`);
-      if (fs.existsSync(target) && readText(target).split(/\r?\n/).includes(`### Requirement: ${title}`)) conflicts.add(entry.name);
+      if (fs.existsSync(target) && readText(target).split(/\r?\n/).some(line => titles.has(line))) conflicts.add(entry.name);
     }
   }
   for (const change of conflicts) {

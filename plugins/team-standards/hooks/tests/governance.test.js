@@ -794,3 +794,14 @@ test('automatic migration synchronizes the current slice while preserving explic
   assert.match(inspection.contentCoverage[0].migration.reason, /legacy functional chapter/);
   assert.match(fs.readFileSync(path.join(f.root, 'docs/current.md'), 'utf8'), /hello greeting/);
 });
+
+ test('baseline scans more than 100 changes and retains late conflicts', t => {
+  const f = fixture(t); enrollBaseline(f);
+  for (let i = 0; i < 120; i++) write(f.root, 'openspec/changes/unrelated-' + i + '/specs/other/spec.md', '### Requirement: Other\n');
+  assert.equal(service.bind(f.options).status, 'PASS');
+  write(f.root, 'openspec/changes/zzz-conflict/specs/greeting/spec.md', '### Requirement: Stable greeting\n');
+  assert.equal(service.guarded(() => service.bind(f.options)).findings[0].rule, 'BASELINE_CONFLICT');
+  f.plan.conflicts = [{ change: 'zzz-conflict', order: 'current before other', reason: 'Rebase the later change after this validated delivery.' }];
+  f.save();
+  assert.equal(service.bind(f.options).status, 'PASS');
+});
