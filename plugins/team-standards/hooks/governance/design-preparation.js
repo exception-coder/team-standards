@@ -57,20 +57,21 @@ function prepare(options) {
     next: 'Agent 读取候选并确认归属，补建/更新真实正文，再调用 upsert；不要求用户填写 JSON。' };
 }
 
-function validateState(repo, state) {
+function validateState(repo, state, targets = []) {
   need(state?.version === 1 && state.repo === repo.root && state.branch === repo.branch && state.base === repo.head,
     'DESIGN_PREPARATION_STALE', '准备记录的仓库、分支或 HEAD 已变化；保留现场并在独立任务中重新核对');
-  for (const [file, digest] of Object.entries(state.initial)) {
+  for (const file of targets) if (Object.hasOwn(state.initial, file)) {
+    const digest = state.initial[file];
     need(fingerprint(repo.root, file) === digest, 'DESIGN_INITIAL_CHANGED', `起始已有改动发生变化：${file}；先分离任务，不覆盖他人内容`);
   }
 }
 
-function readPreparation(repo, session) {
+function readPreparation(repo, session, targets = []) {
   need(text(session), 'SESSION_REQUIRED', '缺少任务 session');
   const file = stateFile(repo.root, session);
   need(fs.existsSync(file), 'DESIGN_PREPARATION_REQUIRED', 'Agent 应先 prepare 保存任务起点，再补建文档和绑定');
   const state = storage.readJson(file);
-  validateState(repo, state);
+  validateState(repo, state, targets);
   return state;
 }
 
@@ -102,6 +103,7 @@ function upsert(options) {
     }
     const next = { ...registry, managed: [...new Set([...registry.managed, ...(module.scopes || [])])],
       modules: prior ? registry.modules.map(item => item.id === module.id ? module : item) : [...registry.modules, module] };
+    validateState(repo, state, [baselines.REGISTRY, module.overview.path, module.detailed.path]);
     baselines.validateRegistry(repo.root, next);
     for (const scope of module.scopes) baselines.affected(next, [scope]);
     for (const ref of [module.overview, module.detailed]) {
@@ -129,7 +131,7 @@ function upsert(options) {
 // 首次治理 bind 只接纳本任务准备阶段的正文和绑定，不豁免提前修改业务代码。
 function bindingPreparation(repo, session, targets, current) {
   if (!fs.existsSync(stateFile(repo.root, session))) return null;
-  const state = readPreparation(repo, session);
+  const state = readPreparation(repo, session, [...targets, baselines.REGISTRY, ...current]);
   need(fingerprint(repo.root, baselines.REGISTRY) === state.registryHash, 'DESIGN_REGISTRY_CONCURRENT', '准备后绑定发生变化，需重新核对');
   const changed = repoApi.changedFiles(repo.root, repo.head, undefined, targets);
   for (const target of targets) if (changed.includes(target)) {

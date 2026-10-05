@@ -37,7 +37,7 @@ node $design upsert --root $project --session $session --module $module `
 
 --scope、--capability 可重复；合并范围只增加不静默删除。已绑定模块未传的字段原样保留。新绑定尚未具备完整内容索引时使用 migrate 并写真实缺口；Agent 完成索引后以 `--content <Agent生成的临时索引文件>` 传入 content 对象。新模块必须在本次交付前补齐适用内容、关联和审阅，不可把 migrate 当永久豁免。功能索引不复制业务正文。
 
-准备状态保存在治理用户数据目录，和 session 绑定分开命名；重复 prepare 保留起始 HEAD 与已有脏文件，不重置归属。upsert 不写正文、不创建 OpenSpec、不修改 Hook/CI。原 initializer 的 --baselines/--bindings 兼容入口保留，供旧流程使用；新自动开发流程无需用户另外调用它。
+准备状态保存在治理用户数据目录，和 session 绑定分开命名；重复 prepare 保留起始 HEAD 与已有脏文件，不重置归属。起始脏文件指纹只在本次目标文档、绑定文件或执行输入进入检查范围时校验；无关文件变化不阻断当前模块。upsert 不写正文、不创建 OpenSpec、不修改 Hook/CI。原 initializer 的 --baselines/--bindings 兼容入口保留，供旧流程使用；新自动开发流程无需用户另外调用它。
 
 ## 实施、同步与交付
 
@@ -57,7 +57,7 @@ Agent 在实现过程中维护本次目标与发现；独立切片完成真实�
 | DESIGN_DIRTY_DOCUMENT / DESIGN_DIRTY_REGISTRY | 保留任务开始前的修改，与实际所有者协调或顺序执行；未经宿主授权不自行建隔离工作树，不换 session 认领 |
 | DESIGN_REGISTRY_CONCURRENT / DESIGN_DOCUMENT_STALE | 停止覆盖，重新读取并核对其它任务差异；可确认本任务正文时重新 upsert，跨任务绑定冲突先分离处理 |
 | DESIGN_EARLY_CODE | 先分离提前产生的源码；不能把 prepare 当作跳过治理 bind 的许可 |
-| DESIGN_PREPARATION_STALE / DESIGN_INITIAL_CHANGED | 原起点或他人初始改动发生变化，保留现场重新确定任务边界；不删除记录规避 |
+| DESIGN_PREPARATION_STALE / DESIGN_INITIAL_CHANGED | 原起点或本任务目标文件的初始改动发生变化，保留现场重新确定任务边界；不删除记录规避。无关文件变化不属于此检查范围 |
 | DESIGN_SCAN_LIMIT | 使用项目索引/定向源码人工核实归属；超限发现不声称完整扫描，补建设计仍可由 Agent 进行 |
 | 文档归属/业务事实仍有关键歧义 | 仅询问阻塞问题；其它独立部分继续推进 |
 

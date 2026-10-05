@@ -84,6 +84,19 @@ test('automatic design: dirty documents cannot be claimed by preparation or repe
   assert.equal(fs.existsSync(path.join(f.root, baselines.REGISTRY)), false);
 });
 
+test('automatic design: unrelated initial changes may evolve while target changes remain protected', t => {
+  const f = fixture(t);
+  fs.mkdirSync(path.join(f.root, '.agents', 'skills', 'forge'), { recursive: true });
+  const skill = path.join(f.root, '.agents', 'skills', 'forge', 'SKILL.md');
+  fs.writeFileSync(skill, 'initial Forge skill\n');
+  f.docs(); f.commit();
+  fs.writeFileSync(skill, 'Forge update in progress\n');
+  api.prepare(f.options);
+  fs.writeFileSync(skill, 'Forge update completed\n');
+  assert.doesNotThrow(() => api.prepare(f.options));
+  assert.equal(api.upsert(f.options).action, 'created');
+});
+
 test('automatic design: concurrent registry changes are preserved and rejected', t => {
   const f = fixture(t); api.prepare(f.options); f.docs(); api.upsert(f.options);
   const file = path.join(f.root, baselines.REGISTRY);
