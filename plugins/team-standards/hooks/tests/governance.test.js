@@ -657,6 +657,9 @@ test('in-repo linked input fingerprint changes with its target', t => {
 
 test('automatic preparation feeds governance bind and delivery without a user-authored registry', t => {
   const f = fixture(t);
+  write(f.root, 'docs/other.md', '# Other task baseline\n');
+  runGit(f.root, ['add', 'docs/other.md']); runGit(f.root, ['commit', '-qm', 'other task baseline']);
+  write(f.root, 'docs/other.md', '# Other task\n');
   const prepare = require('../governance/design-preparation');
   prepare.prepare({ root: f.root, session: f.options.session, module: 'greeting' });
   const docs = require('./helpers/design-content').setup(f.root, changeDir + '/specs/greeting/spec.md');
@@ -677,9 +680,41 @@ test('automatic preparation feeds governance bind and delivery without a user-au
   f.plan.review.content = [{ module: 'greeting', result: 'PASS', reason: 'Named fixture content review.', inputFingerprint: service.snapshot(f.options).contentFingerprints.greeting }];
   f.save(); const recorded = service.record(f.options); assert.equal(service.check(f.options).status, 'PASS');
   const base = runGit(f.root, ['rev-parse', 'HEAD']);
-  runGit(f.root, ['add', '.']); runGit(f.root, ['commit', '-qm', 'verified automatic preparation']);
+  runGit(f.root, ['add', '.']); runGit(f.root, ['reset', '-q', '--', 'docs/evidence.md', 'docs/other.md']);
+  runGit(f.root, ['commit', '-qm', 'verified automatic preparation']);
   const head = runGit(f.root, ['rev-parse', 'HEAD']);
-  assert.equal(service.check({ repo: f.root, evidence: recorded.evidence, base, head }).status, 'PASS');
+  assert.throws(() => prepare.prepare({ root: f.root, session: f.options.session }), { rule: 'DESIGN_PREPARATION_STALE' });
+  const files = repoApi.changedFiles(f.root, base, head);
+  runGit(f.root, ['checkout', '-qb', 'other-branch']);
+  assert.throws(() => prepare.resume({ root: f.root, session: f.options.session, change: f.options.change, files }),
+    { rule: 'DESIGN_PREPARATION_STALE' });
+  runGit(f.root, ['checkout', '-q', 'main']);
+  write(f.root, 'unrelated.txt', 'another task\n');
+  runGit(f.root, ['add', 'unrelated.txt']); runGit(f.root, ['commit', '-qm', 'unrelated commit']);
+  assert.throws(() => prepare.resume({ root: f.root, session: f.options.session, change: f.options.change, files }),
+    { rule: 'DESIGN_RESUME_SCOPE' });
+  runGit(f.root, ['reset', '--hard', head]);
+  write(f.root, 'src/greet.js', 'module.exports = () => "mixed";\n');
+  assert.throws(() => prepare.resume({ root: f.root, session: f.options.session, change: f.options.change, files }),
+    { rule: 'DESIGN_RESUME_EVIDENCE' });
+  runGit(f.root, ['checkout', '--', 'src/greet.js']);
+  const evidenceFile = path.join(f.root, recorded.evidence);
+  const staleEvidence = JSON.parse(fs.readFileSync(evidenceFile, 'utf8'));
+  staleEvidence.inputs['src/greet.js'] = 'expired';
+  fs.writeFileSync(evidenceFile, JSON.stringify(staleEvidence));
+  assert.throws(() => prepare.resume({ root: f.root, session: f.options.session, change: f.options.change, files }),
+    { rule: 'DESIGN_RESUME_EVIDENCE' });
+  runGit(f.root, ['checkout', '--', recorded.evidence]);
+  write(f.root, 'docs/other.md', '# Other task changed\n');
+  assert.throws(() => prepare.resume({ root: f.root, session: f.options.session, change: f.options.change, files }),
+    { rule: 'DESIGN_INITIAL_CHANGED' });
+  write(f.root, 'docs/other.md', '# Other task\n');
+  const resumed = prepare.resume({ root: f.root, session: f.options.session, change: f.options.change, files });
+  assert.equal(resumed.origin, base);
+  assert.equal(resumed.base, head);
+  assert.equal(prepare.prepare({ root: f.root, session: f.options.session }).preparation.base, head);
+  assert.equal(service.bind(f.options).base, head);
+  assert.equal(service.check({ ...f.options, phase: 'preflight' }).status, 'PASS');
 });
 
 test('automatic migration synchronizes the current slice while preserving explicit legacy content gaps', t => {

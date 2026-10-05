@@ -27,6 +27,8 @@ $design = Join-Path $plugin 'skills/init-project-docs/scripts/design-baseline.js
 node $design discover --root $project --module $module
 # 已授权开发：首次项目写入之前保存任务起点，后续沿用同一 session。
 node $design prepare --root $project --session $session --module $module
+# 同一真实会话的已验证切片提交后，显式声明该次提交实际触及的每个文件。
+node $design resume --root $project --session $session --change $change --file $committedFile
 # Agent 已完成相关正文、核对实际标题；下面变量取项目真实值。
 node $design upsert --root $project --session $session --module $module `
   --scope $moduleScope --capability $capability --owner $owner `
@@ -36,6 +38,8 @@ node $design upsert --root $project --session $session --module $module `
 ```
 
 --scope、--capability 可重复；合并范围只增加不静默删除。已绑定模块未传的字段原样保留。新绑定尚未具备完整内容索引时使用 migrate 并写真实缺口；Agent 完成索引后以 `--content <Agent生成的临时索引文件>` 传入 content 对象。新模块必须在本次交付前补齐适用内容、关联和审阅，不可把 migrate 当永久豁免。功能索引不复制业务正文。
+
+`resume` 只用于同一真实会话完成 `record → delivery → commit` 后继续下一切片。`--file` 可重复，须与从当前检查点到 HEAD 的每个线性提交所触及文件完全一致；脚本核对原绑定 change、交付证据新鲜度、文件归属、分支及其它任务初始脏文件，并保留原始起点和每次续接记录。成功后当前检查点推进到 HEAD，再按 `prepare → upsert → bind → 实施 → record → delivery` 执行下一切片。拒绝时保留原记录，不删除、不改写缓存，也不用新 session 认领旧改动。
 
 准备状态保存在治理用户数据目录，和 session 绑定分开命名；重复 prepare 保留起始 HEAD 与已有脏文件，不重置归属。起始脏文件指纹只在本次目标文档、绑定文件或执行输入进入检查范围时校验；无关文件变化不阻断当前模块。登记文件在起点已有其它模块改动时，upsert 对比起始 HEAD 的目标模块条目，仅允许目标条目未被他人修改的定向合并，并保留其它模块；目标模块已有改动或准备后登记文件再次变化仍拒绝覆盖。重复登记沿用本任务已确认的条目，不能据此认领其它模块。upsert 不写正文、不创建 OpenSpec、不修改 Hook/CI。原 initializer 的 --baselines/--bindings 兼容入口保留，供旧流程使用；新自动开发流程无需用户另外调用它。
 
@@ -57,7 +61,7 @@ Agent 在实现过程中维护本次目标与发现；独立切片完成真实�
 | DESIGN_DIRTY_DOCUMENT / DESIGN_DIRTY_REGISTRY | 保留任务开始前的修改，与实际所有者协调或顺序执行；未经宿主授权不自行建隔离工作树，不换 session 认领 |
 | DESIGN_REGISTRY_CONCURRENT / DESIGN_DOCUMENT_STALE | 停止覆盖，重新读取并核对其它任务差异；可确认本任务正文时重新 upsert，跨任务绑定冲突先分离处理 |
 | DESIGN_EARLY_CODE | 先分离提前产生的源码；不能把 prepare 当作跳过治理 bind 的许可 |
-| DESIGN_PREPARATION_STALE / DESIGN_INITIAL_CHANGED | 原起点或本任务目标文件的初始改动发生变化，保留现场重新确定任务边界；不删除记录规避。无关文件变化不属于此检查范围 |
+| DESIGN_PREPARATION_STALE / DESIGN_INITIAL_CHANGED | 正常提交后使用显式 resume 核验续接；换分支或初始改动归属变化时保留现场重新确定任务边界，不删除记录规避 |
 | DESIGN_SCAN_LIMIT | 使用项目索引/定向源码人工核实归属；超限发现不声称完整扫描，补建设计仍可由 Agent 进行 |
 | 文档归属/业务事实仍有关键歧义 | 仅询问阻塞问题；其它独立部分继续推进 |
 

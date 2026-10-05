@@ -1,6 +1,6 @@
 # team-standards
 
-4.4.0 将概设/详设维护接入普通开发任务：Agent 自动发现、补建、绑定与同步，不要求用户手工初始化。已有正文原位复用，准备记录保护初始脏文件与并行绑定；未启用 OpenSpec 的项目支持本地验收引用。见[自动执行流程](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)及[实际试点与验证](docs/maintenance/automatic-design-release.md)。
+4.4.0 将概设/详设维护接入普通开发任务：Agent 自动发现、补建、绑定与同步，不要求用户手工初始化。已有正文原位复用，准备记录保护初始脏文件与并行绑定；同一真实会话完成已验证切片提交后，可显式核验提交范围并续接准备检查点。未启用 OpenSpec 的项目支持本地验收引用。见[自动执行流程](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)及[实际试点与验证](docs/maintenance/automatic-design-release.md)。
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 

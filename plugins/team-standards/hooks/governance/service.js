@@ -58,10 +58,18 @@ function bind(options) {
       requireValue(previous.change === (options.change || null), 'REBIND_CONFLICT', '同一会话已有不同 change 绑定，不按最近修改时间替换');
       requireValue(previous.plan.files.every(item => plan.files.includes(item)), 'SCOPE_SHRINK', '不能通过缩小范围排除已绑定改动');
     }
-    const initial = previous?.initial || options.designPreparation?.initial || fingerprints(repo.root, current);
+    const preparation = require('./design-preparation').readCheckpoint(repo, options.session);
+    const resumed = previous && preparation?.repo === repo.root && preparation.branch === repo.branch
+      && preparation.session === options.session && preparation.base === repo.head && previous.base !== repo.head;
+    if (resumed) {
+      requireValue(preparation.checkpoints?.at(-1)?.from === previous.base
+        && preparation.checkpoints.at(-1).to === repo.head && previous.evidence,
+        'DESIGN_RESUME_BINDING', '续接检查点与原绑定不一致');
+    }
+    const initial = resumed ? preparation.initial : previous?.initial || options.designPreparation?.initial || fingerprints(repo.root, current);
     requireValue(plan.files.every(item => !Object.hasOwn(initial, item)), 'DIRTY_OWNERSHIP', '范围含任务开始前的脏文件；请先分离改动，不覆盖他人基线');
     return { schemaVersion: VERSION, policyVersion: POLICY_VERSION, repo: repo.root, branch: repo.branch,
-      base: previous?.base || repo.head, initial, change: options.change || null, session: options.session,
+      base: resumed ? repo.head : previous?.base || repo.head, initial, change: options.change || null, session: options.session,
       context, plan, references, retries: previous?.retries || 0, evidence: null };
   });
   return result('PASS', [], { change: binding.change, base: binding.base, binding: file });
