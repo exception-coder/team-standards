@@ -67,21 +67,7 @@ function resume(options) {
   need(state.version === 1 && state.repo === repo.root && state.branch === repo.branch && state.session === options.session,
     'DESIGN_PREPARATION_STALE', '准备记录与当前仓库、分支或会话不一致');
   need(state.base !== repo.head, 'DESIGN_RESUME_RANGE', '当前 HEAD 尚未产生可续接提交');
-  const commits = repoApi.git(repo.root, ['rev-list', '--reverse', `${state.base}..${repo.head}`]).trim().split('\n').filter(Boolean);
-  need(commits.length > 0 && repoApi.git(repo.root, ['merge-base', state.base, repo.head]).trim() === state.base,
-    'DESIGN_RESUME_RANGE', '提交范围不在原检查点之后');
-  let parent = state.base;
-  const touched = new Set();
-  for (const commit of commits) {
-    need(repoApi.git(repo.root, ['rev-list', '--parents', '-n', '1', commit]).trim() === `${commit} ${parent}`,
-      'DESIGN_RESUME_RANGE', '续接仅接受原检查点后的连续线性提交');
-    repoApi.changedFiles(repo.root, parent, commit).forEach(name => touched.add(name));
-    parent = commit;
-  }
-  const declared = [...new Set(options.files || [])].sort();
-  declared.forEach(name => safePath(repo.root, name));
-  need(declared.length > 0 && JSON.stringify([...touched].sort()) === JSON.stringify(declared),
-    'DESIGN_RESUME_SCOPE', '已提交文件与显式声明的切片范围不一致');
+  const { commits, declared, touched } = committedRange(repo, state, options.files);
   const service = require('./service');
   const binding = service.readBinding(repo, options.session);
   need(binding.session === options.session && binding.base === state.base && binding.change === options.change,
@@ -109,12 +95,77 @@ function resume(options) {
   need(dirty.every(name => !touched.has(name)), 'DESIGN_RESUME_MIXED', '已提交切片文件仍有未提交改动；先分离归属');
   const updated = atomicUpdate(file, current => {
     need(JSON.stringify(current) === JSON.stringify(state), 'DESIGN_PREPARATION_CONCURRENT', '准备记录并行变化');
-    return { ...current, origin: current.origin || current.base, base: repo.head,
+    return { ...current, origin: current.origin || current.base,
+      originInitial: current.originInitial || current.initial, originRegistryHash: current.originRegistryHash || current.registryHash,
+      base: repo.head,
       checkpoints: [...(current.checkpoints || []), { from: current.base, to: repo.head, commits, files: declared,
         evidence: binding.evidence }], initial: fingerprints(repo.root, dirty),
       registryHash: fingerprint(repo.root, baselines.REGISTRY), documents: {}, ownedModules: [] };
   });
   return { origin: updated.origin, base: updated.base, commits, files: declared, next: '同一会话重新 prepare、upsert、bind，并为下一切片重新验证和记录证据' };
+}
+
+function committedRange(repo, state, files) {
+  need(state.base !== repo.head, 'DESIGN_RESUME_RANGE', '当前 HEAD 尚未产生可续接提交');
+  const commits = repoApi.git(repo.root, ['rev-list', '--reverse', `${state.base}..${repo.head}`]).trim().split('\n').filter(Boolean);
+  need(commits.length > 0 && repoApi.git(repo.root, ['merge-base', state.base, repo.head]).trim() === state.base,
+    'DESIGN_RESUME_RANGE', '提交范围不在原检查点之后');
+  let parent = state.base;
+  const touched = new Set();
+  for (const commit of commits) {
+    need(repoApi.git(repo.root, ['rev-list', '--parents', '-n', '1', commit]).trim() === `${commit} ${parent}`,
+      'DESIGN_RESUME_RANGE', '续接仅接受原检查点后的连续线性提交');
+    repoApi.changedFiles(repo.root, parent, commit).forEach(name => touched.add(name));
+    parent = commit;
+  }
+  const declared = [...new Set(files || [])].sort();
+  declared.forEach(name => safePath(repo.root, name));
+  need(declared.length > 0 && JSON.stringify([...touched].sort()) === JSON.stringify(declared),
+    'DESIGN_RESUME_SCOPE', '已提交文件与显式声明的切片范围不一致');
+  return { commits, declared, touched };
+}
+
+function recover(options) {
+  need(text(options.session) && text(options.change) && text(options.plan),
+    'DESIGN_RECOVERY_INPUT', '恢复需要原会话、原 change 和当前切片计划');
+  const repo = repoApi.repository(options.root);
+  const file = stateFile(repo.root, options.session);
+  need(fs.existsSync(file), 'DESIGN_PREPARATION_REQUIRED', '缺少原会话准备记录');
+  need(!fs.existsSync(statePath(repo.root, options.session)), 'DESIGN_RECOVERY_BOUND', '已有绑定应使用正常 resume');
+  const state = storage.readJson(file);
+  need(state.version === 1 && state.repo === repo.root && state.branch === repo.branch && state.session === options.session,
+    'DESIGN_PREPARATION_STALE', '原准备记录与仓库、分支或会话不一致');
+  const { commits, declared } = committedRange(repo, state, options.files);
+  const owned = [...new Set(options.ownedFiles || [])].sort();
+  owned.forEach(name => safePath(repo.root, name));
+  need(owned.length > 0, 'DESIGN_RECOVERY_OWNERSHIP', '必须显式列出原 change 拥有的文件');
+  const planFile = path.resolve(options.plan);
+  const plan = storage.readJson(planFile);
+  const context = require('./openspec').loadContext(repo.root, options.change, options);
+  require('./openspec').validate(repo.root, options.change, options);
+  const references = require('./evidence').validatePlan(repo.root, plan, context, 'delivery', repo.head);
+  const referencedFiles = Object.keys(references).map(key => key.split('#')[0]);
+  const allowed = new Set([...plan.files, ...referencedFiles]);
+  need(owned.every(name => allowed.has(name)) && plan.files.every(name => owned.includes(name)),
+    'DESIGN_RECOVERY_OWNERSHIP', '认领范围必须由当前切片计划、设计审阅和验证引用覆盖');
+  const dirty = repoApi.changedFiles(repo.root, repo.head, undefined, [...owned, ...Object.keys(state.initial)]);
+  const initial = fingerprints(repo.root, dirty.filter(name => !owned.includes(name)));
+  const documents = fingerprints(repo.root, owned.filter(name => referencedFiles.includes(name)));
+  const recovery = { change: options.change, from: state.base, to: repo.head, commits, files: declared,
+    ownedFiles: owned, externalDirty: Object.keys(initial), planDigest: storage.hash(readText(planFile)),
+    inputs: fingerprints(repo.root, plan.files), references };
+  const updated = atomicUpdate(file, current => {
+    need(JSON.stringify(current) === JSON.stringify(state), 'DESIGN_PREPARATION_CONCURRENT', '原准备记录并行变化');
+    need(!fs.existsSync(statePath(repo.root, options.session)), 'DESIGN_RECOVERY_BOUND', '恢复期间建立了绑定');
+    return { ...current, origin: current.origin || current.base,
+      originInitial: current.originInitial || current.initial, originRegistryHash: current.originRegistryHash || current.registryHash,
+      base: repo.head, initial,
+      registryHash: fingerprint(repo.root, baselines.REGISTRY), documents,
+      checkpoints: [...(current.checkpoints || []), { ...recovery, kind: 'unbound-recovery' }], recovery };
+  });
+  return { origin: updated.origin, base: updated.base, change: options.change, committedFiles: declared.length,
+    ownedFiles: owned.length, externalDirty: Object.keys(initial).length,
+    next: '使用同一真实会话和已审阅计划重新 bind；恢复记录不代表历史 delivery PASS' };
 }
 
 function validateState(repo, state, targets = []) {
@@ -219,9 +270,10 @@ function bindingPreparation(repo, session, targets, current) {
     need(Object.hasOwn(state.documents, target) && fingerprint(repo.root, target) === state.documents[target],
       'DESIGN_DOCUMENT_STALE', `${target} 未由本任务准备或准备后已变化；重新审阅正文并 upsert`);
   }
-  need(current.every(file => Object.hasOwn(state.initial, file) || file === baselines.REGISTRY),
+  need(current.every(file => Object.hasOwn(state.initial, file) || file === baselines.REGISTRY
+    || state.recovery?.ownedFiles.includes(file)),
     'DESIGN_EARLY_CODE', '自动设计准备只接纳文档和绑定；业务代码必须在治理 bind 后修改');
   return { initial: Object.fromEntries(Object.entries(state.initial).filter(([file]) => file !== baselines.REGISTRY && repoApi.isExecutable(file))), base: state.base };
 }
 
-module.exports = { discover, prepare, resume, upsert, bindingPreparation, readCheckpoint };
+module.exports = { discover, prepare, resume, recover, upsert, bindingPreparation, readCheckpoint };

@@ -29,6 +29,9 @@ node $design discover --root $project --module $module
 node $design prepare --root $project --session $session --module $module
 # 同一真实会话的已验证切片提交后，显式声明该次提交实际触及的每个文件。
 node $design resume --root $project --session $session --change $change --file $committedFile
+# 仅限旧会话已有 prepare、但从未成功 bind 的恢复：先完成当前切片计划的具名审阅和真实验证。
+node $design recover --root $project --session $session --change $change --plan $reviewedPlan `
+  --file $committedFile --owned-file $changeOwnedFile
 # Agent 已完成相关正文、核对实际标题；下面变量取项目真实值。
 node $design upsert --root $project --session $session --module $module `
   --scope $moduleScope --capability $capability --owner $owner `
@@ -40,6 +43,8 @@ node $design upsert --root $project --session $session --module $module `
 --scope、--capability 可重复；合并范围只增加不静默删除。已绑定模块未传的字段原样保留。新绑定尚未具备完整内容索引时使用 migrate 并写真实缺口；Agent 完成索引后以 `--content <Agent生成的临时索引文件>` 传入 content 对象。新模块必须在本次交付前补齐适用内容、关联和审阅，不可把 migrate 当永久豁免。功能索引不复制业务正文。
 
 `resume` 只用于同一真实会话完成 `record → delivery → commit` 后继续下一切片。`--file` 可重复，须与从当前检查点到 HEAD 的每个线性提交所触及文件完全一致；脚本核对原绑定 change、交付证据新鲜度、文件归属、分支及其它任务初始脏文件，并保留原始起点和每次续接记录。成功后当前检查点推进到 HEAD，再按 `prepare → upsert → bind → 实施 → record → delivery` 执行下一切片。拒绝时保留原记录，不删除、不改写缓存，也不用新 session 认领旧改动。
+
+`recover` 只用于原 session 有准备记录但没有兼容治理绑定的旧状态。`--file` 逐一声明从原检查点至 HEAD 的全部提交文件，包含其他任务文件；`--owned-file` 只声明本 change 拥有且经当前计划覆盖的文件。计划须通过 OpenSpec 当前任务、设计视图、Scenario、具名审阅和验证输入指纹的 delivery 检查，提交链须连续且无分支切换。恢复保留原始指纹与审计记录，将其他任务的未提交改动留在初始归属中；成功只建立当前检查点，再用相同 session 和计划运行 `bind → preflight → record → delivery`。它不补写历史 PASS、不完成任务、不归档，也不代替 Forge 宿主恢复自动监督。旧会话若无法取得覆盖当前输入的真实验证证据，应先完成验证，再调用恢复入口。
 
 准备状态保存在治理用户数据目录，和 session 绑定分开命名；重复 prepare 保留起始 HEAD 与已有脏文件，不重置归属。起始脏文件指纹只在本次目标文档、绑定文件或执行输入进入检查范围时校验；无关文件变化不阻断当前模块。登记文件在起点已有其它模块改动时，upsert 对比起始 HEAD 的目标模块条目，仅允许目标条目未被他人修改的定向合并，并保留其它模块；目标模块已有改动或准备后登记文件再次变化仍拒绝覆盖。重复登记沿用本任务已确认的条目，不能据此认领其它模块。upsert 不写正文、不创建 OpenSpec、不修改 Hook/CI。原 initializer 的 --baselines/--bindings 兼容入口保留，供旧流程使用；新自动开发流程无需用户另外调用它。
 
@@ -62,6 +67,7 @@ Agent 在实现过程中维护本次目标与发现；独立切片完成真实�
 | DESIGN_REGISTRY_CONCURRENT / DESIGN_DOCUMENT_STALE | 停止覆盖，重新读取并核对其它任务差异；可确认本任务正文时重新 upsert，跨任务绑定冲突先分离处理 |
 | DESIGN_EARLY_CODE | 先分离提前产生的源码；不能把 prepare 当作跳过治理 bind 的许可 |
 | DESIGN_PREPARATION_STALE / DESIGN_INITIAL_CHANGED | 正常提交后使用显式 resume 核验续接；换分支或初始改动归属变化时保留现场重新确定任务边界，不删除记录规避 |
+| DESIGN_RECOVERY_INPUT / DESIGN_RECOVERY_OWNERSHIP / DESIGN_RECOVERY_STALE | 旧会话缺绑定时整理当前切片计划、提交文件清单及本 change 归属；重新审阅并运行覆盖当前输入的验证后才 recover 和 bind，失败保留原记录 |
 | DESIGN_SCAN_LIMIT | 使用项目索引/定向源码人工核实归属；超限发现不声称完整扫描，补建设计仍可由 Agent 进行 |
 | 文档归属/业务事实仍有关键歧义 | 仅询问阻塞问题；其它独立部分继续推进 |
 

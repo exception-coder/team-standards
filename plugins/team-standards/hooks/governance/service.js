@@ -45,6 +45,15 @@ function bind(options) {
   const file = statePath(repo.root, options.session);
   const binding = atomicUpdate(file, previous => {
     if (!previous) {
+      const recovery = require('./design-preparation').readCheckpoint(repo, options.session)?.recovery;
+      if (recovery) {
+        requireValue(recovery.change === options.change && recovery.to === repo.head
+          && recovery.planDigest === storage.hash(storage.readText(path.resolve(options.plan))),
+        'DESIGN_RECOVERY_STALE', '恢复后的 change、HEAD 或审阅计划已变化');
+        compareFingerprints(recovery.inputs, fingerprints(repo.root, plan.files), 'DESIGN_RECOVERY_STALE');
+        compareFingerprints(recovery.references, validatePlan(repo.root, plan, context, 'delivery', repo.head),
+          'DESIGN_RECOVERY_STALE');
+      }
       const targets = (plan.baselines || []).flatMap(item => item.reference ? [item.reference.path] : []);
       const prepared = require('./design-preparation').bindingPreparation(repo, options.session, targets, current);
       requireValue(prepared || !changed.some(file => targets.includes(file)), 'DIRTY_BASELINE_OWNERSHIP',

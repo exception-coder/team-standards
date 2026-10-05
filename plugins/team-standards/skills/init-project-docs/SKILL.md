@@ -145,4 +145,4 @@ Graphify 产物缺失属于 `pending`，不是脚本伪造文件的理由；Open
 
 ## 开发任务内部调用
 
-新增或修改业务模块时由 change-readiness 自动调用[设计准备与绑定流程](../change-readiness/references/automatic-design-maintenance.md)，无需用户另开初始化任务。内部入口为 scripts/design-baseline.js：discover 只读发现；prepare 保存不可重置的任务起点；upsert 按已确认文件/标题幂等合并单个模块。Agent 负责业务写作和真实功能索引，脚本不生成空设计，也不运行全项目结构初始化或自动创建 OpenSpec。
+新增或修改业务模块时由 change-readiness 自动调用[设计准备与绑定流程](../change-readiness/references/automatic-design-maintenance.md)，无需用户另开初始化任务。内部入口为 scripts/design-baseline.js：discover 只读发现；prepare 保存不可重置的任务起点；resume 续接已绑定且已提交的切片；recover 核验旧会话缺绑定的准备记录；upsert 按已确认文件/标题幂等合并单个模块。Agent 负责业务写作和真实功能索引，脚本不生成空设计，也不运行全项目结构初始化或自动创建 OpenSpec。

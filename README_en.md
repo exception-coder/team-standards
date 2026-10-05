@@ -1,10 +1,10 @@
 # team-standards
 
-Version 4.4 makes design discovery, authoring, binding and synchronization part of authorized development tasks. The Agent writes factual content; an internal preparation/upsert entry preserves unrelated modules and preexisting changes. A verified committed slice can explicitly resume its preparation checkpoint in the same session after scope and evidence checks. Legacy projects can reference local acceptance sections without initializing OpenSpec. See the [workflow](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md) and [actual Agent pilot](docs/maintenance/automatic-design-release.md).
+Version 4.4 makes design discovery, authoring, binding and synchronization part of authorized development tasks. The Agent writes factual content; an internal preparation/upsert entry preserves unrelated modules and preexisting changes. A verified committed slice can explicitly resume its preparation checkpoint in the same session; an older unbound session can recover after current scope, review, and verification checks. Legacy projects can reference local acceptance sections without initializing OpenSpec. See the [workflow](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md) and [actual Agent pilot](docs/maintenance/automatic-design-release.md).
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.10.7**. The plugin exposes 19 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.10.8**. The plugin exposes 19 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 The compatibility governance checker limits untracked baseline inputs to declared task files and relevant design candidates. Unrelated temporary files do not consume its file limit. Tracked or staged changes and explicitly referenced task, design, specification, or verification inputs still receive strict path checks.
 

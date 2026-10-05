@@ -5,16 +5,16 @@ const { requireValue } = require('../../../hooks/governance/storage');
 
 function run(argv) {
   const [command, ...args] = argv;
-  requireValue(['discover', 'prepare', 'resume', 'upsert'].includes(command), 'DESIGN_COMMAND', '命令：discover | prepare | resume | upsert');
+  requireValue(['discover', 'prepare', 'resume', 'recover', 'upsert'].includes(command), 'DESIGN_COMMAND', '命令：discover | prepare | resume | recover | upsert');
   const names = { root: 'root', session: 'session', module: 'module', scope: 'scopes', capability: 'capabilities', owner: 'owner',
     overview: 'overview', 'overview-heading': 'overviewHeading', detailed: 'detailed', 'detailed-heading': 'detailedHeading',
     'code-version': 'codeVersion', content: 'content', 'migration-reason': 'migrationReason', 'migration-due': 'migrationDue',
-    change: 'change', file: 'files' };
+    change: 'change', file: 'files', 'owned-file': 'ownedFiles', plan: 'plan' };
   const options = { root: process.cwd() };
   for (let i = 0; i < args.length; i += 2) {
     const key = names[args[i].replace(/^--/, '')];
     requireValue(args[i].startsWith('--') && key && args[i + 1] && !args[i + 1].startsWith('--'), 'DESIGN_ARGUMENT', `无效参数 ${args[i]}`);
-    if (['scopes', 'capabilities', 'files'].includes(key)) (options[key] ||= []).push(args[i + 1]);
+    if (['scopes', 'capabilities', 'files', 'ownedFiles'].includes(key)) (options[key] ||= []).push(args[i + 1]);
     else options[key] = args[i + 1];
   }
   return api[command](options);

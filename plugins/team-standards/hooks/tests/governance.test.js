@@ -717,6 +717,66 @@ test('automatic preparation feeds governance bind and delivery without a user-au
   assert.equal(service.check({ ...f.options, phase: 'preflight' }).status, 'PASS');
 });
 
+test('unbound preparation recovers only with current review and verification', t => {
+  const f = fixture(t);
+  const preparation = require('../governance/design-preparation');
+  write(f.root, 'docs/other.md', '# Other task baseline\n');
+  runGit(f.root, ['add', 'docs/other.md']); runGit(f.root, ['commit', '-qm', 'other baseline']);
+  write(f.root, 'docs/other.md', '# Other task pending\n');
+  preparation.prepare({ root: f.root, session: f.options.session });
+  const legacyBinding = storage.statePath(f.root, f.options.session);
+  const legacyPreparation = path.join(path.dirname(legacyBinding), 'design-preparation', path.basename(legacyBinding));
+  const legacy = JSON.parse(fs.readFileSync(legacyPreparation, 'utf8'));
+  delete legacy.origin;
+  fs.writeFileSync(legacyPreparation, JSON.stringify(legacy));
+  const base = runGit(f.root, ['rev-parse', 'HEAD']);
+  write(f.root, 'src/greet.js', 'module.exports = () => "hello";\n');
+  const taskFile = path.join(f.root, changeDir, 'tasks.md');
+  fs.writeFileSync(taskFile, fs.readFileSync(taskFile, 'utf8').replace('[ ] 1.1', '[x] 1.1'));
+  const digest = storage.hash(JSON.stringify(storage.fingerprints(f.root, f.plan.files)));
+  f.plan.review.inputFingerprint = digest;
+  f.plan.verifications[0].inputFingerprint = digest;
+  f.save();
+  runGit(f.root, ['add', 'src/greet.js', `${changeDir}/tasks.md`]);
+  runGit(f.root, ['commit', '-qm', 'verified greeting implementation']);
+  write(f.root, 'unrelated.txt', 'separate committed task\n');
+  runGit(f.root, ['add', 'unrelated.txt']);
+  runGit(f.root, ['commit', '-qm', 'separate task']);
+  const head = runGit(f.root, ['rev-parse', 'HEAD']);
+  const files = repoApi.changedFiles(f.root, base, head);
+  const options = { root: f.root, session: f.options.session, change, files,
+    ownedFiles: ['src/greet.js'], plan: f.options.plan, cli: f.options.cli };
+  const stateFile = storage.statePath(f.root, f.options.session);
+  const preparationFile = path.join(path.dirname(stateFile), 'design-preparation', path.basename(stateFile));
+  const original = fs.readFileSync(preparationFile);
+  assert.throws(() => preparation.recover({ ...options, session: 'made-up' }), { rule: 'DESIGN_PREPARATION_REQUIRED' });
+  assert.throws(() => preparation.recover({ ...options, files: files.slice(1) }), { rule: 'DESIGN_RESUME_SCOPE' });
+  assert.throws(() => preparation.recover({ ...options, ownedFiles: [...options.ownedFiles, 'docs/other.md'] }),
+    { rule: 'DESIGN_RECOVERY_OWNERSHIP' });
+  runGit(f.root, ['checkout', '-qb', 'other-branch']);
+  assert.throws(() => preparation.recover(options), { rule: 'DESIGN_PREPARATION_STALE' });
+  runGit(f.root, ['checkout', '-q', 'main']);
+  write(f.root, 'src/greet.js', 'module.exports = () => "mixed";\n');
+  assert.throws(() => preparation.recover(options), { rule: 'REVIEW_INPUTS_STALE' });
+  runGit(f.root, ['checkout', '--', 'src/greet.js']);
+  f.plan.review.inputFingerprint = 'expired'; f.save();
+  assert.throws(() => preparation.recover(options), { rule: 'REVIEW_INPUTS_STALE' });
+  f.plan.review.inputFingerprint = digest; f.save();
+  assert.deepEqual(fs.readFileSync(preparationFile), original);
+  const recovered = preparation.recover(options);
+  assert.equal(recovered.origin, base);
+  assert.equal(recovered.base, head);
+  assert.equal(recovered.committedFiles, 3);
+  const audit = JSON.parse(fs.readFileSync(preparationFile, 'utf8'));
+  assert.equal(audit.origin, base);
+  assert.ok(Object.hasOwn(audit.originInitial, 'docs/other.md'));
+  assert.equal(audit.checkpoints.at(-1).kind, 'unbound-recovery');
+  assert.equal(fs.existsSync(stateFile), false);
+  assert.equal(service.bind(f.options).status, 'PASS');
+  assert.equal(service.check({ ...f.options, phase: 'preflight' }).status, 'PASS');
+  assert.equal(fs.readFileSync(path.join(f.root, 'docs/other.md'), 'utf8'), '# Other task pending\n');
+});
+
 test('automatic migration synchronizes the current slice while preserving explicit legacy content gaps', t => {
   const f = fixture(t); enrollBaseline(f);
   const prepare = require('../governance/design-preparation');
