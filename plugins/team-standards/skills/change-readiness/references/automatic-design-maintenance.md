@@ -32,6 +32,12 @@ node $design resume --root $project --session $session --change $change --file $
 # 仅限旧会话已有 prepare、但从未成功 bind 的恢复：先完成当前切片计划的具名审阅和真实验证。
 node $design recover --root $project --session $session --change $change --plan $reviewedPlan `
   --file $committedFile --owned-file $changeOwnedFile
+# 真实 Forge writer 已有未提交改动且缺少绑定：审阅当前计划，不要求任务完成或新提交。
+$governance = Join-Path $plugin 'scripts/openspec-governance.js'
+node $governance snapshot --repo $project --session $session --change $change --plan $reviewedPlan --phase preflight
+# 将本次实际审阅的 snapshot.inputFingerprint 写入 plan.review.inputFingerprint。
+node $design recover-writer --root $project --session $session --change $change --plan $reviewedPlan `
+  --owned-file $writerOwnedFile
 # Agent 已完成相关正文、核对实际标题；下面变量取项目真实值。
 node $design upsert --root $project --session $session --module $module `
   --scope $moduleScope --capability $capability --owner $owner `
@@ -47,6 +53,18 @@ node $design upsert --root $project --session $session --module $module `
 `recover` 只用于原 session 有准备记录但没有兼容治理绑定的旧状态。`--file` 逐一声明从原检查点至 HEAD 的全部提交文件，包含其他任务文件；`--owned-file` 只声明本 change 拥有且经当前计划覆盖的文件。计划须通过 OpenSpec 当前任务、设计视图、Scenario、具名审阅和验证输入指纹的 delivery 检查，提交链须连续且无分支切换。恢复保留原始指纹与审计记录，将其他任务的未提交改动留在初始归属中；成功只建立当前检查点，再用相同 session 和计划运行 `bind → preflight → record → delivery`。它不补写历史 PASS、不完成任务、不归档，也不代替 Forge 宿主恢复自动监督。旧会话若无法取得覆盖当前输入的真实验证证据，应先完成验证，再调用恢复入口。
 
 准备状态保存在治理用户数据目录，和 session 绑定分开命名；重复 prepare 保留起始 HEAD 与已有脏文件，不重置归属。起始脏文件指纹只在本次目标文档、绑定文件或执行输入进入检查范围时校验；无关文件变化不阻断当前模块。登记文件在起点已有其它模块改动时，upsert 对比起始 HEAD 的目标模块条目，仅允许目标条目未被他人修改的定向合并，并保留其它模块；目标模块已有改动或准备后登记文件再次变化仍拒绝覆盖。重复登记沿用本任务已确认的条目，不能据此认领其它模块。upsert 不写正文、不创建 OpenSpec、不修改 Hook/CI。原 initializer 的 --baselines/--bindings 兼容入口保留，供旧流程使用；新自动开发流程无需用户另外调用它。
+
+### 真实 writer 的开发恢复
+
+`recover-writer` 专用于已有准备记录、缺少兼容绑定且 Forge v2 仍确认原真实会话拥有当前 change 的活动 writer。缺少准备记录时先 prepare 保存当前现场；已有记录完整保留。显式 `snapshot --phase preflight --plan` 只读取当前计划输入，不建立绑定，也不代表执行过测试或审阅。
+
+Agent 重新审阅当前设计与开发输入后，记录具名审阅及当前 inputFingerprint，再逐文件提供 `--owned-file`。认领范围须同时属于实时 writer 和审阅计划，并覆盖 writer 已有的已跟踪、暂存、未跟踪改动及当前任务。脚本通过公开 `session_init`、`inspect_execution_writer` 核对项目、会话、change、分支、HEAD、提交祖先、精确范围及并行 writer；不接受离线 writer JSON。HEAD 未变时不需要 `--file`；已变化时逐一声明连续提交所触及文件，拒绝无关提交和范围遗漏。其他任务脏文件保留在初始归属中，共享 registry 只核对涉及模块条目。
+
+成功记录原始起点、原始指纹、writer 身份、恢复审阅、文件及暂存区摘要；再执行同 session/change 的 `bind → check --phase preflight`，绑定前重新核验实时归属与现场。失败不改原记录。此入口只恢复开发就绪，不要求任务已完成，不生成历史或当前 delivery PASS；交付仍要求实际验证、任务完成、record 和 delivery 检查。恢复后输入变化时重新审阅并恢复，不能只替换指纹冒充审阅。
+
+计划 taskIds 沿用 OpenSpec apply 返回的 ID；Forge 的当前 task 可能是 checklist key（如 2.2），apply 则返回序号（如 6）。恢复根据当前任务描述中的编号建立唯一对应，错配或歧义拒绝，不改写 tasks 勾选状态。
+
+Forge Runtime 的 `WAITING_USER` 与兼容绑定分别处理。按用户已授权的恢复意图，确认插件版本、绑定和 preflight 通过后，从宿主监督面板恢复原运行；API 使用当前运行版本的 resume 动作，409 时先读取最新状态，不能循环上报 CONTINUE 代替恢复。保持原任务与预算，不自动完成或归档；宿主新轮次应重新读取插件入口。
 
 ## 实施、同步与交付
 
@@ -65,9 +83,10 @@ Agent 在实现过程中维护本次目标与发现；独立切片完成真实�
 | 缺少设计/绑定 | 依据事实补建正文，内部调用 upsert；不转交用户填写 JSON |
 | DESIGN_DIRTY_DOCUMENT / DESIGN_DIRTY_REGISTRY | 保留任务开始前的修改，与实际所有者协调或顺序执行；未经宿主授权不自行建隔离工作树，不换 session 认领 |
 | DESIGN_REGISTRY_CONCURRENT / DESIGN_DOCUMENT_STALE | 停止覆盖，重新读取并核对其它任务差异；可确认本任务正文时重新 upsert，跨任务绑定冲突先分离处理 |
-| DESIGN_EARLY_CODE | 先分离提前产生的源码；不能把 prepare 当作跳过治理 bind 的许可 |
+| DESIGN_EARLY_CODE / DIRTY_OWNERSHIP | 先核对真实归属；已有合法 Forge writer 且缺绑定时走 recover-writer，其他情况分离改动 |
 | DESIGN_PREPARATION_STALE / DESIGN_INITIAL_CHANGED | 正常提交后使用显式 resume 核验续接；换分支或初始改动归属变化时保留现场重新确定任务边界，不删除记录规避 |
 | DESIGN_RECOVERY_INPUT / DESIGN_RECOVERY_OWNERSHIP / DESIGN_RECOVERY_STALE | 旧会话缺绑定时整理当前切片计划、提交文件清单及本 change 归属；重新审阅并运行覆盖当前输入的验证后才 recover 和 bind，失败保留原记录 |
+| DESIGN_WRITER_REQUIRED / DESIGN_WRITER_IDENTITY / DESIGN_WRITER_SCOPE / DESIGN_WRITER_MIXED | 重读实时 execution，核对原 session/change、完整文件清单与其他 writer；拒绝时保留原记录，不通过新 session 或手改缓存接管 |
 | DESIGN_SCAN_LIMIT | 使用项目索引/定向源码人工核实归属；超限发现不声称完整扫描，补建设计仍可由 Agent 进行 |
 | 文档归属/业务事实仍有关键歧义 | 仅询问阻塞问题；其它独立部分继续推进 |
 

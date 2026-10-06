@@ -5,11 +5,12 @@ const { requireValue } = require('../../../hooks/governance/storage');
 
 function run(argv) {
   const [command, ...args] = argv;
-  requireValue(['discover', 'prepare', 'resume', 'recover', 'upsert'].includes(command), 'DESIGN_COMMAND', '命令：discover | prepare | resume | recover | upsert');
+  requireValue(['discover', 'prepare', 'resume', 'recover', 'recover-writer', 'upsert'].includes(command), 'DESIGN_COMMAND',
+    '命令：discover | prepare | resume | recover | recover-writer | upsert');
   const names = { root: 'root', session: 'session', module: 'module', scope: 'scopes', capability: 'capabilities', owner: 'owner',
     overview: 'overview', 'overview-heading': 'overviewHeading', detailed: 'detailed', 'detailed-heading': 'detailedHeading',
     'code-version': 'codeVersion', content: 'content', 'migration-reason': 'migrationReason', 'migration-due': 'migrationDue',
-    change: 'change', file: 'files', 'owned-file': 'ownedFiles', plan: 'plan' };
+    change: 'change', file: 'files', 'owned-file': 'ownedFiles', plan: 'plan', cli: 'cli' };
   const options = { root: process.cwd() };
   for (let i = 0; i < args.length; i += 2) {
     const key = names[args[i].replace(/^--/, '')];
@@ -17,7 +18,8 @@ function run(argv) {
     if (['scopes', 'capabilities', 'files', 'ownedFiles'].includes(key)) (options[key] ||= []).push(args[i + 1]);
     else options[key] = args[i + 1];
   }
-  return require('../../../hooks/governance/binding-context').withBindingContext(options, scoped => api[command](scoped));
+  return require('../../../hooks/governance/binding-context').withBindingContext(options,
+    scoped => api[command === 'recover-writer' ? 'recoverWriter' : command](scoped));
 }
 
 if (require.main === module) {

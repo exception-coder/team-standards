@@ -186,6 +186,43 @@ function readPreparation(repo, session, targets = []) {
   return state;
 }
 
+function recoverWriter(options) {
+  need(text(options.session) && text(options.change) && text(options.plan),
+    'DESIGN_RECOVERY_INPUT', '开发恢复需要原真实会话、当前 change 和已审阅计划');
+  const repo = repoApi.repository(options.root);
+  const file = stateFile(repo.root, options.session);
+  need(fs.existsSync(file), 'DESIGN_PREPARATION_REQUIRED', '先 prepare 保存当前现场；既有记录不得删除');
+  need(!fs.existsSync(statePath(repo.root, options.session)), 'DESIGN_RECOVERY_BOUND', '已有绑定使用正常 rebind/resume');
+  const state = storage.readJson(file);
+  need(state.version === 1 && state.repo === repo.root && state.branch === repo.branch && state.session === options.session,
+    'DESIGN_PREPARATION_STALE', '原准备记录与仓库、分支或会话不一致');
+  const range = state.base === repo.head ? { commits: [], declared: [] } : committedRange(repo, state, options.files);
+  need(state.base !== repo.head || !options.files?.length, 'DESIGN_RESUME_SCOPE', 'HEAD 未变化，不能声明不存在的提交文件');
+  const writerRecovery = require('./writer-recovery');
+  const recovery = writerRecovery.build(repo, options, state, range);
+  const plan = storage.readJson(path.resolve(options.plan));
+  const registry = baselines.loadRegistry(repo.root);
+  const modules = [...new Set((plan.baselines || []).map(item => item.module))];
+  // 共享登记文件可以已有其他模块修改；只确认本切片条目未被其他任务改写。
+  modules.forEach(module => verifyInitialModule(repo, state, registry, module));
+  const updated = atomicUpdate(file, current => {
+    need(JSON.stringify(current) === JSON.stringify(state), 'DESIGN_PREPARATION_CONCURRENT', '原准备记录并行变化');
+    need(!fs.existsSync(statePath(repo.root, options.session)), 'DESIGN_RECOVERY_BOUND', '恢复期间建立了绑定');
+    need(repoApi.repository(repo.root).head === repo.head, 'DESIGN_RECOVERY_STALE', '恢复期间 HEAD 变化');
+    const context = require('./openspec').loadContext(repo.root, options.change, options);
+    writerRecovery.verify(repo, options, recovery, plan, context);
+    return { ...current, origin: current.origin || current.base,
+      originInitial: current.originInitial || current.initial, originRegistryHash: current.originRegistryHash || current.registryHash,
+      base: repo.head, initial: recovery.external.inputs,
+      registryHash: fingerprint(repo.root, baselines.REGISTRY),
+      documents: fingerprints(repo.root, recovery.ownedFiles.filter(name => !repoApi.isExecutable(name))),
+      ownedModules: modules, checkpoints: [...(current.checkpoints || []), recovery], recovery };
+  });
+  return { origin: updated.origin, base: updated.base, change: options.change, executionId: recovery.writer.executionId,
+    phase: 'preflight', ownedFiles: recovery.ownedFiles.length, externalDirty: Object.keys(updated.initial).length,
+    next: '同一真实会话 bind 并检查 preflight 后继续开发；交付仍须完成任务、实际验证并 record' };
+}
+
 function readCheckpoint(repo, session) {
   const file = stateFile(repo.root, session);
   return fs.existsSync(file) ? storage.readJson(file) : null;
@@ -263,7 +300,7 @@ function bindingPreparation(repo, session, targets, current) {
   if (!fs.existsSync(stateFile(repo.root, session))) return null;
   const state = readPreparation(repo, session, [...targets, ...current].filter(file => file !== baselines.REGISTRY));
   need(fingerprint(repo.root, baselines.REGISTRY) === state.registryHash, 'DESIGN_REGISTRY_CONCURRENT', '准备后绑定发生变化，需重新核对');
-  need(!Object.hasOwn(state.initial, baselines.REGISTRY) || state.ownedModules?.length,
+  need(!Object.hasOwn(state.initial, baselines.REGISTRY) || state.ownedModules?.length || state.recovery?.kind === 'writer-recovery',
     'DESIGN_DIRTY_REGISTRY', '初始登记改动须先经过目标模块 upsert 核验，不能直接认领');
   const changed = repoApi.changedFiles(repo.root, repo.head, undefined, targets);
   for (const target of targets) if (changed.includes(target)) {
@@ -273,7 +310,8 @@ function bindingPreparation(repo, session, targets, current) {
   need(current.every(file => Object.hasOwn(state.initial, file) || file === baselines.REGISTRY
     || state.recovery?.ownedFiles.includes(file)),
     'DESIGN_EARLY_CODE', '自动设计准备只接纳文档和绑定；业务代码必须在治理 bind 后修改');
-  return { initial: Object.fromEntries(Object.entries(state.initial).filter(([file]) => file !== baselines.REGISTRY && repoApi.isExecutable(file))), base: state.base };
+  return { initial: Object.fromEntries(Object.entries(state.initial).filter(([file]) => repoApi.isExecutable(file)
+    && (file !== baselines.REGISTRY || state.recovery?.kind === 'writer-recovery'))), base: state.base };
 }
 
-module.exports = { discover, prepare, resume, recover, upsert, bindingPreparation, readCheckpoint };
+module.exports = { discover, prepare, resume, recover, recoverWriter, upsert, bindingPreparation, readCheckpoint };

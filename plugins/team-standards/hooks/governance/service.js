@@ -50,9 +50,13 @@ function bind(options) {
         requireValue(recovery.change === options.change && recovery.to === repo.head
           && recovery.planDigest === storage.hash(storage.readText(path.resolve(options.plan))),
         'DESIGN_RECOVERY_STALE', '恢复后的 change、HEAD 或审阅计划已变化');
-        compareFingerprints(recovery.inputs, fingerprints(repo.root, plan.files), 'DESIGN_RECOVERY_STALE');
-        compareFingerprints(recovery.references, validatePlan(repo.root, plan, context, 'delivery', repo.head),
-          'DESIGN_RECOVERY_STALE');
+        if (recovery.kind === 'writer-recovery') {
+          require('./writer-recovery').verify(repo, options, recovery, plan, context);
+        } else {
+          compareFingerprints(recovery.inputs, fingerprints(repo.root, plan.files), 'DESIGN_RECOVERY_STALE');
+          compareFingerprints(recovery.references, validatePlan(repo.root, plan, context, 'delivery', repo.head),
+            'DESIGN_RECOVERY_STALE');
+        }
       }
       const targets = (plan.baselines || []).flatMap(item => item.reference ? [item.reference.path] : []);
       const prepared = require('./design-preparation').bindingPreparation(repo, options.session, targets, current);
@@ -196,8 +200,13 @@ function doctor(options) {
 
 function snapshot(options) {
   const repo = repoApi.repository(options.repo);
-  const binding = readBinding(repo, options.session);
-  checkRange(repo, binding);
+  // 显式开发审阅快照允许先读计划；不借此创建绑定、writer 或验证结论。
+  const planning = options.phase === 'preflight' && options.plan;
+  const binding = planning ? { plan: readJson(options.plan) } : readBinding(repo, options.session);
+  if (planning) {
+    const context = loadContext(repo.root, options.change, binding.plan, options);
+    validatePlan(repo.root, binding.plan, context, 'preflight', repo.head);
+  } else checkRange(repo, binding);
   const files = options.files ? (Array.isArray(options.files) ? options.files : options.files.split(',')) : binding.plan.files;
   requireValue(files.every(file => binding.plan.files.includes(file)), 'SNAPSHOT_SCOPE', 'snapshot 输入必须属于绑定范围');
   const inputs = fingerprints(repo.root, files);

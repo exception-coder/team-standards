@@ -44,4 +44,6 @@ SessionStart 注册只证明适配器存在。支持该事件的宿主可注入�
 
 治理 CLI、设计准备 CLI 和 Hook 在 Forge v2 下通过 `session_init` 读取真实会话的当前写入执行，按项目、真实会话、change 选择设计准备及证据绑定。旧单会话记录仅在 change 相同时复用；其他 change 的基线与证据保留，不伪造新 session、不删除旧记录、不复用其他规格的 PASS。显式 `--change` 与当前执行不一致时返回 `GOVERNANCE_CHANGE_MISMATCH`。
 
-自动推进遇到绑定缺失或 `SCOPE_GAP`，先核对 Runtime change 与写入执行，再审阅当前 task 的实际文件、相关设计和既有计划。归属明确时主动准备当前 change、更新计划并 bind，执行必要的设计检查后继续；已有本地测试仅在输入指纹仍有效时复用。不得为消除范围错误盲目扩大到全仓，也不得把实际设计缺口当作绑定错误跳过。遗留脏文件使用既有具名 recover/resume 流程核实归属；无安全恢复路径时记录具体冲突，推进其他可执行项。
+自动推进遇到绑定缺失或 `SCOPE_GAP`，先核对 Runtime change 与写入执行，再审阅当前 task 的实际文件、相关设计和既有计划。归属明确时主动准备当前 change、更新计划并 bind，执行必要的设计检查后继续；已有本地测试仅在输入指纹仍有效时复用。不得为消除范围错误盲目扩大到全仓，也不得把实际设计缺口当作绑定错误跳过。
+
+真实 writer 已有未提交改动、任务未完成且缺兼容绑定时，使用 [recover-writer 开发恢复](automatic-design-maintenance.md#真实-writer-的开发恢复)：实时核对身份、精确文件范围与当前设计审阅，恢复后重新 bind/preflight。不要要求先提交或先完成 task 才恢复开发绑定。已提交且已验证的切片仍使用 resume，缺绑定但已有当前交付证据的旧状态可用 recover。Runtime 已进入 WAITING_USER 时，在用户授权恢复后使用宿主的原运行 resume 动作；进度上报的 HTTP 409 不等于新的代码或设计缺口。

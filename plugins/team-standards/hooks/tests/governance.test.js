@@ -777,6 +777,179 @@ test('unbound preparation recovers only with current review and verification', t
   assert.equal(fs.readFileSync(path.join(f.root, 'docs/other.md'), 'utf8'), '# Other task pending\n');
 });
 
+function writerFixture(t, enrolled = false) {
+  const f = fixture(t);
+  const preparation = require('../governance/design-preparation');
+  const registry = enrolled ? enrollBaseline(f) : null;
+  write(f.root, 'other/task.js', 'original other task\n');
+  runGit(f.root, ['add', 'other/task.js']); runGit(f.root, ['commit', '-qm', 'other task baseline']);
+  write(f.root, 'other/task.js', 'uncommitted other task\n');
+  write(f.root, 'src/greet.js', 'module.exports = () => "work in progress";\n');
+  write(f.root, 'src/new.js', 'module.exports = "untracked writer file";\n');
+  f.plan.files.push('src/new.js'); f.plan.views[0].files.push('src/new.js'); f.plan.scenarios[0].files.push('src/new.js');
+  if (enrolled) {
+    syncBaseline(f);
+    f.plan.files.push('docs/current.md'); f.plan.views[0].files.push('docs/current.md'); f.plan.scenarios[0].files.push('docs/current.md');
+    registry.modules.push({ ...registry.modules[0], id: 'other-module', scopes: ['unrelated/'] });
+    registry.managed.push('unrelated/');
+    write(f.root, baselines.REGISTRY, JSON.stringify(registry));
+  }
+  f.save();
+  f.plan.review.inputFingerprint = service.snapshot({ ...f.options, phase: 'preflight' }).inputFingerprint;
+  f.plan.verifications = []; f.save();
+  const options = { ...f.options, root: f.root, ownedFiles: [...f.plan.files] };
+  preparation.prepare(options);
+  const repo = repoApi.repository(f.root);
+  const execution = { executionId: 'real-writer', taskId: '1.1', changeId: change,
+    ownsWriter: true, state: 'BOUND', branch: repo.branch, files: [...f.plan.files] };
+  const writer = { executionId: execution.executionId, ownerSessionId: options.session,
+    assignedBranch: repo.branch, baselineHead: repo.head, scopes: [`change:${change}`],
+    scopedPaths: [...execution.files, changeDir], scopeFingerprint: 'live-writer-scope' };
+  const session = { protocolVersion: 2, project: repo.root, sessionId: options.session, branch: repo.branch, execution };
+  const workspace = { project: repo.root, branch: repo.branch, head: repo.head, writers: [writer] };
+  const client = require('../forge/client');
+  t.mock.method(client, 'runtime', () => ({ protocolVersion: 2 }));
+  t.mock.method(client, 'callForge', (config, name) => ({ status: 0,
+    response: name === 'session_init' ? session : workspace }));
+  const bindingFile = storage.statePath(repo.root, options.session);
+  const preparationFile = path.join(path.dirname(bindingFile), 'design-preparation', path.basename(bindingFile));
+  return { ...f, options, repo, execution, writer, session, workspace, preparation, preparationFile, bindingFile,
+    recover: () => preparation.recoverWriter(options) };
+}
+
+test('writer recovery binds dirty work without commits or completed tasks and never creates delivery evidence', t => {
+  const f = writerFixture(t);
+  const before = runGit(f.root, ['diff']);
+  assert.throws(() => service.bind(f.options), { rule: 'DESIGN_EARLY_CODE' });
+  const recovered = f.recover();
+  assert.equal(recovered.phase, 'preflight'); assert.equal(recovered.base, f.repo.head);
+  const audit = storage.readJson(f.preparationFile);
+  assert.equal(audit.origin, f.repo.head);
+  assert.equal(audit.checkpoints.at(-1).kind, 'writer-recovery');
+  assert.deepEqual(audit.checkpoints.at(-1).commits, []);
+  assert.ok(Object.hasOwn(audit.originInitial, 'src/greet.js'));
+  assert.ok(Object.hasOwn(audit.initial, 'other/task.js'));
+  assert.equal(service.bind(f.options).status, 'PASS');
+  assert.equal(service.check({ ...f.options, phase: 'preflight' }).status, 'PASS');
+  assert.equal(storage.readJson(f.bindingFile).evidence, null);
+  assert.throws(() => service.check(f.options), { rule: 'EVIDENCE_REQUIRED' });
+  assert.throws(() => service.record(f.options), { rule: 'VERIFICATION_GAP' });
+  assert.match(fs.readFileSync(path.join(f.root, changeDir, 'tasks.md'), 'utf8'), /\[ \] 1.1/);
+  assert.equal(runGit(f.root, ['diff']), before);
+  write(f.root, 'other/task.js', 'other task changed after bind');
+  assert.throws(() => service.check({ ...f.options, phase: 'preflight' }), { rule: 'MIXED_CHANGES' });
+});
+
+for (const [name, mutate, rule] of [
+  ['fabricated session', f => { f.options.session = 'made-up'; }, 'DESIGN_PREPARATION_REQUIRED'],
+  ['wrong writer owner', f => { f.writer.ownerSessionId = 'another-session'; }, 'DESIGN_WRITER_IDENTITY'],
+  ['wrong change', f => { f.execution.changeId = 'another-change'; }, 'DESIGN_WRITER_IDENTITY'],
+  ['branch drift', f => { runGit(f.root, ['checkout', '-qb', 'other-branch']); }, 'DESIGN_PREPARATION_STALE'],
+  ['missing writer', f => { f.workspace.writers = []; }, 'DESIGN_WRITER_IDENTITY'],
+  ['omitted dirty file', f => { f.execution.files.push('src/omitted.js'); f.writer.scopedPaths.push('src/omitted.js');
+    write(f.root, 'src/omitted.js', 'untracked omitted file'); }, 'DESIGN_WRITER_SCOPE'],
+  ['foreign file', f => { f.options.ownedFiles.push('other/task.js'); }, 'DESIGN_WRITER_SCOPE'],
+  ['overlapping writer', f => { f.workspace.writers.push({ executionId: 'other', scopedPaths: ['src/new.js'] }); }, 'DESIGN_WRITER_MIXED'],
+  ['stale review', f => { f.plan.review.inputFingerprint = 'expired'; f.save(); }, 'REVIEW_INPUTS_STALE'],
+  ['unrelated commit', f => { write(f.root, 'unrelated.txt', 'another task'); runGit(f.root, ['add', 'unrelated.txt']);
+    runGit(f.root, ['commit', '-qm', 'other commit']); f.workspace.head = repoApi.repository(f.root).head;
+    f.options.files = ['unrelated.txt']; }, 'DESIGN_WRITER_SCOPE'],
+]) {
+  test(`writer recovery rejects ${name} and preserves preparation`, t => {
+    const f = writerFixture(t); const original = fs.readFileSync(f.preparationFile);
+    mutate(f);
+    assert.throws(f.recover, { rule });
+    assert.deepEqual(fs.readFileSync(f.preparationFile), original);
+    assert.equal(fs.existsSync(f.bindingFile), false);
+  });
+}
+
+for (const [name, mutate] of [
+  ['writer reassignment', f => { f.writer.ownerSessionId = 'another-session'; }],
+  ['owned input', f => { write(f.root, 'src/new.js', 'changed after recovery'); }],
+  ['index', f => { runGit(f.root, ['add', 'src/new.js']); }],
+  ['external input', f => { write(f.root, 'other/task.js', 'changed after recovery'); }],
+  ['design reference', f => { fs.appendFileSync(path.join(f.root, changeDir, 'design.md'), '\nDesign changed after review.'); }],
+]) {
+  test(`writer recovery rechecks ${name} before binding`, t => {
+    const f = writerFixture(t); f.recover(); const original = fs.readFileSync(f.preparationFile);
+    mutate(f);
+    assert.throws(() => service.bind(f.options), error => ['DESIGN_RECOVERY_STALE', 'DESIGN_WRITER_IDENTITY'].includes(error.rule));
+    assert.equal(fs.existsSync(f.bindingFile), false);
+    assert.deepEqual(fs.readFileSync(f.preparationFile), original);
+  });
+}
+
+test('writer recovery requires a live Forge v2 response', t => {
+  const f = writerFixture(t);
+  t.mock.method(require('../forge/client'), 'runtime', () => ({ protocolVersion: 1 }));
+  assert.throws(f.recover, { rule: 'DESIGN_WRITER_REQUIRED' });
+});
+
+test('writer recovery keeps unrelated registry edits and binds current design sections', t => {
+  const f = writerFixture(t, true);
+  const registry = fs.readFileSync(path.join(f.root, baselines.REGISTRY));
+  f.recover();
+  assert.equal(service.bind(f.options).status, 'PASS');
+  assert.equal(service.check({ ...f.options, phase: 'preflight' }).status, 'PASS');
+  assert.deepEqual(fs.readFileSync(path.join(f.root, baselines.REGISTRY)), registry);
+  assert.deepEqual(storage.readJson(f.preparationFile).ownedModules, ['greeting']);
+});
+
+test('writer recovery refuses existing edits to the target registry module', t => {
+  const f = writerFixture(t, true);
+  const original = fs.readFileSync(f.preparationFile);
+  const registry = storage.readJson(path.join(f.root, baselines.REGISTRY));
+  registry.modules[0].owner = 'another owner';
+  write(f.root, baselines.REGISTRY, JSON.stringify(registry));
+  assert.throws(f.recover, { rule: 'DESIGN_DIRTY_REGISTRY' });
+  assert.deepEqual(fs.readFileSync(f.preparationFile), original);
+});
+
+test('writer recovery refuses a writer change during recovery without replacing original records', t => {
+  const f = writerFixture(t);
+  const original = fs.readFileSync(f.preparationFile);
+  let reads = 0;
+  t.mock.method(require('../forge/client'), 'callForge', (config, name) => {
+    if (name === 'inspect_execution_writer' && ++reads === 2) f.writer.ownerSessionId = 'reassigned';
+    return { status: 0, response: name === 'session_init' ? f.session : f.workspace };
+  });
+  assert.throws(f.recover, { rule: 'DESIGN_WRITER_IDENTITY' });
+  assert.deepEqual(fs.readFileSync(f.preparationFile), original);
+});
+
+test('recover-writer CLI uses the current change namespace and preserves the old preparation', t => {
+  const f = writerFixture(t);
+  const original = fs.readFileSync(f.preparationFile);
+  const run = require('../../skills/init-project-docs/scripts/design-baseline').run;
+  run(['prepare', '--root', f.root, '--session', f.options.session]);
+  const args = ['recover-writer', '--root', f.root, '--session', f.options.session,
+    '--change', change, '--plan', f.options.plan, '--cli', f.options.cli];
+  f.options.ownedFiles.forEach(file => args.push('--owned-file', file));
+  assert.equal(run(args).phase, 'preflight');
+  assert.deepEqual(fs.readFileSync(f.preparationFile), original);
+  require('../governance/binding-context').withBindingContext(f.options, options => {
+    assert.equal(service.bind(options).status, 'PASS');
+    assert.equal(service.check({ ...options, phase: 'preflight' }).status, 'PASS');
+  });
+});
+
+test('writer recovery maps the real checklist key to the unique OpenSpec apply ordinal', t => {
+  const f = writerFixture(t);
+  const cli = fs.readFileSync(f.options.cli, 'utf8').replace("{id:'1.1',done:", "{id:'1',description:'1.1 Return greeting',done:");
+  fs.writeFileSync(f.options.cli, cli);
+  f.plan.taskIds = ['1']; f.plan.scenarios.forEach(scenario => { scenario.taskIds = ['1']; }); f.save();
+  assert.equal(f.recover().phase, 'preflight');
+  assert.equal(service.bind(f.options).status, 'PASS');
+  assert.equal(service.check({ ...f.options, phase: 'preflight' }).status, 'PASS');
+  assert.match(fs.readFileSync(path.join(f.root, changeDir, 'tasks.md'), 'utf8'), /\[ \] 1.1/);
+});
+
+test('writer recovery rejects a plan for a different current task', t => {
+  const f = writerFixture(t); f.execution.taskId = '1.2';
+  assert.throws(f.recover, { rule: 'DESIGN_WRITER_TASK' });
+});
+
 test('automatic migration synchronizes the current slice while preserving explicit legacy content gaps', t => {
   const f = fixture(t); enrollBaseline(f);
   const prepare = require('../governance/design-preparation');
