@@ -89,7 +89,9 @@ function statePath(root, session) {
   requireValue(typeof session === 'string' && session.trim(), 'SESSION_REQUIRED', '请提供当前会话的 session ID');
   const home = process.env.TEAM_STANDARDS_GOVERNANCE_DATA
     || path.join(os.homedir(), '.local', 'share', 'team-standards', 'governance');
-  return path.join(home, hash(canonicalPath(root)), `${hash(session)}.json`);
+  const canonical = canonicalPath(root);
+  const legacy = path.join(home, hash(canonical), `${hash(session)}.json`);
+  return require('./binding-context').bindingStatePath(canonical, session, legacy, hash);
 }
 
 function atomicUpdate(file, update) {

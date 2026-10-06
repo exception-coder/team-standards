@@ -17,7 +17,7 @@ function run(argv) {
     if (['scopes', 'capabilities', 'files', 'ownedFiles'].includes(key)) (options[key] ||= []).push(args[i + 1]);
     else options[key] = args[i + 1];
   }
-  return api[command](options);
+  return require('../../../hooks/governance/binding-context').withBindingContext(options, scoped => api[command](scoped));
 }
 
 if (require.main === module) {

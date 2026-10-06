@@ -20,7 +20,7 @@ function parse(argv) {
 
 const output = service.guarded(() => {
   const { command, options } = parse(process.argv.slice(2));
-  return service[command](options);
+  return require('../hooks/governance/binding-context').withBindingContext(options, scoped => service[command](scoped));
 });
 process.stdout.write(`${JSON.stringify(output)}\n`);
 process.exitCode = ['PASS', 'NOT_APPLICABLE'].includes(output.status) ? 0

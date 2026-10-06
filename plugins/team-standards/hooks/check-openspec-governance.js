@@ -6,6 +6,7 @@ const { checkGovernance, runtime } = require('./forge/client');
 const { normalizeChanges } = require('./change-input');
 const { isExternalTemporaryFile } = require('./project-scope');
 const service = require('./governance/service');
+const { withBindingContext } = require('./governance/binding-context');
 const { repository, isExecutable } = require('./governance/repository');
 const { statePath, atomicUpdate, relativePath, MAX_BYTES, MAX_FILES, requireValue } = require('./governance/storage');
 
@@ -42,8 +43,10 @@ function handle(payload) {
       if (execution.code !== 0) return { status: 'NEEDS_WORK', strict: execution.enforcement === 'block', findings: [{ rule: 'EXECUTION_NOT_READY', message: execution.stderr }] };
       if (execution.legacyGovernanceRequired === false) return service.result('NOT_APPLICABLE');
       if (!hasConfig(cwd)) return service.result('NOT_APPLICABLE');
-      if (stop && (!session || !fs.existsSync(statePath(repo.root, session)))) return service.result('NOT_APPLICABLE');
-      return service.check({ repo: repo.root, session, phase: stop ? 'delivery' : 'preflight', files });
+      return withBindingContext({ repo: repo.root, session, phase: stop ? 'delivery' : 'preflight', files }, options => {
+        if (stop && !options.change && (!session || !fs.existsSync(statePath(repo.root, session)))) return service.result('NOT_APPLICABLE');
+        return service.check(options);
+      });
     });
     if (!['PASS', 'NOT_APPLICABLE'].includes(output.status)) outcomes.push(output);
   }
@@ -74,7 +77,11 @@ function nearestExisting(directory) {
 function stopDecision(payload, session, message) {
   const attempt = service.guarded(() => {
     const repo = repository(payload.cwd);
-    const current = atomicUpdate(statePath(repo.root, session), previous => ({ ...previous, retries: (previous?.retries || 0) + 1 }));
+    const current = withBindingContext({ repo: repo.root, session }, () => {
+      const file = statePath(repo.root, session);
+      requireValue(fs.existsSync(file), 'BINDING_REQUIRED', '当前 change 尚未完成设计绑定；先审阅并 bind，不重复测试');
+      return atomicUpdate(file, previous => ({ ...previous, retries: (previous?.retries || 0) + 1 }));
+    });
     return current.retries;
   });
   if (typeof attempt !== 'number' || attempt > 2) {
