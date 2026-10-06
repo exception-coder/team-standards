@@ -44,7 +44,31 @@ function liveWriter(repo, options) {
   }
   return { executionId: execution.executionId, session: options.session, change: options.change,
     taskId: execution.taskId, branch: repo.branch, head: repo.head, baselineHead: writer.baselineHead,
-    files, changeDir, scopeFingerprint: writer.scopeFingerprint };
+    files, changeDir, protectedPaths: writer.scopes.filter(scope => /^(?:file|module):/.test(scope))
+      .map(scope => scope.replace(/^(?:file|module):/, '')).sort(), scopeFingerprint: writer.scopeFingerprint };
+}
+
+// 共享分支的外部提交必须逐个声明完整 SHA；只审计，不把外部文件认领到当前切片。
+function range(repo, state, options, readRange) {
+  const external = [...new Set(options.externalCommits || [])];
+  need(external.every(commit => /^[a-f0-9]{40}(?:[a-f0-9]{24})?$/.test(commit)),
+    'DESIGN_EXTERNAL_COMMIT', '外部提交必须使用完整 commit ID');
+  if (state.base === repo.head) {
+    need(!options.files?.length && !external.length, 'DESIGN_RESUME_SCOPE', 'HEAD 未变化，不能声明不存在的提交');
+    return { commits: [], declared: [], externalCommits: [] };
+  }
+  const commits = repoApi.git(repo.root, ['rev-list', '--reverse', `${state.base}..${repo.head}`]).trim().split('\n');
+  need(external.every(commit => commits.includes(commit)), 'DESIGN_EXTERNAL_COMMIT', '外部提交不在当前续接范围');
+  const externalCommits = external.map(commit => ({ commit,
+    files: repoApi.changedFiles(repo.root, `${commit}^`, commit) }));
+  const externalFiles = [...new Set(externalCommits.flatMap(item => item.files))];
+  const declared = [...new Set(options.files || [])].sort();
+  need(!declared.some(file => externalFiles.includes(file)), 'DESIGN_EXTERNAL_COMMIT', '外部提交文件不能同时认领为当前切片');
+  const checked = readRange(repo, state, [...declared, ...externalFiles]);
+  need(checked.commits.filter(commit => !external.includes(commit)).every(commit =>
+    repoApi.changedFiles(repo.root, `${commit}^`, commit).every(file => declared.includes(file))),
+  'DESIGN_EXTERNAL_COMMIT', '遗漏外部提交或当前切片提交文件，必须逐个核对');
+  return { ...checked, declared, externalCommits };
 }
 
 function snapshot(repo, files) {
@@ -88,8 +112,13 @@ function build(repo, options, state, range) {
     && range.declared.every(file => owned.includes(file)),
   'DESIGN_WRITER_SCOPE', '遗漏 writer 已有改动或提交包含无关文件；显式核对完整范围');
   const inputs = [...new Set([...owned, ...referenced, ...Object.keys(context.artifacts)])].sort();
+  const protectedPaths = [...inputs, ...writer.files, ...writer.protectedPaths, writer.changeDir,
+    require('./baselines').REGISTRY];
+  need((range.externalCommits || []).every(item => item.files.every(file => !protectedPaths.some(scope =>
+    file === scope || file.startsWith(`${scope}/`) || scope.startsWith(`${file}/`)))),
+  'DESIGN_EXTERNAL_COMMIT', '外部提交触及当前 writer、设计输入或登记文件；不能按独立提交续接');
   return { kind: 'writer-recovery', change: options.change, from: state.base, to: repo.head,
-    commits: range.commits, files: range.declared, ownedFiles: owned, writer,
+    commits: range.commits, files: range.declared, externalCommits: range.externalCommits || [], ownedFiles: owned, writer,
     planDigest: hash(storage.readText(path.resolve(options.plan))),
     ...snapshot(repo, inputs), references, artifacts: context.artifacts,
     external: snapshot(repo, dirty.filter(file => !owned.includes(file))),
@@ -107,4 +136,4 @@ function verify(repo, options, recovery, plan, context) {
   equal(recovery.references, review(repo, options, plan, context));
 }
 
-module.exports = { build, verify };
+module.exports = { range, build, verify };

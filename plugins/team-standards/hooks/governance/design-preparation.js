@@ -196,9 +196,8 @@ function recoverWriter(options) {
   const state = storage.readJson(file);
   need(state.version === 1 && state.repo === repo.root && state.branch === repo.branch && state.session === options.session,
     'DESIGN_PREPARATION_STALE', '原准备记录与仓库、分支或会话不一致');
-  const range = state.base === repo.head ? { commits: [], declared: [] } : committedRange(repo, state, options.files);
-  need(state.base !== repo.head || !options.files?.length, 'DESIGN_RESUME_SCOPE', 'HEAD 未变化，不能声明不存在的提交文件');
   const writerRecovery = require('./writer-recovery');
+  const range = writerRecovery.range(repo, state, options, committedRange);
   const recovery = writerRecovery.build(repo, options, state, range);
   const plan = storage.readJson(path.resolve(options.plan));
   const registry = baselines.loadRegistry(repo.root);

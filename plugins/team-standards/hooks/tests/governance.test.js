@@ -950,6 +950,53 @@ test('writer recovery rejects a plan for a different current task', t => {
   assert.throws(f.recover, { rule: 'DESIGN_WRITER_TASK' });
 });
 
+function commitExternal(f, file = 'other/task.js') {
+  runGit(f.root, ['add', file]); runGit(f.root, ['commit', '-qm', 'independent task']);
+  f.workspace.head = repoApi.repository(f.root).head;
+  f.options.externalCommits = [f.workspace.head];
+}
+
+test('writer external commit is explicitly audited through CLI without claiming it or completing tasks', t => {
+  const f = writerFixture(t);
+  const run = require('../../skills/init-project-docs/scripts/design-baseline').run;
+  run(['prepare', '--root', f.root, '--session', f.options.session]);
+  commitExternal(f);
+  const args = ['recover-writer', '--root', f.root, '--session', f.options.session, '--change', change,
+    '--plan', f.options.plan, '--cli', f.options.cli, '--external-commit', f.workspace.head];
+  f.options.ownedFiles.forEach(file => args.push('--owned-file', file));
+  assert.equal(run(args).base, f.workspace.head);
+  require('../governance/binding-context').withBindingContext(f.options, options => {
+    const binding = storage.statePath(f.repo.root, options.session);
+    const audit = storage.readJson(path.join(path.dirname(binding), 'design-preparation', path.basename(binding)));
+    assert.equal(audit.origin, f.repo.head);
+    assert.deepEqual(audit.recovery.externalCommits, [{ commit: f.workspace.head, files: ['other/task.js'] }]);
+    assert.deepEqual(audit.recovery.files, []);
+    assert.equal(audit.recovery.ownedFiles.includes('other/task.js'), false);
+    assert.equal(service.bind(options).status, 'PASS');
+    assert.equal(service.check({ ...options, phase: 'preflight' }).status, 'PASS');
+    assert.equal(storage.readJson(binding).evidence, null);
+  });
+  assert.match(fs.readFileSync(path.join(f.root, changeDir, 'tasks.md'), 'utf8'), /\[ \] 1.1/);
+});
+
+for (const [name, mutate] of [
+  ['writer file', f => { commitExternal(f, 'src/greet.js'); }],
+  ['design input', f => { fs.appendFileSync(path.join(f.root, changeDir, 'design.md'), '\nAnother change.');
+    commitExternal(f, `${changeDir}/design.md`); }],
+  ['other file in writer module', f => { f.writer.scopes.push('module:src'); write(f.root, 'src/dependency.js', 'changed dependency');
+    commitExternal(f, 'src/dependency.js'); }],
+  ['omitted commit with the same file', f => { commitExternal(f); write(f.root, 'other/task.js', 'another commit'); commitExternal(f); }],
+  ['out of range commit', f => { commitExternal(f); f.options.externalCommits = [f.repo.head]; }],
+  ['duplicate ownership', f => { commitExternal(f); f.options.files = ['other/task.js']; }],
+]) {
+  test(`writer external commit rejects ${name} and preserves preparation`, t => {
+    const f = writerFixture(t); const original = fs.readFileSync(f.preparationFile); mutate(f);
+    assert.throws(f.recover, { rule: 'DESIGN_EXTERNAL_COMMIT' });
+    assert.deepEqual(fs.readFileSync(f.preparationFile), original);
+    assert.equal(fs.existsSync(f.bindingFile), false);
+  });
+}
+
 test('automatic migration synchronizes the current slice while preserving explicit legacy content gaps', t => {
   const f = fixture(t); enrollBaseline(f);
   const prepare = require('../governance/design-preparation');
