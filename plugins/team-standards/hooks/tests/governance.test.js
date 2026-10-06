@@ -950,6 +950,111 @@ test('writer recovery rejects a plan for a different current task', t => {
   assert.throws(f.recover, { rule: 'DESIGN_WRITER_TASK' });
 });
 
+test('canonical evidence output records repeatedly without self hashing and keeps source freshness', t => {
+  const f = fixture(t); const output = `${changeDir}/governance-evidence.json`;
+  f.plan.files.push(output); f.plan.views[0].files.push(output); f.plan.scenarios[0].files.push(output); f.save();
+  service.bind(f.options); implement(f);
+  const snapshot = service.snapshot(f.options);
+  assert.deepEqual(snapshot.excludedOutputs, [output]);
+  assert.equal(Object.hasOwn(snapshot.inputs, output), false);
+  service.record(f.options); assert.equal(service.check(f.options).status, 'PASS');
+  assert.equal(service.snapshot(f.options).inputFingerprint, snapshot.inputFingerprint);
+  service.record(f.options); assert.equal(service.check(f.options).status, 'PASS');
+  assert.ok(storage.readJson(storage.statePath(f.root, f.options.session)).plan.files.includes(output));
+  write(f.root, 'src/greet.js', 'changed source');
+  assert.throws(() => service.check(f.options), { rule: 'CODE_STALE' });
+});
+
+test('canonical evidence exclusion never ignores another JSON or accepts itself as a reference', t => {
+  const f = fixture(t); const other = `${changeDir}/verification.json`;
+  write(f.root, other, '{}'); runGit(f.root, ['add', other]); runGit(f.root, ['commit', '-qm', 'verification input']);
+  f.plan.files.push(other); f.plan.views[0].files.push(other); f.plan.scenarios[0].files.push(other); f.save();
+  service.bind(f.options); implement(f); service.record(f.options);
+  assert.ok(Object.hasOwn(service.snapshot(f.options).inputs, other));
+  write(f.root, other, '{"changed":true}');
+  assert.throws(() => service.check(f.options), { rule: 'CODE_STALE' });
+  f.plan.review.reference = { path: `${changeDir}/governance-evidence.json`, heading: '#' };
+  f.save();
+  assert.notEqual(service.guarded(() => service.bind(f.options)).status, 'PASS');
+});
+
+function boundWriterFixture(t) {
+  const f = writerFixture(t); f.recover(); service.bind(f.options);
+  runGit(f.root, ['add', 'src/greet.js', 'src/new.js']); runGit(f.root, ['commit', '-qm', 'previous implemented slice']);
+  f.workspace.head = repoApi.repository(f.root).head;
+  write(f.root, 'src/greet.js', 'current incomplete slice');
+  f.options.files = ['src/greet.js', 'src/new.js'];
+  f.plan.review.inputFingerprint = service.snapshot({ ...f.options, files: undefined, phase: 'preflight' }).inputFingerprint; f.save();
+  return { ...f, resume: () => f.preparation.resumeWriter(f.options) };
+}
+
+test('bound writer recovery resumes unfinished work without delivery and preserves old binding until bind', t => {
+  const f = boundWriterFixture(t); const old = fs.readFileSync(f.bindingFile);
+  assert.throws(() => f.preparation.resume(f.options), { rule: 'DESIGN_RESUME_EVIDENCE' });
+  assert.throws(f.recover, { rule: 'DESIGN_RECOVERY_BOUND' });
+  f.resume(); assert.deepEqual(fs.readFileSync(f.bindingFile), old);
+  const audit = storage.readJson(f.preparationFile);
+  assert.equal(audit.origin, f.repo.head);
+  assert.deepEqual(audit.recovery.previousBinding, JSON.parse(old));
+  assert.equal(audit.recovery.previousBinding.evidence, null);
+  assert.equal(service.bind(f.options).base, f.workspace.head);
+  assert.equal(service.check({ ...f.options, phase: 'preflight' }).status, 'PASS');
+  assert.equal(service.bind(f.options).base, f.workspace.head);
+  assert.equal(storage.readJson(f.bindingFile).evidence, null);
+  assert.throws(() => service.check(f.options), { rule: 'EVIDENCE_REQUIRED' });
+  assert.match(fs.readFileSync(path.join(f.root, changeDir, 'tasks.md'), 'utf8'), /\[ \] 1.1/);
+});
+
+test('bound writer recovery retries a pending checkpoint and retains clean historical files', t => {
+  const f = boundWriterFixture(t);
+  f.execution.files = ['src/greet.js']; f.writer.scopedPaths = ['src/greet.js', changeDir];
+  f.resume(); f.resume();
+  assert.equal(service.bind(f.options).status, 'PASS');
+  assert.ok(storage.readJson(f.bindingFile).plan.files.includes('src/new.js'));
+});
+
+for (const [name, mutate, rule] of [
+  ['scope shrink', f => { f.plan.files.pop(); f.save(); }, 'SCOPE_SHRINK'],
+  ['wrong change', f => { f.options.change = 'other-change'; }, 'DESIGN_RESUME_BINDING'],
+  ['branch drift', f => { runGit(f.root, ['checkout', '-qb', 'other']); }, 'DESIGN_PREPARATION_STALE'],
+  ['stale review', f => { write(f.root, 'src/greet.js', 'unreviewed'); }, 'REVIEW_INPUTS_STALE'],
+  ['dirty historical file outside current writer', f => { f.execution.files = ['src/new.js'];
+    f.writer.scopedPaths = ['src/new.js', changeDir]; }, 'DESIGN_WRITER_SCOPE'],
+]) {
+  test(`bound writer recovery rejects ${name} without changing either record`, t => {
+    const f = boundWriterFixture(t); const preparation = fs.readFileSync(f.preparationFile); const binding = fs.readFileSync(f.bindingFile);
+    mutate(f); assert.throws(f.resume, { rule });
+    assert.deepEqual(fs.readFileSync(f.preparationFile), preparation);
+    assert.deepEqual(fs.readFileSync(f.bindingFile), binding);
+  });
+}
+
+test('bound writer recovery refuses changed binding before checkpoint adoption', t => {
+  const f = boundWriterFixture(t); f.resume();
+  const current = storage.readJson(f.bindingFile); current.retries++;
+  write(path.dirname(f.bindingFile), path.basename(f.bindingFile), JSON.stringify(current));
+  assert.throws(() => service.bind(f.options), { rule: 'DESIGN_RECOVERY_STALE' });
+  assert.equal(storage.readJson(f.bindingFile).base, f.repo.head);
+});
+
+test('bound writer recovery permits formal upsert then reviewed adoption of a shared registry', t => {
+  const f = writerFixture(t, true); f.recover(); service.bind(f.options);
+  f.execution.files.push(baselines.REGISTRY); f.writer.scopedPaths.push(baselines.REGISTRY);
+  runGit(f.root, ['add', 'src/greet.js', 'src/new.js']); runGit(f.root, ['commit', '-qm', 'previous slice']);
+  f.workspace.head = repoApi.repository(f.root).head; f.options.files = ['src/greet.js', 'src/new.js'];
+  const other = storage.readJson(path.join(f.root, baselines.REGISTRY)).modules[1];
+  f.preparation.resumeWriter(f.options);
+  f.preparation.upsert({ root: f.root, session: f.options.session, module: 'greeting', codeVersion: 'current reviewed slice',
+    migrationReason: 'Current slice is reviewed; legacy content mapping remains explicit.', migrationDue: 'before module delivery' });
+  f.plan.files.push(baselines.REGISTRY); f.plan.views[0].files.push(baselines.REGISTRY); f.plan.scenarios[0].files.push(baselines.REGISTRY);
+  f.options.ownedFiles.push(baselines.REGISTRY); f.save();
+  f.plan.review.inputFingerprint = service.snapshot({ ...f.options, files: undefined, phase: 'preflight' }).inputFingerprint; f.save();
+  f.preparation.resumeWriter(f.options);
+  assert.equal(service.bind(f.options).status, 'PASS');
+  assert.equal(service.check({ ...f.options, phase: 'preflight' }).status, 'PASS');
+  assert.deepEqual(storage.readJson(path.join(f.root, baselines.REGISTRY)).modules[1], other);
+});
+
 function commitExternal(f, file = 'other/task.js') {
   runGit(f.root, ['add', file]); runGit(f.root, ['commit', '-qm', 'independent task']);
   f.workspace.head = repoApi.repository(f.root).head;

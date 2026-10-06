@@ -70,6 +70,20 @@ Forge Runtime 的 `WAITING_USER` 与兼容绑定分别处理。按用户已授�
 
 ## 实施、同步与交付
 
+### 已有绑定的开发续接
+
+4.10.13 的 `resume-writer` 处理已有兼容绑定、真实 writer 仍在开发、HEAD 已前移或外部现场变化的状态。`resume` 继续用于已有新鲜 delivery 的已提交切片；不能让未完成任务先勾选或先取得 delivery 才恢复开发。
+
+命令参数与 `recover-writer` 相同：原 session/change、当前具名审阅计划、逐个 owned-file、当前切片的 committed file 及逐个 external-commit。保留旧 plan.files；历史绑定中的文件只有在当前 HEAD 干净时才能保留而不要求当前 writer 再次认领，当前未提交文件仍必须有实时写入权。入口锁定原绑定，原子更新准备检查点并保存旧绑定、旧证据正文、原点和续接审计；只有后续 bind 重新核验成功才采用新检查点并清空交付指针，失败不覆盖原绑定。
+
+设计登记按 `resume-writer → upsert → 当前计划审阅/snapshot → resume-writer → bind → preflight` 处理受影响输入。upsert 造成输入或登记变化后重新审阅；尚未消费的检查点可正式重试，不删除原记录。共享 registry 可保留为外部脏文件；只有正式 upsert 合并目标模块、当前登记摘要一致且计划明确包含该模块后，才能纳入本次文件范围，其他模块内容保留。
+
+### 规范证据输出的输入边界
+
+仅当前 change 的 `openspec/changes/<change>/governance-evidence.json` 属于规范输出。它仍保留在 plan.files 与审计中，但 snapshot、审阅/验证输入指纹、record、delivery 和 CI 的源输入计算排除此文件，防止输出包含自身摘要。snapshot 明列 excludedOutputs；新 record 写入 source-inputs-v1 标记。其他 JSON、源码、设计和规格照常核验，规范输出也不能作为自己的设计、审阅或验证来源。
+
+旧含自引用的证据不会自动升级为 PASS。重新审阅当前源输入，按实际验证更新关联指纹后正式 record，再执行 delivery；已有证据正文随开发续接保存供审计。不得只替换摘要冒充审阅或测试。
+
 Agent 在实现过程中维护本次目标与发现；独立切片完成真实验证后更新功能全景、对应详设、接受的规格和证据关联，再以相同 session upsert 更新受影响模块的索引与代码范围。已有严格模块不能降级为 migrate。
 
 交付前由 delivery-verification 核对：本次新增/更新/删除功能是否都处理、正文与规格及实际结果是否一致、剩余缺口是否真实。使用 snapshot 获取完成审阅时的内容摘要，记录具名审阅，再 record/check。归档时复核完整性，不能把独立切片完成当作整个 change 自动归档。

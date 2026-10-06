@@ -78,12 +78,12 @@ function snapshot(repo, files) {
 
 function review(repo, options, plan, context) {
   const references = require('./evidence').validatePlan(repo.root, plan, context, 'preflight', repo.head);
-  need(plan.review.inputFingerprint === hash(JSON.stringify(fingerprints(repo.root, plan.files))),
+  need(plan.review.inputFingerprint === hash(JSON.stringify(require('./evidence-inputs').fingerprints(repo.root, context, plan.files))),
     'REVIEW_INPUTS_STALE', '重新审阅当前开发输入并记录 snapshot.inputFingerprint；无需宣称任务完成');
   return references;
 }
 
-function build(repo, options, state, range) {
+function build(repo, options, state, range, previousBinding = null) {
   const writer = liveWriter(repo, options);
   const plan = storage.readJson(path.resolve(options.plan));
   const openspec = require('./openspec');
@@ -102,13 +102,17 @@ function build(repo, options, state, range) {
   });
   const referenced = Object.keys(references).map(key => key.replace(/^(?:baseline|content):/, '').split('#')[0]);
   const allowed = new Set([...plan.files, ...referenced, ...Object.keys(context.artifacts)]);
+  const dirty = repoApi.changedFiles(repo.root, repo.head, undefined,
+    [...writer.files, writer.changeDir, ...(previousBinding?.plan.files || []), ...Object.keys(state.initial)]);
   const writerOwns = file => writer.files.includes(file) || file.startsWith(`${writer.changeDir}/`);
-  need(owned.length > 0 && owned.every(file => writerOwns(file) && allowed.has(file))
+  // 历史切片保留在绑定中；当前 writer 未取得其写入权时，只能续接 HEAD 中的干净文件。
+  const retained = file => previousBinding?.plan.files.includes(file) && !dirty.includes(file);
+  need(owned.length > 0 && owned.every(file => (writerOwns(file) || retained(file)) && allowed.has(file))
     && plan.files.every(file => owned.includes(file)),
   'DESIGN_WRITER_SCOPE', '认领文件须同时属于实时 writer 和当前审阅计划；不得混入其他任务');
-  const dirty = repoApi.changedFiles(repo.root, repo.head, undefined,
-    [...writer.files, writer.changeDir, ...Object.keys(state.initial)]);
-  need(dirty.filter(writerOwns).every(file => owned.includes(file))
+  const registryFile = require('./baselines').REGISTRY;
+  const sharedRegistry = Object.hasOwn(state.initial, registryFile) && !plan.files.includes(registryFile);
+  need(dirty.filter(file => writerOwns(file) && !(sharedRegistry && file === registryFile)).every(file => owned.includes(file))
     && range.declared.every(file => owned.includes(file)),
   'DESIGN_WRITER_SCOPE', '遗漏 writer 已有改动或提交包含无关文件；显式核对完整范围');
   const inputs = [...new Set([...owned, ...referenced, ...Object.keys(context.artifacts)])].sort();

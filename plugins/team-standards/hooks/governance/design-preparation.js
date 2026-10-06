@@ -73,7 +73,7 @@ function resume(options) {
   need(binding.session === options.session && binding.base === state.base && binding.change === options.change,
     'DESIGN_RESUME_BINDING', '原会话绑定、change 或检查点不一致');
   need(binding.evidence && service.guarded(() => service.check({ repo: repo.root, session: options.session, phase: 'delivery' })).status === 'PASS',
-    'DESIGN_RESUME_EVIDENCE', '原切片交付证据缺失或过期');
+    'DESIGN_RESUME_EVIDENCE', '原切片交付证据缺失或过期；已有真实 writer 的未完成开发使用显式 resume-writer');
   const owned = new Set([...binding.plan.files, ...Object.keys(binding.context.artifacts),
     ...Object.keys(binding.references), ...(binding.plan.baselines || []).flatMap(item => item.reference ? [item.reference.path] : []),
     binding.evidence]);
@@ -170,7 +170,7 @@ function recover(options) {
 
 function validateState(repo, state, targets = []) {
   need(state?.version === 1 && state.repo === repo.root && state.branch === repo.branch && state.base === repo.head,
-    'DESIGN_PREPARATION_STALE', '准备记录的仓库、分支或 HEAD 已变化；保留现场并在独立任务中重新核对');
+    'DESIGN_PREPARATION_STALE', '准备记录的仓库、分支或 HEAD 已变化；保留现场，按真实 writer 开发续接或已交付 resume 核对');
   for (const file of targets) if (Object.hasOwn(state.initial, file)) {
     const digest = state.initial[file];
     need(fingerprint(repo.root, file) === digest, 'DESIGN_INITIAL_CHANGED', `起始已有改动发生变化：${file}；先分离任务，不覆盖他人内容`);
@@ -186,27 +186,56 @@ function readPreparation(repo, session, targets = []) {
   return state;
 }
 
-function recoverWriter(options) {
+function recoverWriter(options, resumeBound = false) {
   need(text(options.session) && text(options.change) && text(options.plan),
     'DESIGN_RECOVERY_INPUT', '开发恢复需要原真实会话、当前 change 和已审阅计划');
   const repo = repoApi.repository(options.root);
   const file = stateFile(repo.root, options.session);
   need(fs.existsSync(file), 'DESIGN_PREPARATION_REQUIRED', '先 prepare 保存当前现场；既有记录不得删除');
-  need(!fs.existsSync(statePath(repo.root, options.session)), 'DESIGN_RECOVERY_BOUND', '已有绑定使用正常 rebind/resume');
+  const bindingFile = statePath(repo.root, options.session);
+  need(resumeBound || !fs.existsSync(bindingFile), 'DESIGN_RECOVERY_BOUND', '已有绑定使用 resume-writer 开发续接或已交付 resume');
+  const previousBinding = resumeBound ? storage.readJson(bindingFile) : null;
   const state = storage.readJson(file);
   need(state.version === 1 && state.repo === repo.root && state.branch === repo.branch && state.session === options.session,
     'DESIGN_PREPARATION_STALE', '原准备记录与仓库、分支或会话不一致');
-  const writerRecovery = require('./writer-recovery');
-  const range = writerRecovery.range(repo, state, options, committedRange);
-  const recovery = writerRecovery.build(repo, options, state, range);
   const plan = storage.readJson(path.resolve(options.plan));
+  if (previousBinding) {
+    need(previousBinding.schemaVersion === storage.VERSION && previousBinding.policyVersion === storage.POLICY_VERSION
+      && previousBinding.repo === repo.root && previousBinding.branch === repo.branch
+      && previousBinding.session === options.session && previousBinding.change === options.change
+      && (previousBinding.base === state.base || state.recovery?.kind === 'bound-writer-recovery'
+        && state.recovery.previousBindingDigest === storage.hash(JSON.stringify(previousBinding))
+        && state.recovery.from === previousBinding.base),
+    'DESIGN_RESUME_BINDING', '原绑定、准备检查点、真实会话和 change 必须一致');
+    need(previousBinding.plan.files.every(file => plan.files.includes(file)), 'SCOPE_SHRINK', '开发续接必须保留原绑定范围');
+  }
+  const writerRecovery = require('./writer-recovery');
+  const rangeState = previousBinding ? { ...state, base: previousBinding.base } : state;
+  const range = writerRecovery.range(repo, rangeState, options, committedRange);
+  const recovery = writerRecovery.build(repo, options, rangeState, range, previousBinding);
+  if (previousBinding) {
+    recovery.kind = 'bound-writer-recovery';
+    recovery.previousBinding = previousBinding;
+    recovery.previousBindingDigest = storage.hash(JSON.stringify(previousBinding));
+    const output = require('./evidence-inputs').output({ change: options.change });
+    if (output && fs.existsSync(safePath(repo.root, output))) {
+      recovery.previousEvidence = { path: output, content: storage.readText(safePath(repo.root, output)) };
+    }
+    recovery.id = storage.hash(JSON.stringify(recovery));
+  }
   const registry = baselines.loadRegistry(repo.root);
   const modules = [...new Set((plan.baselines || []).map(item => item.module))];
+  if (recovery.ownedFiles.includes(baselines.REGISTRY) && Object.hasOwn(state.initial, baselines.REGISTRY)) {
+    need(modules.some(module => state.ownedModules?.includes(module))
+      && fingerprint(repo.root, baselines.REGISTRY) === state.registryHash,
+    'DESIGN_DIRTY_REGISTRY', '已有共享登记改动须先由正式 upsert 合并目标模块，再审阅和认领登记文件');
+  }
   // 共享登记文件可以已有其他模块修改；只确认本切片条目未被其他任务改写。
   modules.forEach(module => verifyInitialModule(repo, state, registry, module));
   const updated = atomicUpdate(file, current => {
     need(JSON.stringify(current) === JSON.stringify(state), 'DESIGN_PREPARATION_CONCURRENT', '原准备记录并行变化');
-    need(!fs.existsSync(statePath(repo.root, options.session)), 'DESIGN_RECOVERY_BOUND', '恢复期间建立了绑定');
+    need(previousBinding ? storage.hash(JSON.stringify(storage.readJson(bindingFile))) === recovery.previousBindingDigest
+      : !fs.existsSync(bindingFile), 'DESIGN_RECOVERY_BOUND', '恢复期间绑定发生变化');
     need(repoApi.repository(repo.root).head === repo.head, 'DESIGN_RECOVERY_STALE', '恢复期间 HEAD 变化');
     const context = require('./openspec').loadContext(repo.root, options.change, options);
     writerRecovery.verify(repo, options, recovery, plan, context);
@@ -220,6 +249,22 @@ function recoverWriter(options) {
   return { origin: updated.origin, base: updated.base, change: options.change, executionId: recovery.writer.executionId,
     phase: 'preflight', ownedFiles: recovery.ownedFiles.length, externalDirty: Object.keys(updated.initial).length,
     next: '同一真实会话 bind 并检查 preflight 后继续开发；交付仍须完成任务、实际验证并 record' };
+}
+
+function resumeWriter(options) {
+  const repo = repoApi.repository(options.root);
+  const file = statePath(repo.root, options.session);
+  need(fs.existsSync(file), 'BINDING_REQUIRED', '已有绑定的开发续接需要原绑定；未绑定使用 recover-writer');
+  // 只锁定并读取原绑定；准备检查点原子写入，原绑定直到 bind 成功才更新。
+  const lock = `${file}.lock`;
+  let descriptor;
+  try { descriptor = fs.openSync(lock, 'wx'); }
+  catch (error) {
+    if (error.code !== 'EEXIST') throw error;
+    need(false, 'STATE_BUSY', '原绑定正在更新，稍后重新读取再续接');
+  }
+  try { return recoverWriter(options, true); }
+  finally { fs.closeSync(descriptor); fs.unlinkSync(lock); }
 }
 
 function readCheckpoint(repo, session) {
@@ -313,4 +358,4 @@ function bindingPreparation(repo, session, targets, current) {
     && (file !== baselines.REGISTRY || state.recovery?.kind === 'writer-recovery'))), base: state.base };
 }
 
-module.exports = { discover, prepare, resume, recover, recoverWriter, upsert, bindingPreparation, readCheckpoint };
+module.exports = { discover, prepare, resume, recover, recoverWriter, resumeWriter, upsert, bindingPreparation, readCheckpoint };

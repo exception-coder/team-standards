@@ -5,8 +5,8 @@ const { requireValue } = require('../../../hooks/governance/storage');
 
 function run(argv) {
   const [command, ...args] = argv;
-  requireValue(['discover', 'prepare', 'resume', 'recover', 'recover-writer', 'upsert'].includes(command), 'DESIGN_COMMAND',
-    '命令：discover | prepare | resume | recover | recover-writer | upsert');
+  requireValue(['discover', 'prepare', 'resume', 'recover', 'recover-writer', 'resume-writer', 'upsert'].includes(command), 'DESIGN_COMMAND',
+    '命令：discover | prepare | resume | recover | recover-writer | resume-writer | upsert');
   const names = { root: 'root', session: 'session', module: 'module', scope: 'scopes', capability: 'capabilities', owner: 'owner',
     overview: 'overview', 'overview-heading': 'overviewHeading', detailed: 'detailed', 'detailed-heading': 'detailedHeading',
     'code-version': 'codeVersion', content: 'content', 'migration-reason': 'migrationReason', 'migration-due': 'migrationDue',
@@ -19,7 +19,7 @@ function run(argv) {
     else options[key] = args[i + 1];
   }
   return require('../../../hooks/governance/binding-context').withBindingContext(options,
-    scoped => api[command === 'recover-writer' ? 'recoverWriter' : command](scoped));
+    scoped => api[({ 'recover-writer': 'recoverWriter', 'resume-writer': 'resumeWriter' })[command] || command](scoped));
 }
 
 if (require.main === module) {

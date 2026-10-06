@@ -47,3 +47,5 @@ SessionStart 注册只证明适配器存在。支持该事件的宿主可注入�
 自动推进遇到绑定缺失或 `SCOPE_GAP`，先核对 Runtime change 与写入执行，再审阅当前 task 的实际文件、相关设计和既有计划。归属明确时主动准备当前 change、更新计划并 bind，执行必要的设计检查后继续；已有本地测试仅在输入指纹仍有效时复用。不得为消除范围错误盲目扩大到全仓，也不得把实际设计缺口当作绑定错误跳过。
 
 真实 writer 已有未提交改动、任务未完成且缺兼容绑定时，使用 [recover-writer 开发恢复](automatic-design-maintenance.md#真实-writer-的开发恢复)：实时核对身份、精确文件范围与当前设计审阅，恢复后重新 bind/preflight。不要要求先提交或先完成 task 才恢复开发绑定。已提交且已验证的切片仍使用 resume，缺绑定但已有当前交付证据的旧状态可用 recover。Runtime 已进入 WAITING_USER 时，在用户授权恢复后使用宿主的原运行 resume 动作；进度上报的 HTTP 409 不等于新的代码或设计缺口。
+
+已有兼容绑定但尚未交付时，使用 [resume-writer](automatic-design-maintenance.md#已有绑定的开发续接)，保留历史范围和旧记录，核验当前 writer 后续接开发。规范 governance-evidence.json 是输出，4.10.13 的 snapshot/record 按源输入计算指纹；旧自引用证据仍需实际审阅、验证关联和新 record，不能自动当作 PASS。

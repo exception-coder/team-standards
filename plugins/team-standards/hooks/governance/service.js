@@ -5,6 +5,7 @@ const storage = require('./storage');
 const repoApi = require('./repository');
 const openspec = require('./openspec');
 const baselines = require('./baselines');
+const inputApi = require('./evidence-inputs');
 const { validatePlan } = require('./evidence');
 const { checkEnrolled } = require('../../state-contract/enrollment');
 const { requireValue, VERSION, POLICY_VERSION, CHECKER_VERSION, readJson, statePath, fingerprints, atomicUpdate, safePath } = storage;
@@ -44,8 +45,19 @@ function bind(options) {
   const current = executableScope(changed, context);
   const file = statePath(repo.root, options.session);
   const binding = atomicUpdate(file, previous => {
+    const preparation = require('./design-preparation').readCheckpoint(repo, options.session);
+    const recovery = preparation?.recovery;
+    const writerResumed = previous && recovery?.kind === 'bound-writer-recovery'
+      && previous.recoveryCheckpoint !== recovery.id;
+    if (writerResumed) {
+      requireValue(preparation.repo === repo.root && preparation.branch === repo.branch
+        && preparation.session === options.session && preparation.base === repo.head
+        && recovery.from === previous.base && recovery.to === repo.head
+        && recovery.previousBindingDigest === storage.hash(JSON.stringify(previous)),
+      'DESIGN_RECOVERY_STALE', '开发续接检查点或原绑定已经变化');
+      require('./writer-recovery').verify(repo, options, recovery, plan, context);
+    }
     if (!previous) {
-      const recovery = require('./design-preparation').readCheckpoint(repo, options.session)?.recovery;
       if (recovery) {
         requireValue(recovery.change === options.change && recovery.to === repo.head
           && recovery.planDigest === storage.hash(storage.readText(path.resolve(options.plan))),
@@ -67,22 +79,25 @@ function bind(options) {
     if (previous) {
       requireValue(previous.schemaVersion === VERSION && [1, 2, 3, 4, POLICY_VERSION].includes(previous.policyVersion),
         'VERSION_MISMATCH', '仅支持已知同结构策略绑定迁移，不能覆盖未知版本');
-      repoApi.verifyBaseline(repo, previous);
+      if (!writerResumed) repoApi.verifyBaseline(repo, previous);
       requireValue(previous.change === (options.change || null), 'REBIND_CONFLICT', '同一会话已有不同 change 绑定，不按最近修改时间替换');
       requireValue(previous.plan.files.every(item => plan.files.includes(item)), 'SCOPE_SHRINK', '不能通过缩小范围排除已绑定改动');
     }
-    const preparation = require('./design-preparation').readCheckpoint(repo, options.session);
-    const resumed = previous && preparation?.repo === repo.root && preparation.branch === repo.branch
+    const resumed = !writerResumed && previous && preparation?.repo === repo.root && preparation.branch === repo.branch
       && preparation.session === options.session && preparation.base === repo.head && previous.base !== repo.head;
     if (resumed) {
       requireValue(preparation.checkpoints?.at(-1)?.from === previous.base
         && preparation.checkpoints.at(-1).to === repo.head && previous.evidence,
         'DESIGN_RESUME_BINDING', '续接检查点与原绑定不一致');
     }
-    const initial = resumed ? preparation.initial : previous?.initial || options.designPreparation?.initial || fingerprints(repo.root, current);
+    const initial = writerResumed ? recovery.external.inputs
+      : resumed ? preparation.initial : previous?.initial || options.designPreparation?.initial || fingerprints(repo.root, current);
     requireValue(plan.files.every(item => !Object.hasOwn(initial, item)), 'DIRTY_OWNERSHIP', '范围含任务开始前的脏文件；请先分离改动，不覆盖他人基线');
     return { schemaVersion: VERSION, policyVersion: POLICY_VERSION, repo: repo.root, branch: repo.branch,
-      base: resumed ? repo.head : previous?.base || repo.head, initial, change: options.change || null, session: options.session,
+      base: resumed || writerResumed ? repo.head : previous?.base || repo.head,
+      origin: previous?.origin || previous?.base || repo.head,
+      recoveryCheckpoint: writerResumed ? recovery.id : previous?.recoveryCheckpoint,
+      initial, change: options.change || null, session: options.session,
       context, plan, references, retries: previous?.retries || 0, evidence: null };
   });
   return result('PASS', [], { change: binding.change, base: binding.base, binding: file });
@@ -146,7 +161,7 @@ function record(options) {
   const evidence = { schemaVersion: VERSION, policyVersion: POLICY_VERSION, checkerVersion: CHECKER_VERSION, phase,
     bindingId: storage.hash(`${repo.root}\n${options.session}`),
     change: binding.change, base: binding.base, context, plan, references,
-    inputs: fingerprints(repo.root, plan.files) };
+    inputPolicy: 'source-inputs-v1', inputs: inputApi.fingerprints(repo.root, context, plan.files) };
   const destination = binding.change ? `${context.changeDir}/governance-evidence.json`
     : `.team-standards/evidence/${storage.hash(options.session)}.json`;
   atomicUpdate(safePath(repo.root, destination), previous => {
@@ -167,7 +182,7 @@ function verifyEvidence(root, evidence, phase) {
   requireValue(evidence.change === evidence.context.change, 'EVIDENCE_CHANGE', '证据与工件 change 不匹配');
   validateSmallChange(root, evidence.plan, evidence.context, evidence.base);
   requireValue(phase !== 'archive' || evidence.phase === 'archive', 'ARCHIVE_EVIDENCE', '归档检查缺少同步及长期设计晋升证据', 'NEEDS_WORK');
-  compareFingerprints(evidence.inputs, fingerprints(root, evidence.plan.files), 'CODE_STALE');
+  compareFingerprints(evidence.inputs, inputApi.fingerprints(root, evidence.context, evidence.plan.files), 'CODE_STALE');
   compareFingerprints(evidence.context.artifacts, fingerprints(root, Object.keys(evidence.context.artifacts)), 'ARTIFACTS_STALE');
   compareFingerprints(evidence.references, validatePlan(root, evidence.plan, evidence.context, phase, evidence.base), 'REVIEW_STALE');
 }
@@ -183,7 +198,7 @@ function checkCi(options) {
   requireValue(evidence.base === base, 'CI_BASE_MISMATCH', '证据基线与交付基线不同，请重新核验范围');
   const changed = executableScope(repoApi.changedFiles(repo.root, base, head), evidence.context);
   requireValue(changed.every(file => evidence.plan.files.includes(file)), 'CI_SCOPE_GAP', '存在未被当前 change 证据覆盖的可执行变化', 'NEEDS_WORK');
-  compareFingerprints(evidence.inputs, repoApi.revisionFingerprints(repo.root, head, evidence.plan.files), 'CI_INPUTS');
+  compareFingerprints(evidence.inputs, repoApi.revisionFingerprints(repo.root, head, inputApi.files(evidence.context, evidence.plan.files)), 'CI_INPUTS');
   verifyEvidence(repo.root, evidence, options.phase || 'delivery');
   return result('PASS', [], { phase: options.phase || 'delivery', base, head, change: evidence.change });
 }
@@ -205,11 +220,12 @@ function snapshot(options) {
   const binding = planning ? { plan: readJson(options.plan) } : readBinding(repo, options.session);
   if (planning) {
     const context = loadContext(repo.root, options.change, binding.plan, options);
+    binding.context = context;
     validatePlan(repo.root, binding.plan, context, 'preflight', repo.head);
   } else checkRange(repo, binding);
   const files = options.files ? (Array.isArray(options.files) ? options.files : options.files.split(',')) : binding.plan.files;
   requireValue(files.every(file => binding.plan.files.includes(file)), 'SNAPSHOT_SCOPE', 'snapshot 输入必须属于绑定范围');
-  const inputs = fingerprints(repo.root, files);
+  const inputs = inputApi.fingerprints(repo.root, binding.context, files);
   const baselineApi = require('./baselines');
   const registry = baselineApi.loadRegistry(repo.root);
   const contentFingerprints = {};
@@ -217,6 +233,7 @@ function snapshot(options) {
     if (module.content?.mode === 'enforce') contentFingerprints[module.id] = require('./design-content').fingerprint(repo.root, module);
   }
   return result('PASS', [], { inputs, inputFingerprint: storage.hash(JSON.stringify(inputs)),
+    excludedOutputs: files.filter(file => file === inputApi.output(binding.context)),
     contentFingerprints,
     note: '只读取验证输入；未执行测试或审阅，须在实际验证时关联本结果' });
 }

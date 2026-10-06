@@ -1,5 +1,5 @@
 // 场景、设计视图和验证记录的结构检查；语义结论始终属于具名审阅者。
-const { readText, safePath, hash, requireValue, MAX_FILES, fingerprints } = require('./storage');
+const { readText, safePath, hash, requireValue, MAX_FILES } = require('./storage');
 
 const VIEW_IDS = ['implementation', 'contracts', 'data', 'workflow', 'async', 'runtime', 'architecture', 'ui'];
 
@@ -90,7 +90,7 @@ function validateScenarios(root, plan, remember, delivery) {
   'SCENARIO_COVERAGE', '存在没有场景映射的文件或任务', 'NEEDS_WORK');
 }
 
-function validateReview(root, plan, remember, delivery) {
+function validateReview(root, plan, remember, delivery, context) {
   requireValue(plan.review && ['agent', 'human', 'independent'].includes(plan.review.type)
     && text(plan.review.actor) && plan.review.result === 'PASS', 'REVIEW_REQUIRED', '缺少具名审阅及通过结论', 'NEEDS_WORK');
   remember(reference(root, plan.review.reference));
@@ -106,7 +106,8 @@ function validateReview(root, plan, remember, delivery) {
     requireValue(plan.handoff.blockers.length === 0, 'SLICE_BLOCKED', '当前切片仍有阻塞；请先解决或分离独立切片', 'NEEDS_WORK');
   }
   if (!delivery) return;
-  const inputFingerprint = hash(JSON.stringify(fingerprints(root, plan.files)));
+  const inputApi = require('./evidence-inputs');
+  const inputFingerprint = hash(JSON.stringify(inputApi.fingerprints(root, context, plan.files)));
   requireValue(plan.review.inputFingerprint === inputFingerprint, 'REVIEW_INPUTS_STALE',
     '审阅未覆盖当前代码；复核后记录当时的 snapshot.inputFingerprint', 'NEEDS_WORK');
   requireValue(Array.isArray(plan.verifications) && plan.verifications.length > 0, 'VERIFICATION_REQUIRED', '缺少实际验证结果', 'NEEDS_WORK');
@@ -118,7 +119,8 @@ function validateReview(root, plan, remember, delivery) {
     const files = item.files || plan.files;
     requireValue(Array.isArray(files) && files.length > 0 && files.every(file => plan.files.includes(file)),
       'VERIFICATION_SCOPE', '验证输入范围必须属于当前切片', 'NEEDS_WORK');
-    const expected = hash(JSON.stringify(fingerprints(root, files)));
+    requireValue(inputApi.files(context, files).length > 0, 'VERIFICATION_SCOPE', '验证必须覆盖源输入，不能只声明规范证据输出');
+    const expected = hash(JSON.stringify(inputApi.fingerprints(root, context, files)));
     requireValue(item.inputFingerprint === expected, 'VERIFICATION_INPUTS_STALE',
       '验证输入已变化；重新验证后记录当时的 snapshot.inputFingerprint，不能仅重新 record', 'NEEDS_WORK');
     remember(reference(root, item.reference, true));
@@ -130,11 +132,15 @@ function validateReview(root, plan, remember, delivery) {
 function validatePlan(root, plan, context, phase, base) {
   const delivery = phase !== 'preflight';
   const references = {};
-  const remember = ({ key, digest }) => { references[key] = digest; };
+  const remember = ({ key, digest }) => {
+    requireValue(key.replace(/^(?:baseline|content):/, '').split('#')[0] !== require('./evidence-inputs').output(context),
+      'EVIDENCE_SELF_REFERENCE', '规范证据输出不能作为设计、审阅或验证来源');
+    references[key] = digest;
+  };
   validateScope(plan, context.tasks);
   validateViews(root, plan, remember);
   validateScenarios(root, plan, remember, delivery);
-  validateReview(root, plan, remember, delivery);
+  validateReview(root, plan, remember, delivery, context);
   require('./baselines').validateBaselines(root, plan, context, phase, base, remember);
   if (delivery) requireValue(plan.taskIds.every(id => context.tasks.find(task => task.id === id)?.done === true),
     'TASKS_INCOMPLETE', '本次切片的 OpenSpec tasks 尚未完成', 'NEEDS_WORK');
