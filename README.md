@@ -1,10 +1,12 @@
 # team-standards
 
+4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
+
 4.4.0 将概设/详设维护接入普通开发任务：Agent 自动发现、补建、绑定与同步，不要求用户手工初始化。已有正文原位复用，准备记录保护初始脏文件与并行绑定；同一真实会话完成已验证切片提交后，可显式续接检查点，旧会话缺绑定时可核验当前证据后恢复。未启用 OpenSpec 的项目支持本地验收引用。见[自动执行流程](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)及[实际试点与验证](docs/maintenance/automatic-design-release.md)。
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.10.13**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.11.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.10.13 增加已绑定真实 Forge writer 的 `resume-writer` 开发续接：HEAD 推进且任务尚未完成时，核对实时归属、提交范围及当前审阅后建立检查点，再重新绑定。缺绑定时沿用 `recover-writer`。规范证据输出保留在归属范围中，但不再参与自身输入摘要；原始记录、其他任务改动和交付验收要求保留，自动监督仍由 Forge 的原运行恢复动作控制。
 
@@ -42,7 +44,7 @@ OpenSpec 治理命令默认等待 30 秒，慢环境可通过 `TEAM_STANDARDS_OP
 - 修改宿主事件/载荷：Hook；CLI 传输在 `hooks/forge/client.js`。
 - 旧 runtime 私有状态兼容只留在 `hooks/forge/legacy-v1.js`，历史设计审阅检查继续保留。
 
-新增只读 `session_init`、`resolve_execution_context` 和统一 `check_execution_event`；SessionStart 已注册，实际宿主触发仍需独立验收。配置、可调用、授权与强制覆盖分别报告；v2 连接故障默认失败关闭，旧 runtime 保留 v1 路径。不自动升级安装、迁移历史状态或重启服务。
+新增只读 `session_init`、`resolve_execution_context` 和统一 `check_execution_event`；SessionStart 历史适配器保留，但默认安装不再注册；项目按需接线。配置、可调用、授权与强制覆盖分别报告；v2 连接故障默认失败关闭，旧 runtime 保留 v1 路径。不自动升级安装、迁移历史状态或重启服务。
 
 ## 主流程
 
@@ -93,7 +95,7 @@ flowchart TD
 | 知识文档 | `backend-evidence` | 单服务数据事实、Graphify 即时影响、领域规格与查询性能 |
 | 知识文档 | `markdown-writing-standards` | 写前查重、Markdown/Mermaid 和写后索引 |
 | 知识文档 | `init-project-docs` | 在当前目录幂等初始化 Agent、文档索引、OpenSpec、`.graphifyignore` 与 Graphify Git 共享边界，再编排上下文状态 |
-| 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，有限修复并以最新 PASS 放行 Done |
+| 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，按影响验证并如实报告通过、失败或未验证 |
 | 日志交付 | `git-commit-standards` | 按最小完整逻辑单元实现、验证、提交；正文讲清原问题、关键做法与实际结果，独立判断 push |
 
 ---
@@ -137,7 +139,7 @@ coding-standards-common              所有源码修改的公共基线
 
 4.6.0 完善[已有规格解析](plugins/team-standards/skills/change-readiness/references/existing-spec-resolution.md)：本机自动发现 Forge CLI，按宿主 session 绑定项目、分支与 change，支持 Codex apply_patch/exec_command；提交前检查已确认文件范围，归档后刷新索引。模型草稿仍需审阅。默认 warn，配置和宿主覆盖边界见该协议。
 
-OpenSpec 文档推进增加阶段准出、专家意见回写、概设详设和续跑交接，并提供共享治理检查器。新增检查默认 `warn` 试运行，保留原门禁；通过项目宿主验收后设置 `TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK=block`，按会话绑定 change 和文件范围，真实验证后记录内容指纹，写前/Stop/CI 使用同一检查结果。Stop 补齐最多两轮，退出循环仍可能未完成。详见 [治理检查器协议与当前支持边界](plugins/team-standards/skills/change-readiness/references/governance-checker.md)。
+开发准备与交付默认由 Skill 引导。历史共享治理检查器仍支持绑定、范围和证据核对，但仅供项目主动采用；安装插件不再启动写前、提交前或 Stop 的规格/兼容治理检查。参见[按需治理协议](plugins/team-standards/skills/change-readiness/references/governance-checker.md)。
 
 Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。行为变化的 OpenSpec 执行要求明确选择并读取相关活动 change，行为保持按 Forge 策略无需空 change；未启用 OpenSpec 的项目继续认可兼容设计文档。验证计划按影响范围选择并复用新鲜证据；M/L、交付或归档不自动触发全仓。现有完成前 Hook 仍要求可执行改动后的 `forge_verify phase=all` 或项目 Forge CLI PASS，不能把范围策略误称为 Hook 已支持定向证据；启用该 Hook 的项目仍遵守其契约。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
 

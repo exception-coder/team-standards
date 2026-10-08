@@ -1,5 +1,7 @@
 # 已有规格找回与防重复
 
+适用边界（4.11.0）：下文机器绑定、指纹、Forge 调用和阶段门禁仅适用于用户要求或项目明确采用该治理协议的场景。普通开发按 change-readiness 与 delivery-verification 的引导执行，不因缺少这些记录停止作业。旧 Hook 适配器保留供显式接入，但插件不再默认注册该自动检查链；环境变量设为 block 不会自动恢复已经移除的注册。
+
 ## 工作流
 
 前置入口为[按影响判定](impact-routing.md)：Forge `discover_execution → assess_execution` 无需 changeId。行为保持走无需 Change 的执行；只有行为变化才进入下面 Delta 链路。绑定执行的会话使用 `check_execution_readiness`，其优先于旧的 change-only 路由，提交前还要求真实、未过期的适用验证。

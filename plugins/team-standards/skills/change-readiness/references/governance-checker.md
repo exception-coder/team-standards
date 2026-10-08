@@ -1,5 +1,7 @@
 # OpenSpec 治理检查器协议
 
+适用边界（4.11.0）：下文机器绑定、指纹、Forge 调用和阶段门禁仅适用于用户要求或项目明确采用该治理协议的场景。普通开发按 change-readiness 与 delivery-verification 的引导执行，不因缺少这些记录停止作业。旧 Hook 适配器保留供显式接入，但插件不再默认注册该自动检查链；环境变量设为 block 不会自动恢复已经移除的注册。
+
 4.8.0 起本检查器保留历史设计/审阅证据兼容职责。Forge v2 的执行状态与策略归 Forge，Hook 依据 `legacyGovernanceRequired` 调用此检查器；不再从私有执行文件猜测治理分流。未接入 Forge 的旧项目保持本协议。见[执行适配协议](execution-adapter.md)。
 
 ## 1. 能力与接入边界

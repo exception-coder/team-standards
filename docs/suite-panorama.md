@@ -1,5 +1,7 @@
 # 团队工具套件全景：按工程职责域看链路与节点
 
+4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
+
 这套工具帮助 AI 把自然语言目标转成有依据、边界明确、可验证、可交接的工程成果。它同时管理“怎样工作”和“依据什么工作”：前者是工程规范，后者是项目事实、业务知识与行为规格。
 
 本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。当前三个公共插件合计 22 个 Skill，其中 team-standards 19 个。
@@ -123,7 +125,7 @@ flowchart TD
 
 | 节点 | 输入 | 做什么 | 输出与下一站 |
 |---|---|---|---|
-| [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) | 本次可执行改动与项目验证配置 | 优先调用可用 Forge；否则按声明与影响执行原生验证，判断实际执行和最新证据，失败时有限修复 | 明确通过/失败/环境缺口；静态与运行结果分开 |
+| [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) | 本次可执行改动与项目验证配置 | 按项目声明与影响执行原生验证；明确采用 Forge 时才调用，判断实际执行和最新证据，失败时有限修复 | 明确通过/失败/环境缺口；静态与运行结果分开 |
 | Forge / 项目测试与运行环境 | 已登记验证场景、当前构建与配置 | 真正运行检查、测试、数据库或浏览器场景 | 可核验执行记录；工具注册不等于执行完成 |
 | [git-commit-standards](../plugins/team-standards/skills/git-commit-standards/SKILL.md) | 已完成、验证过的本次文件/片段 | 核对原问题、关键做法和实际结果，用大白话写入三段正文并自动本地提交 | 可审查 commit；机器格式通过不代表内容讲清楚 |
 | 推送 / 部署 | 已有明确授权、目标与项目流程 | 推送指定远端或执行项目自己的发布流程 | 远端提交或经验证的发布结果；本地 commit 不自动授权部署 |
@@ -167,22 +169,20 @@ flowchart TD
 | 用户输入 | prompt-signal-capture | 按配置筛选、脱敏并登记有价值的提示/纠正信号 |
 | 用户输入 | check-plugin-version-stale | 提醒插件版本可能过期，不等于自动更新 |
 | 文件修改前 | change-input + write-guard-dispatcher | 适配写入事件，把同一输入分发到启用的检查器并汇总结果 |
-| 写入分发 1 | check-change-readiness | 实施依据及活动 change 是否满足已声明要求 |
-| 写入分发 2 | check-architecture-boundaries | 可机械识别的模块依赖、Feature 边界等风险 |
-| 写入分发 3 | check-backend-evidence-readiness | 后端变更是否具备要求的上下文证据 |
-| 写入分发 4 | check-comment-density | 注释密度与相关内容风险 |
-| 写入分发 5 | check-sql-ddl-readiness | SQL/DDL 变更所需结构依据 |
-| 写入分发 6 | check-sql-correctness-risk | 可识别 SQL 正确性风险 |
-| 写入分发 7 | check-query-performance-risk | 查询性能风险信号 |
+| 可选旧适配器 | check-change-readiness | 历史适配器；默认不注册，项目显式接入 |
+| 写入分发 1 | check-architecture-boundaries | 可机械识别的模块依赖、Feature 边界等风险 |
+| 写入分发 2 | check-backend-evidence-readiness | 后端变更是否具备要求的上下文证据 |
+| 写入分发 3 | check-comment-density | 注释密度与相关内容风险 |
+| 写入分发 4 | check-sql-ddl-readiness | SQL/DDL 变更所需结构依据 |
+| 写入分发 5 | check-sql-correctness-risk | 可识别 SQL 正确性风险 |
+| 写入分发 6 | check-query-performance-risk | 查询性能风险信号 |
 | 已退役兼容入口 | check-ai-doc-location | 当前不分发；旧宿主调用无副作用放行，不再要求个人文档目录 |
 | 写入/提交保护 | check-file-encoding / pre-commit-encoding | 已登记项目文件是否保持要求的编码；Git 兜底须已安装 |
 | Bash 提交前 | check-git-commit-skill | 需要重审的提交是否进入提交 Skill |
 | Bash 提交前 | check-commit-no-ai-signature | 标题、三段正文、真实 Author 与 AI 署名约束 |
-| 完成前 | check-delivery-verification | 当前相关可执行改动是否有有效验证证据 |
-| 完成前 | check-openspec-governance | Forge v2 执行就绪检查及按需兼容设计证据；Stop 不释放执行 |
 | 按配置记录 | hook-metrics / event-log | 最小化性能指标与结构化 Hook 事件；为排查和反馈提供数据 |
 
-注册来源：[hooks.json](../plugins/team-standards/hooks/hooks.json)；八个写入检查来源：[dispatcher](../plugins/team-standards/hooks/write-guard-dispatcher.js)。Shell、外部工具与未支持事件可能不受这些检查覆盖，仍需宿主权限、访问凭据和具体操作判断。
+注册来源：[hooks.json](../plugins/team-standards/hooks/hooks.json)；六个专项写入检查来源：[dispatcher](../plugins/team-standards/hooks/write-guard-dispatcher.js)。Shell、外部工具与未支持事件可能不受这些检查覆盖，仍需宿主权限、访问凭据和具体操作判断。
 
 ## 六种任务如何穿过全景图
 

@@ -22,7 +22,8 @@ function run(script, repo, tool_name, tool_input) {
     .filter(([key]) => !key.startsWith('TEAM_STANDARDS_') && !key.startsWith('FORGE_')));
   return spawnSync(process.execPath, [path.resolve(__dirname, '..', script)], {
     input: JSON.stringify({ tool_name, tool_input, cwd: repo, session_id: 'temporary-scope-test' }), encoding: 'utf8',
-    env: { ...env, TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK: 'block' },
+    env: { ...env, USERPROFILE: path.dirname(repo), HOME: path.dirname(repo),
+      TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK: 'block' },
   });
 }
 
@@ -78,11 +79,11 @@ test('other projects under the system temporary directory retain their own desig
   }
 });
 
-test('mixed patches still check project files after an external helper', t => {
+test('explicit legacy readiness still checks mixed patches after an external helper', t => {
   const { home, repo } = fixture(t);
   fs.unlinkSync(path.join(repo, 'openspec', 'config.yaml'));
   const command = `*** Begin Patch\n*** Add File: ${path.join(home, 'neutral.py')}\n+print('helper')\n*** Add File: src/main.py\n+print('app')\n*** End Patch`;
-  const result = run('write-guard-dispatcher.js', repo, 'apply_patch', { command });
+  const result = run('check-change-readiness.js', repo, 'apply_patch', { command });
   assert.equal(result.status, 2, result.stderr);
   assert.match(result.stderr, /main\.py/);
 });

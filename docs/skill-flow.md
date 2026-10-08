@@ -1,5 +1,7 @@
 # Skill 链路全景图
 
+4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
+
 已授权业务开发自动执行[设计发现、补建、绑定、同步与验证](../plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)，无需用户另行初始化或填写 JSON。Agent 负责真实内容，内部入口安全合并绑定；纯咨询只读，项目不需要复制通用触发规则。
 
 概设按业务读者组织八章，详设按稳定功能编号组织九项；固定结构按影响裁剪深度，规划、实现、验证与上线分开。业务内容治理沿用既有绑定与生命周期，可选 content v1 渐进接入；机器检查结构、关联与新鲜度，具名审阅判断业务表达及设计正确性。详见[内容契约与完整样衣示例](../plugins/team-standards/skills/change-readiness/references/design-output-contract.md)。
@@ -12,7 +14,7 @@
 
 导航：[总流程](#总流程) · [节点与源码](#总图节点对应哪些源码) · [目录结构](#先分清四种目录) · [Skill 文件索引](#全部-skill-的规则文件索引) · [执行调用链](#真正执行程序的调用链) · [目标项目与外部服务](#目标项目与外部服务中的内容) · [修改入口速查](#想改某个行为时从哪里下手) · [路由场景](#易混淆请求的预期路由)
 
-OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/team-standards/skills/change-readiness/references/openspec-lifecycle.md) 统一维护阶段准出、评审回写、设计视图及续跑交接。delivery-verification 完成真实验证后，按 [治理检查器协议](../plugins/team-standards/skills/change-readiness/references/governance-checker.md) 记录并检查本切片；同步与归档继续调用官方 OpenSpec。新增 Hook 默认报告试运行，宿主验收后才启用阻断。
+OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/team-standards/skills/change-readiness/references/openspec-lifecycle.md) 统一维护阶段准出、评审回写、设计视图及续跑交接。delivery-verification 完成真实验证后，按 [治理检查器协议](../plugins/team-standards/skills/change-readiness/references/governance-checker.md) 记录并检查本切片；同步与归档继续调用官方 OpenSpec。旧治理适配器不再默认注册，需要时由项目自行接入。
 
 整套组件、工程职责域及全部节点的输入输出见 [套件全景](suite-panorama.md)；本文保留任务路由和阶段规则。
 
@@ -22,10 +24,10 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 | 维护对象 | 源码入口 |
 |---|---|
-| 启动上下文 | `hooks/session-init.js` → Forge `session_init` |
+| 可选启动上下文 | `hooks/session-init.js` → Forge `session_init` |
 | 候选探索 | Agent → Forge `resolve_execution_context`，定位后保存 discovery |
-| 写前/提交前策略 | `hooks/check-spec-resolution.js` → `hooks/forge/client.js` → Forge `check_execution_event` |
-| Stop 与兼容设计检查 | `hooks/check-openspec-governance.js` 消费 Forge 的 `legacyGovernanceRequired` |
+| 可选项目写前/提交前策略 | `hooks/check-spec-resolution.js` → `hooks/forge/client.js` → Forge `check_execution_event` |
+| 可选项目 Stop 与兼容设计检查 | `hooks/check-openspec-governance.js` 消费 Forge 的 `legacyGovernanceRequired` |
 | 旧 Forge runtime | `hooks/forge/legacy-v1.js`，不向新版分支继续复制状态读取 |
 
 ## 总流程
@@ -157,16 +159,15 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 flowchart LR
     HOST["宿主工具或会话事件"] --> CONFIG["hooks/hooks.json"]
     CONFIG -->|"Write / Edit / MultiEdit"| DISPATCH["hooks/write-guard-dispatcher.js"]
-    DISPATCH --> GUARDS["八个 check-*.js 检查器"]
+    DISPATCH --> GUARDS["六个专项 check-*.js 检查器"]
     GUARDS --> INPUT["按需使用 hooks/change-input.js 解析输入"]
     CONFIG -->|"Bash"| COMMIT["提交 Skill 与提交正文检查"]
-    CONFIG -->|"Stop"| STOP["交付证据与 OpenSpec 治理检查"]
     CONFIG -->|"UserPromptSubmit"| SIGNAL["提示信号采集与版本提醒"]
 ```
 
-- 写入分发清单在 [write-guard-dispatcher.js](../plugins/team-standards/hooks/write-guard-dispatcher.js) 的 `GUARDS`；七项分别检查就绪、架构、后端证据、注释、DDL、SQL 正确性与性能；旧文档位置入口已退役，不再分发。每项职责见 [全景中的机械门禁表](suite-panorama.md#机械门禁在什么位置工作)。它使用 Worker 分发原始输入，不负责选择主 Skill。
+- 写入分发清单在 [write-guard-dispatcher.js](../plugins/team-standards/hooks/write-guard-dispatcher.js)：保留架构、后端证据、注释、DDL、SQL 正确性与性能六项专项检查；移除规格解析和变更就绪的自动执行。
 - Bash 入口是 [check-git-commit-skill.js](../plugins/team-standards/hooks/check-git-commit-skill.js) 和 [check-commit-no-ai-signature.js](../plugins/team-standards/hooks/check-commit-no-ai-signature.js)；不是 Git 自带 pre-commit，也不会替 Agent 自动写好提交正文。
-- Stop 入口是 [check-delivery-verification.js](../plugins/team-standards/hooks/check-delivery-verification.js) 与 [check-openspec-governance.js](../plugins/team-standards/hooks/check-openspec-governance.js)。前者判定证据，后者检查已接入治理；不是业务测试执行器。
+- 插件不再注册 Stop 检查；历史交付与兼容治理脚本仅供项目显式接入。
 - 提示事件入口是 [prompt-signal-capture.js](../plugins/team-standards/hooks/prompt-signal-capture.js) 与 [check-plugin-version-stale.js](../plugins/team-standards/hooks/check-plugin-version-stale.js)。事件与性能辅助分别见 [event-log.js](../plugins/team-standards/hooks/event-log.js)、[hook-metrics.js](../plugins/team-standards/hooks/hook-metrics.js)。
 
 ### OpenSpec 团队治理

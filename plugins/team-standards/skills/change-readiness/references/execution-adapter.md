@@ -1,5 +1,7 @@
 # Forge 执行适配协议
 
+适用边界（4.11.0）：下文机器绑定、指纹、Forge 调用和阶段门禁仅适用于用户要求或项目明确采用该治理协议的场景。普通开发按 change-readiness 与 delivery-verification 的引导执行，不因缺少这些记录停止作业。旧 Hook 适配器保留供显式接入，但插件不再默认注册该自动检查链；环境变量设为 block 不会自动恢复已经移除的注册。
+
 本文件只维护 Agent 调用方法与插件适配边界。组织策略和执行状态归 Forge；整体组件职责的唯一权威为关联 Forge 仓库 `docs/ai-coding-architecture.md`。
 
 ## 一次任务的调用方法
