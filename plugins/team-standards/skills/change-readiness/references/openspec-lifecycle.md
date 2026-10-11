@@ -83,6 +83,8 @@ openspec validate <change> --strict --json --no-interactive
 
 ## 实施与自动更新
 
+生成 tasks 时先核对已有测试覆盖，复用已有套件；独立风险或验收缺口才新增测试，不为每条规范新增脚本。按 [执行范围与证据复用](../../delivery-verification/SKILL.md#执行范围与证据复用) 写明影响范围、必要消费者、命令及复用条件。构建隐式检查计入证据；task 完成、提交、模型轮次、进度回报及归档本身不触发重验。公共协议、安全、迁移或相关输入改变时重验对应风险，根 POM 登记模块本身不触发全仓回归。官方 schema/生成 Skill 保持原有来源；项目生成入口未采用这些规则时明确接线缺口，不宣称插件能覆盖项目自定义模板。
+
 开始编码前读取 `openspec instructions apply --change <name> --json`，以其中的任务、上下文和约束作为实施输入。
 
 实施过程中发生以下任一情况时，先更新 change 再继续编码：

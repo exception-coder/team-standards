@@ -35,7 +35,8 @@ Deliver a coherent product interface, not a runnable mock. Preserve the reposito
    - Read [quality-gates.md](references/quality-gates.md) before declaring completion.
    - Run [visual-review-checklist.md](references/visual-review-checklist.md) after the first complete render and again after material visual revisions.
    - For list-heavy mobile pages, inspect whether the first useful business object appears in the initial view and whether navigation, search, and filters crowd it out. Verify scroll ownership and the final item in short and long content.
-   - Run the project's build, lint, type, and test commands that are relevant to the change.
+   - Select relevant checks and reuse valid evidence under [delivery-verification](../delivery-verification/SKILL.md#执行范围与证据复用). Count checks already executed by the build; do not repeat them for task completion, commits, progress reports, or archive.
+   - Reuse existing behavior suites, fixtures, render helpers, and minimal providers instead of repeatedly loading the whole application. Reset mutable data, mocks, timers, and mounted components per case. Keep independent failures and permission/state transitions diagnosable. Add tests only for uncovered risks under [testing-assets.md](../coding-standards-common/references/testing-assets.md); use installed Vitest file/related filtering where suitable and explicitly include affected protocol consumers.
    - Inspect at least one mobile and one desktop viewport. Exercise the primary interaction and one failure or empty path.
    - Compare against supplied references and iterate until material differences are resolved or explicitly documented.
 7. Report the result.
