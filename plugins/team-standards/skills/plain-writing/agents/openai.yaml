@@ -1,0 +1,6 @@
+interface:
+  display_name: "人话：说清楚"
+  short_description: "按读者和载体把方案、提交与界面文案说清楚，保留事实和技术含义"
+  default_prompt: "使用 $plain-writing 改写这段内容，让同事容易理解，保留原有事实、条件和技术决策。"
+policy:
+  allow_implicit_invocation: true

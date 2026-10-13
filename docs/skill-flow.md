@@ -123,6 +123,8 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [business-logic-orientation](../plugins/team-standards/skills/business-logic-orientation/SKILL.md) | [references/](../plugins/team-standards/skills/business-logic-orientation/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | [references/](../plugins/team-standards/skills/change-readiness/references/)；[rules/](../plugins/team-standards/skills/change-readiness/rules/) | 规则编排；OpenSpec 与治理程序见下一节 |
 | [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) | 主入口自包含；按需引用设计内容契约和 clear-design-docs | 独立内容评审；不新增执行器或机器门禁 |
+| [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 按需 [取舍示例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md) | 前置收敛当前范围与复杂度；不规定固定演进阶梯 |
+| [plain-writing（人话）](../plugins/team-standards/skills/plain-writing/SKILL.md) | 按需 [改写与失真反例](../plugins/team-standards/skills/plain-writing/references/examples.md) | 后置表达；保留决策与事实，不反向开启架构循环 |
 | [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) | 主入口自包含；可叠加项目可用的 draw.io 工具 Skill | 设计图的语义、层级和视觉阅读路径；不内置绘图引擎 |
 | [coding-standards-common](../plugins/team-standards/skills/coding-standards-common/SKILL.md) | [references/](../plugins/team-standards/skills/coding-standards-common/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) | 直接阅读主入口；无上述下钻目录 | 读取规则后调用外部 Forge 或项目声明命令 |

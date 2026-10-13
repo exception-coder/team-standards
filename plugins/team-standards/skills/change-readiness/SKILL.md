@@ -17,6 +17,7 @@ description: "Guide implementation preparation: understand the existing behavior
 
 ## 按需参考
 
+- 当前任务需要方案取舍或范围收敛时，先用 [architecture-reasoning（悟道）](../architecture-reasoning/SKILL.md) 核实问题、复杂度与升级条件；既定方案执行和普通小改不增加独立阶段。
 - 代码定位：[code-orientation](references/code-orientation.md)；方案取舍：[solution-review](references/solution-review.md)。
 - 需要时参考[风险判断](references/classification.md)、[文档查找](references/document-workflow.md)、[图示表达](rules/mermaid-requirements.md)；项目已登记状态契约时使用[状态契约](references/state-contract.md)。这些参考不增加默认机器门禁。
 - 按影响维护：[impact-routing](references/impact-routing.md)；设计表达：[clear-design-docs](../clear-design-docs/SKILL.md)；设计内容：[design-output-contract](references/design-output-contract.md)。

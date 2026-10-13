@@ -18,6 +18,8 @@
 
 ## 分层维护入口
 
+方案取舍先用 [architecture-reasoning（悟道）](plugins/team-standards/skills/architecture-reasoning/SKILL.md) 判断当前目标与最低充分复杂度，再进入现有设计/实施入口；面向人的说明按 [plain-writing（人话）](plugins/team-standards/skills/plain-writing/SKILL.md) 整理表达。阶段数按需求，人话不改决策、不重开设计；普通编码与已定方案不增加前置阶段，纯润色不启动治理。两者不新增机器门禁，Forge 是否接入及覆盖仍由实际项目声明。
+
 Agent 负责证据理解和实施，Skill 提供操作方法，Forge 负责上下文、执行状态、策略和硬约束，Hook/MCP 连接宿主。全局认知原则与本仓维护约定分开；本文件保留项目入口，不复制 Forge 实现。
 
 - Skill 方法与代码定位：`skills/change-readiness`，上下文充分后开始实施。
@@ -94,6 +96,8 @@ flowchart TD
 
 | 用户意图或动作 | 调用 Skill / 模式 |
 |---|---|
+| 方案取舍、阶段规划或担心过度设计 | `architecture-reasoning`（悟道）；先核实问题与最低充分复杂度，再进入专用设计入口 |
+| 面向人的说明、去套话或要求说人话 | `plain-writing`（人话）；按载体改表达，保护事实和技术决策 |
 | 跨项目规划或估算 | 使用项目声明的证据源；Forge 专属协议不在通用插件内 |
 | 初始化、评审设计或记录明确视觉偏好 | `design-system` 的对应模式；已有设计资产优先 |
 | 业务术语歧义 | `business-logic-orientation` 的术语模式 |
@@ -145,6 +149,8 @@ flowchart TD
 
 | Skill | 核心职责 | 关键模式或边界 |
 |---|---|---|
+| `architecture-reasoning` | 悟道：当前问题、方案复杂度与升级条件 | 前置决策；不为已定方案或小改重开设计 |
+| `plain-writing` | 人话：读者、载体与具体表达 | 后置表达；不改变事实、契约与技术决策 |
 | `architecture-ddd-lite-fullstack` | 跨语言 DDD-lite 分层、Feature 边界、语义分包、单向依赖和原子能力 | 项目具体分层例外由项目声明 |
 | `backend-evidence` | 单服务后端事实、DDL/SQL 正确性与性能、反向影响、领域规格 | 跨项目拓扑不归团队插件 |
 | `bug-doc-required` | Bug 证据、根因、修复合同、最小修复与回归 | 调查模式不改源码；简单问题不强制独立文档 |

@@ -51,6 +51,7 @@ git commit -F "<脚本输出的绝对路径>"
 
 ## 按需细则
 
+- 正文用 [plain-writing（人话）](../plain-writing/SKILL.md) 说清触发问题、关键做法和结果，技术细节按理解需要保留；不改变三段结构、真实作者或验证事实。
 - 修改或发布插件/MCP 运行载荷前，必须读取 [提交与版本细则](references/commit-details.md) 的版本要求；team-standards 三处 manifest 同步升版，CLAUDE.md 修改后生成 AGENTS.md。业务项目不套用插件升版规则。
 - 需要格式示例或排查提交步骤时读取同一参考。Hook 的小改豁免只影响额外重审，不能豁免本 Skill 的提交格式和安全边界；宿主未执行 Hook 不代表已校验。
 - 收尾只报告结果、验证、提交号及实际剩余问题，不重复提交正文和内部清单。

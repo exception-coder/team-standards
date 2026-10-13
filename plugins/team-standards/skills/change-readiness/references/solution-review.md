@@ -7,6 +7,8 @@ description: "Internal proposal-review rules loaded by change-readiness; not a s
 
 ## 核心原则
 
+当前做多深、复杂组件是否必要以及升级条件，统一使用 [architecture-reasoning（悟道）](../../architecture-reasoning/SKILL.md)；本参考保留生产改动的风险与实施取舍，不重复生成阶段规划。
+
 用户提出的是**目标 + 候选方案**，不是天然正确的最终方案。
 
 在进入设计文档、计划或编码前，必须先判断：用户真正想解决什么问题、当前方案是否合适、有没有更简单/更安全/更可维护的做法。

@@ -6,7 +6,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.11.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.12.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#范围选择示例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -30,7 +30,7 @@ OpenSpec 治理命令默认等待 30 秒，慢环境可通过 `TEAM_STANDARDS_OP
 
 - **先看整套做什么** → [按领域的全景链路与节点字典](docs/suite-panorama.md)
 - **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)
-- **查看能力清单** → [19 个 Skill](#19-个-skill)、[合并后的入口](#合并后的入口)
+- **查看能力清单** → [21 个 Skill](#21-个-skill)、[合并后的入口](#合并后的入口)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
 - **安装和维护** → [安装](#安装)、[维护与验证](#维护与验证)、[作业完成条件](#作业完成条件)、[Bug 处理与记录](#bug-处理与记录)
@@ -74,12 +74,16 @@ flowchart TD
 
 ---
 
-## 19 个 Skill
+## 21 个 Skill
+
+4.12.0 补齐 [悟道 architecture-reasoning](plugins/team-standards/skills/architecture-reasoning/SKILL.md) 和 [人话 plain-writing](plugins/team-standards/skills/plain-writing/SKILL.md)：先判断当前需要做到什么程度，再由现有设计/编码入口实施，最后把事实说清楚。阶段数量按需要，保留正确性与安全要求；人话只改表达，不改技术决策或反向重开设计。两者支持自动发现与显式调用，不新增 Hook 或审批。
 
 4.7.1 增加[按影响执行](plugins/team-standards/skills/change-readiness/references/impact-routing.md)：先探索既有规格和 Graphify，分别判断规格、概设、详设及验证；行为保持不建空 Change，相关任务默认共享分支。薄 Hook 优先调用 Forge execution 检查，旧治理仅在实时确认 NO_SPEC_CHANGE 后分流。默认 warn，实际宿主覆盖与服务部署需单独验收。
 
 | 类别 | Skill | 核心价值 |
 |---|---|---|
+| 分析设计 | `architecture-reasoning`（悟道） | 决策前核实问题、已有能力及最低充分复杂度，明确当前范围和升级条件 |
+| 知识文档 | `plain-writing`（人话） | 按读者与载体解释对象、动作和结果，保留事实、条件与技术含义 |
 | 分析设计 | `clear-design-docs` | 常见基础版范围、清晰表达、关系图、中文字段与语义审读 |
 | 分析设计 | `architecture-diagram-design` | 产品能力、领域边界与系统协作图的视角、层级、阅读路径和视觉验收 |
 | 分析设计 | `reviewing-design-plainly` | 独立审查本期设计矛盾、关键缺口和过度设计；未来规模与冷门场景作提醒 |
