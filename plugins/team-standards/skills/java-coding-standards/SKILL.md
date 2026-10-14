@@ -172,6 +172,8 @@ public class AttachmentController { }
 
 ## 12. 测试组织与准备复用
 
+- 业务数据库回归归所属模块与稳定能力包，宿主只承接完整资源、升级和跨模块装配；移动套件维护 test-scope 依赖和资源边界。JUnit 标签/Surefire/Failsafe 可区分执行成本，但执行分组不会自动隔离测试源码编译。编译受阻先核对 mvn -version、源码和依赖制品；不追加全仓命令或把单例结果当完整宿主通过。
+
 - 按稳定能力复用已有 JUnit 套件、准备方法及参数化场景，新增依据遵循 [测试资产规则](../coding-standards-common/references/testing-assets.md)。不为小功能重复搭建完整 Spring 应用。
 - Spring 上下文配置一致且同一测试进程内，优先利用原生 TestContext 缓存；profiles、属性、mock/bean 覆盖等也是配置身份的一部分。不同配置、事件生命周期或启动失败场景不能强行合并；确实污染上下文时保留必要的重建与隔离，不为提速删除 `@DirtiesContext`。
 - 数据库结构及只读夹具可共享，每例清理可变数据、重建可变对象；事务、锁、并发与提交可见性测试保留真实隔离条件，不将回滚视为跨线程或跨进程的万能清理。

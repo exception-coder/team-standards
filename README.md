@@ -6,7 +6,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.12.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.12.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#范围选择示例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -75,6 +75,8 @@ flowchart TD
 ---
 
 ## 21 个 Skill
+
+4.12.1 补充日常快速反馈、真实准备成本、测试编译与执行范围及失败归因；复用既有测试框架和日志，不新增门禁或检查脚本。详见 [交付验证](plugins/team-standards/skills/delivery-verification/SKILL.md) 与 [测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)。
 
 4.12.0 补齐 [悟道 architecture-reasoning](plugins/team-standards/skills/architecture-reasoning/SKILL.md) 和 [人话 plain-writing](plugins/team-standards/skills/plain-writing/SKILL.md)：先判断当前需要做到什么程度，再由现有设计/编码入口实施，最后把事实说清楚。阶段数量按需要，保留正确性与安全要求；人话只改表达，不改技术决策或反向重开设计。两者支持自动发现与显式调用，不新增 Hook 或审批。
 
@@ -147,7 +149,7 @@ coding-standards-common              所有源码修改的公共基线
 
 开发准备与交付默认由 Skill 引导。历史共享治理检查器仍支持绑定、范围和证据核对，但仅供项目主动采用；安装插件不再启动写前、提交前或 Stop 的规格/兼容治理检查。参见[按需治理协议](plugins/team-standards/skills/change-readiness/references/governance-checker.md)。
 
-Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。行为变化的 OpenSpec 执行要求明确选择并读取相关活动 change，行为保持按 Forge 策略无需空 change；未启用 OpenSpec 的项目继续认可兼容设计文档。验证计划按影响范围选择并复用新鲜证据；M/L、交付或归档不自动触发全仓。现有完成前 Hook 仍要求可执行改动后的 `forge_verify phase=all` 或项目 Forge CLI PASS，不能把范围策略误称为 Hook 已支持定向证据；启用该 Hook 的项目仍遵守其契约。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
+Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。行为变化的 OpenSpec 执行要求明确选择并读取相关活动 change，行为保持按 Forge 策略无需空 change；未启用 OpenSpec 的项目继续认可兼容设计文档。验证计划按影响范围选择并复用新鲜证据；M/L、交付或归档不自动触发全仓。当前 hooks.json 未注册交付 Stop Hook；安装本插件不会要求 `forge_verify phase=all` 或 Forge PASS。项目主动启用历史交付 Hook 时仍消费其真实契约，不把 Skill 引导描述为机器已经接受定向证据。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
 
 ---
 

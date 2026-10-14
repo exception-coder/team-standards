@@ -1,12 +1,14 @@
 # team-standards
 
+Version 4.12.1 guides fast daily feedback, risk-triggered expensive preparation, test compilation versus execution, and failure attribution. Reuse native tools and existing logs; no new gates or checker scripts. See [delivery verification](plugins/team-standards/skills/delivery-verification/SKILL.md) and [test ownership](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md).
+
 Version 4.11.0 makes change readiness and delivery verification guidance-only by default. The plugin no longer registers session initialization, specification/readiness guards, or Stop verification gates. Existing checker scripts remain available for explicit project integration; native tests and honest reporting remain part of the workflow.
 
 Version 4.4 makes design discovery, authoring, binding and synchronization part of authorized development tasks. The Agent writes factual content; an internal preparation/upsert entry preserves unrelated modules and preexisting changes. A verified committed slice can explicitly resume its preparation checkpoint in the same session; an older unbound session can recover after current scope, review, and verification checks. Legacy projects can reference local acceptance sections without initializing OpenSpec. See the [workflow](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md) and [actual Agent pilot](docs/maintenance/automatic-design-release.md).
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.11.0**. The plugin exposes 19 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.12.1**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 The compatibility governance checker limits untracked baseline inputs to declared task files and relevant design candidates. Unrelated temporary files do not consume its file limit. Tracked or staged changes and explicitly referenced task, design, specification, or verification inputs still receive strict path checks.
 
