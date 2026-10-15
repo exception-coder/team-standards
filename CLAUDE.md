@@ -156,7 +156,7 @@ flowchart TD
 | `backend-evidence` | 单服务后端事实、DDL/SQL 正确性与性能、反向影响、领域规格 | 跨项目拓扑不归团队插件 |
 | `bug-doc-required` | Bug 证据、根因、修复合同、最小修复与回归 | 调查模式不改源码；简单问题不强制独立文档 |
 | `business-logic-orientation` | Graphify 优先的现状理解与业务语义核实 | 仅明确要求或需要长期基线时生成梳理文档 |
-| `business-ontology-modeling` | 从代码与数据库或业务问题推导对象、属性、关系、规则和回验 | 优先成熟工具；无知识库可起步，三个模板和六问案例，来源/接入/口径分别核实 |
+| `business-ontology-modeling` | 从代码与数据库或业务问题推导对象、属性、关系、规则和回验 | 优先成熟工具；无知识库可起步，三个模板和六问案例，来源/接入/口径分别核实，按实际框架交付语义、Schema与领域事实 |
 | `coding-standards-common` | 跨语言命名、结构、异常、重复、测试和注释规则 | 所有源码改动必经 |
 | `change-readiness` | 规格/设计/验证独立判定、既有资产复用和代码定位 | 行为保持允许无需 Change；相关任务默认共享分支 |
 | `delivery-verification` | 完成前真实验证、有限修复循环与 按影响验证与如实交付 | 按影响范围选择真实验证，复用覆盖输入未变的证据 |
@@ -184,7 +184,7 @@ flowchart TD
 | `skills/change-readiness/references/design-output-contract.md` | `change-readiness` | 适用概设详设视图、唯一正文与长期设计晋升 |
 | `skills/change-readiness/references/governance-checker.md` | `change-readiness` | 任务绑定、JSON 证据、写前/Stop/CI 检查与支持边界 |
 | `skills/business-logic-orientation/references/orientation-document-workflow.md` | `business-logic-orientation` | 仅在需要长期基线时加载的完整现状文档流程 |
-| `skills/business-ontology-modeling/assets/templates/`、`references/` | `business-ontology-modeling` | 问题与证据、领域模型、实施回验模板；跨项目采用与新品六问示例 |
+| `skills/business-ontology-modeling/assets/templates/`、`references/` | `business-ontology-modeling` | 问题与证据、领域模型、实施回验模板；跨项目采用、新品六问及Agent/MCP消费分工 |
 | `skills/bug-doc-required/template.md` | `bug-doc-required` | 按需分析模板，不作为每次 Bug 的必填报告 |
 | `skills/bug-doc-required/references/repair-rules.md` | `bug-doc-required` | 最小修复与回归证据，编码风格复用 common |
 | `skills/backend-evidence/references/` | `backend-evidence` | 存储路由、更新、SQL 正确性、性能、反向影响和领域规格 |

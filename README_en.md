@@ -8,7 +8,9 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.13.1**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.13.2**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+
+Version 4.13.2 incorporates a real legacy-code/Oracle read-only trial: verify source identity and freshness, preserve unreadable sources, and narrow Graphify hub-heavy queries. [Agent and MCP consumption](plugins/team-standards/skills/business-ontology-modeling/references/agent-consumption.md) maps models to existing semantic queries, capability schemas, domain facts and per-runtime integration checks.
 
 Version 4.13.1 adds a [code-and-database starting path](plugins/team-standards/skills/business-ontology-modeling/references/code-and-database-discovery.md): reuse Graphify and existing database metadata/ER tools, cross-check write/read paths and actual data, then derive domain objects, rules and questions. A knowledge base, existing design or question list is not required. Check installed tool capabilities; no new parser, relationship-mining engine or index platform is introduced.
 

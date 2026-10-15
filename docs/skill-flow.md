@@ -73,6 +73,8 @@ flowchart TD
 
 仅分析时交付结论，保存时将模板嵌入已有设计；已授权实施再进入`change-readiness`和项目实际OpenSpec/设计流程，按可用切片实现并用原问题回验。工具负责结构提取，Agent交叉解释语义，不新建解析或知识引擎。
 
+用于业务Agent时，按[消费分工](../plugins/team-standards/skills/business-ontology-modeling/references/agent-consumption.md)把语义、参数Schema、领域事实与覆盖落回现有框架；多个运行时共用业务规则，接线逐个核实。MCP优先复用实际注册与导出，不因建模新建平台。
+
 项目特有对象、表、阈值与权限仍由项目声明；[新品六问](../plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md)仅作有版本边界的完整案例。源码纳入插件、打包分发和宿主实际发现分别验收。
 
 ## 前端设计的条件链路
