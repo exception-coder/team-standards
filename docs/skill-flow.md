@@ -67,6 +67,12 @@ flowchart TD
 | J 验证与同步 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) + [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | Agent 按影响范围选择实际验证并复用新鲜证据，随后同步说明；交付/归档不自动扩大到全仓，显式 Hook/CI 门禁仍遵守 |
 | K 提交 | [git-commit-standards](../plugins/team-standards/skills/git-commit-standards/SKILL.md) → [build-commit-message.js](../plugins/team-standards/skills/git-commit-standards/scripts/build-commit-message.js) → Git | 脚本生成经过校验的消息文件；Agent 定向暂存、执行 commit 并按授权推送 |
 
+## 业务建模的条件链路
+
+真实问题与决策 → `business-ontology-modeling`识别必要流程、对象关系、状态与口径 → 按需复用现状理解和后端证据 → 分别记录来源、接入、口径及答案覆盖。仅分析时交付结论，保存时将模板嵌入已有设计；已授权实施再进入`change-readiness`和项目实际OpenSpec/设计流程，按可用切片实现并用原问题回验。当前方法不增加必备工具或工件。
+
+项目特有对象、表、阈值与权限仍由项目声明；[新品六问](../plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md)仅作有版本边界的完整案例。源码纳入插件、打包分发和宿主实际发现分别验收。
+
 ## 前端设计的条件链路
 
 业务对象与状态证据 → business-visualization-advisor 确定指标、洞察、选图和看板层次 → design-system 复用视觉资产 → frontend-excellence 实施并做浏览器验收 → delivery-verification 汇总证据。前两者交接 Dashboard Spec 或简单图表决策，数值计算仍在项目可信计算层。优化统计总览/看板时，advisor 编码前明确四项业务目的，交付目的—指标—图表—行动映射及候选选图决策；没有改变图表先说明理由，交付区分信息架构与图表化改造，并按业务目的反向验收，至少证明一项决策、洞察、比较、定位或行动能力改善；仅样式变更不能宣称看板优化完成。登录阻断时尝试授权预览，替代预览不等于业务验收。图表评审可独立使用 advisor；普通页面与纯样式修改不强制走完整图表流程。
@@ -121,6 +127,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [backend-evidence](../plugins/team-standards/skills/backend-evidence/SKILL.md) | [references/](../plugins/team-standards/skills/backend-evidence/references/) | 读取规则后查询代码、知识及运行证据 |
 | [bug-doc-required](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | [references/](../plugins/team-standards/skills/bug-doc-required/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [business-logic-orientation](../plugins/team-standards/skills/business-logic-orientation/SKILL.md) | [references/](../plugins/team-standards/skills/business-logic-orientation/references/) | Agent 读取的规则；没有独立同名执行器 |
+| [business-ontology-modeling](../plugins/team-standards/skills/business-ontology-modeling/SKILL.md) | [模板](../plugins/team-standards/skills/business-ontology-modeling/assets/templates/)、[跨项目使用](../plugins/team-standards/skills/business-ontology-modeling/references/adoption.md)、[六问示例](../plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md) | Agent按问题建模与核实可回答性；不绑定数据库、工具或本体运行引擎 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | [references/](../plugins/team-standards/skills/change-readiness/references/)；[rules/](../plugins/team-standards/skills/change-readiness/rules/) | 规则编排；OpenSpec 与治理程序见下一节 |
 | [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) | 主入口自包含；按需引用设计内容契约和 clear-design-docs | 独立内容评审；不新增执行器或机器门禁 |
 | [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 按需 [取舍示例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md) | 前置收敛当前范围与复杂度；不规定固定演进阶梯 |

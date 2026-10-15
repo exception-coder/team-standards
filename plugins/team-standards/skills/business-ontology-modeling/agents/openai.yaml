@@ -1,0 +1,4 @@
+interface:
+  display_name: "业务本体建模"
+  short_description: "从真实业务问题建立对象、关系、口径与证据，并分步验证落地"
+  default_prompt: "使用 $business-ontology-modeling，围绕当前业务问题核实对象、关键属性、关系、口径和来源缺口，并形成分步实施与验收安排。"

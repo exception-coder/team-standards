@@ -6,7 +6,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.12.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.13.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#范围选择示例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -30,7 +30,8 @@ OpenSpec 治理命令默认等待 30 秒，慢环境可通过 `TEAM_STANDARDS_OP
 
 - **先看整套做什么** → [按领域的全景链路与节点字典](docs/suite-panorama.md)
 - **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)
-- **查看能力清单** → [21 个 Skill](#21-个-skill)、[合并后的入口](#合并后的入口)
+- **查看能力清单** → [22 个 Skill](#22-个-skill)、[合并后的入口](#合并后的入口)
+- **给其他业务建模** → [业务本体建模](plugins/team-standards/skills/business-ontology-modeling/SKILL.md)、[三个模板与跨项目使用](plugins/team-standards/skills/business-ontology-modeling/references/adoption.md)、[新品六问完整示例](plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
 - **安装和维护** → [安装](#安装)、[维护与验证](#维护与验证)、[作业完成条件](#作业完成条件)、[Bug 处理与记录](#bug-处理与记录)
@@ -74,7 +75,9 @@ flowchart TD
 
 ---
 
-## 21 个 Skill
+## 22 个 Skill
+
+4.13.0 新增 [business-ontology-modeling](plugins/team-standards/skills/business-ontology-modeling/SKILL.md)：从真实业务问题推导对象、关系、状态、口径和证据，分别标记来源、接入与口径缺口，再安排可独立验证的实施切片。配三个可嵌入模板、新品上市六问完整教学案例和跨项目试用场景；已有规范按需复用，没有Graphify、OpenSpec或知识服务也可明确证据边界后建模。不新增Hook、强制工件或业务写入权限。
 
 4.12.1 补充日常快速反馈、真实准备成本、测试编译与执行范围及失败归因；复用既有测试框架和日志，不新增门禁或检查脚本。详见 [交付验证](plugins/team-standards/skills/delivery-verification/SKILL.md) 与 [测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)。
 
@@ -92,6 +95,7 @@ flowchart TD
 | 分析设计 | `change-readiness` | 自动匹配或创建 OpenSpec change，持续更新 artifacts，并统一方案审视、风险分档和实施前代码定位 |
 | 分析设计 | `bug-doc-required` | 证据驱动的 Bug 调查、最小修复与回归；简单问题不另建报告 |
 | 分析设计 | `business-logic-orientation` | Graphify 优先理解当前业务逻辑，按需沉淀长期基线 |
+| 分析设计 | `business-ontology-modeling` | 业务问题→对象关系与规则→来源/接入/口径→分步实施和问题回验；含模板与完整六问示例 |
 | 架构编码 | `architecture-ddd-lite-fullstack` | 跨语言 DDD-lite 分层、依赖方向与按稳定语义分包 |
 | 架构编码 | `coding-standards-common` | 通用命名、结构、异常、测试与注释规则 |
 | 架构编码 | `java-coding-standards` | Java 与关系数据库专属规范 |

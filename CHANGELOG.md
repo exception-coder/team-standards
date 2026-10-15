@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.13.0] - 2026-10-15
+
+- Add business-ontology-modeling with question-to-model evidence tracing and independent source, integration and semantic readiness states.
+- Include three embeddable templates, a complete six-question product-launch teaching example, cross-project adoption and trial scenarios.
+- Reuse existing design, evidence, OpenSpec and verification standards without new hooks, mandatory tools or business-write permissions. Host discovery and business-system acceptance remain separately verified.
+
 ## [4.2.0] - 2026-09-16
 
 - Add versioned current-design module bindings and delivery-slice baseline checks using existing governance records.

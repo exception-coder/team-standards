@@ -8,7 +8,9 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.12.1**. The plugin exposes 21 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.13.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+
+Version 4.13.0 adds [business-ontology-modeling](plugins/team-standards/skills/business-ontology-modeling/SKILL.md): derive objects, relationships, lifecycle rules and measures from real business questions, trace evidence, and classify source availability, integration and semantic readiness independently. It includes three embeddable templates, a complete six-question product-launch teaching example, portable adoption guidance and trial scenarios. Existing standards remain authoritative; Graphify, OpenSpec, OWL and knowledge services are optional project capabilities. No new hook, mandatory artifact or business-write authorization is introduced.
 
 The compatibility governance checker limits untracked baseline inputs to declared task files and relevant design candidates. Unrelated temporary files do not consume its file limit. Tracked or staged changes and explicitly referenced task, design, specification, or verification inputs still receive strict path checks.
 
@@ -57,13 +59,14 @@ The main consolidated entry points are:
 - `delivery-verification`: requires current execution evidence before completion, then routes documentation synchronization and automatic local commit.
 - `bug-doc-required`: evidence-led investigation, minimal authorized fixes, and regression. Simple bugs do not require separate reports, diagrams, or fixed tables. Complex or high-risk bugs retain evidence in an existing issue, OpenSpec change, or project document; create a separate report only when needed. The existing invocation name remains compatible.
 - `backend-evidence`: database/runtime truth, fresh Graphify impact queries, domain specifications, and query-performance gates; it does not maintain a parallel code index.
+- `business-ontology-modeling`: question-driven domain modeling with evidence and answerability boundaries; see [adoption and templates](plugins/team-standards/skills/business-ontology-modeling/references/adoption.md) and the [six-question worked example](plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md).
 - `markdown-writing-standards`: document ownership, Markdown/Mermaid structure, and affected existing navigation.
 - `init-project-docs`: idempotently initializes Agent entrypoints, document indexes, OpenSpec, `.graphifyignore`, and the Graphify Git sharing boundary, then routes project rules and evidence without duplicate fact projections.
 - `design-system`: registry/profile initialization and evidence-based preference learning.
 - `business-visualization-advisor`: business-object and lifecycle driven metrics, insights, chart selection, and dashboard information design. Management dashboards connect targets, gaps, evidence-backed breakdowns, and actionable details.
 - `frontend-excellence`: UI implementation, responsive interactions, accessibility, and real-browser verification. It routes business charts to the advisor; design-system owns visual consistency. Ordinary pages do not load the full chart workflow. Dashboard and statistical-overview optimization requires explicit users, discovery goals, actions and first-screen questions, plus purpose–metric–visualization–action mappings and a visible candidate/decision list before coding, a rationale when charts remain unchanged, and delivery that distinguishes information architecture, visualization changes, and interactions. Preview limitations must be disclosed. Completion requires evidence of improved decision-making, insights, comparisons, issue localization or drill-down, verified against business goals; cosmetic changes alone do not qualify.
 
-See [README.md](README.md) for the complete 19-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+See [README.md](README.md) for the complete 22-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
 
 ## Bug records
 

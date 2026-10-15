@@ -38,3 +38,5 @@ description: "Use to understand existing business logic before refactoring, rewr
 ## 术语模式
 
 业务术语歧义或命名映射需要核对时读取 [terminology.md](references/terminology.md)，复用权威知识源，不新建术语索引。
+
+需要从业务问题设计或补齐对象、属性、关系、状态及指标口径时，使用 `business-ontology-modeling`；本 Skill 继续提供当前逻辑与术语的证据，不为普通代码定位加载完整建模流程。

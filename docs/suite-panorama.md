@@ -4,7 +4,7 @@
 
 这套工具帮助 AI 把自然语言目标转成有依据、边界明确、可验证、可交接的工程成果。它同时管理“怎样工作”和“依据什么工作”：前者是工程规范，后者是项目事实、业务知识与行为规格。
 
-本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。当前三个公共插件合计 22 个 Skill，其中 team-standards 19 个。
+本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。当前三个公共插件合计 25 个 Skill，其中 team-standards 22 个。
 
 需要从节点找到实际文件、理解 Skill 与程序的关系时，先看 [链路源码导航](skill-flow.md#总图节点对应哪些源码)。
 
@@ -14,7 +14,7 @@
 
 | 组件 | 在整套中扮演什么角色 | 保存或提供什么 |
 |---|---|---|
-| team-standards | 工程工作方法与质量约束 | 19 个 Skill、Hook、状态契约工具及套件维护脚本 |
+| team-standards | 工程工作方法与质量约束 | 22 个 Skill、Hook、状态契约工具及套件维护脚本 |
 | project-coding-profiles | 遗留项目编码保护 | encoding-guard、项目识别画像、逐文件编码约定与写前/提交检查 |
 | project-domain-knowledge | 业务知识内容与 MCP 查询引擎 | 经确认的术语、规则、状态语义，以及与正式知识分开的规格候选 |
 | cross-project-topology | 系统连接知识内容 | 跨项目调用、数据流、提供方/消费方和接口契约；复用知识引擎作为第二个 MCP 实例 |
@@ -66,6 +66,7 @@ flowchart TD
 |---|---|---|---|
 | 意图/授权/风险判断 | 当前请求、历史授权、项目与环境 | 分别判断目标、可做范围、具体副作用和 S/M/L 影响 | 专业主入口与必要阶段；没有独立总路由 Skill |
 | [business-logic-orientation](../plugins/team-standards/skills/business-logic-orientation/SKILL.md) | 现有业务、源码与行为问题 | 理解入口、分支、依赖和不变量，区分事实与推断 | 现状结论；已授权重构时给 change-readiness 提供依据 |
+| [business-ontology-modeling](../plugins/team-standards/skills/business-ontology-modeling/SKILL.md) | 真实问题、决策、可用资料 | 推导对象、关系、状态、规则及证据，分别核实来源/接入/口径 | 问题追踪与可嵌入模板；已授权时安排分步实施与回验 |
 | [bug-doc-required](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | 现象、预期、日志或失败测试 | 调查根因；有授权才做最小修复；按风险选择记录载体 | 诊断结论，或修复依据与回归结果；简单 Bug 不强制独立报告 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | 已授权变更目标、影响与项目规则 | 审视方案、分档、定位；按项目 OpenSpec 或合法兼容路径准备实施 | 设计依据、活动切片和代码坐标；进入架构与实现 |
 

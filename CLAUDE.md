@@ -107,6 +107,7 @@ flowchart TD
 | 只咨询方案可行性、审查或影响 | 按问题对象探查；不自动进入实施 |
 | 报告 Bug、异常、超时、错误行为；或明确要求修复 | `bug-doc-required` |
 | 重构、复写、迁移前理解现有业务 | `business-logic-orientation` |
+| 从业务问题建立或补齐本体、对象关系、状态及指标口径，分析Agent可回答性 | `business-ontology-modeling`；按需复用现状理解、后端证据与变更准备 |
 | 开始写业务代码 | `architecture-ddd-lite-fullstack` |
 | 任何源码 Edit/Write | `coding-standards-common` |
 | Java 源码 | `java-coding-standards` |
@@ -135,7 +136,7 @@ flowchart TD
 
 ## Skill 分类
 
-- 分析：change-readiness、reviewing-design-plainly、bug-doc-required、business-logic-orientation（含术语）。
+- 分析：change-readiness、reviewing-design-plainly、bug-doc-required、business-logic-orientation（含术语）、business-ontology-modeling。
 - 编码：architecture-ddd-lite-fullstack、coding-standards-common（含清理/反馈）、java-coding-standards、go-coding-standards、llm-agent-coding-standards。
 - 前端设计：business-visualization-advisor（指标与信息设计）、design-system（视觉系统）、frontend-excellence（实现与验收）；业务事实仍归现有证据入口。
 - 证据与接入：backend-evidence、init-project-docs、markdown-writing-standards。
@@ -155,6 +156,7 @@ flowchart TD
 | `backend-evidence` | 单服务后端事实、DDL/SQL 正确性与性能、反向影响、领域规格 | 跨项目拓扑不归团队插件 |
 | `bug-doc-required` | Bug 证据、根因、修复合同、最小修复与回归 | 调查模式不改源码；简单问题不强制独立文档 |
 | `business-logic-orientation` | Graphify 优先的现状理解与业务语义核实 | 仅明确要求或需要长期基线时生成梳理文档 |
+| `business-ontology-modeling` | 从业务问题推导对象、属性、关系、规则、证据与分步回验 | 三个可嵌入模板和六问教学案例；来源/接入/口径独立分类，工具缺失可降级 |
 | `coding-standards-common` | 跨语言命名、结构、异常、重复、测试和注释规则 | 所有源码改动必经 |
 | `change-readiness` | 规格/设计/验证独立判定、既有资产复用和代码定位 | 行为保持允许无需 Change；相关任务默认共享分支 |
 | `delivery-verification` | 完成前真实验证、有限修复循环与 按影响验证与如实交付 | 按影响范围选择真实验证，复用覆盖输入未变的证据 |
@@ -182,6 +184,7 @@ flowchart TD
 | `skills/change-readiness/references/design-output-contract.md` | `change-readiness` | 适用概设详设视图、唯一正文与长期设计晋升 |
 | `skills/change-readiness/references/governance-checker.md` | `change-readiness` | 任务绑定、JSON 证据、写前/Stop/CI 检查与支持边界 |
 | `skills/business-logic-orientation/references/orientation-document-workflow.md` | `business-logic-orientation` | 仅在需要长期基线时加载的完整现状文档流程 |
+| `skills/business-ontology-modeling/assets/templates/`、`references/` | `business-ontology-modeling` | 问题与证据、领域模型、实施回验模板；跨项目采用与新品六问示例 |
 | `skills/bug-doc-required/template.md` | `bug-doc-required` | 按需分析模板，不作为每次 Bug 的必填报告 |
 | `skills/bug-doc-required/references/repair-rules.md` | `bug-doc-required` | 最小修复与回归证据，编码风格复用 common |
 | `skills/backend-evidence/references/` | `backend-evidence` | 存储路由、更新、SQL 正确性、性能、反向影响和领域规格 |
