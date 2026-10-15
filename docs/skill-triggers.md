@@ -10,7 +10,7 @@
 | 已授权需求实施、重构、源码修改 | `change-readiness`；OpenSpec 项目自动匹配/创建并维护 change | 架构、语言和领域 Skill |
 | Bug、异常、超时、错误行为 | `bug-doc-required` | `change-readiness`、编码标准 |
 | 重构前理解现状 | `business-logic-orientation` | `backend-evidence` |
-| 从业务问题补本体、属性、关系、状态/指标口径，或分析Agent能否回答 | `business-ontology-modeling` | 现状理解、后端证据；实施时change-readiness |
+| 仅有代码/数据库时反向建模，或按业务问题补本体、关系、状态和口径 | `business-ontology-modeling` | 优先Graphify及数据库工具；现状/后端证据按需，实施时change-readiness |
 | 表、SQL、状态、字段、事件、API、性能 | `backend-evidence` | `glossary-required` |
 | 共享定义影响面 | `backend-evidence` Graphify 即时影响模式 | `change-readiness` |
 | 状态密集业务缺少闭环规格 | `backend-evidence` 领域规格模式 | `planning-evidence-discovery` |

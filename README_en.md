@@ -8,7 +8,9 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.13.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.13.1**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+
+Version 4.13.1 adds a [code-and-database starting path](plugins/team-standards/skills/business-ontology-modeling/references/code-and-database-discovery.md): reuse Graphify and existing database metadata/ER tools, cross-check write/read paths and actual data, then derive domain objects, rules and questions. A knowledge base, existing design or question list is not required. Check installed tool capabilities; no new parser, relationship-mining engine or index platform is introduced.
 
 Version 4.13.0 adds [business-ontology-modeling](plugins/team-standards/skills/business-ontology-modeling/SKILL.md): derive objects, relationships, lifecycle rules and measures from real business questions, trace evidence, and classify source availability, integration and semantic readiness independently. It includes three embeddable templates, a complete six-question product-launch teaching example, portable adoption guidance and trial scenarios. Existing standards remain authoritative; Graphify, OpenSpec, OWL and knowledge services are optional project capabilities. No new hook, mandatory artifact or business-write authorization is introduced.
 
@@ -59,7 +61,7 @@ The main consolidated entry points are:
 - `delivery-verification`: requires current execution evidence before completion, then routes documentation synchronization and automatic local commit.
 - `bug-doc-required`: evidence-led investigation, minimal authorized fixes, and regression. Simple bugs do not require separate reports, diagrams, or fixed tables. Complex or high-risk bugs retain evidence in an existing issue, OpenSpec change, or project document; create a separate report only when needed. The existing invocation name remains compatible.
 - `backend-evidence`: database/runtime truth, fresh Graphify impact queries, domain specifications, and query-performance gates; it does not maintain a parallel code index.
-- `business-ontology-modeling`: question-driven domain modeling with evidence and answerability boundaries; see [adoption and templates](plugins/team-standards/skills/business-ontology-modeling/references/adoption.md) and the [six-question worked example](plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md).
+- `business-ontology-modeling`: reverse modeling from code and databases, or question-driven model completion, with evidence and answerability boundaries; see [adoption and templates](plugins/team-standards/skills/business-ontology-modeling/references/adoption.md) and the [six-question worked example](plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md).
 - `markdown-writing-standards`: document ownership, Markdown/Mermaid structure, and affected existing navigation.
 - `init-project-docs`: idempotently initializes Agent entrypoints, document indexes, OpenSpec, `.graphifyignore`, and the Graphify Git sharing boundary, then routes project rules and evidence without duplicate fact projections.
 - `design-system`: registry/profile initialization and evidence-based preference learning.

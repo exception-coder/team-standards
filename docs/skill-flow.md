@@ -69,7 +69,9 @@ flowchart TD
 
 ## 业务建模的条件链路
 
-真实问题与决策 → `business-ontology-modeling`识别必要流程、对象关系、状态与口径 → 按需复用现状理解和后端证据 → 分别记录来源、接入、口径及答案覆盖。仅分析时交付结论，保存时将模板嵌入已有设计；已授权实施再进入`change-readiness`和项目实际OpenSpec/设计流程，按可用切片实现并用原问题回验。当前方法不增加必备工具或工件。
+只有代码和数据库时，先按[反向建模流程](../plugins/team-standards/skills/business-ontology-modeling/references/code-and-database-discovery.md)复用Graphify和现有数据库工具，发现业务入口、表族和读写链，再提炼对象关系、状态、口径及候选问题。有明确问题时直接追踪其证据；知识库和设计可以在过程中形成。分别记录来源、接入、口径及答案覆盖，必要时复用现状理解和后端证据。
+
+仅分析时交付结论，保存时将模板嵌入已有设计；已授权实施再进入`change-readiness`和项目实际OpenSpec/设计流程，按可用切片实现并用原问题回验。工具负责结构提取，Agent交叉解释语义，不新建解析或知识引擎。
 
 项目特有对象、表、阈值与权限仍由项目声明；[新品六问](../plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md)仅作有版本边界的完整案例。源码纳入插件、打包分发和宿主实际发现分别验收。
 

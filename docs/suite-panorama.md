@@ -66,7 +66,7 @@ flowchart TD
 |---|---|---|---|
 | 意图/授权/风险判断 | 当前请求、历史授权、项目与环境 | 分别判断目标、可做范围、具体副作用和 S/M/L 影响 | 专业主入口与必要阶段；没有独立总路由 Skill |
 | [business-logic-orientation](../plugins/team-standards/skills/business-logic-orientation/SKILL.md) | 现有业务、源码与行为问题 | 理解入口、分支、依赖和不变量，区分事实与推断 | 现状结论；已授权重构时给 change-readiness 提供依据 |
-| [business-ontology-modeling](../plugins/team-standards/skills/business-ontology-modeling/SKILL.md) | 真实问题、决策、可用资料 | 推导对象、关系、状态、规则及证据，分别核实来源/接入/口径 | 问题追踪与可嵌入模板；已授权时安排分步实施与回验 |
+| [business-ontology-modeling](../plugins/team-standards/skills/business-ontology-modeling/SKILL.md) | 代码和数据库，或真实业务问题 | 复用成熟工具提结构，交叉核实对象、关系、状态、规则及证据 | 无知识库可起步，形成模型与能力问题；已授权时分步实施与回验 |
 | [bug-doc-required](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | 现象、预期、日志或失败测试 | 调查根因；有授权才做最小修复；按风险选择记录载体 | 诊断结论，或修复依据与回归结果；简单 Bug 不强制独立报告 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | 已授权变更目标、影响与项目规则 | 审视方案、分档、定位；按项目 OpenSpec 或合法兼容路径准备实施 | 设计依据、活动切片和代码坐标；进入架构与实现 |
 

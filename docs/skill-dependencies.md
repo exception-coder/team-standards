@@ -25,7 +25,7 @@ flowchart LR
 | `change-readiness` | 用户意图、OpenSpec 配置与可用项目证据 | 自动 change 生命周期、架构、后端事实或编码标准 |
 | `bug-doc-required` | Bug 现象与可验证证据 | 需要修复时进入设计与编码链 |
 | `business-logic-orientation` | 现有代码和业务场景 | 结论；已授权重构时继续设计 |
-| `business-ontology-modeling` | 真实业务问题、角色、决策和可用资料；工具非必备 | 按需复用现状/后端证据；模板嵌入既有设计，已授权实施进入change-readiness |
+| `business-ontology-modeling` | 原始代码和数据库，或真实业务问题；已有知识/设计非前置 | 优先Graphify及数据库工具；交叉核实对象规则，按需保存模型，已授权实施进入change-readiness |
 | `planning-evidence-discovery` | 项目范围解析 | 规划输出或设计 |
 | `backend-evidence` | 已识别服务边界 | 即时影响分析、领域规格或实施验证 |
 | `markdown-writing-standards` | 已确定文档归属 | 受影响的已有导航维护 |

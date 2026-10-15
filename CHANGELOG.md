@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.13.1] - 2026-10-15
+
+- Add code-and-database reverse modeling as the starting path for legacy systems without a knowledge base, design or question list.
+- Reuse Graphify and existing database metadata/ER tools; cross-check reads, writes, procedures and samples before deriving business semantics.
+- Record tool-version and evidence limits; do not introduce a new parser, mining engine or mandatory knowledge service.
+
 ## [4.13.0] - 2026-10-15
 
 - Add business-ontology-modeling with question-to-model evidence tracing and independent source, integration and semantic readiness states.
