@@ -7,6 +7,8 @@ description: "Guide implementation preparation: understand the existing behavior
 
 帮助 Agent 在已授权任务内找到足够依据后开始实施。普通开发不要求先调用 Forge、建立兼容治理绑定、填写 JSON 或取得机器 PASS；插件不注册相关写前、提交前或 Stop 门禁。
 
+遵循[工程原则](references/engineering-principles.md)：以当前目标和风险选择方法，复用已有上下文，不为档位或模板增加作业。
+
 ## 工作方法
 
 1. **确认当前目标。** 区分咨询与实施，读取项目入口、相关源码和已有规格。只读咨询不自动创建设计、change 或绑定。

@@ -1,12 +1,16 @@
 # team-standards
 
+使命：**以最小复杂度，持续交付可靠、可维护的软件。** [工程原则](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一默认判断：按需使用能力，以实际风险决定设计和验证深度，以真实结果交付。
+
+4.14.0 收敛默认作业负担：取消按文件/行数升档、按分支强拆 Service 和注释行数配额；Java 实践按项目契约适用。架构路径与注释模式 Hook 默认改为 `warn`，保留明确配置的 `block` / `off`。升级无需新建治理记录，不新增 Skill 或验证平台；既有 CI、安全、权限、数据完整性和项目显式门禁继续生效。改动及验证范围见[维护记录](docs/dev-log/2026-10-20.md)。
+
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
 4.4.0 将概设/详设维护接入普通开发任务：Agent 自动发现、补建、绑定与同步，不要求用户手工初始化。已有正文原位复用，准备记录保护初始脏文件与并行绑定；同一真实会话完成已验证切片提交后，可显式续接检查点，旧会话缺绑定时可核验当前证据后恢复。未启用 OpenSpec 的项目支持本地验收引用。见[自动执行流程](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)及[实际试点与验证](docs/maintenance/automatic-design-release.md)。
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.13.2**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.14.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#范围选择示例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -151,13 +155,20 @@ coding-standards-common              所有源码修改的公共基线
 
 ## Hook 边界
 
+| 检查 | 默认行为 | 项目选择 |
+|---|---|---|
+| 架构路径模式 | `warn`，核对依赖与实际公开边界 | `TEAM_STANDARDS_ARCH_BOUNDARY_HOOK=block` 显式严格；`off` 关闭 |
+| 注释模式 | `warn`，核对用途，不按日期/工单号判错 | `TEAM_STANDARDS_COMMENT_HOOK=block` 保留旧模式阻断；`off` 关闭 |
+
+未设置变量的安装升级后采用上述默认值；已有显式 `block` 不会被覆盖。确认项目是否需要这些命名/风格模式后再调整其配置，不为通过检查删除有效契约或绕过安全要求。
+
 设计依据与 OpenSpec 写前检查不再将项目外、无所属项目的系统临时文件归入当前项目；一次性文档辅助脚本可保留 `.py` 扩展名。项目内 `.tmp/` 脚本、系统临时目录中的真实项目、指向项目的目录链接仍执行原检查；混合补丁逐文件判断，移动文件同时检查原路径。此边界不豁免其他内容检查，也不覆盖脚本执行产生的副作用。
 
 4.6.0 完善[已有规格解析](plugins/team-standards/skills/change-readiness/references/existing-spec-resolution.md)：本机自动发现 Forge CLI，按宿主 session 绑定项目、分支与 change，支持 Codex apply_patch/exec_command；提交前检查已确认文件范围，归档后刷新索引。模型草稿仍需审阅。默认 warn，配置和宿主覆盖边界见该协议。
 
 开发准备与交付默认由 Skill 引导。历史共享治理检查器仍支持绑定、范围和证据核对，但仅供项目主动采用；安装插件不再启动写前、提交前或 Stop 的规格/兼容治理检查。参见[按需治理协议](plugins/team-standards/skills/change-readiness/references/governance-checker.md)。
 
-Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。行为变化的 OpenSpec 执行要求明确选择并读取相关活动 change，行为保持按 Forge 策略无需空 change；未启用 OpenSpec 的项目继续认可兼容设计文档。验证计划按影响范围选择并复用新鲜证据；M/L、交付或归档不自动触发全仓。当前 hooks.json 未注册交付 Stop Hook；安装本插件不会要求 `forge_verify phase=all` 或 Forge PASS。项目主动启用历史交付 Hook 时仍消费其真实契约，不把 Skill 引导描述为机器已经接受定向证据。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。其余门禁包括架构边界、DDL、SQL 正确性风险、查询性能、注释红线和提交信息。
+Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义决策。行为变化的 OpenSpec 执行要求明确选择并读取相关活动 change，行为保持按 Forge 策略无需空 change；未启用 OpenSpec 的项目继续认可兼容设计文档。验证计划按影响范围选择并复用新鲜证据；M/L、交付或归档不自动触发全仓。当前 hooks.json 未注册交付 Stop Hook；安装本插件不会要求 `forge_verify phase=all` 或 Forge PASS。项目主动启用历史交付 Hook 时仍消费其真实契约，不把 Skill 引导描述为机器已经接受定向证据。后端上下文检查优先认可 Graphify 查询，图谱 manifest 早于目标文件时会显式提示或阻断。架构、注释、后端证据和 SQL 专项检查默认提供提醒；提交检查仍按既有配置执行。提示不是 PASS，显式 block 与检查器执行错误仍可能中断作业。
 
 ---
 
@@ -205,6 +216,8 @@ Claude Code：
 ---
 
 ## 维护与验证
+
+套件 CI 对可选 Graphify 的全仓来源指纹使用 `node scripts/check-graphify-freshness.mjs --advisory`：过期明确输出 `STALE (advisory, not verified)`，不据此要求每次改规则都重建图谱。不带该参数仍严格拒绝过期指纹，文件不可读等执行错误在两种模式都失败。来源指纹本身不能证明图谱内容正确；实际消费图谱时仍核对相关来源，过期则刷新或用当前源码补证，不能只重写指纹伪造新鲜度。此调整仅影响套件自身 CI，业务项目门禁不变。
 
 3.3.0 引入意图、授权与风险的独立判断，区分咨询交付和已授权实施；3.4.0 继续保留 21 个 Skill，并收敛重复文档及旧位置门禁。3.4.1 补充工作台可用视口验收。
 

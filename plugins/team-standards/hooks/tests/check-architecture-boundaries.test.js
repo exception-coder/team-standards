@@ -11,7 +11,7 @@ function run(payload, env = {}) {
   return spawnSync('node', [HOOK], {
     input: JSON.stringify(payload),
     encoding: 'utf8',
-    env: { ...process.env, ...env },
+    env: { ...process.env, TEAM_STANDARDS_ARCH_BOUNDARY_HOOK: '', ...env },
   });
 }
 
@@ -27,7 +27,7 @@ test('blocks a direct dependency between tool modules', () => {
   const result = run(patch(
     'C:/repo/tools/tool-docker/pom.xml',
     '<dependency><artifactId>tool-hosts</artifactId></dependency>',
-  ));
+  ), { TEAM_STANDARDS_ARCH_BOUNDARY_HOOK: 'block' });
   assert.equal(result.status, 2);
   assert.match(result.stderr, /tool-module-dependency/);
 });
@@ -44,7 +44,7 @@ test('blocks imports of another feature internal path', () => {
   const result = run(patch(
     'C:/repo/frontend/src/features/reqpool/pages/ReqPoolPage.tsx',
     "import { ChatPanel } from '@/features/claude-chat/components/ChatPanel';",
-  ));
+  ), { TEAM_STANDARDS_ARCH_BOUNDARY_HOOK: 'block' });
   assert.equal(result.status, 2);
   assert.match(result.stderr, /feature-internal-import/);
 });
@@ -68,11 +68,21 @@ test('warns but does not block growth of an existing giant file', () => {
   fs.rmSync(root, { recursive: true, force: true });
 });
 
-test('warn mode never blocks objective boundary violations', () => {
+test('default mode warns for a tool dependency without blocking', () => {
   const result = run(patch(
     'C:/repo/tools/tool-docker/pom.xml',
     '<dependency><artifactId>tool-hosts</artifactId></dependency>',
-  ), { TEAM_STANDARDS_ARCH_BOUNDARY_HOOK: 'warn' });
+  ));
   assert.equal(result.status, 0);
   assert.match(result.stderr, /tool-module-dependency/);
+});
+
+test('default mode warns for feature imports without claiming a block', () => {
+  const result = run(patch(
+    'C:/repo/frontend/src/features/orders/pages/Orders.tsx',
+    "import { Stock } from '@/features/stock/components/Stock';",
+  ));
+  assert.equal(result.status, 0);
+  assert.match(result.stderr, /\[warn\] feature-internal-import/);
+  assert.doesNotMatch(result.stderr, /\[block\]/);
 });

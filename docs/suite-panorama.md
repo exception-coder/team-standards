@@ -1,5 +1,7 @@
 # 团队工具套件全景：按工程职责域看链路与节点
 
+按[工程原则](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)按需调用能力、按风险验证结果。4.14.0 起，文件数、行数和分支数不单独触发升档或强拆；架构路径与注释 Hook 默认提醒。
+
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
 这套工具帮助 AI 把自然语言目标转成有依据、边界明确、可验证、可交接的工程成果。它同时管理“怎样工作”和“依据什么工作”：前者是工程规范，后者是项目事实、业务知识与行为规格。
@@ -173,9 +175,9 @@ flowchart TD
 | 用户输入 | check-plugin-version-stale | 提醒插件版本可能过期，不等于自动更新 |
 | 文件修改前 | change-input + write-guard-dispatcher | 适配写入事件，把同一输入分发到启用的检查器并汇总结果 |
 | 可选旧适配器 | check-change-readiness | 历史适配器；默认不注册，项目显式接入 |
-| 写入分发 1 | check-architecture-boundaries | 可机械识别的模块依赖、Feature 边界等风险 |
+| 写入分发 1 | check-architecture-boundaries | 路径与命名约定的风险提示；默认 warn，项目可显式 block/off |
 | 写入分发 2 | check-backend-evidence-readiness | 后端变更是否具备要求的上下文证据 |
-| 写入分发 3 | check-comment-density | 注释密度与相关内容风险 |
+| 写入分发 3 | check-comment-density | 注释模式提示，不证明内容错误；默认 warn，项目可显式 block/off |
 | 写入分发 4 | check-sql-ddl-readiness | SQL/DDL 变更所需结构依据 |
 | 写入分发 5 | check-sql-correctness-risk | 可识别 SQL 正确性风险 |
 | 写入分发 6 | check-query-performance-risk | 查询性能风险信号 |

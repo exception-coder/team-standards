@@ -34,7 +34,7 @@ test('dispatcher forwards one payload and preserves a blocking result', () => {
       '+// [BUGFIX] history belongs in git',
       '*** End Patch',
     ].join('\n') },
-  });
+  }, { TEAM_STANDARDS_COMMENT_HOOK: 'block' });
   assert.equal(result.status, 2);
   assert.match(result.stderr, /change-marker/);
   assert.equal(result.stdout, '');

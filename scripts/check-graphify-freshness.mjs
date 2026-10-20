@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const fingerprintFile = path.join(repositoryRoot, 'graphify-out', 'source-fingerprint.json');
 const writeMode = process.argv.includes('--write');
+const advisoryMode = process.argv.includes('--advisory');
 const current = collectFingerprints();
 
 if (writeMode) {
@@ -21,7 +22,12 @@ if (writeMode) {
 const recorded = readRecorded();
 const changed = [...new Set([...Object.keys(recorded), ...Object.keys(current)])]
   .filter((file) => recorded[file] !== current[file]);
-if (changed.length) fail(`Graphify source fingerprint is stale:\n${changed.map((file) => `  ${file}`).join('\n')}\nRun "graphify update ." and then "node scripts/check-graphify-freshness.mjs --write".`);
+if (changed.length) {
+  const message = `Graphify source fingerprint is stale:\n${changed.map((file) => `  ${file}`).join('\n')}\nBefore relying on the graph, refresh the relevant evidence or inspect current source. A source fingerprint alone does not verify graph contents.`;
+  if (!advisoryMode) fail(message);
+  console.warn(`[graphify-freshness] STALE (advisory, not verified): ${message}`);
+  process.exit(0);
+}
 console.log(`[graphify-freshness] current (${Object.keys(current).length} files)`);
 
 function collectFingerprints() {

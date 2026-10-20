@@ -1,40 +1,16 @@
 #!/usr/bin/env node
-// =============================================================
-// PreToolUse hook: 源码 Write/Edit/MultiEdit 之前
-//   扫描本次「新增内容」里的注释，命中 coding-standards-common §5.4
-//   注释红线时提醒。规则源是 §5.4，本 hook 只做机械兜底。
-//
-// 默认 block 模式：命中客观红线（变更标记/日期/工单号/分节线/版本流水）即硬阻断（exit 2）。
-//   long-block（连续注释块超阈值）是启发式软规则，只提示不阻断——避免误伤公开 API 的长 dartdoc。
-// TEAM_STANDARDS_COMMENT_HOOK=warn → 仅 stderr 提示，不阻断（exit 0）
-// TEAM_STANDARDS_COMMENT_HOOK=off  → 完全跳过
-//
-// 抓的是「客观无歧义」的红线（误报极低）：
-//   - 变更标记 [BUGFIX]/[DEPRECATED]/[ADDED]/[REWRITTEN]/[MODIFIED]/[FIX]/[FIXED]...
-//   - 注释里的日期（2026-04-30 / 2026年4月）
-//   - 工单/PR/Issue 号引用（PR #123 / KP-789 / Linear ...）
-//   - 带个人或日期的 TODO(name 2026-04)
-//   - 带日期/版本/标记的分节线注释（// ===== [ADDED ...] =====）
-//   - 版本流水/版本标记措辞（v6 调整流水 / vN 新增·起·上线·移除 / 旧实现…新实现…）
-// 外加一道软提醒：单段连续注释块超过阈值（默认 6 行，疑似函数头过载/历史科普）。
-//
-// 只扫「新增文本」（Edit.new_string / MultiEdit.edits[].new_string / Write.content），
-// 不动用户没碰的存量注释。注释判定为去掉字符串字面量后的注释片段，避免
-// URL（http://）/ 字符串里的 "//" 误判。
-//
-// 范围：源码扩展名（.dart/.java/.kt/.ts/.js/.py/.go/.rs/.cs/... 等）。
-//   .md/.json/.yaml/配置文件直接放行。
-//
-// 阈值可调：TEAM_STANDARDS_COMMENT_MAX_BLOCK（默认 6，连续注释块行数上限）
-// =============================================================
+// 扫描新增源码注释的模式线索，默认 warn。日期、工单和长注释也可能承载必要契约。
+// 语义依据：skills/coding-standards-common/references/comments.md。
+// 项目显式设 TEAM_STANDARDS_COMMENT_HOOK=block 时保留既有模式阻断；off 关闭。
+// 连续长注释只提醒；字符串排除和输入规范化复用原有实现。
 
-const MODE = (process.env.TEAM_STANDARDS_COMMENT_HOOK || 'block').toLowerCase();
+const MODE = (process.env.TEAM_STANDARDS_COMMENT_HOOK || 'warn').toLowerCase();
 if (MODE === 'off') process.exit(0);
 const { normalizeChanges } = require('./change-input');
 
 const MAX_BLOCK = parseInt(process.env.TEAM_STANDARDS_COMMENT_MAX_BLOCK || '6', 10);
 
-// 源码扩展名（注释红线是全语言通用的）
+// 待检查的源码扩展名
 const SOURCE_EXT = /\.(dart|java|kt|kts|ts|tsx|js|jsx|mjs|cjs|py|go|rs|c|cc|cpp|cxx|h|hpp|cs|scala|rb|php|swift|m|mm|vue|lua|sql)$/i;
 
 // 行注释 token 按扩展名区分（# 只对 py/rb 等，-- 只对 sql/lua）
@@ -52,32 +28,32 @@ function stripStrings(line) {
     .replace(/`(?:\\.|[^`\\])*`/g, '``');
 }
 
-// 红线规则：对「注释文本」匹配
+// 模式线索：对「注释文本」匹配，不能代替语义判断
 const RULES = [
   {
     id: 'change-marker',
-    desc: '变更标记（属于 git commit body / bug doc，不进源码）',
+    desc: '变更标记（核对是否只是重复 Git 流水，保留正式弃用契约）',
     re: /\[\s*(BUGFIX|DEPRECATED|ADDED|REWRITTEN|MODIFIED|FIX|FIXED|CHANGED|REMOVED|REFACTORED)\b/i,
   },
   {
     id: 'date',
-    desc: '注释里的日期（变更时间属于 git log）',
+    desc: '注释里的日期（保留法律、协议与兼容所需日期）',
     re: /\b(?:19|20)\d{2}[-/.](?:0?[1-9]|1[0-2])[-/.](?:0?[1-9]|[12]\d|3[01])\b|\b(?:19|20)\d{2}\s*年\s*\d{1,2}\s*月/,
   },
   {
     id: 'ticket-ref',
-    desc: '工单/PR/Issue 号引用（易失效，归外部文档）',
+    desc: '工单/PR/Issue 引用（核对是否仍解释当前限制）',
     re: /\b(?:PR|MR|issue|ticket|jira|linear)\b\s*#?\s*\d+/i,
   },
   {
     id: 'ticket-code',
-    desc: '工单编号（如 KP-789，归 design/bug doc）',
+    desc: '工单编号（核对是否仍有必要，不能仅凭编号删除）',
     // 2-5 个大写字母 + 短横 + ≥3 位数字；排除 ISO/RFC/UTF 等常见技术标准前缀，避免误判
     re: /\b(?!(?:ISO|RFC|UTF|ASCII|SHA|AES|RSA|IEEE|ANSI|IEC|ITU|GMT|UTC|PEP|ECMA|JIS|DIN|EN|GB|X)-?\d)[A-Z]{2,5}-\d{3,}\b/,
   },
   {
     id: 'todo-person-date',
-    desc: 'TODO/FIXME 带个人或日期（应匿名写原因或开任务）',
+    desc: 'TODO/FIXME 元信息（核对实际约束及可执行后续事项）',
     re: /\b(?:TODO|FIXME|HACK|XXX)\s*\([^)]*(?:\d{4}|[A-Za-z]{2,})[^)]*\)/,
   },
   {
@@ -107,7 +83,7 @@ process.stdin.on('end', () => {
   if (matches.length === 0) process.exit(0);
 
   const lines = [
-    '[team-standards] 本次新增内容的注释疑似命中 coding-standards-common §5.4 注释红线：',
+    '[team-standards] 新增注释存在待核对的模式线索，不代表内容错误：',
   ];
   for (const match of matches) {
     lines.push(`  文件：${match.filePath}`);
@@ -116,11 +92,11 @@ process.stdin.on('end', () => {
       if (f.sample) lines.push(`      行内样例：${f.sample}`);
     }
   }
-  lines.push('  红线规则源：skills/coding-standards-common/SKILL.md §5.4 / §5.4.1');
-  lines.push('  处置：变更历史/标记/日期进 git commit body 或 design/bug doc；行内 WHY 压成 1 行；私有方法 1 行职责即可。');
-  lines.push('  旁路：TEAM_STANDARDS_COMMENT_HOOK=warn 仅提示 / =off 关闭；TEAM_STANDARDS_COMMENT_MAX_BLOCK 调注释块行数阈值。');
+  lines.push('  参考：skills/coding-standards-common/references/comments.md');
+  lines.push('  处置：结合用途核对；重复变更流水可移至 Git，保留必要法律、兼容依据和缺陷引用，不按行数删减契约。');
+  lines.push('  默认 warn 仅提示；项目显式设置 TEAM_STANDARDS_COMMENT_HOOK=block 时按模式阻断，off 关闭；TEAM_STANDARDS_COMMENT_MAX_BLOCK 调整长度提醒。');
 
-  // long-block 是启发式软规则（公开 API 长 dartdoc 易误伤），只提示不阻断；其余客观红线在 block 模式下硬阻断。
+  // 保持项目已采用的严格模式契约；长注释在所有模式下都只提醒。
   const hasHardFinding = matches.some((match) => match.findings.some((f) => f.id !== 'long-block'));
   process.stderr.write(lines.join('\n') + '\n');
   process.exit(MODE === 'block' && hasHardFinding ? 2 : 0);

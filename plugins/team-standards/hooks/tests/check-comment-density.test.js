@@ -1,7 +1,7 @@
 // =============================================================
 // 端到端测试 check-comment-density.js
 // 通过 spawnSync + stdin JSON payload 模拟 PreToolUse(Write/Edit/MultiEdit)，
-// 验证注释红线（§5.4）在新增内容里的 warn / block / off 行为与误报边界。
+// 验证注释模式线索在新增内容里的 warn / block / off 行为与误报边界。
 // =============================================================
 
 const test = require('node:test');
@@ -15,7 +15,7 @@ function runHook(payload, env = {}) {
   const res = spawnSync('node', [HOOK], {
     input: JSON.stringify(payload),
     encoding: 'utf8',
-    env: { ...process.env, ...env },
+    env: { ...process.env, TEAM_STANDARDS_COMMENT_HOOK: '', ...env },
   });
   return { code: res.status, stderr: res.stderr || '', stdout: res.stdout || '' };
 }
@@ -42,11 +42,11 @@ test('放行：干净注释（当前职责 1 行 WHY）', () => {
   assert.equal(stderr, '');
 });
 
-test('命中：变更标记 [BUGFIX]（默认 block → exit 2）', () => {
+test('命中：变更标记 [BUGFIX]（默认 warn → exit 0）', () => {
   const { code, stderr } = runHook(edit('lib/a.dart', '// [BUGFIX] 旧实现用 transaction_no 反查\nfinal x = 1;\n'));
-  assert.equal(code, 2); // 默认 block，客观红线硬阻断
+  assert.equal(code, 0); // 默认提示，不以模式命中打断编辑
   assert.match(stderr, /change-marker/);
-  assert.match(stderr, /§5\.4/);
+  assert.match(stderr, /references\/comments\.md/);
 });
 
 test('命中：[DEPRECATED] 标记', () => {
@@ -98,15 +98,15 @@ test('命中：超长注释块（> 默认 6 行）', () => {
   assert.match(stderr, /long-block/);
 });
 
-test('默认 block：long-block 单独命中只提示不阻断（exit 0）', () => {
+test('显式 block：long-block 单独命中仍不阻断（exit 0）', () => {
   const block = Array.from({ length: 8 }, (_, i) => `// 第 ${i} 行说明`).join('\n') + '\nfinal x = 1;\n';
-  const { code, stderr } = runHook(edit('lib/a.dart', block));
+  const { code, stderr } = runHook(edit('lib/a.dart', block), { TEAM_STANDARDS_COMMENT_HOOK: 'block' });
   assert.equal(code, 0); // long-block 是软规则，公开 API 长 dartdoc 不应被硬阻断
   assert.match(stderr, /long-block/);
 });
 
-test('默认 block：客观红线（工单号）→ exit 2', () => {
-  const { code, stderr } = runHook(edit('lib/a.dart', '// 见 KP-789 需求\nfinal x = 1;\n'));
+test('显式 block：保留工单号模式阻断 → exit 2', () => {
+  const { code, stderr } = runHook(edit('lib/a.dart', '// 见 KP-789 需求\nfinal x = 1;\n'), { TEAM_STANDARDS_COMMENT_HOOK: 'block' });
   assert.equal(code, 2);
   assert.match(stderr, /ticket-code/);
 });
@@ -203,7 +203,7 @@ test('Codex apply_patch：检查多文件补丁中的后续危险文件', () => 
         '*** End Patch',
       ].join('\n'),
     },
-  });
+  }, { TEAM_STANDARDS_COMMENT_HOOK: 'block' });
   assert.equal(code, 2);
   assert.match(stderr, /risky\.dart/);
   assert.match(stderr, /change-marker/);

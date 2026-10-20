@@ -24,12 +24,16 @@ test('source edits proceed without design or Forge even with legacy block settin
   const outcome = spawnSync(process.execPath, [path.join(hooksRoot, 'write-guard-dispatcher.js')], {
     cwd: root, encoding: 'utf8', timeout: 20000,
     input: JSON.stringify({ cwd: root, session_id: 'unbound', tool_name: 'Write',
-      tool_input: { file_path: path.join(root, 'src', 'greet.js'), content: 'module.exports = () => "hello";\n' } }),
+      tool_input: { file_path: path.join(root, 'src', 'features', 'orders', 'index.js'), content: "// Protocol valid from 2026-10-20; see issue #1234.\nimport { Stock } from '@/features/stock/components/Stock';\n" } }),
     env: { ...process.env, FORGE_EXECUTION_PROTOCOL: '2', FORGE_SPEC_RESOLUTION_CLI: path.join(root, 'missing.cjs'),
+      TEAM_STANDARDS_COMMENT_HOOK: '', TEAM_STANDARDS_ARCH_BOUNDARY_HOOK: '',
       TEAM_STANDARDS_CHANGE_READINESS_HOOK: 'block', TEAM_STANDARDS_SPEC_RESOLUTION_HOOK: 'block',
       TEAM_STANDARDS_OPENSPEC_GOVERNANCE_HOOK: 'block', TEAM_STANDARDS_DELIVERY_VERIFICATION_HOOK: 'block' },
   });
   assert.equal(outcome.status, 0, outcome.stderr);
+  assert.match(outcome.stderr, /feature-internal-import/);
+  assert.match(outcome.stderr, /ticket-ref/);
+  assert.doesNotMatch(outcome.stderr, /\[block\]/);
   assert.doesNotMatch(outcome.stderr, /EXECUTION_NOT_READY|BINDING_REQUIRED|设计依据|Forge/);
   assert.equal(fs.existsSync(path.join(root, '.team-standards')), false);
   assert.equal(fs.existsSync(path.join(root, '.forge')), false);

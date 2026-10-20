@@ -288,7 +288,7 @@ Graphify、OpenSpec 和 Skill 分属不同层级，不建立三个并行主流�
 4. `init-project-docs` 先以 structure 模式建立六层最小入口、`.graphifyignore` 和 Graphify Git 共享白名单，再由 init 编排真实 Graphify、OpenSpec 与领域证据；不复制图谱、规格或 00–10 文档树。
 5. 项目声明的规划流程负责跨项目证据编排；Graphify 和 OpenSpec只是证据适配器，不替代项目关系权威源。
 
-“已启用”不等于目录存在：`openspec/config.yaml` 必须包含真实项目上下文。启用后，没有相关 change 就自动创建，artifacts 不完整就按 schema 补齐，生成 Skill 缺失但 CLI 正常时走 agent-compatible CLI；这些都不再触发静默 legacy。只有项目未启用 OpenSpec，或用户明确批准当前变更降级时，才使用兼容设计文档。
+“已启用”不等于目录存在：`openspec/config.yaml` 必须包含真实项目上下文。确认行为变化且没有相关 change 时才创建，受影响 artifacts 按 schema 补齐；行为保持不建空 change，生成 Skill 缺失但 CLI 正常时走 agent-compatible CLI；这些都不再触发静默 legacy。只有项目未启用 OpenSpec，或用户明确批准当前变更降级时，才使用兼容设计文档。
 
 完成阶段复用 OpenSpec 官方能力：严格 validate 后执行 verify；需要提前合并 delta specs 时 sync；任务与验证满足条件后才 archive。OpenSpec 自身的 verify/archive warning 在团队门禁中不能替代阻断判断，项目测试、数据库和发布证据仍独立验证。
 
@@ -298,13 +298,15 @@ Graphify 查询也不天然代表当前工作区。消费图谱前比较其 mani
 
 ## S/M/L 路由
 
+[工程原则](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)约束默认流程：档位只决定深度，规格与设计独立按影响维护；不按文件数或行数要求完整工件、重新审批或全量验证。
+
 ```mermaid
 flowchart LR
-    CHANGE["变更请求"] --> RISK{"共享契约、状态、跨模块或不可逆?"}
-    RISK -->|"是"| LARGE["L：完整证据、设计、影响分析与知识回写"]
-    RISK -->|"否"| SIZE{"不超过 2 文件、30 行且仅局部修改?"}
+    CHANGE["变更请求"] --> RISK{"关键不变量、迁移或共享契约存在实质风险?"}
+    RISK -->|"是"| LARGE["L：核实影响、失败恢复与必要消费者"]
+    RISK -->|"否"| SIZE{"影响明确且现有验证能覆盖?"}
     SIZE -->|"是"| SMALL["S：极简判断、编码标准、定向验证"]
-    SIZE -->|"否"| MEDIUM["M：轻量设计、架构门禁、实施验证与提交"]
+    SIZE -->|"否"| MEDIUM["M：维护受影响规则并验证相关行为"]
 ```
 
 ---
@@ -327,7 +329,7 @@ flowchart LR
 | Markdown 新建或重组 | `markdown-writing-standards` 检查受影响导航 |
 | 状态、字段、事件、API 变化 | `backend-evidence` Graphify 即时影响查询；协同项写入 OpenSpec |
 | 项目结构、API、数据访问变化 | `init-project-docs` refresh：更新 Graphify 本体，不生成 Markdown 镜像 |
-| 可执行改动准备交付 | `delivery-verification`；优先 `forge_verify phase=all` |
+| 可执行改动准备交付 | `delivery-verification`；原生检查或项目明确采用的工具，范围按风险选择 |
 | 作业完成且有可提交改动 / 准备 commit | `git-commit-standards` 自动本地提交本次范围 |
 
 ## 状态契约治理扩展
@@ -339,7 +341,7 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 本地检查按 [delivery-verification 的影响分级](../plugins/team-standards/skills/delivery-verification/SKILL.md) 选择，Forge 与 CI 门禁保持原约束。Markdown 格式细则和提交示例由对应 Skill 按需加载。日常日志默认由 Git 承载，明确要求独立日报时按主题合并，不按文件数累加工时；正常自动提交仅报告提交结果，不重复展示完整正文。
 
 
-套件维护复用 [README 的维护入口](../README.md#维护与验证)：快测只覆盖轻量契约，改动相关集成测试与完整 CI 继续执行；共享副本先预览再同步，消费者独立验证升版；发布前检查根总览元数据。此轮保持 21 个独立意图入口与现有 warn/block，清理架构 Skill 的 Dart 触发残留。
+套件维护复用 [README 的维护入口](../README.md#维护与验证)：快测只覆盖轻量契约，改动相关集成测试与完整 CI 继续执行；共享副本先预览再同步，消费者独立验证升版；发布前检查根总览元数据。当前独立意图入口见套件索引；架构路径和注释模式默认 warn，项目显式配置继续有效。
 
 
 ## 易混淆请求的预期路由

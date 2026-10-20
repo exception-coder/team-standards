@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { normalizeChanges } = require('./change-input');
 
-const MODE = (process.env.TEAM_STANDARDS_ARCH_BOUNDARY_HOOK || 'block').toLowerCase();
+const MODE = (process.env.TEAM_STANDARDS_ARCH_BOUNDARY_HOOK || 'warn').toLowerCase();
 if (MODE === 'off') process.exit(0);
 
 const GIANT_FILE_LINES = Number.parseInt(
@@ -32,11 +32,12 @@ process.stdin.on('end', () => {
 
   const lines = ['[team-standards] 架构边界检查发现新增内容可能破坏模块边界：'];
   for (const finding of findings) {
-    lines.push(`  - [${finding.severity}] ${finding.id}: ${finding.message}`);
+    const severity = MODE === 'block' ? finding.severity : 'warn';
+    lines.push(`  - [${severity}] ${finding.id}: ${finding.message}`);
     lines.push(`    文件：${finding.filePath}`);
   }
   lines.push('  规则源：skills/architecture-ddd-lite-fullstack/SKILL.md 与 rules/structure-quality-gates.md');
-  lines.push('  旁路：TEAM_STANDARDS_ARCH_BOUNDARY_HOOK=warn 仅提示 / =off 关闭；TEAM_STANDARDS_GIANT_FILE_LINES 可调整体积提醒阈值。');
+  lines.push('  默认 warn 仅提示；项目确认路径约定适用后可显式设 TEAM_STANDARDS_ARCH_BOUNDARY_HOOK=block，off 关闭；TEAM_STANDARDS_GIANT_FILE_LINES 调整体积提醒阈值。');
   process.stderr.write(`${lines.join('\n')}\n`);
 
   const hasHardFinding = findings.some((finding) => finding.severity === 'block');
@@ -60,7 +61,7 @@ function checkToolModuleDependency(change) {
       id: 'tool-module-dependency',
       severity: 'block',
       filePath: change.filePath,
-      message: `${owner} 新增对 ${dependency} 的直接 Maven 依赖；请提取平台能力或小型 contract/SPI。`,
+      message: `${owner} 新增对 ${dependency} 的直接 Maven 依赖；请核对项目允许的依赖方向与公开契约，不仅凭模块名要求抽取平台。`,
     }));
 }
 
@@ -80,7 +81,7 @@ function checkFeatureImports(change) {
       id: 'feature-internal-import',
       severity: 'block',
       filePath: change.filePath,
-      message: `${owner} 直接引用 ${target.feature} 的内部路径“${specifier}”；跨 feature 只能通过 features/${target.feature}/public-api。`,
+      message: `${owner} 直接引用 ${target.feature} 的内部路径“${specifier}”；请核对该路径是否为项目公开入口；此检测器只识别 public-api 命名约定。`,
     });
   }
   return findings;

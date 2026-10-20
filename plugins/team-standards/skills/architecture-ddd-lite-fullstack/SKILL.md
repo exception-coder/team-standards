@@ -3,17 +3,17 @@ name: architecture-ddd-lite-fullstack
 description: "Use before writing or reviewing business code in Java, Go, Python, React, or Vue to choose layers, feature boundaries, reusable capabilities, and one-way dependencies."
 ---
 
-# DDD-lite 全栈架构约束
+# DDD-lite 全栈架构方法
 
 ## 目标
 
-让业务规则位于稳定、可测试的边界内，保持 feature 内高内聚、层间单向依赖，并防止 Controller、Page、Widget 或基础设施对象承载业务逻辑。
+让业务规则位于稳定、可验证的边界内，保持职责清楚和依赖可控。沿用项目已确认的架构；下面的分层是参考，不要求简单用例建立空层或接口。按[工程原则](../change-readiness/references/engineering-principles.md)控制本次改动范围。
 
 ## 渐进读取
 
 - 需要判断层职责、feature 结构、聚合或事务边界时，读取 [references/layers-and-boundaries.md](references/layers-and-boundaries.md)。
 - 根据技术栈，只读取 [references/framework-rules.md](references/framework-rules.md) 中对应章节。
-- 扩展既有 Service、Controller、Page、Widget，新增跨 feature 调用，目标目录混放多个职责簇，或目标文件已呈现多职责、巨型文件、跨分支编排迹象时，**必须**读取 [rules/structure-quality-gates.md](rules/structure-quality-gates.md)。该文件是语义分包、focused service、跨 feature 公开边界和旧骨架增量治理的规则源。
+- 扩展既有 Service、Controller、Page、Widget，新增跨 feature 调用，目标目录混放多个职责簇，或目标文件已呈现多职责、巨型文件、跨分支编排迹象时，需要结构判断时读取 [rules/structure-quality-gates.md](rules/structure-quality-gates.md)。该文件提供语义分包、服务拆分和公共边界的判断依据。
 
 ## 基本依赖方向
 
@@ -30,13 +30,13 @@ Domain 不依赖 UI、Controller、数据库实现、HTTP 客户端或框架适�
    检查目标层内是否已有多个稳定职责簇；有则按语义分包，单一职责簇保持扁平。
 2. 将输入适配留在 presentation，将用例编排留在 application，将业务不变量留在 domain。
 3. Repository 在 domain 定义端口，在 infrastructure 提供实现；Go 按消费方在 application/domain 定义小接口，见 framework-rules 的 Go 章节。
-4. 一个业务分支差异明显时拆成 focused service 或策略，不在单函数堆叠多场景条件。
+4. 分支规则独立变化、依赖不同或妨碍验证时考虑提取函数、服务或策略；同一用例的简单分支可以保留。
 5. 跨聚合或跨服务操作明确事务边界、失败补偿、幂等和可观测性。
 6. 复用已有原子能力；不存在时以清晰业务动作命名新增能力。
 
 ### 函数级业务场景分流
 
-不同业务场景的规则或失败行为明显不同时，拆成 focused function/service，由用例层选择；详细判定见 `references/layers-and-boundaries.md`。
+按职责、依赖与变化原因判断是否拆分，不按分支数量建立 Service；详细判定见 `rules/structure-quality-gates.md`。
 
 ### 服务命名 taxonomy
 
@@ -49,16 +49,16 @@ Domain 不依赖 UI、Controller、数据库实现、HTTP 客户端或框架适�
 - 不以 `Util`、`CommonService`、`Manager` 掩盖不清晰职责。
 - 不为了形式完整创建没有行为的层或空抽象。
 - 不在一个 Service 中混合互不相关的业务动作。
-- 后端工具模块默认不得直接依赖另一个工具模块；复用通过平台能力、稳定契约或 SPI。
-- 前端 feature 不得 import 另一个 feature 的内部组件、hook、store 或 API；跨 feature 只允许引用对方明确声明的 `public-api`。
+- 模块依赖遵守项目已声明的架构边界；不因模块名含 tool 就强制抽取平台或 SPI。
+- 跨 feature 使用项目明确公开的契约，不引用明确私有的内部实现；公开入口不限定为 `public-api` 文件名。
 - `common` 只接收稳定、无业务归属的运行时能力，不因“多个地方会用”就收纳业务 feature。
 
 ## 可执行门禁
 
-- Skill 负责判定语义边界；项目应使用 ArchUnit、Maven Enforcer、ESLint `no-restricted-imports` 或等价检查把客观规则纳入 CI。
-- 插件的 `check-architecture-boundaries` Hook 对新增的工具模块依赖和前端跨 feature 内部引用执行机械兜底，并对继续膨胀的巨型源码文件给出软提醒。
-- 机械检查未覆盖不代表架构合法；涉及职责、业务归属和聚合边界的判断仍以本 Skill 为准。
+- Skill 帮助判断语义边界；需要固化已确认的项目约束时，优先复用 ArchUnit、Maven Enforcer、ESLint 或已有 CI，不为通用建议另建门禁。
+- `check-architecture-boundaries` 按有限路径约定发现风险，默认 warn；项目确认适用后可显式 block，off 可关闭。文件体积提醒不证明多职责。
+- 命中或未命中均不能证明设计正确；结合项目边界、业务不变量与实际验证判断。
 
 ## 输出
 
-实施或评审时说明：目标 feature、落点层、复用能力、聚合/事务边界、依赖方向和验证方式。
+说明与本次判断有关的落点、依赖或事务风险及验证即可，不要求逐项生成报告。

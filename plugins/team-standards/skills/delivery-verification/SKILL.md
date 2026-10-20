@@ -7,6 +7,8 @@ description: "Guide proportionate verification and honest delivery reporting aft
 
 帮助 Agent 选择能证明当前改动有效的检查，并清楚说明实际结果。插件不注册 Stop 验证门禁，不要求每次任务获得 Forge PASS、记录治理 JSON 或执行固定的 phase=all。
 
+遵循[工程原则](../change-readiness/references/engineering-principles.md)，以可核实结果而非测试数量、文档数量或机器状态判断完成度。
+
 ## 工作方法
 
 1. 根据本轮实际改动和相关依赖选择验证范围，保护他人的未提交内容。优先复用项目现有测试、构建和检查命令。
