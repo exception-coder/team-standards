@@ -1,5 +1,7 @@
 # team-standards
 
+Platform template handoff: [Project foundation pack 1.0.0](templates/project-foundation/README.md) includes six repo-local skills, required code documentation, and agent entry files. Projects can use it without a preinstalled suite; existing plugin entry points remain compatible.
+
 Version 4.12.1 guides fast daily feedback, risk-triggered expensive preparation, test compilation versus execution, and failure attribution. Reuse native tools and existing logs; no new gates or checker scripts. See [delivery verification](plugins/team-standards/skills/delivery-verification/SKILL.md) and [test ownership](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md).
 
 Version 4.11.0 makes change readiness and delivery verification guidance-only by default. The plugin no longer registers session initialization, specification/readiness guards, or Stop verification gates. Existing checker scripts remain available for explicit project integration; native tests and honest reporting remain part of the workflow.

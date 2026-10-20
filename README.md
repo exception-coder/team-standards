@@ -1,5 +1,7 @@
 # team-standards
 
+基础平台模板交接：[项目基础规范包 1.0.0](templates/project-foundation/README.md)，包含六个可随项目分发的本地 Skill、代码注释要求与 Agent 入口；无需预装套件，保留现有插件入口以兼容旧项目。
+
 使命：**以最小复杂度，持续交付可靠、可维护的软件。** [工程原则](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一默认判断：按需使用能力，以实际风险决定设计和验证深度，以真实结果交付。
 
 4.14.0 收敛默认作业负担：取消按文件/行数升档、按分支强拆 Service 和注释行数配额；Java 实践按项目契约适用。架构路径与注释模式 Hook 默认改为 `warn`，保留明确配置的 `block` / `off`。升级无需新建治理记录，不新增 Skill 或验证平台；既有 CI、安全、权限、数据完整性和项目显式门禁继续生效。改动及验证范围见[维护记录](docs/dev-log/2026-10-20.md)。

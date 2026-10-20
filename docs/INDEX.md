@@ -2,6 +2,7 @@
 
 | 目录/文件 | 说明 |
 |-----------|------|
+| [基础平台项目模板交接包](../templates/project-foundation/README.md) | 六项基础规范、代码注释要求、项目入口、来源映射与插件共存验收 |
 | [../plugins/team-standards/skills/bug-doc-required/SKILL.md](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | Bug 证据闭环与按风险记录，简单问题免独立报告 |
 | [suite-panorama.md](suite-panorama.md) | 整套工具八个工程职责域、19 个 Skill、事实源、Hook 与任务全景 |
 | [skill-flow.md](skill-flow.md) | Skill 链路与源码导航（A—K 节点、规则文件、执行调用链和目标目录） |

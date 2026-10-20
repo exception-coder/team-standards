@@ -1,0 +1,25 @@
+{
+  "id": "project-foundation",
+  "version": "1.0.0",
+  "payloadRoot": "template",
+  "entries": {
+    "codex": "AGENTS.md",
+    "otherHosts": "CLAUDE.md"
+  },
+  "source": {
+    "suite": "team-standards",
+    "suiteVersion": "4.14.0",
+    "gitCommit": "b215db3fb46640c77ae5c24bb4951994b01375c3",
+    "adaptation": "裁剪为项目模板；注释增加新增业务职责与公共契约要求；移除外部工具、治理和套件专属脚本依赖。"
+  },
+  "runtimeDependencies": [],
+  "hooksBundled": false,
+  "skills": [
+    { "name": "foundation-coding", "path": ".agents/skills/foundation-coding/SKILL.md", "sourceSkills": ["coding-standards-common", "architecture-ddd-lite-fullstack", "architecture-reasoning"] },
+    { "name": "foundation-comments", "path": ".agents/skills/foundation-comments/SKILL.md", "sourceSkills": ["coding-standards-common/references/comments.md", "java-coding-standards", "go-coding-standards"] },
+    { "name": "foundation-bugfix", "path": ".agents/skills/foundation-bugfix/SKILL.md", "sourceSkills": ["bug-doc-required"] },
+    { "name": "foundation-verification", "path": ".agents/skills/foundation-verification/SKILL.md", "sourceSkills": ["delivery-verification", "coding-standards-common/references/testing-assets.md"] },
+    { "name": "foundation-git", "path": ".agents/skills/foundation-git/SKILL.md", "sourceSkills": ["git-commit-standards", "plain-writing"] },
+    { "name": "foundation-docs", "path": ".agents/skills/foundation-docs/SKILL.md", "sourceSkills": ["markdown-writing-standards", "plain-writing"] }
+  ]
+}
