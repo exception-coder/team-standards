@@ -16,7 +16,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.14.3**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.14.4**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -24,7 +24,7 @@
 
 OpenSpec 治理命令默认等待 30 秒，慢环境可通过 `TEAM_STANDARDS_OPENSPEC_TIMEOUT_MS` 在 1–120 秒内调整；超时、失败和安全检查仍会阻断。配置见[治理检查器协议](plugins/team-standards/skills/change-readiness/references/governance-checker.md)。
 
-兼容治理只将任务声明的未跟踪文件和相关设计候选纳入初始基线；无关临时产物不会触发文件数上限。Git 已跟踪或暂存的改动，以及显式设计、规格和验证输入仍执行严格路径检查。构建依赖如参与验证，应在验证记录中明确其来源与新鲜度。
+兼容治理只将任务声明的未跟踪文件和相关设计候选纳入初始基线；无关临时产物不会触发文件数上限。Git 已跟踪或暂存的改动，以及显式设计、规格和验证输入仍执行严格路径检查。4.14.4 独立核对暂存路径，防止工作区差异抵消后漏掉越界链接；返回的任务变更集合仍保持净差异语义。构建依赖如参与验证，应在验证记录中明确其来源与新鲜度。
 
 完整内容规范及样衣示例见[设计输出契约](plugins/team-standards/skills/change-readiness/references/design-output-contract.md)，配置与检查边界见[内容治理协议](plugins/team-standards/skills/change-readiness/references/design-content-governance.md)。
 

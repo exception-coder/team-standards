@@ -28,13 +28,15 @@ function changedFiles(root, base, head, untrackedScope = []) {
   if (head) args.push(resolveRevision(root, head));
   args.push('--');
   const tracked = git(root, args).split('\0').filter(Boolean);
-  // 未跟踪文件没有 Git 提交归属，只读取任务显式声明的路径；已暂存文件
-  // 始终由 diff 覆盖。避免把依赖缓存及其它任务产物纳入基线。
+  // 工作区差异可能抵消暂存变更；索引中的路径仍须独立检查，防止链接越界被抵消隐藏。
+  const staged = head ? [] : git(root, ['diff', '--cached', '--name-only', '--no-renames', '-z', revision, '--'])
+    .split('\0').filter(Boolean);
+  // 未跟踪文件只读取任务显式声明的路径，避免把依赖缓存及其它任务产物纳入基线。
   const scope = [...new Set(untrackedScope)];
   scope.forEach(file => safePath(root, file, '任务声明的未跟踪输入'));
   const untracked = head || !scope.length ? []
     : git(root, ['ls-files', '--others', '--exclude-standard', '-z', '--', ...scope]).split('\0').filter(Boolean);
-  tracked.forEach(file => safePath(root, file, 'Git 已跟踪的变更'));
+  [...new Set([...tracked, ...staged])].forEach(file => safePath(root, file, 'Git 工作区或暂存的变更'));
   return [...new Set([...tracked, ...untracked])].sort();
 }
 

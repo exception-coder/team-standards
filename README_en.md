@@ -14,7 +14,9 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.14.3**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.14.4**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+
+Version 4.14.4 independently validates staged paths so a cancelling worktree diff cannot hide an external symlink. The returned change set keeps its net-diff semantics. Regression fixtures accept both POSIX symlinks and Windows junctions without weakening explicit-input checks.
 
 Version 4.13.2 incorporates a real legacy-code/Oracle read-only trial: verify source identity and freshness, preserve unreadable sources, and narrow Graphify hub-heavy queries. [Agent and MCP consumption](plugins/team-standards/skills/business-ontology-modeling/references/agent-consumption.md) maps models to existing semantic queries, capability schemas, domain facts and per-runtime integration checks.
 

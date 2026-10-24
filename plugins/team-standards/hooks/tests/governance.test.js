@@ -602,10 +602,14 @@ test('unrelated untracked junction does not block, explicit input still fails', 
     throw error;
   }
   const linked = '.codex-work/node_modules/.modules.yaml';
-  assert.match(runGit(f.root, ['ls-files', '--others', '--exclude-standard']), /\.modules\.yaml/);
+  // Git reports POSIX directory symlinks themselves, but may traverse Windows junctions.
+  const untracked = runGit(f.root, ['ls-files', '--others', '--exclude-standard', '-z']).split('\0');
+  assert.ok(untracked.includes('.codex-work/node_modules') || untracked.includes(linked));
   assert.ok(!repoApi.changedFiles(f.root, runGit(f.root, ['rev-parse', 'HEAD'])).includes(linked));
   assert.equal(service.guarded(() => service.bind(f.options)).status, 'PASS');
   assert.throws(() => storage.fingerprints(f.root, [linked]), error => error.rule === 'PATH_SYMLINK');
+  assert.throws(() => repoApi.changedFiles(f.root, runGit(f.root, ['rev-parse', 'HEAD']), undefined, [linked]),
+    error => error.rule === 'PATH_SYMLINK');
   write(f.root, '.gitignore', '.codex-work/\n');
   assert.equal(runGit(f.root, ['ls-files', '--others', '--exclude-standard']).includes('.modules.yaml'), false);
   assert.throws(() => storage.fingerprints(f.root, [linked]), error => error.rule === 'PATH_SYMLINK');
@@ -649,6 +653,19 @@ test('staged external symlink remains a hard failure', t => {
   runGit(f.root, ['update-index', '--add', '--cacheinfo', `100644,${blob},${linked}`]);
   assert.throws(() => repoApi.changedFiles(f.root, runGit(f.root, ['rev-parse', 'HEAD'])),
     error => error.rule === 'PATH_SYMLINK');
+  const head = runGit(f.root, ['rev-parse', 'HEAD']);
+  assert.deepEqual(repoApi.changedFiles(f.root, head, head), [], 'committed comparisons do not inspect the current index');
+});
+
+test('safe staged changes cancelled in the worktree retain the net comparison', t => {
+  const f = fixture(t);
+  const head = runGit(f.root, ['rev-parse', 'HEAD']);
+  const original = fs.readFileSync(path.join(f.root, 'src/greet.js'));
+  write(f.root, 'src/greet.js', 'module.exports = () => "staged";\n');
+  runGit(f.root, ['add', 'src/greet.js']);
+  fs.writeFileSync(path.join(f.root, 'src/greet.js'), original);
+  assert.equal(runGit(f.root, ['diff', '--cached', '--name-only']), 'src/greet.js');
+  assert.deepEqual(repoApi.changedFiles(f.root, head), []);
 });
 
 test('in-repo linked input fingerprint changes with its target', t => {
