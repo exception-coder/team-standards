@@ -6,7 +6,8 @@ const os = require('node:os');
 const { handle } = require('../check-spec-resolution');
 
 function fixture(t, response = { allowed: true, code: 'PASS' }) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec hook '));
+  // macOS temp paths can use /var aliases while child process.cwd() resolves /private/var.
+  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec hook ')));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   fs.mkdirSync(path.join(root, 'openspec')); fs.writeFileSync(path.join(root, 'openspec/config.yaml'), 'context: test');
   const cli = path.join(root, 'fake forge.cjs');
