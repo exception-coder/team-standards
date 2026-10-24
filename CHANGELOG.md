@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.14.3] - 2026-10-24
+
+- Normalize Bash / exec_command command payloads and target working directories for commit-message validation.
+- Unregister the diff-size / Skill-invocation gate and retain a non-blocking compatibility entrypoint.
+- Add equivalent-host regression cases and a reproducible, isolated Agent task comparison with explicit evidence limits.
+- Isolate three legacy governance test cases from the developer host's installed Forge protocol.
+
 ## [4.14.2] - 2026-10-24
 
 - Simplify the remaining 21 Skill entrypoints around goals, criteria, necessary constraints and compact counterexamples; all 22 reference the shared constitution.

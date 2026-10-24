@@ -1,6 +1,6 @@
 # 团队工具套件全景：按工程职责域看链路与节点
 
-共同准则与证据分工统一归[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。4.14.2 的 22 个 Skill 入口保留专项目标、判断、必要约束和精炼反例，具体格式与操作协议按需读取。架构路径与注释 Hook 仍默认提醒。
+共同准则与证据分工统一归[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。4.14.3 的 22 个 Skill 入口保留专项目标、判断、必要约束和精炼反例，具体格式与操作协议按需读取。架构路径与注释 Hook 仍默认提醒。
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
@@ -183,8 +183,7 @@ flowchart TD
 | 写入分发 6 | check-query-performance-risk | 查询性能风险信号 |
 | 已退役兼容入口 | check-ai-doc-location | 当前不分发；旧宿主调用无副作用放行，不再要求个人文档目录 |
 | 写入/提交保护 | check-file-encoding / pre-commit-encoding | 已登记项目文件是否保持要求的编码；Git 兜底须已安装 |
-| Bash 提交前 | check-git-commit-skill | 需要重审的提交是否进入提交 Skill |
-| Bash 提交前 | check-commit-no-ai-signature | 标题、三段正文、真实 Author 与 AI 署名约束 |
+| Bash / exec_command 提交前 | command-input + check-commit-no-ai-signature | 统一命令与工作目录，检查三段正文、Author 格式及 AI 署名；不按体量或 Skill 调用记录阻断 |
 | 按配置记录 | hook-metrics / event-log | 最小化性能指标与结构化 Hook 事件；为排查和反馈提供数据 |
 
 注册来源：[hooks.json](../plugins/team-standards/hooks/hooks.json)；六个专项写入检查来源：[dispatcher](../plugins/team-standards/hooks/write-guard-dispatcher.js)。Shell、外部工具与未支持事件可能不受这些检查覆盖，仍需宿主权限、访问凭据和具体操作判断。

@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-// PreToolUse(Bash) hook：校验 git commit 信息结构，并拦截「AI 工具署名」落款。
+// PreToolUse(Bash|exec_command)：校验提交正文与署名，不执行传入命令。
 // team-standards 明令禁止任何 AI 署名（git-commit-standards：Author 只填真实提交者）。
-// 那是 SKILL 层规则——小改不走 skill 时，宿主/IDE 默认指令可能擅自追加 Co-Authored-By。
+// 宿主/IDE 可能默认追加 Co-Authored-By；校验不依赖是否读取 Skill。
 // 本 hook 在 commit 落盘前机械扫描提交信息（-m 内联 / heredoc / -F 文件），结构不完整或命中 AI 署名即阻断，
 // 与改动大小、是否走 skill 无关。默认 block；TEAM_STANDARDS_COMMIT_MESSAGE_HOOK=warn 仅提示、=off 关闭。
-// 局限：编辑器交互式 commit（无 -m/-F）在 PreToolUse 阶段拿不到正文，本 hook 不覆盖（AI 几乎都用 -m）。
+// 局限：交互编辑、动态 Shell 和不可读取的消息文件可能无法静态提取正文，不代表已验证。
 
 const fs = require('fs');
+const path = require('node:path');
+const { normalizeCommand } = require('./command-input');
 const { validateCommitBody } = require('../skills/git-commit-standards/scripts/commit-message-format');
 const MODE = (
   process.env.TEAM_STANDARDS_COMMIT_MESSAGE_HOOK ||
@@ -19,7 +21,7 @@ function decodeQuotedArgument(value) {
   return value.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\"/g, '"');
 }
 
-function extractCommitMessage(command) {
+function extractCommitMessage(command, cwd) {
   const paragraphs = [];
   const messagePattern = /(?:^|\s)(?:-m|--message)(?:=|\s+)(?:"((?:\\.|[^"\\])*)"|'([^']*)'|(\S+))/g;
   for (const match of command.matchAll(messagePattern)) {
@@ -30,7 +32,7 @@ function extractCommitMessage(command) {
   for (const match of command.matchAll(filePattern)) {
     const filePath = match[1] || match[2] || match[3];
     if (!filePath || filePath === '-') continue;
-    try { paragraphs.push(fs.readFileSync(filePath, 'utf8')); } catch (e) {}
+    try { paragraphs.push(fs.readFileSync(path.resolve(cwd, filePath), 'utf8')); } catch (e) {}
   }
 
   return paragraphs.join('\n\n').trim();
@@ -56,11 +58,12 @@ process.stdin.setEncoding('utf8');
 process.stdin.on('data', (c) => { raw += c; });
 process.stdin.on('end', () => {
   let payload; try { payload = JSON.parse(raw); } catch (e) { process.exit(0); }
-  if (payload.tool_name !== 'Bash') process.exit(0);
-  const cmd = (payload.tool_input && payload.tool_input.command) || '';
+  const shell = normalizeCommand(payload);
+  if (!shell) process.exit(0);
+  const cmd = shell.command;
   if (!/\bgit\b[^\n]*\bcommit\b/.test(cmd)) process.exit(0);
 
-  const message = extractCommitMessage(cmd);
+  const message = extractCommitMessage(cmd, shell.cwd);
   const structureError = validateStructure(message);
   if (structureError) {
     process.stderr.write(

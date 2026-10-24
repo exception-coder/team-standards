@@ -2,7 +2,7 @@
 
 Platform template handoff: [Project foundation pack 1.0.0](templates/project-foundation/README.md) includes six repo-local skills, required code documentation, and agent entry files. Projects can use it without a preinstalled suite; existing plugin entry points remain compatible.
 
-Version 4.14.2 simplifies the other 21 Skill entrypoints into goals, specialized criteria, necessary constraints and compact counterexamples. All 22 reference the [engineering constitution](plugins/team-standards/skills/change-readiness/references/engineering-principles.md). Formats and operational contracts remain available on demand, including commit, data, state, project-gate and real-verification requirements. Scope and evidence limits are in the [maintenance record](docs/dev-log/2026-10-24.md).
+Version 4.14.3 normalizes Bash and exec_command commit payloads and retires gates based on diff size or recorded Skill calls. Commit-message validation remains active; all 22 Skills retain the shared constitution. A small reproducible comparison runs real agents on disposable executable tasks; see [behavior regression methods and results](docs/maintenance/behavior-regression.md).
 
 Version 4.14.1 consolidated shared guidance into the engineering constitution. [Architecture reasoning](plugins/team-standards/skills/architecture-reasoning/SKILL.md) distinguishes business outcomes from implementation suggestions; proposal review dropped fixed steps and a mandatory response template.
 
@@ -14,7 +14,7 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.14.2**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.14.3**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Version 4.13.2 incorporates a real legacy-code/Oracle read-only trial: verify source identity and freshness, preserve unreadable sources, and narrow Graphify hub-heavy queries. [Agent and MCP consumption](plugins/team-standards/skills/business-ontology-modeling/references/agent-consumption.md) maps models to existing semantic queries, capability schemas, domain facts and per-runtime integration checks.
 

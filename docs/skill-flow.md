@@ -181,7 +181,7 @@ flowchart LR
 ```
 
 - 写入分发清单在 [write-guard-dispatcher.js](../plugins/team-standards/hooks/write-guard-dispatcher.js)：保留架构、后端证据、注释、DDL、SQL 正确性与性能六项专项检查；移除规格解析和变更就绪的自动执行。
-- Bash 入口是 [check-git-commit-skill.js](../plugins/team-standards/hooks/check-git-commit-skill.js) 和 [check-commit-no-ai-signature.js](../plugins/team-standards/hooks/check-commit-no-ai-signature.js)；不是 Git 自带 pre-commit，也不会替 Agent 自动写好提交正文。
+- Bash / exec_command 共用 [command-input.js](../plugins/team-standards/hooks/command-input.js) 解析命令与工作目录，由 [check-commit-no-ai-signature.js](../plugins/team-standards/hooks/check-commit-no-ai-signature.js) 校验消息；旧体量/Skill 调用门禁已退役。Hook 不执行 Git 命令，原子性与内容准确性仍由 Agent 判断。
 - 插件不再注册 Stop 检查；历史交付与兼容治理脚本仅供项目显式接入。
 - 提示事件入口是 [prompt-signal-capture.js](../plugins/team-standards/hooks/prompt-signal-capture.js) 与 [check-plugin-version-stale.js](../plugins/team-standards/hooks/check-plugin-version-stale.js)。事件与性能辅助分别见 [event-log.js](../plugins/team-standards/hooks/event-log.js)、[hook-metrics.js](../plugins/team-standards/hooks/hook-metrics.js)。
 

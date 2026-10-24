@@ -7,13 +7,53 @@ const test = require('node:test');
 
 const hookPath = path.join(__dirname, '..', 'check-commit-no-ai-signature.js');
 
-function runHook(command, env = {}) {
+function runHook(command, env = {}, tool = 'Bash', context = {}) {
   return spawnSync(process.execPath, [hookPath], {
-    input: JSON.stringify({ tool_name: 'Bash', tool_input: { command } }),
+    input: JSON.stringify({ tool_name: tool,
+      tool_input: tool === 'Bash' ? { command } : { cmd: command, workdir: context.workdir },
+      cwd: context.cwd }),
     encoding: 'utf8',
     env: { ...process.env, TEAM_STANDARDS_COMMIT_MESSAGE_HOOK: 'block', ...env },
   });
 }
+
+for (const tool of ['Bash', 'exec_command']) {
+test(`${tool}: 相同提交合同、模式与非提交命令`, () => {
+  const valid = 'git commit -m "fix(hook): 修复校验" -m "【改动】统一载荷。\\n【原因】宿主漏检。\\n【结果】两端一致。" -m "Author: Tester <test@example.com>"';
+  assert.equal(runHook(valid, {}, tool).status, 0);
+  assert.equal(runHook('git commit -m "fix: title only"', {}, tool).status, 2);
+  const ai = valid + ' -m "Co-Authored-By: Codex <bot@openai.com>"';
+  assert.equal(runHook(ai, {}, tool).status, 2);
+  const warn = runHook(ai, { TEAM_STANDARDS_COMMIT_MESSAGE_HOOK: 'warn' }, tool);
+  assert.equal(warn.status, 0);
+  assert.match(warn.stderr, /AI 工具署名/);
+  const off = runHook(ai, { TEAM_STANDARDS_COMMIT_MESSAGE_HOOK: 'off' }, tool);
+  assert.equal(off.status, 0);
+  assert.equal(off.stderr, '');
+  assert.equal(runHook('git status --short', {}, tool).status, 0);
+});
+
+test(`${tool}: 相对消息文件按目标工作目录读取`, (t) => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'commit-cwd-'));
+  t.after(() => {
+    assert.ok(path.resolve(directory).startsWith(path.resolve(os.tmpdir()) + path.sep));
+    fs.rmSync(directory, { recursive: true, force: true });
+  });
+  fs.writeFileSync(path.join(directory, 'message.txt'), 'fix: only a title\n');
+  const context = tool === 'Bash' ? { cwd: directory }
+    : { workdir: directory, cwd: os.tmpdir() };
+  assert.equal(runHook('git commit -F message.txt', {}, tool, context).status, 2);
+});
+}
+
+test('不相关或畸形载荷不执行命令、不崩溃', () => {
+  for (const payload of [null, {}, { tool_name: 'Read', tool_input: { command: 'git commit -m bad' } },
+    { tool_name: 'exec_command', tool_input: { cmd: 42 } },
+    { tool_name: 'Bash', tool_input: 'git commit -m bad' }]) {
+    const result = spawnSync(process.execPath, [hookPath], { input: JSON.stringify(payload), encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+  }
+});
 
 test('放行：标题、中文正文和 Author 完整', () => {
   const result = runHook('git commit -m "fix(prd): 完善反馈" -m "【改动】补充流式进度。\n【原因】生成过程缺少反馈。\n【结果】用户可持续观察执行状态。" -m "Author: 张凯 <425485346@qq.com>"');

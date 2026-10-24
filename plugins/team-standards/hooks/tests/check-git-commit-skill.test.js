@@ -1,193 +1,49 @@
-// =============================================================
-// 端到端测试 check-git-commit-skill.js
-// 通过 spawnSync + stdin JSON payload 模拟 PreToolUse(Bash) 调用,
-// 验证 git commit 拦截 / 放行行为。
-// =============================================================
-
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { spawnSync, execSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
-const HOOK = path.resolve(__dirname, '..', 'check-git-commit-skill.js');
+const hooksRoot = path.resolve(__dirname, '..');
+const config = JSON.parse(fs.readFileSync(path.join(hooksRoot, 'hooks.json'), 'utf8'));
+const commitGroup = config.hooks.PreToolUse.find(group => group.matcher === 'Bash|exec_command');
 
-function runHook(payload, env = {}) {
-  const res = spawnSync('node', [HOOK], {
-    input: JSON.stringify(payload),
-    encoding: 'utf8',
-    env: { ...process.env, ...env },
+function run(script, payload) {
+  return spawnSync(process.execPath, [path.join(hooksRoot, script)], {
+    input: JSON.stringify(payload), encoding: 'utf8',
+    env: { ...process.env, TEAM_STANDARDS_COMMIT_MESSAGE_HOOK: 'block' },
   });
-  return { code: res.status, stderr: res.stderr || '', stdout: res.stdout || '' };
 }
 
-// 建一个临时 git repo + transcript,便于测拦截/放行
-function makeRepo(opts = {}) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ts-hook-'));
-  execSync('git init -q', { cwd: dir });
-  execSync('git config user.email test@local', { cwd: dir });
-  execSync('git config user.name test', { cwd: dir });
-
-  // 先建 baseline commit 让后续 staged diff 有参照
-  fs.writeFileSync(path.join(dir, 'README.md'), 'init\n');
-  execSync('git add README.md', { cwd: dir });
-  execSync('git commit -q -m init', { cwd: dir });
-
-  // 制造 staged 变化
-  if (opts.files === 'trivial') {
-    fs.appendFileSync(path.join(dir, 'README.md'), 'one more line\n');
-    execSync('git add README.md', { cwd: dir });
-  } else if (opts.files === 'large') {
-    // 制造 >2 文件 + >30 行
-    for (let i = 0; i < 5; i++) {
-      fs.writeFileSync(
-        path.join(dir, `f${i}.txt`),
-        Array.from({ length: 20 }, (_, j) => `line ${j}`).join('\n') + '\n'
-      );
-    }
-    execSync('git add -A', { cwd: dir });
-  } else if (opts.files === 'add_new') {
-    // 单个新文件 = A 状态,不算 trivial
-    fs.writeFileSync(path.join(dir, 'new.txt'), 'x\n');
-    execSync('git add new.txt', { cwd: dir });
-  }
-  return dir;
-}
-
-function makeTranscript(opts = {}) {
-  const tmp = path.join(os.tmpdir(), `transcript-${Date.now()}-${Math.random()}.jsonl`);
-  const lines = [];
-  if (opts.hasSkillCall) {
-    lines.push(
-      JSON.stringify({
-        type: 'tool_use',
-        name: 'Skill',
-        // 默认完全限定名；测裸名场景时传 opts.skillName 覆盖
-        input: { skill: opts.skillName || 'team-standards:git-commit-standards' },
-      })
-    );
-  } else {
-    lines.push(JSON.stringify({ type: 'text', text: 'hello' }));
-  }
-  fs.writeFileSync(tmp, lines.join('\n') + '\n');
-  return tmp;
-}
-
-function cleanup(dir, transcript) {
-  try {
-    fs.rmSync(dir, { recursive: true, force: true });
-  } catch (e) {}
-  if (transcript) {
-    try {
-      fs.rmSync(transcript, { force: true });
-    } catch (e) {}
-  }
-}
-
-test('放行：非 Bash 工具', () => {
-  const { code } = runHook({ tool_name: 'Read', tool_input: {} });
-  assert.equal(code, 0);
+test('默认提交链只校验消息，不再登记体量或 Skill 调用门禁', () => {
+  assert.equal(commitGroup.hooks.length, 1);
+  assert.match(commitGroup.hooks[0].command, /check-commit-no-ai-signature\.js/);
+  assert.doesNotMatch(JSON.stringify(config), /check-git-commit-skill/);
 });
 
-test('放行：Bash 但非 git commit 命令', () => {
-  const { code } = runHook({
-    tool_name: 'Bash',
-    tool_input: { command: 'ls -la' },
+for (const tool of ['Bash', 'exec_command']) {
+  test(tool + ': 大量新增文件且未调用 Skill 时仍可通过合规提交，旧入口也不再阻断', t => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'commit-policy-'));
+    t.after(() => {
+      assert.ok(path.resolve(root).startsWith(path.resolve(os.tmpdir()) + path.sep));
+      assert.match(path.basename(root), /^commit-policy-/);
+      fs.rmSync(root, { recursive: true, force: true });
+    });
+    assert.equal(spawnSync('git', ['init', '-q'], { cwd: root }).status, 0);
+    for (let index = 0; index < 3; index++) fs.writeFileSync(path.join(root, index + '.txt'), 'example\n'.repeat(40));
+    assert.equal(spawnSync('git', ['add', '0.txt', '1.txt', '2.txt'], { cwd: root }).status, 0);
+    const transcript = path.join(root, 'session.jsonl');
+    fs.writeFileSync(transcript, JSON.stringify({ type: 'text', text: 'No skill invocation.' }));
+    const command = 'git commit -m "fix(policy): 保持逻辑单元完整" -m "【改动】移除体量门禁。\\n【原因】规模不等于风险。\\n【结果】按消息合同校验。" -m "Author: Test <test@example.com>"';
+    const payload = { cwd: root, transcript_path: transcript, tool_name: tool,
+      tool_input: tool === 'Bash' ? { command } : { cmd: command, workdir: root } };
+    const registered = run('check-commit-no-ai-signature.js', payload);
+    assert.equal(registered.status, 0, registered.stderr);
+    const legacy = run('check-git-commit-skill.js', payload);
+    assert.equal(legacy.status, 0, legacy.stderr);
+    assert.equal(legacy.stderr, '');
+    assert.equal(spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: root }).status, 128,
+      'Hook must inspect payloads without executing the proposed commit');
   });
-  assert.equal(code, 0);
-});
-
-test('放行：git push 不再门禁(只拦 commit)', () => {
-  const { code } = runHook({
-    tool_name: 'Bash',
-    tool_input: { command: 'git push origin main' },
-  });
-  assert.equal(code, 0);
-});
-
-test('放行：小改 git commit（≤2 文件 ∧ ≤30 行 ∧ 仅 M 修改）', () => {
-  const dir = makeRepo({ files: 'trivial' });
-  const transcript = makeTranscript({ hasSkillCall: false });
-  try {
-    const { code } = runHook({
-      tool_name: 'Bash',
-      tool_input: { command: 'git commit -m fix' },
-      cwd: dir,
-      transcript_path: transcript,
-    });
-    assert.equal(code, 0);
-  } finally {
-    cleanup(dir, transcript);
-  }
-});
-
-test('阻断：大改 git commit 但 transcript 无 skill 调用', () => {
-  const dir = makeRepo({ files: 'large' });
-  const transcript = makeTranscript({ hasSkillCall: false });
-  try {
-    const { code, stderr } = runHook({
-      tool_name: 'Bash',
-      tool_input: { command: 'git commit -m big' },
-      cwd: dir,
-      transcript_path: transcript,
-    });
-    assert.equal(code, 2);
-    assert.match(stderr, /git-commit-standards/);
-  } finally {
-    cleanup(dir, transcript);
-  }
-});
-
-test('放行：大改 git commit 且 transcript 已含 skill 调用', () => {
-  const dir = makeRepo({ files: 'large' });
-  const transcript = makeTranscript({ hasSkillCall: true });
-  try {
-    const { code } = runHook({
-      tool_name: 'Bash',
-      tool_input: { command: 'git commit -m big' },
-      cwd: dir,
-      transcript_path: transcript,
-    });
-    assert.equal(code, 0);
-  } finally {
-    cleanup(dir, transcript);
-  }
-});
-
-test('放行：大改 git commit 且 transcript 含裸名 skill 调用(无 team-standards: 前缀)', () => {
-  const dir = makeRepo({ files: 'large' });
-  const transcript = makeTranscript({ hasSkillCall: true, skillName: 'git-commit-standards' });
-  try {
-    const { code } = runHook({
-      tool_name: 'Bash',
-      tool_input: { command: 'git commit -m big' },
-      cwd: dir,
-      transcript_path: transcript,
-    });
-    assert.equal(code, 0);
-  } finally {
-    cleanup(dir, transcript);
-  }
-});
-
-test('阻断：新增文件（A 状态）即使行数少也不算 trivial', () => {
-  const dir = makeRepo({ files: 'add_new' });
-  const transcript = makeTranscript({ hasSkillCall: false });
-  try {
-    const { code } = runHook({
-      tool_name: 'Bash',
-      tool_input: { command: 'git commit -m newfile' },
-      cwd: dir,
-      transcript_path: transcript,
-    });
-    assert.equal(code, 2);
-  } finally {
-    cleanup(dir, transcript);
-  }
-});
-
-test('放行：非 JSON stdin 不崩溃', () => {
-  const res = spawnSync('node', [HOOK], { input: 'not json', encoding: 'utf8' });
-  assert.equal(res.status, 0);
-});
+}

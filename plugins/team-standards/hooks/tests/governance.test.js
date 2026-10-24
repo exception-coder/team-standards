@@ -25,6 +25,16 @@ function write(root, file, body) {
   fs.writeFileSync(target, body);
 }
 
+function useLegacyForgeProtocol(t) {
+  // These cases exercise local bindings, independent of an installed Forge v2 host.
+  const previous = process.env.FORGE_EXECUTION_PROTOCOL;
+  process.env.FORGE_EXECUTION_PROTOCOL = '1';
+  t.after(() => {
+    if (previous === undefined) delete process.env.FORGE_EXECUTION_PROTOCOL;
+    else process.env.FORGE_EXECUTION_PROTOCOL = previous;
+  });
+}
+
 function fixture(t, realCli) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'governance 中文 '));
   const root = path.join(home, 'repo with spaces');
@@ -264,6 +274,7 @@ test('baseline A18: bounded registry and explicit small-change limits fail close
 });
 
 test('baseline A16: Hook process keeps warn/off distinct from block without a host session ID', t => {
+  useLegacyForgeProtocol(t);
   const f = fixture(t);
   const hook = path.resolve(__dirname, '../check-openspec-governance.js');
   const payload = { cwd: f.root, tool_name: 'Edit', tool_input: { file_path: 'src/greet.js' } };
@@ -295,6 +306,7 @@ test('bind → implement → record → delivery: clean committed changes remain
 });
 
 test('missing binding and transcript text never authorize implementation', t => {
+  useLegacyForgeProtocol(t);
   const f = fixture(t);
   const output = handle({ cwd: f.root, session_id: 'not-bound', tool_name: 'Edit',
     tool_input: { file_path: 'src/greet.js' }, transcript_path: 'mentions any complete change' });
@@ -387,6 +399,7 @@ test('unbound Stop and documentation repair remain non-blocking', t => {
 });
 
 test('delete and rename check both source and destination scope', t => {
+  useLegacyForgeProtocol(t);
   const f = fixture(t);
   service.bind(f.options);
   const output = handle({ cwd: f.root, session_id: f.options.session, tool_name: 'apply_patch', tool_input: {

@@ -16,6 +16,8 @@
 
 独立审查概设、详设或技术方案使用 [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md)：核实当前事实，只指出本期实质缺口、矛盾与未决选择；未来规模和冷门场景以提醒为主，不以扩展设计充当评审结果。表达问题按需叠加 clear-design-docs；不新增机器阻断或审批。
 
+提交 Hook 仅检查可静态取得的消息合同，统一接受 Bash.command 与 exec_command.cmd；不以 staged 文件数、行数或调用过某个 Skill 作为准入条件。隔离 Agent 任务的运行方法与证据见[行为回归](docs/maintenance/behavior-regression.md)，结构测试通过不等于任务效果改善。
+
 ## 工程使命
 
 以最小复杂度，持续交付可靠、可维护的软件。[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护共同准则与证据分工。22 个 Skill 入口聚焦目标、专项判断、必要约束和精炼反例；格式、命令与采用条件保留在所属参考，按需读取。固定结构只服务实际契约，不把这些段落当作用户回复模板；安全、权限、数据完整性和项目明确采用的质量要求继续适用。
