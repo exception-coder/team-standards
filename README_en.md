@@ -97,6 +97,8 @@ See the [documentation rules](plugins/team-standards/skills/markdown-writing-sta
 
 ## Validation
 
+The [team-tools-suite workflow](.github/workflows/suite-ci.yml) checks out the private GitHub repository `exception-coder/cross-project-topology`. Configure the repository Actions secret `TEAM_TOOLS_READ_TOKEN` with read-only Contents access to that repository; the default `GITHUB_TOKEN` cannot read another private repository. A missing secret fails explicitly, and checkout does not persist the credential. A fresh runner generates a disposable component overview for release preflight; local overview validation remains unchanged.
+
 Version 3.0.0 removed the Dart coding skill and distributes 21 Skills. Remove any project-specific invocations of the retired entrypoint.
 
 ```bash

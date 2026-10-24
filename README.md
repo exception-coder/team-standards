@@ -223,6 +223,8 @@ Claude Code：
 
 ## 维护与验证
 
+跨仓 [team-tools-suite 工作流](.github/workflows/suite-ci.yml) 从 GitHub 检出私有的 `exception-coder/cross-project-topology`。在本仓 Actions Secrets 配置 `TEAM_TOOLS_READ_TOKEN`，授予目标仓库 Contents 只读权限；默认 `GITHUB_TOKEN` 不能跨仓读取私有代码。缺失时工作流会明确失败，checkout 不持久保存该凭据。全新 Runner 只在临时工作区生成组件总览供发布预检使用；本地已有总览仍由维护脚本校验。
+
 套件 CI 对可选 Graphify 的全仓来源指纹使用 `node scripts/check-graphify-freshness.mjs --advisory`：过期明确输出 `STALE (advisory, not verified)`，不据此要求每次改规则都重建图谱。不带该参数仍严格拒绝过期指纹，文件不可读等执行错误在两种模式都失败。来源指纹本身不能证明图谱内容正确；实际消费图谱时仍核对相关来源，过期则刷新或用当前源码补证，不能只重写指纹伪造新鲜度。此调整仅影响套件自身 CI，业务项目门禁不变。
 
 3.3.0 引入意图、授权与风险的独立判断，区分咨询交付和已授权实施；3.4.0 继续保留 21 个 Skill，并收敛重复文档及旧位置门禁。3.4.1 补充工作台可用视口验收。

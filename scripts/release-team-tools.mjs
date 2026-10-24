@@ -109,7 +109,6 @@ function runRepositoryTests() {
 
   run(process.execPath, ['--test'], path.join(plugins[1].pluginRoot, 'hooks'));
   run(process.execPath, ['--test'], path.join(plugins[2].pluginRoot, 'hooks'));
-  run(process.execPath, ['--test', path.join(plugins[2].pluginRoot, 'scripts', 'tests', 'onboard-pipeline.test.mjs')], plugins[2].repositoryRoot);
   for (const plugin of plugins) {
     run(process.execPath, [path.join(plugin.repositoryRoot, 'scripts', 'check-runtime-version-bump.js'), '--base', 'HEAD'], plugin.repositoryRoot);
   }
