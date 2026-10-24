@@ -6,16 +6,16 @@ Use this reference for new products, redesigns, new visual languages, component 
 
 ## Establish one visual direction
 
-Before styling, write a compact direction containing:
+Use the project's accepted visual direction. When the task requires a new direction, make the relevant choices clear:
 
 - product character and audience;
 - dominant information hierarchy;
 - typography mood and density;
 - color role and contrast strategy;
 - shape, surface, depth, and motion language;
-- one distinctive motif grounded in the product's content or brand.
+- a distinctive motif only where the product's content or brand supports one.
 
-Keep the direction coherent. Do not mix unrelated visual trends merely to make the interface look elaborate.
+Keep the direction coherent; existing project decisions need not be restated as a new design report. Do not mix unrelated visual trends merely to make the interface look elaborate.
 
 Treat named products and styles as analytical references, not decoration recipes. Extract their hierarchy, restraint, typography, density, material discipline, and implementation precision. Do not equate a premium interface with glass effects, gradients, or any single brand's current visual treatment.
 

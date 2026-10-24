@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.14.2] - 2026-10-24
+
+- Simplify the remaining 21 Skill entrypoints around goals, criteria, necessary constraints and compact counterexamples; all 22 reference the shared constitution.
+- Centralize evidence ownership and remove duplicated checklists while retaining operational, format and verification contracts.
+- Clarify existing opt-in governance in initialization guidance and synchronize navigation; no Hook or runtime implementation changes.
+
 ## [4.14.1] - 2026-10-24
 
 - Consolidate shared guidance into an engineering constitution with goals, decision principles, boundaries and concise counterexamples.

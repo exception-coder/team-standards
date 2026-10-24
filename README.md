@@ -2,7 +2,9 @@
 
 基础平台模板交接：[项目基础规范包 1.0.0](templates/project-foundation/README.md)，包含六个可随项目分发的本地 Skill、代码注释要求与 Agent 入口；无需预装套件，保留现有插件入口以兼容旧项目。
 
-使命：**以最小复杂度，持续交付可靠、可维护的软件。** [工程原则](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一默认判断：按需使用能力，以实际风险决定设计和验证深度，以真实结果交付。
+使命：**以最小复杂度，持续交付可靠、可维护的软件。** 共同准则与证据分工由[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护。
+
+4.14.2 将其余 21 个 Skill 入口收敛为目标、专项判断、必要约束和精炼反例；全套 22 个入口引用工程宪法。详细格式与操作协议按需读取，提交格式、状态/数据契约、项目门禁和真实验证要求保留。同步精简提交参考流程，修正初始化的可选绑定表述；结构校验与 Agent 实际效果分别报告，见[维护记录](docs/dev-log/2026-10-24.md)。
 
 4.14.1 将共同准则收敛为[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，用目标、判断依据、必要边界和精炼反例指导决策。需求求真并入已有[悟道](plugins/team-standards/skills/architecture-reasoning/SKILL.md)，旧方案审视取消固定流程与七项回显；沿用 S/M/L、已采用的 OpenSpec 和真实安全约束，不新增 Skill、审批或检查器。
 
@@ -10,13 +12,13 @@
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
-4.4.0 将概设/详设维护接入普通开发任务：Agent 自动发现、补建、绑定与同步，不要求用户手工初始化。已有正文原位复用，准备记录保护初始脏文件与并行绑定；同一真实会话完成已验证切片提交后，可显式续接检查点，旧会话缺绑定时可核验当前证据后恢复。未启用 OpenSpec 的项目支持本地验收引用。见[自动执行流程](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)及[实际试点与验证](docs/maintenance/automatic-design-release.md)。
+4.4.0 引入概设/详设自动维护；当前绑定流程仅用于明确采用该治理机制的项目。Agent 自动发现、补建、绑定与同步，不要求用户手工初始化。已有正文原位复用，准备记录保护初始脏文件与并行绑定；同一真实会话完成已验证切片提交后，可显式续接检查点，旧会话缺绑定时可核验当前证据后恢复。未启用 OpenSpec 的项目支持本地验收引用。见[自动执行流程](plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)及[实际试点与验证](docs/maintenance/automatic-design-release.md)。
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.14.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.14.2**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
-4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#范围选择示例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
+4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
 4.10.13 增加已绑定真实 Forge writer 的 `resume-writer` 开发续接：HEAD 推进且任务尚未完成时，核对实时归属、提交范围及当前审阅后建立检查点，再重新绑定。缺绑定时沿用 `recover-writer`。规范证据输出保留在归属范围中，但不再参与自身输入摘要；原始记录、其他任务改动和交付验收要求保留，自动监督仍由 Forge 的原运行恢复动作控制。
 

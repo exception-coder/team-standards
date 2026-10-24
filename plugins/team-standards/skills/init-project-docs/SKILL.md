@@ -5,144 +5,40 @@ description: "用于接入新代码项目或系统，以及初始化、刷新或
 
 # 项目上下文接入
 
-## 定位
+目标：项目规则、行为规格、实现事实和业务证据有可用入口与真实状态。共同准则及证据分工见[工程宪法](../change-readiness/references/engineering-principles.md)。
 
-本 Skill 是项目上下文的轻量编排入口，不是文档生成器，也不维护第二套代码事实或业务规格。
+## 模式与判断准则
 
-```mermaid
-flowchart LR
-    A["项目内 AGENTS.md\n规则与入口"] --> E["编码任务上下文"]
-    B["Graphify\n当前实现事实"] --> E
-    C["OpenSpec\n目标行为与活动变更"] --> E
-    D["领域知识 / DDL / 运行证据\n业务真理与数据事实"] --> E
-```
+| 请求 | 行为与按需参考 |
+|---|---|
+| 检查状态 `status` | 只读检查项目入口、图谱覆盖、规格与知识缺口 |
+| 初始化工程结构 `structure` | 用 [init-ai-structure](references/initialization-output.md) 创建缺失入口，保留既有内容 |
+| 完整初始化 `init` | 完成 structure，再构建/校验 Graphify、严格校验 OpenSpec，核对领域与运行证据入口 |
+| 新系统接入 `onboard` | 按[接入流程](references/onboard-workflow.md)使用 onboard-pipeline 断点续跑 |
+| 刷新 `refresh` | 按 [Git 变化](references/update-workflow.md)刷新受影响权威产物 |
+| 独立画像 `profile` | 仅在明确要求时按[画像规则](references/project-profile-generation.md)保存轻量导航 |
 
-检查状态只进入 status，不因缺项自动执行 init/refresh；明确初始化或刷新请求才在约定范围写入，不能顺带修改业务代码、部署或扩大外部操作授权。已授权接入任务中的状态检查不撤销后续接入授权。
+检查状态不因缺项升级为初始化。明确初始化时，默认根目录为当前项目，用户指定其他路径才覆盖；创建范围不能扩到父目录或其他仓库。
 
-## 模式
+## 必要约束
 
-当前设计接入时读取 [AI 原生项目适配指引](references/design-baseline-adoption.md)，复用 `init-ai-structure.mjs status/plan/apply --baselines`。只读盘点、候选计划与授权应用分开；已有正文/配置按字节保留，存量缺口登记责任和治理计划，宿主与 CI 接线分别验证。
+- 复用项目规则和已有事实入口，不生成平行代码清单或 00–10 文档树；项目专属架构和业务规范留在项目内。
+- 初始化器按字节保留已有正文与配置，管理标记区按其合同处理；禁止强制覆盖。初始化不写业务代码、不安装升级工具、不改全局配置或创建定时任务。
+- Graphify 按当前可用 Skill 构建或增量更新，核对 HEAD 与相关工作区覆盖；缺失时报告 pending，确定性扫描降级标 fallback。
+- OpenSpec 按项目采用情况初始化或链接；空配置标 initialized-empty，不伪造 specs/changes。领域候选、缺失 DDL 和未取得运行证据分别报告。
+- 当前设计接入用[基线指引](references/design-baseline-adoption.md)及既有 status/plan/apply 协议；仅在项目明确采用绑定治理时使用[设计准备](../change-readiness/references/automatic-design-maintenance.md)，不因普通模块修改初始化全项目。
 
-- `onboard`：新系统首次接入时读取 [references/onboard-workflow.md](references/onboard-workflow.md)，使用 `onboard-pipeline.mjs` 断点续跑。
-- `structure`：用户要求初始化 AI 工程结构、AI 目录或默认项目解析结构时，读取 [references/initialization-output.md](references/initialization-output.md)，在当前目录执行 `init-ai-structure.mjs`，建立六层职责入口、Graphify 输入边界和 Git 共享边界。
-- `init`：读取 [references/initialization-output.md](references/initialization-output.md)，先执行 `structure`，再构建或校验 Graphify、严格校验 OpenSpec，并报告领域知识与运行证据连接状态。
-- `refresh`：读取 [references/update-workflow.md](references/update-workflow.md)，按 Git 变化刷新权威产物，不生成平行投影。
-- `status`：只读检查项目入口、图谱新鲜度、OpenSpec 状态和知识缺口。
-- `profile`：用户明确要求独立画像时读取 [references/project-profile-generation.md](references/project-profile-generation.md)，只生成一份轻量导航。
+## 初始化操作边界
 
-## 权威边界
+`structure/init` 按[初始化契约](references/initialization-output.md)先 plan、核对 missing/preserved/update 后 apply，再 status；这是保护既有文件的操作顺序。已授权初始化无需再次审批。
 
-| 权威来源 | 唯一职责 | 本 Skill 的行为 |
-|---|---|---|
-| 项目 `AGENTS.md` / 项目内 Skill | 项目特有编码、目录、接线、启动与验证规则 | 读取、补入口；不复制团队通用规则 |
-| Graphify | 当前代码的模块、符号、调用、API、数据访问与依赖 | 调用、查询、检查新鲜度；不再生成 `modules.md` 等镜像 |
-| OpenSpec | 已接受行为与活动变更 | 初始化或链接；不复制 proposal/spec/design/tasks |
-| Domain Knowledge | 术语、业务规则、状态语义与经确认决策 | 建立项目映射；候选仍经人工确认 |
-| DDL / 数据库 / 日志 | 表结构与运行事实 | 记录权威入口；不由静态图谱推断替代 |
+最小结构覆盖 Agent 入口、既有文档导航与架构入口、OpenSpec 配置、Graphify 输入排除及 Git 共享边界。具体文件清单、保留策略和命令归上述契约。
 
-## 共享流程
+## 精炼反例
 
-### 初始化内容摘要
+- 用户只问状态，发现入口缺失就自动创建：保持 status 只读。
+- 图谱文件存在就称上下文新鲜：核对当前提交及未提交改动覆盖。
+- 创建空 OpenSpec 配置就称业务规格齐备：报告 initialized-empty。
+- 把某项目的 Java/Oracle 规则写进通用模板：保留在项目自身入口。
 
-| 类型 | `structure` 负责 | `init` 继续负责 |
-|---|---|---|
-| 项目入口 | `AGENTS.md`、`CLAUDE.md` | 读取并核实项目边界与项目自有规则 |
-| 长期文档 | `docs/README.md`、`docs/INDEX.md`、`docs/ai-coding-architecture.md` | 检查权威入口和知识缺口，不生成 00–10 文档树 |
-| 行为规格 | `openspec/AGENTS.md`、`openspec/config.yaml` | 严格校验配置和活动 change，不伪造 specs/changes |
-| 代码图谱 | `.graphifyignore` 与 `.gitignore` 共享白名单 | 由 Graphify 生成或刷新 `graph.json`、`manifest.json`、`GRAPH_REPORT.md` |
-| 领域与运行事实 | 不生成正文 | 识别领域知识、DDL、数据库、日志和验证命令入口并报告状态 |
-
-完整文件、保留策略和明确不初始化的内容见 [references/initialization-output.md](references/initialization-output.md)。
-
-### 0. 初始化 AI 工程结构
-
-用户明确要求初始化时，当前目录就是默认项目根；只有用户给出其它路径时才使用 `--root`。执行：
-
-```text
-node <skill-root>/init-ai-structure.mjs plan --root <project-root>
-node <skill-root>/init-ai-structure.mjs apply --root <project-root>
-```
-
-先回显 `plan` 的 `missing/preserved/update` 清单，再运行 `apply`。显式执行本 Skill 即授权创建当前项目范围内的缺失结构；不得扩展到父目录、用户主目录或其它仓库。
-
-脚本创建最小入口：
-
-- `AGENTS.md` 与 `CLAUDE.md`
-- `docs/README.md`、`docs/INDEX.md`、`docs/ai-coding-architecture.md`
-- `openspec/AGENTS.md` 与 `openspec/config.yaml`
-- `.graphifyignore` 中团队共享的 Graphify 输入排除基线
-- `.gitignore` 中受标记管理的 Graphify 共享边界
-
-已有文件按字节保留并标记 `preserved`，由 Agent 读取后决定是否需要人工合并；禁止使用强制覆盖绕过项目自有规则。脚本不创建空 `.codex/skills`、领域、设计、ADR、OpenSpec specs/changes 或 `graphify-out/` 目录。
-
-`apply` 后继续执行当前安装的 Graphify Skill；首次项目构建图谱，已有图谱则检查新鲜度并按需增量更新。随后运行 OpenSpec 严格校验。最后执行：
-
-```text
-node <skill-root>/init-ai-structure.mjs status --root <project-root>
-```
-
-Graphify 产物缺失属于 `pending`，不是脚本伪造文件的理由；OpenSpec 只有空配置时也必须报告 `initialized-empty`，不能包装为已具备业务规格。
-
-### 1. 确认项目身份
-
-1. 确认项目根、仓库/系统边界、当前 HEAD 与工作区变化。
-2. 读取 `AGENTS.md`、README、构建文件和既有索引，识别项目自有规则。
-3. 缺少 Agent 入口时通过 `structure` 模式补齐；不得自动创建 00–10 文档树。
-
-### 2. 校验实现事实
-
-1. 完整读取当前安装的 Graphify Skill，并按其当前版本查询、增量更新或首次构建。
-2. 使用图谱前验证它覆盖当前 HEAD 和任务涉及的未提交文件；过期时刷新，或用 `git diff`、`rg` 与定向源码读取补齐并声明缺口。
-3. Graphify 不可用时允许确定性扫描降级，但必须标记 `fallback`。
-4. 不把 `graph.json`、HTML、报告或查询结果复制成长期维护的 Markdown 清单。
-
-### 3. 校验目标行为与业务真理
-
-1. 若存在 `openspec/config.yaml`，通过 OpenSpec CLI 检查配置、活动 change 与严格校验结果。
-2. OpenSpec 缺失时只在项目确实采用该工作流且用户授权初始化时创建，不能把空模板报告为已具备规格。
-3. 领域知识、DDL 与运行证据只记录唯一入口和状态；缺失内容作为 gap，不在项目说明中补写猜测版正文。
-
-### 4. 输出状态
-
-默认只在会话中输出状态摘要：
-
-```text
-项目上下文状态：
-- 项目边界：{repos/services}
-- Agent 入口：{ready|missing|stale}
-- Graphify：{fresh|stale|missing|fallback}
-- OpenSpec：{active|initialized-empty|missing|not-applicable}
-- 领域知识：{stable|draft|missing|not-applicable}
-- 数据/运行证据：{verified|partial|missing|not-applicable}
-- 待处理缺口：{gaps}
-```
-
-只有用户明确要求持久化项目画像时才写一份 `project-profile.md`；已有 README、AGENTS 或知识索引能承担导航时，不新增文件。
-
-## 完成标准
-
-- 每类事实只有一个权威正文，链接可达且状态可验证。
-- Graphify 与当前 Git/工作区的覆盖关系已说明。
-- OpenSpec 的“当前目标”与 Graphify 的“当前实现”没有混为一谈。
-- 未确认业务候选、空规格和缺失运行证据被如实标记。
-- `status` 不写文件；其他模式只修改当前模式拥有的入口或权威产物。
-
-## 约束与协作
-
-- 不自动安装或升级 Graphify/OpenSpec，不修改全局配置，不创建定时任务。
-- 不把 Yoooni One 的 Java、React、Oracle、模块命名或业务规则写入通用初始化模板。
-- 不把项目特有规范写回公共插件；它们属于项目 `AGENTS.md` 或项目内 Skill。
-- `backend-evidence` 按需查询 Graphify、领域知识、DDL 与运行证据，不消费二次影响索引。
-- `change-readiness` 以 OpenSpec/兼容设计为变更依据，以 Graphify/源码为实现坐标。
-- `markdown-writing-standards` 只在实际写 Markdown 时叠加。
-- `git-commit-standards` 可提示上下文过期，但不强制每次提交重建。
-
-
-## 业务设计内容升级
-
-存量项目先盘点业务读者、八章概设/九项功能详设与功能编号链路。按[基线接入指引](references/design-baseline-adoption.md)渐进迁移，明确责任、节点和缺口；保留同文件双章节与历史证据，不批量重写正文。未接入或仅结构检查通过不能宣称设计合格。
-
-
-## 开发任务内部调用
-
-新增或修改业务模块时由 change-readiness 自动调用[设计准备与绑定流程](../change-readiness/references/automatic-design-maintenance.md)，无需用户另开初始化任务。内部入口为 scripts/design-baseline.js：discover 只读发现；prepare 保存不可重置的任务起点；resume 续接已绑定且已提交的切片；recover 核验旧会话缺绑定的准备记录；upsert 按已确认文件/标题幂等合并单个模块。Agent 负责业务写作和真实功能索引，脚本不生成空设计，也不运行全项目结构初始化或自动创建 OpenSpec。
+完成时说明项目边界、各入口状态、覆盖与缺口；默认会话交付，独立画像按请求保存。结构检查通过、设计内容认可、真实接入和运行验证分别报告。

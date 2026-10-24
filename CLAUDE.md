@@ -18,7 +18,7 @@
 
 ## 工程使命
 
-以最小复杂度，持续交付可靠、可维护的软件。[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护共同准则；Skill 主入口聚焦目标、适用条件、判断依据与完成边界，专项细节和精炼反例按需展开。安全、权限、数据完整性和项目明确采用的质量门禁仍须满足，不以流程数量代替交付效果。
+以最小复杂度，持续交付可靠、可维护的软件。[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护共同准则与证据分工。22 个 Skill 入口聚焦目标、专项判断、必要约束和精炼反例；格式、命令与采用条件保留在所属参考，按需读取。固定结构只服务实际契约，不把这些段落当作用户回复模板；安全、权限、数据完整性和项目明确采用的质量要求继续适用。
 
 ## 分层维护入口
 

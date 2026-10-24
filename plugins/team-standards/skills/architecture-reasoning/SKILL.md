@@ -5,7 +5,7 @@ description: "悟道：在功能名称代替需求、方案未定或担心过度
 
 # 悟道：先判断现在需要做到什么程度
 
-目标：让方案满足真实需求，并把实现、运行和维护的整体成本控制在必要范围。共同底线沿用[工程原则](../change-readiness/references/engineering-principles.md)。
+目标：让方案满足真实需求，并把实现、运行和维护的整体成本控制在必要范围。共同底线沿用[工程宪法](../change-readiness/references/engineering-principles.md)。
 
 ## 判断准则
 

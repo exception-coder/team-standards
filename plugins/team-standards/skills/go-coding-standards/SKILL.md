@@ -5,43 +5,29 @@ description: "Use when writing, reviewing, or modifying Go code. Adds idiomatic 
 
 # Go 整洁编码规范
 
-叠加 `coding-standards-common`；业务边界与 DDD 分层使用 `architecture-ddd-lite-fullstack` 的 Go 章节。Go 的包、接口、错误与并发规则以本 Skill 为语言专属解释，不套用 Java 的类、Javadoc、异常和线程池要求。
+目标：包和接口贴合实际调用，资源、错误和并发都有明确归属。共同准则见[工程宪法](../change-readiness/references/engineering-principles.md)；叠加[通用编码规范](../coding-standards-common/SKILL.md)，业务分层按 [DDD-lite](../architecture-ddd-lite-fullstack/SKILL.md) 的 Go 规则。
 
-## 开始前
+## 判断准则
 
-读取 `go.mod`、`go.work`（存在时）、项目 Agent 入口和现有包结构；按声明的 Go/toolchain 版本编码。不顺手升级 Go、引入 DI 框架或批量执行 `go mod tidy`。
+- 以 `go.mod`、`go.work` 和项目 toolchain 为依据，使用 `gofmt` 及既有 import 工具。包名表达职责，默认不导出，接口由消费方按所需行为定义。
+- 组合与零值优先；需要保护不变量才引入构造与行为方法。接收者按修改语义、复制成本和方法集选择，mutex 等不可复制状态不按值复制；留意 interface 中的 typed nil。
+- 错误补充操作上下文，需要可识别错误链时用 `%w` 与 `errors.Is/As`。预期失败返回 error，recover 留在明确隔离边界；责任边界统一记录，避免逐层打印再返回。
+- Context 显式传递取消与期限，通常为首参 `ctx`；派生后调用 cancel。后台任务单独定义生命周期，context 不承载可选业务参数。
+- goroutine 有启动、取消、等待和错误处理责任；并发与队列有界，阻塞通信可退出。channel 关闭由发送方协调，共享 map/状态受同步保护。
 
-## 包、类型与接口
+## 必要约束与完成边界
 
-- 使用 `gofmt`，沿用项目 import 工具；包名短、小写、表达职责，避免 `utils`、`common`、`manager` 收容不相关代码。
-- 默认不导出标识符；导出名避免包名重复。使用组合，不模拟继承、抽象基类或 `XxxImpl` 层次。
-- 接口通常由消费方定义，只描述当前所需行为；不要给每个 struct 配一个接口，也不为 mock 方便建立全量仓储接口。一般返回具体类型，已有稳定 API 不为形式改签名。
-- 接收者命名一致，按修改语义、复制成本和方法集选择值/指针；包含 mutex 等不可复制状态的类型不按值复制。
-- 注释说明契约、生命周期或不明显的原因。导出 API 的文档注释以符号名开头，使用 Go doc comment，不生成 Java 风格 `@param` 模板或给每个私有字段机械补注释。
-- 不为零值天然有效的类型强造构造器；需要保护不变量时使用显式构造/行为方法。注意 interface 内含 typed nil 时并不等于 nil。
+检查返回 error，忽略时有安全依据；文件、响应体和 rows 及时关闭并检查 `rows.Err()`。批量循环中控制 defer 的实际持有时间。SQL 参数绑定，同一事务统一使用 `sql.Tx`，处理 Begin/Commit 失败与回滚。
 
-## 错误与副作用
+导出 API 的 Go doc 说明契约和生命周期。按实际 module/workspace 范围执行格式检查、相关 `go test` 和 `go vet`；并发改动在支持环境运行 `-race`。既有静态工具沿用项目版本，结果只覆盖实际执行路径。
 
-- 检查返回的 `error`；只在能解释安全原因时忽略。添加操作上下文，需保留可识别错误链时用 `%w`，以 `errors.Is/As` 判断，不比较错误文案。
-- 预期失败返回 error；不使用 panic 处理用户输入、数据库失败或常规业务分支。recover 留在明确的进程/请求隔离边界，不掩盖损坏状态。
-- 错误由责任边界统一记录，避免逐层“打印再返回”。沿用项目结构化日志，记录必要业务标识，不输出凭据或敏感载荷；不强求每个 Go error 自带堆栈。
-- 及时关闭文件、响应体和 rows，检查 `rows.Err()`；循环内长时间持有资源时抽取局部函数或显式释放，不把所有 defer 堆到整个批次结束。
-- SQL 使用参数绑定；事务中统一使用同一个 `sql.Tx`，处理 Begin/Commit 错误并保证失败路径回滚，不混用事务外 `sql.DB` 操作假装原子性。具体数据证据走 `backend-evidence`。
+## 精炼反例
 
-## Context 与并发
+- 为每个 struct 复制完整接口：接口只表达消费方当前需要。
+- 请求下游换成 `context.Background()`：会丢失取消和期限。
+- 用 sleep 等待 goroutine 完成：使用明确的同步与退出机制。
+- 在 `sql.Tx` 中夹用 `sql.DB` 写入：这些操作不共享事务保证。
 
-- 请求范围的 `context.Context` 通常作为首参 `ctx` 显式传递，不传 nil、不用 context 承载可选业务参数、不随意保存在长期 struct 中。
-- 调用链传递取消与期限；派生 context 后确保 cancel 被调用。不在请求下游用 `context.Background()` 丢弃取消。后台任务单独定义生命周期、超时与退出策略。
-- 启动 goroutine 前明确谁启动、谁取消、谁等待、如何传递错误。限制并发和队列容量，阻塞发送/接收考虑取消；不用 sleep 同步协程。
-- 明确 channel 关闭所有权，通常由发送方协调关闭；不在接收方随意 close，不并发写普通 map，不在锁保护外读写共享可变状态。
-- 简单临界区优先 mutex，确需消息传递时用 channel；不为了“Go 风格”把同步逻辑改成异步。事务不会自动保护进程内共享内存。
+## 按需依据
 
-## 验证与交付
-
-按实际 module/workspace 范围执行格式检查、相关 `go test` 与 `go vet`；多 module 不把工作区根 `go test ./...` 当作已覆盖全部模块。并发改动增加受支持环境下的 `go test -race`，其通过只覆盖实际运行路径。
-
-测试针对行为、边界、错误与取消；表驱动测试按可读性选择，不强制所有测试套模板。已有 Staticcheck/golangci-lint 时沿用已固定版本和项目配置；不因本 Skill 自动安装新工具。环境或外部依赖缺失时报告未验证项，不把静态阅读当作运行通过。
-
-## 依据
-
-Go 官方 [Code Review Comments](https://go.dev/wiki/CodeReviewComments)、[模块布局](https://go.dev/doc/modules/layout)、[事务处理](https://go.dev/doc/database/execute-transactions)。DDD 分层是团队针对业务复杂度的约定，不是 Go 官方强制目录标准。
+具体语言契约查项目版本对应的 [Code Review Comments](https://go.dev/wiki/CodeReviewComments)、[模块布局](https://go.dev/doc/modules/layout)与[事务处理](https://go.dev/doc/database/execute-transactions)。DDD 是团队的业务边界约定。

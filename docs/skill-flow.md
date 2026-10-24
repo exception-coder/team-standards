@@ -2,7 +2,7 @@
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
-已授权业务开发自动执行[设计发现、补建、绑定、同步与验证](../plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)，无需用户另行初始化或填写 JSON。Agent 负责真实内容，内部入口安全合并绑定；纯咨询只读，项目不需要复制通用触发规则。
+已授权业务开发按实际影响维护设计；明确采用绑定治理的项目使用[设计发现、补建、绑定、同步与验证](../plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)。Agent 负责真实内容，内部入口安全合并绑定；纯咨询只读，普通开发不因插件存在而初始化治理。
 
 概设按业务读者组织八章，详设按稳定功能编号组织九项；固定结构按影响裁剪深度，规划、实现、验证与上线分开。业务内容治理沿用既有绑定与生命周期，可选 content v1 渐进接入；机器检查结构、关联与新鲜度，具名审阅判断业务表达及设计正确性。详见[内容契约与完整样衣示例](../plugins/team-standards/skills/change-readiness/references/design-output-contract.md)。
 
@@ -18,7 +18,7 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 整套组件、工程职责域及全部节点的输入输出见 [套件全景](suite-panorama.md)；本文保留任务路由和阶段规则。
 
-共同决策准则统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响进入既有设计/实施入口。明确小改不增加前置阶段，固定输出模板不作为准入条件；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)仅在需要校准判断时读取。
+22 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
 
 ## 执行适配源码导航
 

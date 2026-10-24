@@ -7,6 +7,18 @@ description: "Exact files, follow-up products, preservation rules, and exclusion
 
 在用户要求查看初始化内容、执行 `structure` / `init`，或判断现有项目是否符合统一结构时读取本文件。
 
+## 执行命令
+
+`<skill-root>` 为 init-project-docs 所在目录，`<project-root>` 为用户指定目录或当前项目根。已授权初始化时先核对 plan 的 missing/preserved/update，再 apply，最后 status：
+
+```text
+node <skill-root>/init-ai-structure.mjs plan --root <project-root>
+node <skill-root>/init-ai-structure.mjs apply --root <project-root>
+node <skill-root>/init-ai-structure.mjs status --root <project-root>
+```
+
+只请求检查时仅执行 status。init 的图谱与规格验证在 apply 后、最终 status 前按下文完成。
+
 ## `structure` 直接创建或补齐
 
 | 目标 | 初始化内容 | 约束 |

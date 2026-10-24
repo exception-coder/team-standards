@@ -1,6 +1,6 @@
 # 团队工具套件全景：按工程职责域看链路与节点
 
-按[工程原则](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)按需调用能力、按风险验证结果。4.14.0 起，文件数、行数和分支数不单独触发升档或强拆；架构路径与注释 Hook 默认提醒。
+共同准则与证据分工统一归[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。4.14.2 的 22 个 Skill 入口保留专项目标、判断、必要约束和精炼反例，具体格式与操作协议按需读取。架构路径与注释 Hook 仍默认提醒。
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 

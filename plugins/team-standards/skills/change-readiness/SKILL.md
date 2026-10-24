@@ -5,26 +5,30 @@ description: "Guide implementation preparation: understand the existing behavior
 
 # 变更实施引导
 
-帮助 Agent 在已授权任务内找到足够依据后开始实施。普通开发不要求先调用 Forge、建立兼容治理绑定、填写 JSON 或取得机器 PASS；插件不注册相关写前、提交前或 Stop 门禁。
+目标：在已授权任务内取得足够实施依据，维护受影响的行为和设计后推进交付。共同准则见[工程宪法](references/engineering-principles.md)。
 
-遵循[工程原则](references/engineering-principles.md)：以当前目标和风险选择方法，复用已有上下文，不为档位或模板增加作业。
+## 判断准则
 
-## 工作方法
+- 明确当前目标和已确认约束，定位入口、关键条件、依赖与测试；Graphify 或工具不可用时用定向源码补齐。
+- 规格、概设和详设分别按实际影响维护。已有设计原位更新，缺失只补本次所需部分；行为保持不建空 change。
+- 项目已采用 OpenSpec 时按现有生命周期维护增量；设计中的目标与已验证能力分别记录。
 
-1. **确认当前目标。** 区分业务结果、候选实现与已确认约束，以及咨询与实施。功能名不能直接推出新增模块；方案已明确且没有新风险时直接沿用。读取必要的项目入口、源码和已有规格，纯咨询不自动创建设计、change 或绑定。
-2. **定位影响。** 找到入口、关键条件、依赖和测试；只调查当前任务需要的信息。Graphify 或工具不可用时用定向源码读取补齐，避免等待工具状态。
-3. **按影响维护设计。** 复用已有概设详设；缺失时根据确认的需求和实现事实补齐受影响部分。已采用 OpenSpec 的项目按其现有流程维护本次增量；不因插件存在就初始化 OpenSpec 或治理登记。行为保持不建空 change，局部修改不补齐整个模块历史欠账。
-4. **开始实施。** 缺少设计文件、登记或检查器结果不单独阻止开发。仅当关键业务歧义、权限不足或无法安全保护已有改动时暂停受影响操作，继续可确认的工作。规划内容与已验证能力分开记录。
-5. **验证并说明结果。** 使用 [delivery-verification](../delivery-verification/SKILL.md) 选择适用检查，更新受影响文档，按项目提交约定完成当前任务。报告实际结果、未验证项和下一步，不把缺少治理记录包装成业务失败。
+## 必要约束与完成边界
+
+插件不注册就绪写前、提交前或 Stop 门禁；缺少绑定、治理 JSON、Forge PASS 或历史设计不单独阻止实施。关键业务歧义、权限不足或无法保护已有改动时只暂停受影响操作。
+
+入口、预期变化及关键风险有依据即可实施；用[交付验证](../delivery-verification/SKILL.md)核实结果并同步受影响说明。
+
+## 精炼反例
+
+- 修改一个校验条件先补全模块全部历史设计：只维护受影响规则。
+- 插件里有 Forge 工具就先创建治理绑定：核对项目是否明确采用。
+- 为保持行为的重构编造需求变更：记录影响和回归依据即可。
 
 ## 按需参考
 
-- 功能名代替需求、方案未定或需要范围收敛时，用 [architecture-reasoning（悟道）](../architecture-reasoning/SKILL.md) 核实目标、必要复杂度与升级条件；判断可以内部完成，既定方案执行和明确小改不增加独立阶段。
-- 代码定位：[code-orientation](references/code-orientation.md)；方案取舍：[solution-review](references/solution-review.md)。
-- 需要时参考[风险判断](references/classification.md)、[文档查找](references/document-workflow.md)、[图示表达](rules/mermaid-requirements.md)；项目已登记状态契约时使用[状态契约](references/state-contract.md)。这些参考不增加默认机器门禁。
-- 按影响维护：[impact-routing](references/impact-routing.md)；设计表达：[clear-design-docs](../clear-design-docs/SKILL.md)；设计内容：[design-output-contract](references/design-output-contract.md)。
-- 已采用 OpenSpec 的项目：[openspec-lifecycle](references/openspec-lifecycle.md)。
-- 用户要求或项目明确采用绑定治理时，才加载 [automatic-design-maintenance](references/automatic-design-maintenance.md)、[current-design-baseline](references/current-design-baseline.md) 和 [governance-checker](references/governance-checker.md)。这些可选协议中的绑定、指纹及恢复命令不扩散为普通任务的准入条件。
-- 项目明确采用 Forge 时，按 [execution-adapter](references/execution-adapter.md) 使用其项目策略。工具可用或插件已安装不等于项目选择了硬门禁；项目自行设置的权限、CI 和执行约束仍按项目约定处理。
-
-上述按需参考不覆盖本入口的默认引导边界。无需为了推进当前任务更换会话、删除历史状态或伪造检查结果。
+- 目标或方案未定：[悟道](../architecture-reasoning/SKILL.md)及[方案审视](references/solution-review.md)。
+- 代码定位：[code-orientation](references/code-orientation.md)；风险：[classification](references/classification.md)。
+- 设计影响：[impact-routing](references/impact-routing.md)；查找：[document-workflow](references/document-workflow.md)；表达：[clear-design-docs](../clear-design-docs/SKILL.md)与[图示](rules/mermaid-requirements.md)；结构：[design-output-contract](references/design-output-contract.md)。
+- 已采用 OpenSpec：[生命周期](references/openspec-lifecycle.md)；已登记状态：[状态契约](references/state-contract.md)。
+- 明确采用绑定治理：[设计维护](references/automatic-design-maintenance.md)、[当前基线](references/current-design-baseline.md)、[检查器](references/governance-checker.md)；已采用 Forge：[执行适配](references/execution-adapter.md)。这些可选协议不扩散为普通任务的准入条件。

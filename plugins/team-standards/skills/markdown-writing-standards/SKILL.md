@@ -5,29 +5,30 @@ description: "Use when delivering suite or project updates to synchronize affect
 
 # Markdown 编写规范
 
-## 文档生命周期路由
+目标：文档内容准确、入口可发现、格式可阅读，维护同一主题的唯一权威正文。共同准则见[工程宪法](../change-readiness/references/engineering-principles.md)。
 
-创建或结构性修改项目文档、设计文档、Bug 文档或用户知识库 Markdown 时，先读取 [references/document-index-workflow.md](references/document-index-workflow.md)：优先更新唯一权威载体，写后只维护受影响的已有导航。不要求 Phase-A / Phase-B、个人目录索引或另建 INDEX.md。
+## 判断准则
 
-概设、详设的编写与精简使用 [clear-design-docs](../clear-design-docs/SKILL.md)；独立方案评审由 [reviewing-design-plainly](../reviewing-design-plainly/SKILL.md) 判断实质问题，表达或图示核对再按需使用 clear-design-docs。普通 Markdown 润色不触发设计流程。内容结构及绑定仍遵循设计内容契约，本 Skill 负责格式和导航。
+- 从项目入口或已有索引找到所属文档，优先原位更新；现状基线与活动变更分别记录当前能力和目标增量。
+- 只维护受影响的正文与已有导航。当前文档需要反映真实行为，提交说明与开发日志不能代替。
+- 有生成来源时修改来源并重新生成；版本、路径、命令、数量、用法及语言版本按实际影响同步。
+- 新文档的归属与历史重复内容处理见[最小维护规则](references/document-index-workflow.md)；纯措辞调整无需额外设计流程。
 
 ## 作业交付时同步文档
 
-模块当前概设/详设与活动 change 分别承担现状和目标增量，不属于禁止维护的重复正文。按 [当前设计基线协议](../change-readiness/references/current-design-baseline.md) 原位更新受影响当前章节、移除失效表述并维护必要导航；不以开发日志、空标题或刷新日期代替同步，不将未实现目标写为当前能力。
+套件或项目改动在同一交付单元内核对文档影响，更新相关 README、规则入口、流程、索引与示例。跨仓分别维护组件和总览，总览只保留摘要与权威链接；非 Git 产物说明实际保存位置。
 
-AI 原生项目的文档是后续 Agent 与成员工作的输入。套件或项目更新必须在同次作业中核对文档影响；受影响内容与实现一起更新、验证和提交，不能留到用户追问，也不能仅以 commit body 或开发日志替代现行说明。
+无文档影响时说明理由即可。交付前核对事实、标题、链接、命令和格式，再按[提交规范](../git-commit-standards/SKILL.md)处理本次范围。
 
-1. 开始时从仓库入口和现有索引确定权威文档；结束时对照本次 diff 与实际行为检查 README、已维护的语言版本、安装用法、配置、能力数量、版本、契约、规则和示例。只更新受影响段落；确无文档影响时在提交正文或交付说明中写明理由，不制造无意义改动。
-2. Skill、Hook 或工作流变化：同步对应 Skill 正文和受影响的 README、Agent 入口、流程与索引。有生成来源时改来源并重新生成，不能直接修改派生产物；决策型变更与发布说明按项目已有维护约定记录，不强制创建日志。
-3. 跨仓套件变更分别核对组件文档和套件总览；总览只保留必要摘要及权威链接，不复制规则正文。非 Git 的总览可同步更新，但必须说明未纳入提交，不能冒称版本化交付。
-4. 更新已有权威文档，不为同一主题新建平行说明。必要的关联索引同步属于当前作业授权范围，直接执行；新增无关文档或改变知识归属才另行判断。
-5. 核对标题、链接、命令实际路径、版本和能力描述；机器检查通过不等于描述正确。未执行、未接入、试运行的能力必须如实表达，不能写成已全面生效。
-6. 文档同步完成后进入 [git-commit-standards](../git-commit-standards/SKILL.md) 自动本地提交；可执行改动的验证仍由 delivery-verification 负责。文档同步和自动提交是 Agent 执行义务，不宣称所有宿主都有强制 Hook。
+## 必要约束与完成边界
 
-## 按需读取格式细则
+标题层级连续，围栏闭合，表格列数一致，链接可达。修改 Mermaid 前读取[格式细则](references/markdown-format.md)的相关章节并验证；静态结构检查不能冒充实际渲染或内容正确性审读。
 
-- 通用说明去套话、降低阅读成本时用 [plain-writing（人话）](../plain-writing/SKILL.md)，保留事实、条件和用户格式；表达整理不触发方案重设计。
-- 生成或修改 Mermaid 前，必须读取 [格式细则](references/markdown-format.md)，逐项排查其中的致命错误；不能仅凭结构检查宣称图表可渲染。
-- 创建或结构性修改表格、代码块、标题导航时，读取同一参考中的对应章节；普通措辞更新不加载整份语法示例。
-- 保持标题层级连续、围栏闭合、表格列数一致、链接可达；优先沿用已有格式。
-- 文档同步只维护受影响事实，不复制规则正文，不为每次交付新增总结文档。
+当前设计维护见[基线协议](../change-readiness/references/current-design-baseline.md)，概设详设表达用[清晰设计文档](../clear-design-docs/SKILL.md)，通用润色用[人话](../plain-writing/SKILL.md)。
+
+## 精炼反例
+
+- 功能行为变了，只在 dev-log 写一条：同步实际使用说明。
+- 新增一篇文档就逐层新建 INDEX：维护需要的现有入口。
+- 更新日期而不修正失效内容：原位修正文。
+- Mermaid 围栏闭合就称图可渲染：执行对应校验，未渲染如实说明。

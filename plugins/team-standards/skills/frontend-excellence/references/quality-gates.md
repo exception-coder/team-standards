@@ -2,16 +2,16 @@
 
 Read this reference before declaring material frontend work complete. Scale the number of checks to the change, but do not skip an applicable quality dimension.
 
-## Verification loop
+## Verification criteria
 
-1. Select checks relevant to the changed scope under [delivery-verification](../../delivery-verification/SKILL.md#执行范围与证据复用). Reuse current evidence and count checks already executed within the build; run only uncovered or invalidated checks, rather than treating this list as a fixed command sequence.
-2. Start the application through its documented development or preview command.
-3. Open the changed experience in a real browser.
-4. Inspect the primary route at a representative mobile and desktop viewport. Add tablet or dense-data widths when the product requires them.
-5. Exercise the primary interaction plus one empty, validation, permission, network, or failure path.
-6. Run [visual-review-checklist.md](visual-review-checklist.md) against the rendered page.
-7. Compare with supplied references at equivalent dimensions.
-8. Fix material hierarchy, spacing, overflow, generic-pattern, state, and interaction defects; recheck affected evidence until stable, without restarting unrelated checks.
+Shared scope and evidence rules belong to [delivery verification](../../delivery-verification/SKILL.md#执行范围与证据复用). For material frontend work, use the documented application or preview in a real browser and establish:
+
+- the primary route works at representative mobile and desktop sizes, including relevant density or breakpoint changes;
+- the primary interaction and an applicable empty, validation, permission or failure path remain usable;
+- the rendered page satisfies the relevant [visual review criteria](visual-review-checklist.md) and supplied references at equivalent dimensions;
+- material visual or interaction defects are resolved, or remaining limitations are stated with their actual impact.
+
+These are evidence requirements, not a fixed command sequence. Recheck affected evidence when fixes change its inputs.
 
 When no target sizes are supplied, use approximately 375 pixels wide for a mobile pass and 1440 pixels wide for a desktop pass, then inspect any breakpoint where composition changes.
 

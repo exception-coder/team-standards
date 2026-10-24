@@ -5,21 +5,28 @@ description: "Use for design-system initialization, profile binding, visual cons
 
 # 设计系统与视觉治理
 
-先读取项目已有组件、tokens、设计规范、批准的页面和明确偏好；这些足够支持任务时直接复用，不因缺少个人 Registry 阻断 UI 工作或创建第二套设计系统。
+目标：界面有一致且适合当前任务的视觉语言，设计偏好有明确来源和作用域。共同准则见[工程宪法](../change-readiness/references/engineering-principles.md)。
+
+## 判断准则
+
+- 以项目组件、tokens、批准页面和明确偏好为依据；成熟区域复用和组合，新区域按任务范围探索。
+- Registry/Profile 用于已选择该机制的项目，普通页面工作直接使用已有设计资产。
+- 接受与拒绝保留原因和适用场景；候选模式出现频繁不等于可晋升为团队硬规则。
+- 视觉一致性与业务信息设计分工：指标、口径和选图归[业务可视化](../business-visualization-advisor/SKILL.md)，页面实现及浏览器验证归[前端质量](../frontend-excellence/SKILL.md)。
+
+## 必要约束与完成边界
+
+重大规则晋升需有明确确认；单次偏好不扩散成跨项目要求。报告复用资产、必要偏离及验证结果，持续变化的设计知识存于项目约定位置。
+
+## 精炼反例
+
+- 缺少个人 Registry 就停止页面修改：使用项目资产。
+- 用户喜欢一次圆角卡片，就将全部项目改为卡片：保留偏好作用域。
+- 为修配色重新定义业务指标：只处理视觉影响。
 
 ## 按需模式
 
-- **实施与评审**：读取 [review-mode.md](references/review-mode.md)。成熟区域优先复用、扩展和组合；新区域允许有范围的探索。生产 Web 同时使用 frontend-excellence。
-- **初始化与绑定**：用户要求或项目明确需要 Registry/Profile 时读取 [bootstrap.md](references/bootstrap.md)，按其中 schema 和模板建立最小资产；普通页面修改不自动初始化。
-- **偏好记录**：用户明确接受、拒绝或比较设计时，读取 [evidence-capture.md](references/evidence-capture.md)；已有存储约定则保留最小证据，未配置时在当前任务说明，不自动创建全局 Registry。
-- **模式归纳**：用户要求归纳或已有证据需要整理时，读取 [pattern-mining.md](references/pattern-mining.md)；候选不能因出现次数多就自动变成团队硬规则。
-
-## 图表与看板协作
-
-业务图表、指标概览与看板的指标选择、业务状态解释、选图和信息层次由 [business-visualization-advisor](../business-visualization-advisor/SKILL.md) 负责；本 Skill 复用视觉 tokens、语义色与组件，frontend-excellence 负责页面实现和真实浏览器验收。单纯配色或样式评审不自动重做指标设计。
-
-## 共同边界
-
-使用已配置 Registry 时读取 [resolver.md](references/resolver.md)，没有时以项目资产为准并说明证据来源。小文案、间距调整按影响验证，不强制完整视觉循环。保持批准/拒绝依据及偏好作用域，重大规则晋升需要明确确认；当前任务授权不因进入模式而重复申请。
-
-报告复用资产、必要偏离、实际视觉验证和未确定项。Registry 存储约定只约束启用该机制的项目；Skill 不存放持续变化的设计知识。
+- 实施与一致性评审：[review-mode](references/review-mode.md)。
+- 明确要求初始化/绑定：[bootstrap](references/bootstrap.md)；已配置 Registry 时用[resolver](references/resolver.md)。
+- 用户明确表达接受、拒绝或比较：[偏好证据](references/evidence-capture.md)。
+- 请求归纳或整理已有证据：[模式归纳](references/pattern-mining.md)。

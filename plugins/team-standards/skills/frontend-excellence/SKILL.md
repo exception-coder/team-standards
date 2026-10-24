@@ -5,63 +5,39 @@ description: "Use when creating, redesigning, or substantially improving product
 
 # Frontend Excellence
 
-Deliver a coherent product interface, not a runnable mock. Preserve the repository's stack and design language while improving structure, visual quality, interaction completeness, and verification evidence.
+Goal: deliver a coherent, usable product interface with recoverable interactions and browser evidence. Shared decisions follow the [engineering constitution](../change-readiness/references/engineering-principles.md).
 
-## Required workflow
+## Decision criteria
 
-1. Inspect the current project before choosing libraries or structure.
-   - Read the package manifest, application entry, routes, styling setup, existing design tokens, shared components, state/data patterns, and test commands.
-   - Reuse established capabilities unless the user explicitly requests a redesign or migration.
-2. Establish the product intent.
-   - Identify audience, primary task, content hierarchy, brand cues, target viewports, and accessibility expectations.
-   - For operational workspaces and material redesigns, sketch Page Anatomy, comparison task, density mode, mobile first useful content, and scroll owner before coding. Read [enterprise-ui-failure-patterns.md](references/enterprise-ui-failure-patterns.md) for observed corrections, review questions, and Eval cases; keep this compact in the current task or design rather than creating a new report.
-   - Use provided Figma selections, screenshots, brand assets, or written references as sources of truth.
-   - If no visual reference exists, state a concise visual direction and its rationale before implementing it.
-   - Separate durable product character from fashionable references. Translate references into hierarchy, typography, density, material, and motion decisions instead of imitating a named brand.
-   - For business charts, KPI overviews, or dashboards, read [business-visualization-advisor](../business-visualization-advisor/SKILL.md) before choosing metrics, chart types, or page composition. It owns information design and metric semantics; this skill owns implementation and browser verification. Ordinary pages do not require the chart workflow.
-3. Resolve architecture and state ownership.
-   - Apply `architecture-ddd-lite-fullstack` for Feature boundaries and dependency direction.
-   - Read [architecture-and-state.md](references/architecture-and-state.md) when adding routes, features, shared components, data fetching, forms, or state.
-4. Build a design system before composing pages.
-   - Read [design-system-and-aesthetics.md](references/design-system-and-aesthetics.md) for new projects, redesigns, new visual languages, or reusable component work.
-   - Express repeated decisions through semantic tokens and component variants, not page-local magic values.
-5. Implement the complete experience.
-   - Read [interaction-and-states.md](references/interaction-and-states.md) when the page can load, fail, be empty, reject input, deny access, or block the user's current workflow.
-   - Cover responsive layout, content hierarchy, keyboard behavior, focus, motion preferences, and all relevant loading, empty, error, success, disabled, and permission states.
-   - For operational workspaces, trace the available width/height from the application shell through every wrapper to the working panels. Assign remaining space and scroll ownership explicitly; reading-column limits belong to readable content, not automatically to the workspace. Use the viewport checks in [quality-gates.md](references/quality-gates.md#workspace-viewport-contract).
-   - Use real content shapes and realistic density. Keep fixtures centralized when live data is unavailable.
-   - On configuration screens, reveal current state and applicable source or inheritance before editing; show the pending difference and recovery path. For rule-driven results, layer result, business reason, and inspectable evidence.
-6. Verify in a real browser.
-   - Read [quality-gates.md](references/quality-gates.md) before declaring completion.
-   - Run [visual-review-checklist.md](references/visual-review-checklist.md) after the first complete render and again after material visual revisions.
-   - For list-heavy mobile pages, inspect whether the first useful business object appears in the initial view and whether navigation, search, and filters crowd it out. Verify scroll ownership and the final item in short and long content.
-   - Select relevant checks and reuse valid evidence under [delivery-verification](../delivery-verification/SKILL.md#执行范围与证据复用). Count checks already executed by the build; do not repeat them for task completion, commits, progress reports, or archive.
-   - Reuse existing behavior suites, fixtures, render helpers, and minimal providers instead of repeatedly loading the whole application. Reset mutable data, mocks, timers, and mounted components per case. Keep independent failures and permission/state transitions diagnosable. Add tests only for uncovered risks under [testing-assets.md](../coding-standards-common/references/testing-assets.md); use installed Vitest file/related filtering where suitable and explicitly include affected protocol consumers.
-   - Inspect at least one mobile and one desktop viewport. Exercise the primary interaction and one failure or empty path.
-   - Compare against supplied references and iterate until material differences are resolved or explicitly documented.
-7. Report the result.
-   - Summarize the visual direction, architectural choices, verification performed, and any residual limitation.
-   - Do not claim the interface is fully verified when browser validation could not run.
+- Use the repository's stack, tokens, components, data patterns and supplied visual references. Define a concise visual direction where none exists; create only the missing design decisions.
+- Organize around the audience's primary task, content hierarchy, comparison needs and realistic density. For material workspace changes, make the page anatomy, first useful mobile content and scroll ownership clear before implementation.
+- Keep feature boundaries and state ownership explicit. Use semantic tokens and component variants for repeated decisions; visual novelty must support hierarchy or interaction.
+- Cover applicable loading, empty, error, success, invalid, disabled and permission states. Preserve context and offer a useful recovery action.
+- Design responsive hierarchy rather than shrinking desktop layouts. Trace available width and height through wrappers; constrain reading content without unnecessarily constraining the operational workspace.
+- Configuration screens show current values and their source/inheritance, pending changes and recovery. Rule-driven results distinguish the result, business explanation and inspectable evidence.
 
-## Tool and input routing
+## Necessary constraints and completion
 
-- Use a Figma connector when the user supplies Figma resources and the connector is available. Figma is an enhancement, not a prerequisite.
-- Use image generation only for original bitmap assets, textures, illustrations, or visual exploration. Do not rasterize UI that should remain semantic code.
-- Use the repository's browser automation when available; otherwise use an interactive browser and preserve equivalent visual evidence.
-- Use existing icons, fonts, tokens, and component primitives before adding dependencies.
+Keyboard access, visible focus and reduced-motion behavior are part of applicable interactions. Avoid scattered raw styles, a competing design system or a giant production page that hides unrelated responsibilities.
 
-## Hard gates
+Material visual work requires real-browser inspection at relevant desktop and mobile sizes, including short-height workspace behavior, the primary interaction and a failure or empty path. Inspect final items and scroll ownership with short and long content. Compilation alone cannot establish usability; name inaccessible or unverified scope.
 
-- Do not deliver a single giant page component or a single-file HTML demo as production architecture unless the repository is intentionally static and the user explicitly wants that form.
-- Do not introduce a second design system beside an existing one without an explicit migration decision.
-- Do not scatter raw colors, spacing, radii, shadows, z-index values, endpoints, or breakpoints across page code.
-- Do not use desktop shrinkage as the mobile strategy; reflow hierarchy and interaction for constrained space.
-- Do not omit focus, keyboard, reduced-motion, error, empty, loading, or disabled behavior when the component can enter those states.
-- Do not substitute visual novelty for information hierarchy, legibility, or task completion.
-- Do not default to a centered icon-title-description card, universal card grids, oversized radii, decorative gradients, or shadows on every surface. Each container and effect must express structure or interaction.
-- Do not leave empty, error, invalid, expired, or permission states as dead ends. Preserve context and provide the next useful action whenever one exists.
-- Do not declare completion from compilation alone; browser inspection is required for material visual work.
+Use [delivery verification](../delivery-verification/SKILL.md#执行范围与证据复用) for execution scope and [test assets](../coding-standards-common/references/testing-assets.md) for shared fixtures and isolated mutable state. Reuse valid checks rather than adding a second acceptance run.
 
-## Completion contract
+## Compact counterexamples
 
-A finished result must be componentized, type-safe where the stack supports it, consistent with the repository, visually intentional, free of unexamined generic UI patterns, responsive, accessible, recoverable in non-happy states, and backed by proportionate build/test/browser evidence. If any dimension is intentionally deferred, name it explicitly.
+- A centered card grid on every page: choose containers that express the actual task and comparison structure.
+- Mobile filters occupy the entire first viewport: expose the first useful business object and adapt controls.
+- Every panel scrolls independently: assign scroll ownership and verify the final content remains reachable.
+- An error banner with no next action: preserve input and provide recovery where possible.
+
+## Read when needed
+
+- Routes, features, forms or state: [architecture and state](references/architecture-and-state.md) and [DDD-lite](../architecture-ddd-lite-fullstack/SKILL.md).
+- New visual language or reusable components: [aesthetics](references/design-system-and-aesthetics.md) and [design-system](../design-system/SKILL.md).
+- Interaction states: [interaction and states](references/interaction-and-states.md).
+- Workspace composition: [enterprise UI cases](references/enterprise-ui-failure-patterns.md).
+- Completion evidence: [quality gates](references/quality-gates.md), especially its workspace viewport contract; visual inspection: [review checklist](references/visual-review-checklist.md).
+- Business charts: [business visualization](../business-visualization-advisor/SKILL.md) owns metric semantics and chart choices.
+
+Use available Figma/browser tools for their actual inputs. Image generation is for bitmap assets, not rasterizing semantic UI. Report the implemented direction, verification and material limitations.

@@ -5,38 +5,27 @@ description: "Use to understand existing business logic before refactoring, rewr
 
 # 业务逻辑现状理解
 
-## 核心原则
+目标：重构、复写、迁移或回归审查前，理解当前业务实际怎样运行及哪些行为需要保持。共同准则与证据分工见[工程宪法](../change-readiness/references/engineering-principles.md)。
 
-重构、复写或迁移前必须先理解现状，但默认不生成新的梳理文档或 AI 速查索引。
+## 判断准则
 
-## 探查边界
+- 从项目入口确定业务边界和权威来源；Graphify 定位入口、依赖与读写链路，检查其对当前 HEAD 和工作区的覆盖，缺口用定向源码、DDL、测试或运行证据补齐。
+- 分开说明当前实现、已接受规则、活动变更和推断。业务术语、状态语义及失败行为需要对应证据，调用关系本身不足以证明。
+- 围绕本次问题还原主要路径与关键消费者，不生成平行代码索引。长期基线只有实际接手或迁移需要时才保存。
 
-独立现状理解或审查请求默认只分析，不自动改源码、刷新图谱文件或创建实施 change；当前证据不足时定向读取并说明缺口。若它是已授权重构或修复的前置阶段，证据充分后继续原任务，不重复请求实施授权。查询生产系统的负载、数据范围与权限单独评估，只读不代表低风险。
+## 必要约束与完成边界
 
-异常调查优先 bug-doc-required；跨项目价值与工作量评估优先读取项目声明的关系与证据来源；缺少平台时在已知范围分析并说明缺口；专业审查按对象选择规则。本 Skill 不把所有 Explore 请求收为同一执行流程。
+独立现状分析默认不写源码、不刷新图谱产物、不创建实施 change；作为已授权修复或重构的前置工作时，证据充分后继续原任务。结论应能定位依据，并说明行为冲突、覆盖缺口及其影响。
 
-## 上下文优先级
+## 精炼反例
 
-1. 读取项目 `AGENTS.md` 和项目知识索引，确认业务边界及权威来源。
-2. 若存在 Graphify，按当前安装 Skill 的查询流程定位入口、调用链、依赖和数据访问；使用前检查图谱是否覆盖当前 HEAD 与工作区改动。
-3. 读取 OpenSpec `specs/` 中已接受行为及相关活动 change；不得把目标行为当成当前实现事实。
-4. 用定向源码、DDL、SQL、测试或运行证据核实 Graphify 无法证明的业务语义、状态不变量和失败行为。
-5. 将输出区分为“当前实现事实”“已接受行为”“活动变更”和“待确认推断”。
+- 活动 change 写“支持退货”就认为系统已支持：核对当前实现和执行证据。
+- 图谱显示调用关系，就把注释中的规则当事实：追到真实条件、写入和失败路径。
+- 解释一个接口先生成全仓实体卡片：只还原回答问题所需的链路。
 
-普通分析直接输出结论和证据位置，不复制 Graphify 节点或 OpenSpec 正文。只有用户明确要求沉淀现状文档、项目没有可复用知识入口，或重构需要长期基线时，才读取 [references/orientation-document-workflow.md](references/orientation-document-workflow.md)，并叠加 `markdown-writing-standards` 的唯一归属与必要链接检查。
+## 按需参考
 
-## 边界
-
-- 本 Skill 不替代 `change-readiness` 的变更设计，也不实现 Graphify 查询算法。
-- Graphify 过期或缺失时可以用确定性扫描降级，但必须说明覆盖缺口。
-- 业务规则、术语和状态语义需要权威文档、运行证据或人工确认；不得仅凭图谱关系晋升为真相。
-
-## 状态契约闭环
-
-梳理状态消费者时，读取 [状态契约治理协议](../change-readiness/references/state-contract.md)。优先复用已登记的状态契约及只读 Graphify 关联视图，逐项核对写入、策略、查询、展示、迁移和测试；不新建第二份手工状态字典。
-
-## 术语模式
-
-业务术语歧义或命名映射需要核对时读取 [terminology.md](references/terminology.md)，复用权威知识源，不新建术语索引。
-
-需要从业务问题设计或补齐对象、属性、关系、状态及指标口径时，使用 `business-ontology-modeling`；本 Skill 继续提供当前逻辑与术语的证据，不为普通代码定位加载完整建模流程。
+- 需要持久现状基线：[文档工作流](references/orientation-document-workflow.md)。
+- 术语歧义或命名映射：[术语模式](references/terminology.md)。
+- 状态消费者：[状态契约](../change-readiness/references/state-contract.md)，核对写入、策略、查询、展示、迁移和测试。
+- 异常调查用 [bug-doc-required](../bug-doc-required/SKILL.md)，数据事实用 [backend-evidence](../backend-evidence/SKILL.md)；从问题补对象和口径时用[业务本体建模](../business-ontology-modeling/SKILL.md)。

@@ -19,6 +19,6 @@
 
 新增公司自定义检查前，在现有任务或提交中说明独立风险、维护归属及已有能力为何不足；优先补充已有检查器，不另建依赖图、测试扫描器、上下文池或验证规划平台。修改检查器时验证其行为，普通业务修改只运行适用检查，不连带重跑无关检查器自测。
 
-Java 上下文和数据库准备见 [Java 测试组织](../../java-coding-standards/SKILL.md#12-测试组织与准备复用)，前端准备见 [frontend-excellence](../../frontend-excellence/SKILL.md)。执行去重和证据边界见 [delivery-verification](../../delivery-verification/SKILL.md#执行范围与证据复用)。
+Java 上下文和数据库准备见 [Java 测试组织](../../java-coding-standards/SKILL.md#测试组织与准备复用)，前端准备见 [frontend-excellence](../../frontend-excellence/SKILL.md)。执行去重和证据边界见 [delivery-verification](../../delivery-verification/SKILL.md#执行范围与证据复用)。
 
 原生能力依据：[Maven Reactor](https://maven.apache.org/guides/mini/guide-multiple-modules.html)、[Spring TestContext 缓存](https://docs.spring.io/spring-framework/reference/testing/testcontext-framework/ctx-management/caching.html)、[Vitest CLI](https://vitest.dev/guide/cli.html)。
