@@ -11,7 +11,7 @@ description: "Guide implementation preparation: understand the existing behavior
 
 ## 工作方法
 
-1. **确认当前目标。** 区分咨询与实施，读取项目入口、相关源码和已有规格。只读咨询不自动创建设计、change 或绑定。
+1. **确认当前目标。** 区分业务结果、候选实现与已确认约束，以及咨询与实施。功能名不能直接推出新增模块；方案已明确且没有新风险时直接沿用。读取必要的项目入口、源码和已有规格，纯咨询不自动创建设计、change 或绑定。
 2. **定位影响。** 找到入口、关键条件、依赖和测试；只调查当前任务需要的信息。Graphify 或工具不可用时用定向源码读取补齐，避免等待工具状态。
 3. **按影响维护设计。** 复用已有概设详设；缺失时根据确认的需求和实现事实补齐受影响部分。已采用 OpenSpec 的项目按其现有流程维护本次增量；不因插件存在就初始化 OpenSpec 或治理登记。行为保持不建空 change，局部修改不补齐整个模块历史欠账。
 4. **开始实施。** 缺少设计文件、登记或检查器结果不单独阻止开发。仅当关键业务歧义、权限不足或无法安全保护已有改动时暂停受影响操作，继续可确认的工作。规划内容与已验证能力分开记录。
@@ -19,7 +19,7 @@ description: "Guide implementation preparation: understand the existing behavior
 
 ## 按需参考
 
-- 当前任务需要方案取舍或范围收敛时，先用 [architecture-reasoning（悟道）](../architecture-reasoning/SKILL.md) 核实问题、复杂度与升级条件；既定方案执行和普通小改不增加独立阶段。
+- 功能名代替需求、方案未定或需要范围收敛时，用 [architecture-reasoning（悟道）](../architecture-reasoning/SKILL.md) 核实目标、必要复杂度与升级条件；判断可以内部完成，既定方案执行和明确小改不增加独立阶段。
 - 代码定位：[code-orientation](references/code-orientation.md)；方案取舍：[solution-review](references/solution-review.md)。
 - 需要时参考[风险判断](references/classification.md)、[文档查找](references/document-workflow.md)、[图示表达](rules/mermaid-requirements.md)；项目已登记状态契约时使用[状态契约](references/state-contract.md)。这些参考不增加默认机器门禁。
 - 按影响维护：[impact-routing](references/impact-routing.md)；设计表达：[clear-design-docs](../clear-design-docs/SKILL.md)；设计内容：[design-output-contract](references/design-output-contract.md)。

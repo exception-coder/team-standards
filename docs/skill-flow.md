@@ -18,6 +18,8 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 整套组件、工程职责域及全部节点的输入输出见 [套件全景](suite-panorama.md)；本文保留任务路由和阶段规则。
 
+共同决策准则统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响进入既有设计/实施入口。明确小改不增加前置阶段，固定输出模板不作为准入条件；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)仅在需要校准判断时读取。
+
 ## 执行适配源码导航
 
 4.8.0 的运行时调用方法以[执行适配协议](../plugins/team-standards/skills/change-readiness/references/execution-adapter.md)为准。认知与任务方法留在 Skill，组织执行策略归 Forge，宿主 Hook 只适配事件与协议。纯咨询通过只读会话/候选查询结束，不创建执行绑定。
@@ -134,7 +136,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [business-ontology-modeling](../plugins/team-standards/skills/business-ontology-modeling/SKILL.md) | [模板](../plugins/team-standards/skills/business-ontology-modeling/assets/templates/)、[跨项目使用](../plugins/team-standards/skills/business-ontology-modeling/references/adoption.md)、[六问示例](../plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md) | Agent按问题建模与核实可回答性；不绑定数据库、工具或本体运行引擎 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | [references/](../plugins/team-standards/skills/change-readiness/references/)；[rules/](../plugins/team-standards/skills/change-readiness/rules/) | 规则编排；OpenSpec 与治理程序见下一节 |
 | [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) | 主入口自包含；按需引用设计内容契约和 clear-design-docs | 独立内容评审；不新增执行器或机器门禁 |
-| [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 按需 [取舍示例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md) | 前置收敛当前范围与复杂度；不规定固定演进阶梯 |
+| [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 按需[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)；共用工程宪法 | 需求求真与最小充分决策；不新增阶段、固定输出或技术阶梯 |
 | [plain-writing（人话）](../plugins/team-standards/skills/plain-writing/SKILL.md) | 按需 [改写与失真反例](../plugins/team-standards/skills/plain-writing/references/examples.md) | 后置表达；保留决策与事实，不反向开启架构循环 |
 | [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) | 主入口自包含；可叠加项目可用的 draw.io 工具 Skill | 设计图的语义、层级和视觉阅读路径；不内置绘图引擎 |
 | [coding-standards-common](../plugins/team-standards/skills/coding-standards-common/SKILL.md) | [references/](../plugins/team-standards/skills/coding-standards-common/references/) | Agent 读取的规则；没有独立同名执行器 |

@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.14.1] - 2026-10-24
+
+- Consolidate shared guidance into an engineering constitution with goals, decision principles, boundaries and concise counterexamples.
+- Extend existing architecture reasoning to distinguish business outcomes from implementation suggestions while preserving explicit user choices and necessary guarantees.
+- Replace the legacy proposal-review sequence and fixed response template with risk-based guidance; keep 22 Skills and existing project adoption boundaries.
+
 ## [4.13.1] - 2026-10-15
 
 - Add code-and-database reverse modeling as the starting path for legacy systems without a knowledge base, design or question list.

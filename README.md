@@ -4,6 +4,8 @@
 
 使命：**以最小复杂度，持续交付可靠、可维护的软件。** [工程原则](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一默认判断：按需使用能力，以实际风险决定设计和验证深度，以真实结果交付。
 
+4.14.1 将共同准则收敛为[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，用目标、判断依据、必要边界和精炼反例指导决策。需求求真并入已有[悟道](plugins/team-standards/skills/architecture-reasoning/SKILL.md)，旧方案审视取消固定流程与七项回显；沿用 S/M/L、已采用的 OpenSpec 和真实安全约束，不新增 Skill、审批或检查器。
+
 4.14.0 收敛默认作业负担：取消按文件/行数升档、按分支强拆 Service 和注释行数配额；Java 实践按项目契约适用。架构路径与注释模式 Hook 默认改为 `warn`，保留明确配置的 `block` / `off`。升级无需新建治理记录，不新增 Skill 或验证平台；既有 CI、安全、权限、数据完整性和项目显式门禁继续生效。改动及验证范围见[维护记录](docs/dev-log/2026-10-20.md)。
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
@@ -12,7 +14,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.14.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.14.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#范围选择示例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -97,7 +99,7 @@ flowchart TD
 
 | 类别 | Skill | 核心价值 |
 |---|---|---|
-| 分析设计 | `architecture-reasoning`（悟道） | 决策前核实问题、已有能力及最低充分复杂度，明确当前范围和升级条件 |
+| 分析设计 | `architecture-reasoning`（悟道） | 分清真实目标、候选实现和约束，选择最小充分方案；条件与反例按需读取 |
 | 知识文档 | `plain-writing`（人话） | 按读者与载体解释对象、动作和结果，保留事实、条件与技术含义 |
 | 分析设计 | `clear-design-docs` | 常见基础版范围、清晰表达、关系图、中文字段与语义审读 |
 | 分析设计 | `architecture-diagram-design` | 产品能力、领域边界与系统协作图的视角、层级、阅读路径和视觉验收 |

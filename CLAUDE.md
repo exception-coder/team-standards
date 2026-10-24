@@ -18,11 +18,11 @@
 
 ## 工程使命
 
-以最小复杂度，持续交付可靠、可维护的软件。按[工程原则](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)执行：目标优先、最小充分、尊重边界、证据驱动、自主执行、风险匹配、持续简化。Skill 和 Reference 按任务需要读取，不把工具调用、模板填满或文件数量当作交付目标。安全、权限、数据完整性和项目明确采用的质量门禁仍须满足。
+以最小复杂度，持续交付可靠、可维护的软件。[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护共同准则；Skill 主入口聚焦目标、适用条件、判断依据与完成边界，专项细节和精炼反例按需展开。安全、权限、数据完整性和项目明确采用的质量门禁仍须满足，不以流程数量代替交付效果。
 
 ## 分层维护入口
 
-方案取舍先用 [architecture-reasoning（悟道）](plugins/team-standards/skills/architecture-reasoning/SKILL.md) 判断当前目标与最低充分复杂度，再进入现有设计/实施入口；面向人的说明按 [plain-writing（人话）](plugins/team-standards/skills/plain-writing/SKILL.md) 整理表达。阶段数按需求，人话不改决策、不重开设计；普通编码与已定方案不增加前置阶段，纯润色不启动治理。两者不新增机器门禁，Forge 是否接入及覆盖仍由实际项目声明。
+功能名代替需求或方案未定时，用 [architecture-reasoning（悟道）](plugins/team-standards/skills/architecture-reasoning/SKILL.md) 分清真实目标、候选实现和必要约束，选择最小充分方案；既定方案和明确小改直接推进。面向人的说明用 [plain-writing（人话）](plugins/team-standards/skills/plain-writing/SKILL.md) 整理表达，不反向重开设计。阶段、文档和验证按实际影响，不新增同职责 Skill、固定回显或机器门禁。
 
 Agent 负责证据理解和实施，Skill 提供操作方法，Forge 负责上下文、执行状态、策略和硬约束，Hook/MCP 连接宿主。全局认知原则与本仓维护约定分开；本文件保留项目入口，不复制 Forge 实现。
 
@@ -102,7 +102,7 @@ flowchart TD
 
 | 用户意图或动作 | 调用 Skill / 模式 |
 |---|---|
-| 方案取舍、阶段规划或担心过度设计 | `architecture-reasoning`（悟道）；先核实问题与最低充分复杂度，再进入专用设计入口 |
+| 功能名代替需求、方案取舍、阶段规划或担心过度设计 | `architecture-reasoning`（悟道）；分清目标、候选实现和约束，再判断最小充分方案；明确小改不加阶段 |
 | 面向人的说明、去套话或要求说人话 | `plain-writing`（人话）；按载体改表达，保护事实和技术决策 |
 | 跨项目规划或估算 | 使用项目声明的证据源；Forge 专属协议不在通用插件内 |
 | 初始化、评审设计或记录明确视觉偏好 | `design-system` 的对应模式；已有设计资产优先 |
@@ -156,7 +156,7 @@ flowchart TD
 
 | Skill | 核心职责 | 关键模式或边界 |
 |---|---|---|
-| `architecture-reasoning` | 悟道：当前问题、方案复杂度与升级条件 | 前置决策；不为已定方案或小改重开设计 |
+| `architecture-reasoning` | 悟道：需求求真、最小充分方案与升级条件 | 尊重明确选择；不为已定方案或小改重开设计 |
 | `plain-writing` | 人话：读者、载体与具体表达 | 后置表达；不改变事实、契约与技术决策 |
 | `architecture-ddd-lite-fullstack` | 跨语言 DDD-lite 分层、Feature 边界、语义分包、单向依赖和原子能力 | 项目具体分层例外由项目声明 |
 | `backend-evidence` | 单服务后端事实、DDL/SQL 正确性与性能、反向影响、领域规格 | 跨项目拓扑不归团队插件 |
@@ -182,6 +182,8 @@ flowchart TD
 
 | 资源 | 所属 Skill | 用途 |
 |---|---|---|
+| `skills/change-readiness/references/engineering-principles.md` | `change-readiness` | 工程宪法：共同目标、判断准则与必要边界，其他入口引用而不复制 |
+| `skills/architecture-reasoning/references/examples.md` | `architecture-reasoning` | 条件与精炼反例，按需校准需求和复杂度判断 |
 | `skills/change-readiness/references/solution-review.md` | `change-readiness` | 方案与生产风险审视 |
 | `skills/change-readiness/references/classification.md` | `change-readiness` | S/M/L 与模板选择 |
 | `skills/change-readiness/references/document-workflow.md` | `change-readiness` | 设计文档查找、命名和更新 |
@@ -211,6 +213,7 @@ flowchart TD
 3. 破坏性删除或重命名递增 Major；三个 manifest 版本必须一致：marketplace、Claude plugin、Codex plugin。
 4. 项目专属编码规范、URL 路由、模块脚手架、架构 lint 和跨项目生态拓扑不进入本插件。
 5. 辅助细则放 `references/`，必要的可复用资产放 `templates/` 或 `assets/`；能够引用权威来源时不创建模板副本，只有用户意图级入口才建立独立 Skill。
+   共同原则优先引用工程宪法；新增固定步骤、模板或强制措辞须说明所保护的具体契约或风险，不能把单个案例推广成所有任务的默认流程。
 6. 每次套件更新按文档同步规则检查中文与英文 README、组件版本与数量、用法、流程和套件总览；受影响文档在同次作业中修正。完成验证后自动提交本次改动，不积压；明确禁止提交、无改动或验证失败等例外按提交 Skill 处理。
 
 ## 发版校验

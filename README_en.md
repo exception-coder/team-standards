@@ -2,6 +2,8 @@
 
 Platform template handoff: [Project foundation pack 1.0.0](templates/project-foundation/README.md) includes six repo-local skills, required code documentation, and agent entry files. Projects can use it without a preinstalled suite; existing plugin entry points remain compatible.
 
+Version 4.14.1 consolidates shared goals, decision principles, and boundaries in the [engineering constitution](plugins/team-standards/skills/change-readiness/references/engineering-principles.md). [Architecture reasoning](plugins/team-standards/skills/architecture-reasoning/SKILL.md) distinguishes business outcomes from suggested implementations and uses concise conditional counterexamples. Proposal review drops fixed steps and a mandatory seven-item response. Existing risk levels, adopted project tools, and safety guarantees remain; no additional Skill, approval, or checker is introduced.
+
 Version 4.12.1 guides fast daily feedback, risk-triggered expensive preparation, test compilation versus execution, and failure attribution. Reuse native tools and existing logs; no new gates or checker scripts. See [delivery verification](plugins/team-standards/skills/delivery-verification/SKILL.md) and [test ownership](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md).
 
 Version 4.11.0 makes change readiness and delivery verification guidance-only by default. The plugin no longer registers session initialization, specification/readiness guards, or Stop verification gates. Existing checker scripts remain available for explicit project integration; native tests and honest reporting remain part of the workflow.
@@ -10,7 +12,7 @@ Version 4.4 makes design discovery, authoring, binding and synchronization part 
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.13.2**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.14.1**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Version 4.13.2 incorporates a real legacy-code/Oracle read-only trial: verify source identity and freshness, preserve unreadable sources, and narrow Graphify hub-heavy queries. [Agent and MCP consumption](plugins/team-standards/skills/business-ontology-modeling/references/agent-consumption.md) maps models to existing semantic queries, capability schemas, domain facts and per-runtime integration checks.
 

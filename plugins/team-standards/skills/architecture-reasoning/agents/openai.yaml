@@ -1,6 +1,6 @@
 interface:
-  display_name: "悟道：收敛方案"
-  short_description: "先核实当前问题与约束，选择足够可靠的简单方案并说明升级条件"
-  default_prompt: "使用 $architecture-reasoning 判断这项需求当前需要做到什么程度，给出当前方案与有依据的升级条件。"
+  display_name: "悟道：需求求真与方案取舍"
+  short_description: "分清真实目标、候选实现和必要约束，按事实选择最小充分方案及升级条件"
+  default_prompt: "使用 $architecture-reasoning 核实这项需求的业务目标与约束，选择最小充分方案并说明关键边界。"
 policy:
   allow_implicit_invocation: true

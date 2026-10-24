@@ -98,7 +98,7 @@ flowchart TD
 |---|---|---|---|
 | [architecture-ddd-lite-fullstack](../plugins/team-standards/skills/architecture-ddd-lite-fullstack/SKILL.md) | 需求边界、现有结构与实现坐标 | 确定 Feature、层次、可复用能力及单向依赖 | 放置代码的边界与依赖约束 |
 | [coding-standards-common](../plugins/team-standards/skills/coding-standards-common/SKILL.md) | 本次源码改动 | 约束命名、职责、错误处理、重复、测试与注释 | 清晰、可维护的实现基线 |
-| [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 方案取舍或阶段规划 | 先核实问题、约束与已有能力，选择最低充分复杂度 | 当前建议、必要理由与升级条件；再进入已有设计/实施入口 |
+| [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 功能名代替需求、方案取舍或阶段规划 | 分清目标、候选实现和约束，按工程宪法选择最小充分方案 | 当前建议、必要理由与关键边界；明确小改直接进入已有实施入口 |
 | [plain-writing（人话）](../plugins/team-standards/skills/plain-writing/SKILL.md) | 面向人的说明或表达整理 | 按读者与载体说清对象、动作和结果，核对语义 | 清楚的说明；不改变事实或技术决策 |
 | [java-coding-standards](../plugins/team-standards/skills/java-coding-standards/SKILL.md) | Java 改动 | 在 common 上叠加 Java、并发、集合、日志与关系库规则 | Java 专属约束；不用于非 Java 任务 |
 | [llm-agent-coding-standards](../plugins/team-standards/skills/llm-agent-coding-standards/SKILL.md) | LLM SDK、Prompt、工具调用或 Agent 循环 | 校验信任边界、参数、结构化输出、超时与循环出口 | 可检查的模型集成契约与失败处理 |
