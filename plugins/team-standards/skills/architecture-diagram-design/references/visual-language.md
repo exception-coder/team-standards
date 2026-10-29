@@ -7,8 +7,8 @@
 | 模板 | 表达方式 | 调整重点 |
 |---|---|---|
 | [能力构成](../assets/templates/01-capability.drawio) | L1，大面积实色能力主体居中；方法与业务资源分列两侧，统一线性图标 | 箭头由能力指向按需引用的资源；SOP 独立置底、可选指导，不是必经执行步骤 |
-| [系统协作](../assets/templates/02-system-collaboration.drawio) | L2，资源集合、机器人主体与内部能力、办事窗口各用有语义的形象 | 仅员工范围显式画边界；维护、引用、调用方向明确；协作扩展弱化并标记可选 |
-| [执行对比](../assets/templates/03-execution-comparison.drawio) | L3，人物/模型为主角；校验盾牌、工具箱、成果文档共用同一阅读路径 | 当前突出用户推动；未来突出候选规划且标注规划中；拒绝分支与正常主线分开，不把模型画成执行授权者 |
+| [系统协作](../assets/templates/02-system-collaboration.drawio) | L2，资源集合、员工头像与内部能力、办事窗口各用有语义的形象 | 仅员工范围显式画边界；维护、引用、调用方向明确；协作扩展弱化并标记可选 |
+| [执行对比](../assets/templates/03-execution-comparison.drawio) | L3，人物/模型为主角；权限锁、工具与成果文档共用同一阅读路径 | 当前突出用户推动；未来突出候选规划且标注规划中；拒绝分支与正常主线分开，不把模型画成执行授权者 |
 
 SVG 预览：[能力构成](../assets/templates/01-capability.svg)、[系统协作](../assets/templates/02-system-collaboration.svg)、[当前执行](../assets/templates/03-current-execution.svg)、[未来规划](../assets/templates/03-future-planning.svg)。PNG 预览：[能力构成](../assets/templates/01-capability.png)、[系统协作](../assets/templates/02-system-collaboration.png)、[当前执行](../assets/templates/03-current-execution.png)、[未来规划](../assets/templates/03-future-planning.png)。预览由 draw.io 从对应源图导出，编辑后应重新导出。
 
@@ -31,19 +31,28 @@ SVG 预览：[能力构成](../assets/templates/01-capability.svg)、[系统协�
 
 ## 统一图标与语义
 
-draw.io 原生编辑优先使用 [13 项原生图标库](../assets/native-icon-library.xml)。同一套图标采用 64×64 基准画框、约 2.6 单位线宽、圆角及不填色的线性主体；放大时同步缩放笔画。形状与图标可随对象缩放，保持比例、留白和家族一致，不混搭随机 Emoji 或不同拟物风格。
+优先使用 draw.io 自带图形与图标：先在左侧搜索，必要时打开 More Shapes，选择语义合适且风格一致的一套。项目或用户有明确图标要求时遵从；只有自带素材不合适且确有特殊业务表达需要时才定制，不为“原生可编辑”默认重画一套。
 
-| 对象 | 图标隐喻 | 仍须保留的文字 |
+当前三套模板采用自带 **iOS7 Icons** 线性家族，统一描边、颜色和大小，并保留图标本身比例。以下名称已在实际编辑器中渲染核实，不要求其他项目照搬这个家族。
+
+| 对象 | 自带图形名 | 模板中的 shape 标识 |
 |---|---|---|
-| 人员 / 数字员工 | 人物 / 机器人 | 角色与职责 |
-| 工作能力 / Skill | 组合模块 | 能力名称与必要限定 |
-| Prompt / SOP | 对话框 / 清单板 | 指引或可选流程语义 |
-| 知识 / Tool | 书本 / 工具箱 | 业务事实或系统操作能力 |
-| 模型 / 校验 | 芯片 / 盾牌勾选 | 候选规划、程序权限与约束；盾牌不等于校验一定通过 |
-| 入口 / 成果 | 办事窗口 / 勾选文档 | 使用方式或交付内容 |
-| 协作 / 拒绝 | 多人 / 禁止标志 | 可选扩展或拒绝原因 |
+| 人员 / 数字员工 | User | `mxgraph.ios7.icons.user` |
+| 工作能力 / Skill | Cube | `mxgraph.ios7.icons.cube` |
+| Prompt | Chat | `mxgraph.ios7.icons.chat` |
+| 知识 | Book | `mxgraph.ios7.icons.book` |
+| Tool / 执行 | Tools | `mxgraph.ios7.icons.tools` |
+| SOP / 用户任务 | Documents | `mxgraph.ios7.icons.documents` |
+| 权限与程序校验 | Locked | `mxgraph.ios7.icons.locked` |
+| 模型规划 | Lightbulb | `mxgraph.ios7.icons.lightbulb` |
+| 业务入口 | Window | `mxgraph.ios7.icons.window` |
+| 成果 | Document | `mxgraph.ios7.icons.document` |
+| 可选协作 | Share | `mxgraph.ios7.icons.share` |
+| 拒绝执行 | Delete | `mxgraph.ios7.icons.delete` |
 
-图标是识别辅助手段，不是架构组件清单；不能为了凑图标虚构流程或状态。用户明确要求原生可编辑时，不把 SVG 图标当作可拆分图元。项目已有图标系统仍可优先，但须满足本次编辑深度要求。
+图标辅助识别，业务名称与限定必须保留；锁不意味着校验必定通过，灯泡不代表模型能够自行授权执行，分享符号不代表协作已经实现。不能为了凑图标虚构组件或流程。
+
+“自带”和“自建”须明确区分。4.15.1 的 [13 项自建原生图标](../assets/native-icon-library.xml)由基础图元组合，保留为兼容与特殊拆分需求的备用，当前模板不使用，也不是 draw.io 官方自带图库。内置 stencil 可按图形编辑，不把每一笔都能取消组合作为默认验收条件。
 
 ## 布局与文字
 

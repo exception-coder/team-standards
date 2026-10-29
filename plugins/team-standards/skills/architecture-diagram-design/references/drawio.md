@@ -33,17 +33,16 @@
 
 最小结构检查可用环境已有的 XML 解析器；检查每页根结构、重复 ID、悬空父子或边引用、无效几何。它不能证明业务正确或视觉可读，不要求额外依赖或自建评分器。
 
-## 原生图标与编辑
+## 图标选择与编辑
 
-[原生图标库](../assets/native-icon-library.xml)采用 draw.io 的 `mxlibrary`，每项保存一份原生 `mxGraphModel`，使用 `xml` 属性而非 `data:image`。可通过 File → Open Library from → Device 打开，也可直接从模板复制已有图标组；不会依赖外链图片或字体图标。
+优先在 draw.io 的搜索与 More Shapes 中选自带图形，尽量使用同一图标家族。当前模板使用内置 iOS7 Icons；具体名称见[图标对照](visual-language.md#统一图标与语义)。从实际编辑器的样式或官方图形定义核实 `shape=mxgraph.*`，不要猜名字；未知形状可能只显示为普通矩形，必须实际渲染检查。
 
-- 一个图标是 `style="group;"` 的父 cell 与矩形、椭圆、线段等子 cell；子几何坐标相对组。图标外的名称另存可编辑文字，移动业务节点时图标、标签与连接一同跟随。
-- 原生组样式以 `group;` 开始。模板采用 `selectParentFirst=1`，先选整体，再点击进入子图元；不要通过锁定子图元防止误选。样式或 XML 写入成功后，仍需实际抽查整体选择和取消组合。
-- 可将图标整体缩放、复制或取消组合，再修改单条线、形状或颜色；修改完成后可重新组合。没有锁定图元，也不把整图或单个 SVG 当作原生分解图元。
-- 图标内部线段可用无箭头的原生 edge 和 sourcePoint/targetPoint；它们不是业务依赖。业务关系必须有明确起止对象，优先挂到可见主体轮廓或稳定语义锚点，避免连接止于大片空白。
-- 原生图标不是要求自建渲染器；已有基础图元与普通分组已足够，不为本模板增加 DSL 或运行时依赖。
+- 自带 stencil 通常保存为一个原生图形节点，可调整位置、大小、描边、填色，业务文字与连接线继续编辑。它不等同于 PNG/SVG 图片节点，也不表示每条笔画都能取消组合。
+- 默认验证图形可选中、可移动缩放与改色，文字能修改、连接端点正确；只有用户明确要求笔画级编辑时才验证该深度，不能因此默认重建图库。
+- 图标名称与业务标签分开，原生分组负责对象整体移动；移动后检查边界、标签与连接跟随。业务线挂到可见主体轮廓或稳定语义锚点，不连接到装饰空白。
+- 自带图标中也可能有图片型素材，不能只因位于面板中就承诺逐笔画可编辑。遇到外链图片先检查目标环境可访问性；需要独立交付时用合适的自带 stencil 或按需内嵌素材，不依赖不可用外链。
 
-验收时除节点改字与连线端点外，抽查一个图标可以取消组合、单独改动图元并恢复；再检查组合移动后边界与业务连线仍正确。只证明“一个整体能拖动”不足以证明逐图元编辑。
+历史 [13 项自建图标库](../assets/native-icon-library.xml)是基础图元组合的 `mxlibrary`，保留兼容旧图，当前三套模板不依赖它。仅当缺少合适自带图标且有实际需求，或用户明确要求可拆分图元时按需采用；不将其误称为 draw.io 自带资源，也不默认继续扩建。
 
 ## 打开、编辑与预览
 
@@ -64,4 +63,4 @@
 
 ## 官方依据
 
-2026-10-29 核对：[AI 生成与验证](https://www.drawio.com/docs/reference/diagram-generation/)说明原生 XML 结构与未压缩生成方式；[保存格式](https://www.drawio.com/docs/manual/editor/save-file-formats/)说明 `.drawio` 及嵌入源数据的图片格式；[自定义图形库格式](https://www.drawio.com/docs/reference/format-custom-shape-library/)说明 `mxlibrary` 的 JSON、尺寸和 XML 属性；[组合与取消组合](https://www.drawio.com/docs/manual/editor/group-shapes-connectors/)说明编辑、选择顺序和 `selectParentFirst`；[桌面端源码](https://github.com/jgraph/drawio-desktop)是 CLI 行为依据。实际工具可能较旧，按已安装版本能力操作；不复制上游完整样式手册。
+2026-10-29 核对：[搜索自带图形](https://www.drawio.com/docs/manual/shapes/shape-search/)、[图形与 stencil 的实现区别](https://github.com/jgraph/drawio/wiki/Shapes-and-Stencils)、[iOS7 Icons 官方图形定义](https://app.diagrams.net/stencils/ios7/icons.xml)、[保存格式](https://www.drawio.com/docs/manual/editor/save-file-formats/)及[桌面端源码](https://github.com/jgraph/drawio-desktop)。按实际编辑器版本核实图标和导出能力，不复制上游完整图形库进插件。

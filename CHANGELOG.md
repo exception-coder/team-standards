@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.15.2] - 2026-10-29
+
+- Prioritize draw.io built-in shapes; replace all template icon assemblies with verified native iOS7 Icons while retaining the layouts and semantics.
+- Distinguish native stencil editability from stroke-level ungrouping. Default checks cover icon position, size, color, labels and connectors.
+- Retain the previous 13 custom icon groups only as a compatibility fallback; synchronize guidance and all four SVG/PNG previews without a new renderer or Hook.
+
 ## [4.15.1] - 2026-10-29
 
 - Redraw the three native draw.io templates with dominant subjects, supporting resources and distinct semantic metaphors instead of equally weighted flowchart boxes.

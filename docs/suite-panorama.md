@@ -214,4 +214,4 @@ flowchart TD
 
 部署、生产权限、数据库连接、业务启动和项目专属脚手架由目标项目拥有。套件提供方法、证据路由和检查能力，具体业务结果必须由当前项目的实际执行来证明。
 
-概设详设的表达质量由 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 承接；产品能力、领域边界与系统协作图的架构表达、视觉主次、统一原生图标和可编辑交付由 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 承接；独立方案问题评审由 [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) 承接。结构与生命周期继续归 change-readiness，不新增执行策略或 Hook。
+概设详设的表达质量由 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 承接；产品能力、领域边界与系统协作图的架构表达、视觉主次、自带图标优先和可编辑交付由 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 承接；独立方案问题评审由 [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) 承接。结构与生命周期继续归 change-readiness，不新增执行策略或 Hook。

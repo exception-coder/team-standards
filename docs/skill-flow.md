@@ -138,7 +138,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) | 主入口自包含；按需引用设计内容契约和 clear-design-docs | 独立内容评审；不新增执行器或机器门禁 |
 | [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 按需[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)；共用工程宪法 | 需求求真与最小充分决策；不新增阶段、固定输出或技术阶梯 |
 | [plain-writing（人话）](../plugins/team-standards/skills/plain-writing/SKILL.md) | 按需 [改写与失真反例](../plugins/team-standards/skills/plain-writing/references/examples.md) | 后置表达；保留决策与事实，不反向开启架构循环 |
-| [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) | 视图与主线在入口；按需加载视觉语言、draw.io 操作、三套原生模板、13 项可拆分图标和验收清单 | 统一信息提炼、形象表达、绘制与实际验收；不内置绘图引擎 |
+| [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) | 视图与主线在入口；按需加载视觉语言、draw.io 操作、三套原生模板、自带图标对照和验收清单 | 统一信息提炼、形象表达、绘制与实际验收；不内置绘图引擎 |
 | [coding-standards-common](../plugins/team-standards/skills/coding-standards-common/SKILL.md) | [references/](../plugins/team-standards/skills/coding-standards-common/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) | 直接阅读主入口；无上述下钻目录 | 读取规则后调用外部 Forge 或项目声明命令 |
 | [business-visualization-advisor](../plugins/team-standards/skills/business-visualization-advisor/SKILL.md) | [选图规则](../plugins/team-standards/skills/business-visualization-advisor/references/visual-rules.md)、[Dashboard Spec](../plugins/team-standards/skills/business-visualization-advisor/references/dashboard-spec.md) | Agent 探索业务事实并设计指标/图表，不是运行时图表引擎 |
@@ -410,7 +410,7 @@ Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成�
 
 ## 设计表达与结构的分工
 
-编写概设详设时，由 change-readiness 的内容契约确定结构与生命周期，再使用 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 完成逐段试讲、关系图、字段说明与语义核对。绘制产品能力、领域能力或系统协作图时，叠加 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 按受众选择 L1/L2/L3，提炼问题、主角与阅读路径，再组织图形与配色；draw.io 按需复用三套原生模板与统一原生图标，区分主体、支撑和注释；以实际打开、图标拆分、文字和端点抽查及轻量清单验收，具体格式沿用项目选择。独立评审概设、详设或技术方案由 [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) 核实本期事实、矛盾、关键缺口和过度设计；表达问题按需叠加 clear-design-docs。未来规模和冷门场景默认提醒，不作为当前硬指标。markdown-writing-standards 检查格式和导航，delivery-verification 核对受影响设计的实际审读范围。纯设计咨询不自动实施；普通文字编辑不要求启动设计治理。
+编写概设详设时，由 change-readiness 的内容契约确定结构与生命周期，再使用 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 完成逐段试讲、关系图、字段说明与语义核对。绘制产品能力、领域能力或系统协作图时，叠加 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 按受众选择 L1/L2/L3，提炼问题、主角与阅读路径，再组织图形与配色；draw.io 优先搜索自带图标并复用三套原生模板，区分主体、支撑和注释；以实际打开、图标改色/缩放、文字和端点抽查及轻量清单验收，逐笔画编辑仅按明确需求验证，具体格式沿用项目选择。独立评审概设、详设或技术方案由 [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) 核实本期事实、矛盾、关键缺口和过度设计；表达问题按需叠加 clear-design-docs。未来规模和冷门场景默认提醒，不作为当前硬指标。markdown-writing-standards 检查格式和导航，delivery-verification 核对受影响设计的实际审读范围。纯设计咨询不自动实施；普通文字编辑不要求启动设计治理。
 
 ER 表达按 clear-design-docs 核对模型对象、同表自关联及关联两端；逻辑对象与物理表分开，不以图中别名制造新表。
 
