@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.15.1] - 2026-10-29
+
+- Redraw the three native draw.io templates with dominant subjects, supporting resources and distinct semantic metaphors instead of equally weighted flowchart boxes.
+- Add a self-contained library of 13 native editable icon groups made from rectangles, ellipses and line segments; retain editable labels, boundaries and connectors.
+- Strengthen visual hierarchy and primitive-level editability guidance, preserve optional SOP/current/future semantics, and refresh all four SVG/PNG previews. No new Skill, renderer or Hook.
+
 ## [4.15.0] - 2026-10-29
 
 - Extend architecture-diagram-design into one architecture-visualization capability while preserving its name and the existing 22-Skill layout.

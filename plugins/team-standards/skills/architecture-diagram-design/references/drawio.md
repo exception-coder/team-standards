@@ -33,6 +33,18 @@
 
 最小结构检查可用环境已有的 XML 解析器；检查每页根结构、重复 ID、悬空父子或边引用、无效几何。它不能证明业务正确或视觉可读，不要求额外依赖或自建评分器。
 
+## 原生图标与编辑
+
+[原生图标库](../assets/native-icon-library.xml)采用 draw.io 的 `mxlibrary`，每项保存一份原生 `mxGraphModel`，使用 `xml` 属性而非 `data:image`。可通过 File → Open Library from → Device 打开，也可直接从模板复制已有图标组；不会依赖外链图片或字体图标。
+
+- 一个图标是 `style="group;"` 的父 cell 与矩形、椭圆、线段等子 cell；子几何坐标相对组。图标外的名称另存可编辑文字，移动业务节点时图标、标签与连接一同跟随。
+- 原生组样式以 `group;` 开始。模板采用 `selectParentFirst=1`，先选整体，再点击进入子图元；不要通过锁定子图元防止误选。样式或 XML 写入成功后，仍需实际抽查整体选择和取消组合。
+- 可将图标整体缩放、复制或取消组合，再修改单条线、形状或颜色；修改完成后可重新组合。没有锁定图元，也不把整图或单个 SVG 当作原生分解图元。
+- 图标内部线段可用无箭头的原生 edge 和 sourcePoint/targetPoint；它们不是业务依赖。业务关系必须有明确起止对象，优先挂到可见主体轮廓或稳定语义锚点，避免连接止于大片空白。
+- 原生图标不是要求自建渲染器；已有基础图元与普通分组已足够，不为本模板增加 DSL 或运行时依赖。
+
+验收时除节点改字与连线端点外，抽查一个图标可以取消组合、单独改动图元并恢复；再检查组合移动后边界与业务连线仍正确。只证明“一个整体能拖动”不足以证明逐图元编辑。
+
 ## 打开、编辑与预览
 
 1. 从 `.drawio` 打开最终文件，检查所有页、中文和图形；选择一个节点改字、选择一条连接检查端点。验证可在副本进行，不为了验收改掉最终内容。
@@ -52,4 +64,4 @@
 
 ## 官方依据
 
-2026-10-29 核对：[AI 生成与验证](https://www.drawio.com/docs/reference/diagram-generation/)说明原生 XML 结构与未压缩生成方式；[保存格式](https://www.drawio.com/docs/manual/editor/save-file-formats/)说明 `.drawio` 及嵌入源数据的图片格式；[桌面端源码](https://github.com/jgraph/drawio-desktop)是 CLI 行为依据。实际工具可能较旧，按已安装版本能力操作；不复制上游完整样式手册。
+2026-10-29 核对：[AI 生成与验证](https://www.drawio.com/docs/reference/diagram-generation/)说明原生 XML 结构与未压缩生成方式；[保存格式](https://www.drawio.com/docs/manual/editor/save-file-formats/)说明 `.drawio` 及嵌入源数据的图片格式；[自定义图形库格式](https://www.drawio.com/docs/reference/format-custom-shape-library/)说明 `mxlibrary` 的 JSON、尺寸和 XML 属性；[组合与取消组合](https://www.drawio.com/docs/manual/editor/group-shapes-connectors/)说明编辑、选择顺序和 `selectParentFirst`；[桌面端源码](https://github.com/jgraph/drawio-desktop)是 CLI 行为依据。实际工具可能较旧，按已安装版本能力操作；不复制上游完整样式手册。

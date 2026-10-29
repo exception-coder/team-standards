@@ -14,7 +14,9 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.15.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.15.1**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+
+Version 4.15.1 redraws the three templates around a dominant subject and supporting resources, with a consistent library of 13 native editable icon groups. Capability, employee configuration and human/model-led execution use distinct visual structures while retaining their architectural meaning. Four pages have SVG/PNG previews; the lightweight checks now include ungrouping and editing individual icon primitives, labels and connector endpoints. No new Skill, renderer or Hook is added.
 
 Version 4.15.0 extends the existing [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md) rather than adding a competing Skill. It combines L1 reporting, L2 design and L3 implementation views with visual guidance, three native editable draw.io templates (four example pages), and lightweight semantic, visual and editability checks. The plugin still exposes 22 Skills; no rendering engine, score system or Hook is added. See the [template guide](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md).
 
