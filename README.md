@@ -1,5 +1,7 @@
 # team-standards
 
+4.15.3 将用户已确认的三套 draw.io 模板风格设为后续架构说明图默认：形象化主体、明确主次、统一线性图标、留白与语义配色。新图优先复用原生模板和自带 iOS7 Icons，无需再次指定形象化风格；已有项目规范、用户指定和标准工程符号优先。已确认的三套源图及四页预览保持不变，详见[团队默认风格](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格)。
+
 基础平台模板交接：[项目基础规范包 1.0.0](templates/project-foundation/README.md)，包含六个可随项目分发的本地 Skill、代码注释要求与 Agent 入口；无需预装套件，保留现有插件入口以兼容旧项目。
 
 4.15.2 将架构图图标来源改为优先使用 draw.io 自带图形。三套模板统一采用已核实的 iOS7 Icons，保留视觉主次、可编辑文字和连线；图标可移动、缩放与改色，不再默认要求逐笔画取消组合。上轮 13 项自建图标保留兼容，降为特殊需求备用；不把自建库称为自带资源。详见[图标选择与编辑](plugins/team-standards/skills/architecture-diagram-design/references/drawio.md#图标选择与编辑)。
@@ -22,7 +24,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.15.2**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.15.3**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 

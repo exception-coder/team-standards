@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.15.3] - 2026-10-29
+
+- Adopt the user-approved three-template visual style as the default for subsequent architecture illustrations; reuse built-in iOS7 Icons, clear hierarchy, whitespace and semantic colors.
+- Keep the approved native sources and four-page previews unchanged. Existing project conventions, explicit instructions and standard engineering notation take precedence; synchronize Skill guidance and lightweight acceptance criteria.
+
 ## [4.15.2] - 2026-10-29
 
 - Prioritize draw.io built-in shapes; replace all template icon assemblies with verified native iOS7 Icons while retaining the layouts and semantics.

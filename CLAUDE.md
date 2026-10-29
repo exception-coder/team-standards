@@ -12,7 +12,7 @@
 
 概设详设的清晰表达统一使用 [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md)：逐段试讲、复杂对象配关系图、ER 对象与模型一致、同表层级用自关联且框内保留关键字段中文说明、接口字段有中文说明、简化措辞保持语义。结构和生命周期继续遵循设计内容契约。
 
-架构图统一使用 [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md)：按受众选择 L1 汇报、L2 设计或 L3 实施视图，组织语义、布局、图形与配色；draw.io 优先搜索自带图标，三套模板采用已核实的内置图形，用主体、支撑资源和注释形成主次；实际打开并抽查图标改色/缩放、文字与连线，不默认要求逐笔画拆分。不把可选步骤画成必经流程，也不把规划画成已实现；沿用项目格式，不另建同职责美化 Skill。
+架构图统一使用 [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md)：按受众选择 L1 汇报、L2 设计或 L3 实施视图，组织语义、布局、图形与配色；后续架构说明图默认沿用已确认三套模板的形象化风格，用主体、支撑资源和注释形成主次；draw.io 优先复用内置 iOS7 Icons，同图统一图标；实际打开并抽查图标改色/缩放、文字与连线，不默认要求逐笔画拆分。不把可选步骤画成必经流程，也不把规划画成已实现；沿用项目格式，不另建同职责美化 Skill。
 
 独立审查概设、详设或技术方案使用 [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md)：核实当前事实，只指出本期实质缺口、矛盾与未决选择；未来规模和冷门场景以提醒为主，不以扩展设计充当评审结果。表达问题按需叠加 clear-design-docs；不新增机器阻断或审批。
 

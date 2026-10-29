@@ -14,7 +14,9 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.15.2**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.15.3**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+
+Version 4.15.3 makes the user-approved three-template style the default for subsequent architecture illustrations: a recognizable primary subject, supporting resources, consistent line icons, whitespace and semantic colors. Reuse native templates and built-in iOS7 Icons unless project conventions or explicit instructions call for another style. Standard engineering notation remains applicable. The approved source diagrams and four-page previews are unchanged; see the [default style](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格).
 
 Version 4.15.2 prioritizes draw.io built-in shapes. All three templates now use verified iOS7 Icons while preserving their visual hierarchy, editable labels and connectors. Default checks cover moving, resizing and recoloring native stencil shapes; ungrouping individual strokes is required only when explicitly requested. The previous 13 custom icon groups remain a compatibility fallback and are no longer the default.
 
