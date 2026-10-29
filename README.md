@@ -2,6 +2,8 @@
 
 基础平台模板交接：[项目基础规范包 1.0.0](templates/project-foundation/README.md)，包含六个可随项目分发的本地 Skill、代码注释要求与 Agent 入口；无需预装套件，保留现有插件入口以兼容旧项目。
 
+4.15.0 扩展现有 [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md)，统一架构表达、视觉绘制与轻量验收，保持 22 个 Skill 和已有调用名。按受众选择 L1/L2/L3，提供 [3 套原生 draw.io 模板](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md)覆盖能力构成、后台管理、当前执行及未来分工；交付可编辑源图，实际打开检查，不新增评分器或 Hook。
+
 使命：**以最小复杂度，持续交付可靠、可维护的软件。** 共同准则与证据分工由[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护。
 
 4.14.3 统一 Bash / exec_command 的提交消息载荷解析，移除按文件数、行数及 Skill 调用记录阻断提交的旧门禁。22 个 Skill 继续引用工程宪法，提交格式与真实验证要求保留；新增可重复运行的隔离任务对照，方法和实际结果见[行为回归](docs/maintenance/behavior-regression.md)。
@@ -16,7 +18,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.14.4**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.15.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -32,7 +34,7 @@ OpenSpec 治理命令默认等待 30 秒，慢环境可通过 `TEAM_STANDARDS_OP
 
 4.9.3 增加 [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md)：独立审查概设、详设和技术方案的本期矛盾、关键缺口、待决策前提与过度设计，按事实给最小修正建议。未来高流量和冷门场景默认只提醒，不增加机器门禁。
 
-4.10.0 增加 [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md)：绘制产品能力、领域能力和系统协作图前，先确定图要回答的问题，分开语义视角，设计清晰阅读路径，并以实际渲染检查交付。具体 draw.io 操作仍由专项工具 Skill 承担。
+4.10.0 增加 [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md)：绘制产品能力、领域能力和系统协作图前，先确定图要回答的问题，分开语义视角，设计清晰阅读路径，并以实际渲染检查交付。4.15.0 补齐原生 draw.io 编辑、导出和模板用法，实际绘制仍优先使用环境已有工具。
 
 4.10.1 调整 [Git 提交规范](plugins/team-standards/skills/git-commit-standards/SKILL.md)：保留兼容的三段格式，要求用大白话说清原问题、关键技术或业务处理及实际结果；文件清单、版本号和测试通过只作补充。机器仍只检查格式，不把措辞质量伪装成自动门禁。
 
@@ -104,7 +106,7 @@ flowchart TD
 | 分析设计 | `architecture-reasoning`（悟道） | 分清真实目标、候选实现和约束，选择最小充分方案；条件与反例按需读取 |
 | 知识文档 | `plain-writing`（人话） | 按读者与载体解释对象、动作和结果，保留事实、条件与技术含义 |
 | 分析设计 | `clear-design-docs` | 常见基础版范围、清晰表达、关系图、中文字段与语义审读 |
-| 分析设计 | `architecture-diagram-design` | 产品能力、领域边界与系统协作图的视角、层级、阅读路径和视觉验收 |
+| 分析设计 | `architecture-diagram-design` | 架构可视化：L1/L2/L3、统一图形与配色、三套可编辑 draw.io 模板及轻量验收 |
 | 分析设计 | `reviewing-design-plainly` | 独立审查本期设计矛盾、关键缺口和过度设计；未来规模与冷门场景作提醒 |
 | 分析设计 | `change-readiness` | 自动匹配或创建 OpenSpec change，持续更新 artifacts，并统一方案审视、风险分档和实施前代码定位 |
 | 分析设计 | `bug-doc-required` | 证据驱动的 Bug 调查、最小修复与回归；简单问题不另建报告 |

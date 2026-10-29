@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Team Standards" version="1.0">
+  <diagram id="page-1" name="L2 后台管理">
+    <mxGraphModel dx="1280" dy="720" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1280" pageHeight="720" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="公共资源统一维护，工作能力在数字员工内配置" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;text;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=32;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="36" width="1120" height="52" />
+        </mxCell>
+        <mxCell id="subtitle" value="L2 设计视图 · 从左向右看维护、配置与使用；箭头标签区分不同关系" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;text;align=left;strokeColor=none;fillColor=none;fontSize=17;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="96" width="1100" height="28" />
+        </mxCell>
+        <mxCell id="footer" value="表达示例 · 请按项目事实替换组件、边界与状态" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;text;align=left;strokeColor=none;fillColor=none;fontSize=16;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="670" width="1120" height="24" />
+        </mxCell>
+        <mxCell id="resource-zone" value="公共资源管理" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;swimlane;startSize=48;horizontal=1;container=1;collapsible=0;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#64748B;fillColor=#F8FAFC;fontSize=22;spacing=12;fontSize=22;align=left;spacingLeft=20;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="170" width="330" height="420" />
+        </mxCell>
+        <mxCell id="employee-zone" value="数字员工配置" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;swimlane;startSize=48;horizontal=1;container=1;collapsible=0;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#64748B;fillColor=#F8FAFC;fontSize=22;spacing=12;fontSize=22;align=left;spacingLeft=20;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="440" y="170" width="360" height="420" />
+        </mxCell>
+        <mxCell id="entry-zone" value="业务使用入口" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;swimlane;startSize=48;horizontal=1;container=1;collapsible=0;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#64748B;fillColor=#F8FAFC;fontSize=22;spacing=12;fontSize=22;align=left;spacingLeft=20;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="850" y="170" width="350" height="420" />
+        </mxCell>
+        <mxCell id="resource" value="Prompt / Skill&#10;知识 / Tool" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;shape=cylinder3;boundedLbl=1;size=12;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#8B5CF6;fillColor=#F5F3FF;fontSize=22;spacing=12;" vertex="1" parent="resource-zone">
+          <mxGeometry as="geometry" x="45" y="190" width="240" height="130" />
+        </mxCell>
+        <mxCell id="maintainer" value="资源维护者" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;shape=umlActor;verticalLabelPosition=middle;verticalAlign=middle;labelPosition=right;align=left;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#64748B;fillColor=#FFFFFF;fontSize=22;spacing=12;fontSize=20;whiteSpace=nowrap;spacingLeft=16;" vertex="1" parent="resource-zone">
+          <mxGeometry as="geometry" x="60" y="85" width="60" height="75" />
+        </mxCell>
+        <mxCell id="employee" value="数字员工" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;rounded=1;arcSize=16;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#3B82F6;fillColor=#EFF6FF;fontSize=22;spacing=12;fontStyle=1;" vertex="1" parent="employee-zone">
+          <mxGeometry as="geometry" x="60" y="90" width="240" height="80" />
+        </mxCell>
+        <mxCell id="ability" value="员工内的工作能力" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;rounded=1;arcSize=16;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#3B82F6;fillColor=#EFF6FF;fontSize=22;spacing=12;" vertex="1" parent="employee-zone">
+          <mxGeometry as="geometry" x="60" y="220" width="240" height="100" />
+        </mxCell>
+        <mxCell id="entry" value="办事入口&#10;选择员工与能力" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;shape=process;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#10B981;fillColor=#ECFDF5;fontSize=22;spacing=12;" vertex="1" parent="entry-zone">
+          <mxGeometry as="geometry" x="55" y="180" width="240" height="130" />
+        </mxCell>
+        <mxCell id="maintains" value="维护" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;html=0;edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#64748B;fontSize=17;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="maintainer" target="resource">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="configures" value="配置" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;html=0;edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#3B82F6;fontSize=17;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="employee" target="ability">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="references" value="按需引用" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;html=0;edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8B5CF6;fontSize=17;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" parent="1" source="ability" target="resource">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="invokes" value="调用" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;html=0;edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#3B82F6;fontSize=17;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" parent="1" source="entry" target="ability">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="collaboration" value="多员工协作 · 可选扩展" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;rounded=1;arcSize=16;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#64748B;fillColor=#FFFFFF;fontSize=22;spacing=12;dashed=1;fontSize=18;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="850" y="610" width="350" height="42" />
+        </mxCell>
+        <mxCell id="legend" value="虚线区域仅表示可选扩展，不表示当前执行必经步骤" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;text;align=left;strokeColor=none;fillColor=none;fontColor=#64748B;fontSize=17;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="616" width="720" height="30" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.15.0] - 2026-10-29
+
+- Extend architecture-diagram-design into one architecture-visualization capability while preserving its name and the existing 22-Skill layout.
+- Add L1/L2/L3 views, semantic visual guidance, three native draw.io templates with four example pages, and progressive draw.io editing/export references.
+- Add lightweight accuracy, clarity, visual and editable-delivery checks; preserve optional SOP guidance, human-driven current execution and explicitly planned future delegation. No new renderer or Hook.
+
 ## [4.14.3] - 2026-10-24
 
 - Normalize Bash / exec_command command payloads and target working directories for commit-message validation.

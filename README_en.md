@@ -14,7 +14,9 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.14.4**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **4.15.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+
+Version 4.15.0 extends the existing [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md) rather than adding a competing Skill. It combines L1 reporting, L2 design and L3 implementation views with visual guidance, three native editable draw.io templates (four example pages), and lightweight semantic, visual and editability checks. The plugin still exposes 22 Skills; no rendering engine, score system or Hook is added. See the [template guide](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md).
 
 Version 4.14.4 independently validates staged paths so a cancelling worktree diff cannot hide an external symlink. The returned change set keeps its net-diff semantics. Regression fixtures accept both POSIX symlinks and Windows junctions without weakening explicit-input checks.
 
@@ -40,7 +42,7 @@ Version 4.9 adds [clear-design-docs](plugins/team-standards/skills/clear-design-
 
 Version 4.9.3 adds [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) for independent overview, detailed-design and technical-plan reviews. It prioritizes material contradictions, current-scope gaps and minimal remedies; speculative scale and rare scenarios remain advisory unless confirmed requirements or correctness risks make them relevant.
 
-Version 4.10.0 adds [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md) for product capability maps, domain boundaries, and system collaboration diagrams. It separates viewpoints, establishes a reading path, and requires rendered visual review; format-specific editing remains with the relevant diagram tool.
+Version 4.10.0 adds [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md) for product capability maps, domain boundaries, and system collaboration diagrams. It separates viewpoints, establishes a reading path, and requires rendered visual review; version 4.15.0 adds native draw.io editing and export guidance while reusing available diagram tools.
 
 Version 4.10.1 keeps the three-part [commit format](plugins/team-standards/skills/git-commit-standards/SKILL.md) while asking the author to explain the former problem, decisive business or technical change, and observed result in plain language. File lists, version bumps, and test results supplement that explanation; the existing Hook still checks structure only.
 

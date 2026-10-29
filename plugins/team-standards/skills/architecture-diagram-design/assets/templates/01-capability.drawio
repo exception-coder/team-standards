@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Team Standards" version="1.0">
+  <diagram id="page-1" name="L1 能力构成">
+    <mxGraphModel dx="1280" dy="720" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1280" pageHeight="720" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="工作能力按需组合方法、知识与工具" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;text;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=32;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="36" width="1120" height="52" />
+        </mxCell>
+        <mxCell id="subtitle" value="L1 汇报视图 · 工作能力是主体，资源按需引用，SOP 提供可选指导" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;text;align=left;strokeColor=none;fillColor=none;fontSize=17;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="96" width="1100" height="28" />
+        </mxCell>
+        <mxCell id="footer" value="表达示例 · 请按项目事实替换组件、边界与状态" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;text;align=left;strokeColor=none;fillColor=none;fontSize=16;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="670" width="1120" height="24" />
+        </mxCell>
+        <mxCell id="capability" value="工作能力&#10;完成一项业务任务" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;shape=hexagon;perimeter=hexagonPerimeter2;size=0.12;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#3B82F6;fillColor=#EFF6FF;fontSize=22;spacing=12;fontSize=26;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="490" y="310" width="300" height="160" />
+        </mxCell>
+        <mxCell id="sop" value="SOP&#10;可选流程指导" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;shape=document;boundedLbl=1;size=0.15;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#F59E0B;fillColor=#FFFBEB;fontSize=22;spacing=12;dashed=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="80" y="325" width="220" height="120" />
+        </mxCell>
+        <mxCell id="prompt" value="Prompt&#10;任务指引" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;shape=document;boundedLbl=1;size=0.15;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#8B5CF6;fillColor=#F5F3FF;fontSize=22;spacing=12;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="350" y="165" width="220" height="90" />
+        </mxCell>
+        <mxCell id="skill" value="Skill&#10;可复用方法" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;shape=hexagon;perimeter=hexagonPerimeter2;size=0.12;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#8B5CF6;fillColor=#F5F3FF;fontSize=22;spacing=12;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="710" y="165" width="220" height="90" />
+        </mxCell>
+        <mxCell id="knowledge" value="知识&#10;业务事实与规则" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;shape=cylinder3;boundedLbl=1;size=12;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#64748B;fillColor=#F8FAFC;fontSize=22;spacing=12;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="350" y="535" width="220" height="100" />
+        </mxCell>
+        <mxCell id="tool" value="Tool&#10;系统操作能力" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;rounded=1;arcSize=12;align=center;verticalAlign=middle;strokeWidth=2;strokeColor=#64748B;fillColor=#F8FAFC;fontSize=22;spacing=12;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="710" y="535" width="220" height="100" />
+        </mxCell>
+        <mxCell id="tool-handle" value="" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;whiteSpace=wrap;html=0;rounded=1;fillColor=none;strokeColor=#64748B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="787" y="521" width="66" height="14" />
+        </mxCell>
+        <mxCell id="sop-guide" value="可选指导" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;html=0;edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#F59E0B;fontSize=17;labelBackgroundColor=#FFFFFF;dashed=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="sop" target="capability">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="uses-prompt" value="按需引用" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;html=0;edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8B5CF6;fontSize=17;labelBackgroundColor=#FFFFFF;exitX=0.25;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="1" source="capability" target="prompt">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="uses-skill" value="按需引用" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;html=0;edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8B5CF6;fontSize=17;labelBackgroundColor=#FFFFFF;exitX=0.75;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="1" source="capability" target="skill">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="uses-knowledge" value="按需引用" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;html=0;edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#64748B;fontSize=17;labelBackgroundColor=#FFFFFF;exitX=0.25;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="capability" target="knowledge">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="uses-tool" value="按需调用" style="fontFamily=Microsoft YaHei,Arial;fontColor=#1F2937;html=0;edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#64748B;fontSize=17;labelBackgroundColor=#FFFFFF;exitX=0.75;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="capability" target="tool">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
