@@ -3,6 +3,7 @@
 const path = require('path');
 const { Worker } = require('worker_threads');
 const { recordHookMetric } = require('./hook-metrics');
+const { normalizeChanges } = require('./change-input');
 
 const CHILD_TIMEOUT_MS = 15000;
 const GUARDS = [
@@ -18,6 +19,15 @@ let raw = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { raw += chunk; });
 process.stdin.on('end', async () => {
+  // These formats have no source/path rules. Keep content-based SQL checks active
+  // even in documentation; unknown extensions always retain the existing checks.
+  let payload;
+  try { payload = JSON.parse(raw); } catch { process.exit(0); }
+  const changes = normalizeChanges(payload).filter(change => change.operation !== 'delete');
+  const plainDocument = change => /\.(md|txt|rst|adoc)$/i.test(change.filePath)
+    && !/(select|insert|update|delete|sqlMap|mapper|dao|repository|query|mysql|pg\.|from|filter)/i.test(
+      `${change.addedText}\n${change.removedText}`);
+  if (!changes.length || changes.every(plainDocument)) process.exit(0);
   const active = GUARDS.filter((guard) => guardMode(guard) !== 'off');
   const results = await Promise.all(active.map((guard) => runGuard(guard.script, raw)));
 

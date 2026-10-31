@@ -1,5 +1,7 @@
 # team-standards
 
+**5.0.1：**普通说明文件跳过写前 Worker；文档内 SQL、循环数据访问及混合源码改动仍保留检查。性能基准统一为相同六项，不以固定耗时比阻断。Forge 启动去重已完成源码接入与回归，运行部署另行核验；[适配状态](docs/maintenance/openspec-auto.md)。
+
 **5.0.0：**入口从 23 个收敛为 21 个：`reviewing-design-plainly` 合入 `clear-design-docs` 的独立评审模式；`design-system` 合入 `frontend-excellence` 的设计系统模式。旧名称退出发现列表，项目显式调用需改为新入口。资产和证据按需复用，评审保持只读；现有 Registry/Profile 不迁移。
 
 **4.16.0：**新增独立可复制的 [openspec-auto](plugins/team-standards/skills/openspec-auto/SKILL.md)，支持 L1/L2/L3 自动分级、风险升级及项目优先；[适配与验收说明](docs/maintenance/openspec-auto.md)覆盖 Codex/Claude 的实际去重边界。Plan S 使用 [项目模板 1.1.0](templates/project-foundation/README.md)。
@@ -29,7 +31,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**4.15.3**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**5.0.1**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 

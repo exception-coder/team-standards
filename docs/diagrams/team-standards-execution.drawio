@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<mxfile host="app.diagrams.net" agent="Team Standards" version="5.0.0">
+<mxfile host="app.diagrams.net" agent="Team Standards" version="5.0.1">
   <diagram id="execution" name="01 轻量执行主线">
     <mxGraphModel dx="1800" dy="1080" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1080" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="eyebrow" value="TEAM STANDARDS  /  5.0.0" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#2563EB;fontStyle=1;">
+        <mxCell id="eyebrow" value="TEAM STANDARDS  /  5.0.1" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#2563EB;fontStyle=1;">
           <mxGeometry as="geometry" x="60" y="32" width="1250" height="30" />
         </mxCell>
         <mxCell id="title" value="按风险加深工作，让已授权任务连续推进" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=42;fontColor=#14213D;fontStyle=1;">
@@ -202,7 +202,7 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="eyebrow" value="TEAM STANDARDS  /  5.0.0" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#2563EB;fontStyle=1;">
+        <mxCell id="eyebrow" value="TEAM STANDARDS  /  5.0.1" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#2563EB;fontStyle=1;">
           <mxGeometry as="geometry" x="60" y="32" width="1250" height="30" />
         </mxCell>
         <mxCell id="title" value="21 个 Skill，按当前任务组合调用" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=42;fontColor=#14213D;fontStyle=1;">
@@ -352,10 +352,10 @@
         <mxCell id="write" value="" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;rounded=1;absoluteArcSize=1;arcSize=18;fillColor=#FFFBEB;strokeColor=none;strokeWidth=2;">
           <mxGeometry as="geometry" x="60" y="884" width="520" height="107" />
         </mxCell>
-        <mxCell id="write-title" value="写入前：6 个 Worker 并发" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=22;fontColor=#B45309;fontStyle=1;">
+        <mxCell id="write-title" value="相关写入：6 项并发检查" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=22;fontColor=#B45309;fontStyle=1;">
           <mxGeometry as="geometry" x="80" y="892" width="480" height="34" />
         </mxCell>
-        <mxCell id="write-body" value="架构 / 注释 / 后端 / SQL 类默认 warn&#10;显式 block 才按对应规则阻断" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#14213D;fontStyle=0;">
+        <mxCell id="write-body" value="普通说明无风险信号则跳过 Worker&#10;SQL / 混合源码保留；默认 warn" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#14213D;fontStyle=0;">
           <mxGeometry as="geometry" x="80" y="934" width="480" height="49" />
         </mxCell>
         <mxCell id="commit" value="" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;rounded=1;absoluteArcSize=1;arcSize=18;fillColor=#FFFBEB;strokeColor=none;strokeWidth=2;">
@@ -376,7 +376,7 @@
         <mxCell id="prompt-body" value="无默认 SessionStart / Stop 治理链&#10;宿主覆盖需实际核验" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#14213D;fontStyle=0;">
           <mxGeometry as="geometry" x="1240" y="934" width="480" height="49" />
         </mxCell>
-        <mxCell id="optional" value="可选 Forge / CI / 绑定治理：仅项目明确采用；项目优先去重已有适配，启动器自动接入仍待完成。" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#B45309;fontStyle=0;">
+        <mxCell id="optional" value="可选 Forge / CI / 绑定治理：仅项目明确采用；Forge 去重接线已测试，服务加载待验收；Plan S 按需接入。" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#B45309;fontStyle=0;">
           <mxGeometry as="geometry" x="60" y="997" width="1680" height="28" />
         </mxCell>
       </root>
