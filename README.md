@@ -1,8 +1,11 @@
 # team-standards
 
+**4.16.0：**新增独立可复制的 [openspec-auto](plugins/team-standards/skills/openspec-auto/SKILL.md)，支持 L1/L2/L3 自动分级、风险升级及项目优先；[适配与验收说明](docs/maintenance/openspec-auto.md)覆盖 Codex/Claude 的实际去重边界。Plan S 使用 [项目模板 1.1.0](templates/project-foundation/README.md)。
+
+
 4.15.3 将用户已确认的三套 draw.io 模板风格设为后续架构说明图默认：形象化主体、明确主次、统一线性图标、留白与语义配色。新图优先复用原生模板和自带 iOS7 Icons，无需再次指定形象化风格；已有项目规范、用户指定和标准工程符号优先。已确认的三套源图及四页预览保持不变，详见[团队默认风格](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格)。
 
-基础平台模板交接：[项目基础规范包 1.0.0](templates/project-foundation/README.md)，包含六个可随项目分发的本地 Skill、代码注释要求与 Agent 入口；无需预装套件，保留现有插件入口以兼容旧项目。
+基础平台模板交接：[项目基础规范包 1.1.0](templates/project-foundation/README.md)，包含六个基础 Skill 与 openspec-auto 的项目副本、代码注释要求与 Agent 入口；无需预装套件，保留现有插件入口以兼容旧项目。
 
 4.15.2 将架构图图标来源改为优先使用 draw.io 自带图形。三套模板统一采用已核实的 iOS7 Icons，保留视觉主次、可编辑文字和连线；图标可移动、缩放与改色，不再默认要求逐笔画取消组合。上轮 13 项自建图标保留兼容，降为特殊需求备用；不把自建库称为自带资源。详见[图标选择与编辑](plugins/team-standards/skills/architecture-diagram-design/references/drawio.md#图标选择与编辑)。
 
@@ -48,7 +51,7 @@ OpenSpec 治理命令默认等待 30 秒，慢环境可通过 `TEAM_STANDARDS_OP
 
 - **先看整套做什么** → [按领域的全景链路与节点字典](docs/suite-panorama.md)
 - **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)
-- **查看能力清单** → [22 个 Skill](#22-个-skill)、[合并后的入口](#合并后的入口)
+- **查看能力清单** → [23 个 Skill](#23-个-skill)、[合并后的入口](#合并后的入口)
 - **给其他业务建模** → [业务本体建模](plugins/team-standards/skills/business-ontology-modeling/SKILL.md)、[三个模板与跨项目使用](plugins/team-standards/skills/business-ontology-modeling/references/adoption.md)、[新品六问完整示例](plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
@@ -93,7 +96,7 @@ flowchart TD
 
 ---
 
-## 22 个 Skill
+## 23 个 Skill
 
 4.13.2 根据老ERP代码与实际Oracle只读试用补充数据源身份/时间、不可读来源及Graphify枢纽查询的处理；增加[Agent与MCP消费分工](plugins/team-standards/skills/business-ontology-modeling/references/agent-consumption.md)，复用现有语义查询、能力Schema和领域事实，多运行时共用业务规则，实际接线逐项验收。
 
@@ -114,7 +117,8 @@ flowchart TD
 | 分析设计 | `clear-design-docs` | 常见基础版范围、清晰表达、关系图、中文字段与语义审读 |
 | 分析设计 | `architecture-diagram-design` | 架构可视化：L1/L2/L3、统一图形与配色、三套可编辑 draw.io 模板及轻量验收 |
 | 分析设计 | `reviewing-design-plainly` | 独立审查本期设计矛盾、关键缺口和过度设计；未来规模与冷门场景作提醒 |
-| 分析设计 | `change-readiness` | 自动匹配或创建 OpenSpec change，持续更新 artifacts，并统一方案审视、风险分档和实施前代码定位 |
+| 任务分级 | `openspec-auto` | 项目版本优先；L1 直接开发、L2 轻量计划、L3 项目 OpenSpec；高风险强制升级 |
+| 分析设计 | `change-readiness` | 沿用任务分级，核实实施依据与设计影响；需要 OpenSpec 时匹配或创建 change，不重复分类和初始化 |
 | 分析设计 | `bug-doc-required` | 证据驱动的 Bug 调查、最小修复与回归；简单问题不另建报告 |
 | 分析设计 | `business-logic-orientation` | Graphify 优先理解当前业务逻辑，按需沉淀长期基线 |
 | 分析设计 | `business-ontology-modeling` | 代码/数据库反向建模或业务问题补全；成熟工具提结构，交叉核实对象规则，含模板与六问示例 |

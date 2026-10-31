@@ -1,6 +1,6 @@
 {
   "id": "project-foundation",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "payloadRoot": "template",
   "entries": {
     "codex": "AGENTS.md",
@@ -15,11 +15,64 @@
   "runtimeDependencies": [],
   "hooksBundled": false,
   "skills": [
-    { "name": "foundation-coding", "path": ".agents/skills/foundation-coding/SKILL.md", "sourceSkills": ["coding-standards-common", "architecture-ddd-lite-fullstack", "architecture-reasoning"] },
-    { "name": "foundation-comments", "path": ".agents/skills/foundation-comments/SKILL.md", "sourceSkills": ["coding-standards-common/references/comments.md", "java-coding-standards", "go-coding-standards"] },
-    { "name": "foundation-bugfix", "path": ".agents/skills/foundation-bugfix/SKILL.md", "sourceSkills": ["bug-doc-required"] },
-    { "name": "foundation-verification", "path": ".agents/skills/foundation-verification/SKILL.md", "sourceSkills": ["delivery-verification", "coding-standards-common/references/testing-assets.md"] },
-    { "name": "foundation-git", "path": ".agents/skills/foundation-git/SKILL.md", "sourceSkills": ["git-commit-standards", "plain-writing"] },
-    { "name": "foundation-docs", "path": ".agents/skills/foundation-docs/SKILL.md", "sourceSkills": ["markdown-writing-standards", "plain-writing"] }
+    {
+      "name": "foundation-coding",
+      "path": ".agents/skills/foundation-coding/SKILL.md",
+      "sourceSkills": [
+        "coding-standards-common",
+        "architecture-ddd-lite-fullstack",
+        "architecture-reasoning"
+      ]
+    },
+    {
+      "name": "foundation-comments",
+      "path": ".agents/skills/foundation-comments/SKILL.md",
+      "sourceSkills": [
+        "coding-standards-common/references/comments.md",
+        "java-coding-standards",
+        "go-coding-standards"
+      ]
+    },
+    {
+      "name": "foundation-bugfix",
+      "path": ".agents/skills/foundation-bugfix/SKILL.md",
+      "sourceSkills": [
+        "bug-doc-required"
+      ]
+    },
+    {
+      "name": "foundation-verification",
+      "path": ".agents/skills/foundation-verification/SKILL.md",
+      "sourceSkills": [
+        "delivery-verification",
+        "coding-standards-common/references/testing-assets.md"
+      ]
+    },
+    {
+      "name": "foundation-git",
+      "path": ".agents/skills/foundation-git/SKILL.md",
+      "sourceSkills": [
+        "git-commit-standards",
+        "plain-writing"
+      ]
+    },
+    {
+      "name": "foundation-docs",
+      "path": ".agents/skills/foundation-docs/SKILL.md",
+      "sourceSkills": [
+        "markdown-writing-standards",
+        "plain-writing"
+      ]
+    },
+    {
+      "name": "openspec-auto",
+      "path": ".agents/skills/openspec-auto/SKILL.md",
+      "claudePath": ".claude/skills/openspec-auto/SKILL.md",
+      "sourceSkills": [
+        "openspec-auto"
+      ],
+      "sourceVersion": "4.16.0",
+      "adaptation": "Exact portable copy; both host copies must match canonical source."
+    }
   ]
 }

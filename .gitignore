@@ -1,4 +1,5 @@
 .claude/
+!templates/project-foundation/template/.claude/
 .idea/
 graphify-out/*
 !graphify-out/source-fingerprint.json
