@@ -18,7 +18,7 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 整套组件、工程职责域及全部节点的输入输出见 [套件全景](suite-panorama.md)；本文保留任务路由和阶段规则。
 
-22 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
+23 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
 
 ## 执行适配源码导航
 
@@ -34,40 +34,51 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 ## 总流程
 
-```mermaid
-flowchart TD
-    A["A 目标意图：探查 / 修复 / 演进 / 接入"] --> B["B 结合已有授权，检查具体操作副作用"]
-    B --> C["C 评估环境、数据、契约与影响风险"]
-    C --> D["D 按问题对象选择主 Skill 和必要辅助能力"]
-    D --> E["E 收集当前阶段所需证据"]
-    E --> F{"F 请求是否包含已授权的实施?"}
-    F -->|"否"| G["G 交付结论、证据与缺口"]
-    F -->|"是"| H["H 检查实施依据与授权边界"]
-    H --> I["I 实施或初始化约定范围"]
-    I --> J["J 适用验证与受影响文档同步"]
-    J --> K["K 完成后按规范提交；推送独立判断"]
-```
+[可编辑 draw.io（两页）](diagrams/team-standards-execution.drawio)
 
----
+图件验证：draw.io 31.5.3.0 原生导出两页 PNG，并逐页目视核对文字、图标和连线；XML 节点及引用检查通过。桌面自动化读取最小化窗口失败，尚未完成鼠标编辑抽查。
 
-意图与授权的权威规则见 [入口规范](../CLAUDE.md#意图授权与风险)。主 Skill 按问题对象选择；阶段推进不等于阶段审批。
+第一页面向任务推进，第二页展开全部 23 个 Skill 与实际 Hook。实线表示任务推进，虚线表示按需引用和风险反馈；箭头不表示每个节点都启动脚本。
+
+![轻量执行主线](diagrams/team-standards-execution.png)
+
+![按需能力与实际门禁](diagrams/team-standards-capabilities.png)
 
 ## 总图节点对应哪些源码
 
-图中箭头表示 Agent 的任务推进。只有下面明确标为“执行”的节点才表示调用脚本或工具，不应把所有箭头理解为 JavaScript import。
-
-| 图节点 | 读取/执行位置（相对本仓根） | 这一步实际发生什么 |
+| 图节点 | 规则与实现 | 实际行为 |
 |---|---|---|
-| A 目标意图 | [CLAUDE.md](../CLAUDE.md) → [AGENTS.md](../AGENTS.md) | Claude 入口以 CLAUDE 为源，Codex 入口由 sync-agents 生成；Agent 结合请求理解目标 |
-| B 授权与副作用 | CLAUDE 的意图规则 + 目标项目 AGENTS + 对话中已有授权 | 由 Agent 判断具体操作边界；本仓没有名为 resolveRoute 的分类器或权限状态机 |
-| C 风险 | [change-readiness/references/classification.md](../plugins/team-standards/skills/change-readiness/references/classification.md) | 实施时按影响分档；探查也独立评估生产访问、负载和数据风险 |
-| D 主 Skill | `plugins/team-standards/skills/<name>/SKILL.md`，见下方完整索引 | 宿主暴露名称/描述，Agent 读取匹配入口；不会自动全量读取 references |
-| F 是否实施 | CLAUDE 意图规则；[change-readiness 的阶段边界](../plugins/team-standards/skills/change-readiness/SKILL.md) | 结合当前目标与已有授权选择分支，不靠“迁移/重构”关键词自动改码 |
-| G 分析交付 | 对应调查/现状/规划 Skill 的输出约定 | 默认直接回复结论与证据；没有必须运行的“生成报告.js” |
-| H 变更就绪 | [change-readiness/SKILL.md](../plugins/team-standards/skills/change-readiness/SKILL.md)；其 `references/` 中的方案、分类、OpenSpec 与代码定位规则 | Agent 核对依据；OpenSpec 已接入时调用其官方能力，团队治理工具负责绑定与检查 |
-| I 实施/初始化 | 架构、编码和 UI Skill；接入用 [init-ai-structure.mjs](../plugins/team-standards/skills/init-project-docs/init-ai-structure.mjs) / [onboard-pipeline.mjs](../plugins/team-standards/skills/init-project-docs/onboard-pipeline.mjs) | 业务实现写入目标项目；初始化脚本按指定模式处理约定基线 |
-| J 验证与同步 | [delivery-verification](../plugins/team-standards/skills/delivery-verification/SKILL.md) + [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | Agent 按影响范围选择实际验证并复用新鲜证据，随后同步说明；交付/归档不自动扩大到全仓，显式 Hook/CI 门禁仍遵守 |
-| K 提交 | [git-commit-standards](../plugins/team-standards/skills/git-commit-standards/SKILL.md) → [build-commit-message.js](../plugins/team-standards/skills/git-commit-standards/scripts/build-commit-message.js) → Git | 脚本生成经过校验的消息文件；Agent 定向暂存、执行 commit 并按授权推送 |
+| 01 用户目标 / 02 Agent 判断 | 项目 AGENTS、CLAUDE 及匹配 Skill | 复用当前上下文与授权；咨询审查交付结论，实施任务继续 |
+| 03 自动分级 | [openspec-auto](../plugins/team-standards/skills/openspec-auto/SKILL.md) | 项目版本优先；选择 L1/L2/L3；仅 L3 或项目明确要求时进入完整 OpenSpec |
+| 04 最小充分实施 | change-readiness、架构、语言、前端专项 Skill | 补查相关证据，按范围实施；初始化仅在明确请求时执行 |
+| 05 相称验证 | delivery-verification、项目 SQL/API Gate 与测试 | 按真实风险验证，复用新鲜证据；风险扩大回到分级 |
+| 06 交付 | markdown-writing-standards、git-commit-standards | 同步受影响说明，报告验证与缺口；提交和推送分别按授权 |
+| 实际 Hook | [hooks.json](../plugins/team-standards/hooks/hooks.json) | 写前默认提醒、提交消息检查及用户消息信号；宿主必须真实接入才执行 |
+| 可选执行增强 | Forge 与项目 CI/治理配置 | 保留已采用策略；插件存在本身不初始化治理 |
+
+## 轻量与高效审查（2026-10-31）
+
+**结论：4.16.0 核心规则符合工程宪法的方向，路由表述、宿主适配和写前开销仍需收敛。** 本次核查 23 个 Skill 主入口、实际注册 Hook、分级适配器及 Forge 对接说明。未穷尽全部参考文件，也未重验所有宿主；已有 Graphify 指纹与当前文件不一致，仅用于定位，结论以当前源码为据。
+
+### 已落实的力度
+
+- `openspec-auto` 自动决定规格深度：L1 直接实施，L2 必要计划，L3 项目完整 OpenSpec；权限、数据安全和破坏性变更强制 L3，风险扩大时沿原任务升级。验证范围独立按实际变更风险判断。
+- 23 个入口合计 856 行，参考按需读取。简单 Bug 无独立报告前置条件；架构不强制空层；验证允许复用输入未变的有效证据。
+- `hooks/hooks.json` 未注册 SessionStart、Stop 和旧规格/设计绑定治理检查。六项写前检查默认提醒；提交检查保留消息格式与真实作者约束。已采用的项目权限、CI 和 Forge 策略仍需遵守。
+
+### 剩余问题与最小调整
+
+| 优先级 | 已核实的问题 | 对轻量执行的影响 | 建议与本次状态 |
+|---|---|---|---|
+| 优先收敛 | `CLAUDE.md` 仍有“行为变化复用或创建相关 change”的无条件表述；旧导航把 M/L 直接等同完整 OpenSpec | L2 可能被再次升级为重流程 | 以 openspec-auto 统一规格深度；本次纠正导航，入口规范的剩余表述列为待修项，未改插件行为 |
+| 优先接入 | `scripts/openspec-auto.mjs` 提供项目优先适配，但 Forge/Plan S 启动器尚未完整接线；Claude 原生加载验收未完成 | 安装全局套件后，不能保证物理去重 | 启动器消费适配结果，并逐宿主验证五种场景；不能仅凭 AGENTS 声明已消除重复，详见 [适配状态](maintenance/openspec-auto.md) |
+| 后续优化 | `hooks/write-guard-dispatcher.js` 对普通 Markdown 编辑也启动六个 Worker，之后各自过滤 | 无关检查仍有启动成本 | 按文件类型和有效载荷预筛选；保持提醒语义，不增设门禁。本次仅测量 |
+| 后续修正 | `hooks/benchmarks/check-hook-performance.js` 用当前六项并发检查对比含已退役就绪检查的七项串行检查 | 性能比率无法公平表示同工作量改进 | 改成相同六项与相同输入再比较；本次未改基准脚本 |
+| 参考维护 | draw.io 参考仍写零起点页码；本机 31.5.3.0 明确要求从 1 起，提示 v27.0.2 前才从 0 起 | 照旧示例导出会失败 | 后续按版本修订参考；本次用页码 1、2 成功导出 |
+
+写前测量：临时目录普通 README 编辑载荷，预热后各取 5 次；默认六 Worker 中位数 **148 ms**，六项关闭中位数 **95 ms**，差约 **53 ms**。这是本机 Node 子进程测量，包含启动成本，不代表 Forge 完整响应时间或性能承诺。
+
+本次只同步审查、导航和图件，未发布新插件版本、未修改运行时门禁，也未改变原项目的 session、writer、绑定或任务状态。旧会话恢复与提交快照问题不能据此视为已修复。
 
 ## 业务建模的条件链路
 
@@ -129,6 +140,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 
 | Skill 主入口 | 下钻目录或主要文件 | 与程序的关系 |
 |---|---|---|
+| [openspec-auto](../plugins/team-standards/skills/openspec-auto/SKILL.md) | 独立规则与可选风险下限脚本；[宿主适配](maintenance/openspec-auto.md) | Agent 自动分级；项目优先去重需要启动器消费适配结果 |
 | [architecture-ddd-lite-fullstack](../plugins/team-standards/skills/architecture-ddd-lite-fullstack/SKILL.md) | [references/](../plugins/team-standards/skills/architecture-ddd-lite-fullstack/references/)；[rules/](../plugins/team-standards/skills/architecture-ddd-lite-fullstack/rules/) | Agent 读取的规则；没有独立同名执行器 |
 | [backend-evidence](../plugins/team-standards/skills/backend-evidence/SKILL.md) | [references/](../plugins/team-standards/skills/backend-evidence/references/) | 读取规则后查询代码、知识及运行证据 |
 | [bug-doc-required](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | [references/](../plugins/team-standards/skills/bug-doc-required/references/) | Agent 读取的规则；没有独立同名执行器 |
@@ -173,10 +185,10 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 ```mermaid
 flowchart LR
     HOST["宿主工具或会话事件"] --> CONFIG["hooks/hooks.json"]
-    CONFIG -->|"Write / Edit / MultiEdit"| DISPATCH["hooks/write-guard-dispatcher.js"]
+    CONFIG -->|"Write / Edit / MultiEdit / apply_patch"| DISPATCH["hooks/write-guard-dispatcher.js"]
     DISPATCH --> GUARDS["六个专项 check-*.js 检查器"]
     GUARDS --> INPUT["按需使用 hooks/change-input.js 解析输入"]
-    CONFIG -->|"Bash"| COMMIT["提交 Skill 与提交正文检查"]
+    CONFIG -->|"Bash / exec_command"| COMMIT["提交消息格式与作者检查"]
     CONFIG -->|"UserPromptSubmit"| SIGNAL["提示信号采集与版本提醒"]
 ```
 
@@ -284,13 +296,13 @@ Graphify、OpenSpec 和 Skill 分属不同层级，不建立三个并行主流�
 
 项目已启用 OpenSpec 时：
 
-1. `change-readiness` 对 M/L 变更自动匹配或创建 OpenSpec change，不再创建平行设计文档；实施中的需求修正和新发现通过官方 `update` 工作流回写同一 change。
+1. `openspec-auto` 判定为 L3 或项目明确要求完整规格时，由 `change-readiness` 匹配或创建 OpenSpec change，不再创建平行设计文档；实施中的需求修正和新发现通过官方 `update` 工作流回写同一 change。
 2. `business-logic-orientation` 优先查询 Graphify 获取代码事实，只补充 Graphify 无法证明的业务语义与运行证据；除非用户明确要求或需要长期重构基线，否则不生成新的梳理文档和 AI 索引。
 3. `backend-evidence` 使用 OpenSpec `specs/` 作为已接受行为契约，使用 Graphify 查询当前实现和影响，以 DDL、SQL、数据库和日志验证数据事实；不维护同义行为规格或手工代码索引。
 4. `init-project-docs` 先以 structure 模式建立六层最小入口、`.graphifyignore` 和 Graphify Git 共享白名单，再由 init 编排真实 Graphify、OpenSpec 与领域证据；不复制图谱、规格或 00–10 文档树。
 5. 项目声明的规划流程负责跨项目证据编排；Graphify 和 OpenSpec只是证据适配器，不替代项目关系权威源。
 
-“已启用”不等于目录存在：`openspec/config.yaml` 必须包含真实项目上下文。确认行为变化且没有相关 change 时才创建，受影响 artifacts 按 schema 补齐；行为保持不建空 change，生成 Skill 缺失但 CLI 正常时走 agent-compatible CLI；这些都不再触发静默 legacy。只有项目未启用 OpenSpec，或用户明确批准当前变更降级时，才使用兼容设计文档。
+“已启用”不等于目录存在：`openspec/config.yaml` 必须包含真实项目上下文。需要完整 OpenSpec 且确认行为变化、没有相关 change 时才创建，受影响 artifacts 按 schema 补齐；行为保持不建空 change，生成 Skill 缺失但 CLI 正常时走 agent-compatible CLI；这些都不再触发静默 legacy。只有项目未启用 OpenSpec，或用户明确批准当前变更降级时，才使用兼容设计文档。
 
 完成阶段复用 OpenSpec 官方能力：严格 validate 后执行 verify；需要提前合并 delta specs 时 sync；任务与验证满足条件后才 archive。OpenSpec 自身的 verify/archive warning 在团队门禁中不能替代阻断判断，项目测试、数据库和发布证据仍独立验证。
 
@@ -298,7 +310,9 @@ Graphify 查询也不天然代表当前工作区。消费图谱前比较其 mani
 
 ---
 
-## S/M/L 路由
+## S/M/L 影响分析
+
+S/M/L 用于理解变更影响，不是第二次任务分级。规格深度统一由 openspec-auto 的 L1/L2/L3 决定；不得因这里出现 M 就强制创建 change。
 
 [工程原则](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)约束默认流程：档位只决定深度，规格与设计独立按影响维护；不按文件数或行数要求完整工件、重新审批或全量验证。
 

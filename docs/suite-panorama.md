@@ -1,12 +1,12 @@
 # 团队工具套件全景：按工程职责域看链路与节点
 
-共同准则与证据分工统一归[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。4.14.3 的 22 个 Skill 入口保留专项目标、判断、必要约束和精炼反例，具体格式与操作协议按需读取。架构路径与注释 Hook 仍默认提醒。
+共同准则与证据分工统一归[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。4.16.0 的 23 个 Skill 入口保留专项目标、判断、必要约束和精炼反例，具体格式与操作协议按需读取。架构路径与注释 Hook 仍默认提醒。
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
 这套工具帮助 AI 把自然语言目标转成有依据、边界明确、可验证、可交接的工程成果。它同时管理“怎样工作”和“依据什么工作”：前者是工程规范，后者是项目事实、业务知识与行为规格。
 
-本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。当前三个公共插件合计 25 个 Skill，其中 team-standards 22 个。
+本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。当前 team-standards 提供 23 个 Skill；任务分级入口为 openspec-auto。两页可编辑执行图及当前审查见 [执行流程](skill-flow.md#总流程)。
 
 需要从节点找到实际文件、理解 Skill 与程序的关系时，先看 [链路源码导航](skill-flow.md#总图节点对应哪些源码)。
 
@@ -16,7 +16,7 @@
 
 | 组件 | 在整套中扮演什么角色 | 保存或提供什么 |
 |---|---|---|
-| team-standards | 工程工作方法与质量约束 | 22 个 Skill、Hook、状态契约工具及套件维护脚本 |
+| team-standards | 工程工作方法与质量约束 | 23 个 Skill、Hook、状态契约工具及套件维护脚本 |
 | project-coding-profiles | 遗留项目编码保护 | encoding-guard、项目识别画像、逐文件编码约定与写前/提交检查 |
 | project-domain-knowledge | 业务知识内容与 MCP 查询引擎 | 经确认的术语、规则、状态语义，以及与正式知识分开的规格候选 |
 | cross-project-topology | 系统连接知识内容 | 跨项目调用、数据流、提供方/消费方和接口契约；复用知识引擎作为第二个 MCP 实例 |

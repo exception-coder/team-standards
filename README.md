@@ -50,7 +50,7 @@ OpenSpec 治理命令默认等待 30 秒，慢环境可通过 `TEAM_STANDARDS_OP
 ## 快速导航
 
 - **先看整套做什么** → [按领域的全景链路与节点字典](docs/suite-panorama.md)
-- **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)
+- **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)、[两页可编辑 draw.io](docs/diagrams/team-standards-execution.drawio)
 - **查看能力清单** → [23 个 Skill](#23-个-skill)、[合并后的入口](#合并后的入口)
 - **给其他业务建模** → [业务本体建模](plugins/team-standards/skills/business-ontology-modeling/SKILL.md)、[三个模板与跨项目使用](plugins/team-standards/skills/business-ontology-modeling/references/adoption.md)、[新品六问完整示例](plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
@@ -197,7 +197,7 @@ Hook 只承担可机械判断的最后一道检查，不替代 Skill 的语义�
 - Domain knowledge 保存经确认、跨变更稳定的业务真理和术语。
 - `team-standards` 只负责意图路由与质量门禁，不复制图谱或建立平行规格。
 
-项目的 OpenSpec 配置包含真实上下文后，行为变化由 `change-readiness` 自动匹配或创建 change，并复用 OpenSpec 官方 Skill/CLI 完成 artifacts、apply 上下文、update、verify、sync 与 archive 判定。没有相关 change 或生成 Skill 缺失不再是 legacy 降级理由；CLI 正常时继续走官方 agent 协议。Graphify 查询前还必须校验其对 HEAD 和工作区改动的新鲜度。具体职责矩阵见 [Skill 流程图](docs/skill-flow.md#graphify-与-openspec-接入边界)。
+任务判定为 L3 或项目明确要求完整规格，且 OpenSpec 配置包含真实上下文后，行为变化由 `change-readiness` 自动匹配或创建 change，并复用 OpenSpec 官方 Skill/CLI 完成 artifacts、apply 上下文、update、verify、sync 与 archive 判定。没有相关 change 或生成 Skill 缺失不再是 legacy 降级理由；CLI 正常时继续走官方 agent 协议。Graphify 查询前还必须校验其对 HEAD 和工作区改动的新鲜度。具体职责矩阵见 [Skill 流程图](docs/skill-flow.md#graphify-与-openspec-接入边界)。
 
 ---
 
