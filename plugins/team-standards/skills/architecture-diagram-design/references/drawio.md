@@ -53,11 +53,11 @@
 有 draw.io Desktop CLI 时可使用其导出功能。PowerShell 示例（`$drawioExe` 指向已发现的实际可执行文件）：
 
 ```powershell
-& $drawioExe --export --format png --page-index 0 --output 'architecture.png' 'architecture.drawio'
-& $drawioExe --export --format svg --page-index 0 --output 'architecture.svg' 'architecture.drawio'
+& $drawioExe --export --format png --page-index 1 --output 'architecture.png' 'architecture.drawio'
+& $drawioExe --export --format svg --page-index 1 --output 'architecture.svg' 'architecture.drawio'
 ```
 
-`--page-index` 从 0 开始，按实际安装版本的 `--help` 核对支持项。也可在编辑器使用 File → Export as；需要图像本身也能回到 draw.io 编辑时，选择包含图表数据的导出选项。中文字体、富文本和 SVG 查看器兼容性仍需在实际目标中检查。
+`--page-index` 在 v27.0.2 起从 1 开始，更早版本从 0 开始；上述命令适用新版，仍按实际安装版本核对支持项。也可在编辑器使用 File → Export as；需要图像本身也能回到 draw.io 编辑时，选择包含图表数据的导出选项。中文字体、富文本和 SVG 查看器兼容性仍需在实际目标中检查。
 
 只有解析器时先交付 `.drawio` 并明确“结构已检查，未实际渲染/编辑验证”；不要另写一个简化渲染器再声称它与 draw.io 一致。无法导出时说明预览缺口，不伪造成功。
 

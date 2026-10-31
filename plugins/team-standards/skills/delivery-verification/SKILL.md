@@ -7,6 +7,8 @@ description: "Guide proportionate verification and honest delivery reporting aft
 
 目标：用适当的实际检查证明当前改动，并准确说明结果与限制。共同准则见[工程宪法](../change-readiness/references/engineering-principles.md)。
 
+专项 Skill 的测试、浏览器检查和内容审读纳入同一份任务验证结果；本入口汇总覆盖与缺口，不因专项完成或 Skill 切换再次运行相同检查。
+
 ## 执行范围与证据复用
 
 - 按行为、依赖和必要消费者选择检查。说明改动查事实与链接，局部代码查相关行为，共享协议、装配、安全和迁移覆盖对应风险及消费者；全仓验证需要实际影响依据或项目明确要求。

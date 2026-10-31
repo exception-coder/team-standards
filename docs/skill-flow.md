@@ -18,7 +18,7 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 整套组件、工程职责域及全部节点的输入输出见 [套件全景](suite-panorama.md)；本文保留任务路由和阶段规则。
 
-23 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
+21 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
 
 ## 执行适配源码导航
 
@@ -38,7 +38,7 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 图件验证：draw.io 31.5.3.0 原生导出两页 PNG，并逐页目视核对文字、图标和连线；XML 节点及引用检查通过。桌面自动化读取最小化窗口失败，尚未完成鼠标编辑抽查。
 
-第一页面向任务推进，第二页展开全部 23 个 Skill 与实际 Hook。实线表示任务推进，虚线表示按需引用和风险反馈；箭头不表示每个节点都启动脚本。
+第一页面向任务推进，第二页展开全部 21 个 Skill 与实际 Hook。实线表示任务推进，虚线表示按需引用和风险反馈；箭头不表示每个节点都启动脚本。
 
 ![轻量执行主线](diagrams/team-standards-execution.png)
 
@@ -58,27 +58,29 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 ## 轻量与高效审查（2026-10-31）
 
-**结论：4.16.0 核心规则符合工程宪法的方向，路由表述、宿主适配和写前开销仍需收敛。** 本次核查 23 个 Skill 主入口、实际注册 Hook、分级适配器及 Forge 对接说明。未穷尽全部参考文件，也未重验所有宿主；已有 Graphify 指纹与当前文件不一致，仅用于定位，结论以当前源码为据。
+本节记录 4.16.0 审查基线（23 个入口）；5.0.0 将其收敛为 21 个，独立设计评审与设计系统分别合入 clear-design-docs、frontend-excellence，复用分级与有效证据。宿主去重接线及 Worker 性能问题仍未在本次改动中解决。
+
+**结论：4.16.0 核心规则符合工程宪法的方向，路由表述、宿主适配和写前开销仍需收敛。** 当时核查 23 个 Skill 主入口、实际注册 Hook、分级适配器及 Forge 对接说明。未穷尽全部参考文件，也未重验所有宿主；已有 Graphify 指纹与当前文件不一致，仅用于定位，结论以当前源码为据。
 
 ### 已落实的力度
 
 - `openspec-auto` 自动决定规格深度：L1 直接实施，L2 必要计划，L3 项目完整 OpenSpec；权限、数据安全和破坏性变更强制 L3，风险扩大时沿原任务升级。验证范围独立按实际变更风险判断。
-- 23 个入口合计 856 行，参考按需读取。简单 Bug 无独立报告前置条件；架构不强制空层；验证允许复用输入未变的有效证据。
+- 当时 23 个入口合计 856 行，参考按需读取。简单 Bug 无独立报告前置条件；架构不强制空层；验证允许复用输入未变的有效证据。
 - `hooks/hooks.json` 未注册 SessionStart、Stop 和旧规格/设计绑定治理检查。六项写前检查默认提醒；提交检查保留消息格式与真实作者约束。已采用的项目权限、CI 和 Forge 策略仍需遵守。
 
 ### 剩余问题与最小调整
 
 | 优先级 | 已核实的问题 | 对轻量执行的影响 | 建议与本次状态 |
 |---|---|---|---|
-| 优先收敛 | `CLAUDE.md` 仍有“行为变化复用或创建相关 change”的无条件表述；旧导航把 M/L 直接等同完整 OpenSpec | L2 可能被再次升级为重流程 | 以 openspec-auto 统一规格深度；本次纠正导航，入口规范的剩余表述列为待修项，未改插件行为 |
+| 优先收敛 | `CLAUDE.md` 仍有“行为变化复用或创建相关 change”的无条件表述；旧导航把 M/L 直接等同完整 OpenSpec | L2 可能被再次升级为重流程 | 以 openspec-auto 统一规格深度；本次纠正导航，5.0.0 已同步入口规范，L2 不因行为变化自动创建 change |
 | 优先接入 | `scripts/openspec-auto.mjs` 提供项目优先适配，但 Forge/Plan S 启动器尚未完整接线；Claude 原生加载验收未完成 | 安装全局套件后，不能保证物理去重 | 启动器消费适配结果，并逐宿主验证五种场景；不能仅凭 AGENTS 声明已消除重复，详见 [适配状态](maintenance/openspec-auto.md) |
 | 后续优化 | `hooks/write-guard-dispatcher.js` 对普通 Markdown 编辑也启动六个 Worker，之后各自过滤 | 无关检查仍有启动成本 | 按文件类型和有效载荷预筛选；保持提醒语义，不增设门禁。本次仅测量 |
 | 后续修正 | `hooks/benchmarks/check-hook-performance.js` 用当前六项并发检查对比含已退役就绪检查的七项串行检查 | 性能比率无法公平表示同工作量改进 | 改成相同六项与相同输入再比较；本次未改基准脚本 |
-| 参考维护 | draw.io 参考仍写零起点页码；本机 31.5.3.0 明确要求从 1 起，提示 v27.0.2 前才从 0 起 | 照旧示例导出会失败 | 后续按版本修订参考；本次用页码 1、2 成功导出 |
+| 参考维护 | draw.io 参考仍写零起点页码；本机 31.5.3.0 明确要求从 1 起，提示 v27.0.2 前才从 0 起 | 照旧示例导出会失败 | 5.0.0 已修订版本边界；用页码 1、2 成功导出 |
 
 写前测量：临时目录普通 README 编辑载荷，预热后各取 5 次；默认六 Worker 中位数 **148 ms**，六项关闭中位数 **95 ms**，差约 **53 ms**。这是本机 Node 子进程测量，包含启动成本，不代表 Forge 完整响应时间或性能承诺。
 
-本次只同步审查、导航和图件，未发布新插件版本、未修改运行时门禁，也未改变原项目的 session、writer、绑定或任务状态。旧会话恢复与提交快照问题不能据此视为已修复。
+4.16.0 审查轮次只同步审查、导航和图件，未发布新插件版本、未修改运行时门禁，也未改变原项目的 session、writer、绑定或任务状态。旧会话恢复与提交快照问题不能据此视为已修复。
 
 ## 业务建模的条件链路
 
@@ -92,7 +94,7 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 ## 前端设计的条件链路
 
-业务对象与状态证据 → business-visualization-advisor 确定指标、洞察、选图和看板层次 → design-system 复用视觉资产 → frontend-excellence 实施并做浏览器验收 → delivery-verification 汇总证据。前两者交接 Dashboard Spec 或简单图表决策，数值计算仍在项目可信计算层。优化统计总览/看板时，advisor 编码前明确四项业务目的，交付目的—指标—图表—行动映射及候选选图决策；没有改变图表先说明理由，交付区分信息架构与图表化改造，并按业务目的反向验收，至少证明一项决策、洞察、比较、定位或行动能力改善；仅样式变更不能宣称看板优化完成。登录阻断时尝试授权预览，替代预览不等于业务验收。图表评审可独立使用 advisor；普通页面与纯样式修改不强制走完整图表流程。
+业务对象与状态证据 → business-visualization-advisor 确定指标、洞察、选图和看板层次 → frontend-excellence 复用视觉资产、实施并做浏览器验收 → delivery-verification 汇总证据。前两者交接 Dashboard Spec 或简单图表决策，数值计算仍在项目可信计算层。优化统计总览/看板时，advisor 编码前明确四项业务目的，交付目的—指标—图表—行动映射及候选选图决策；没有改变图表先说明理由，交付区分信息架构与图表化改造，并按业务目的反向验收，至少证明一项决策、洞察、比较、定位或行动能力改善；仅样式变更不能宣称看板优化完成。登录阻断时尝试授权预览，替代预览不等于业务验收。图表评审可独立使用 advisor；普通页面与纯样式修改不强制走完整图表流程。
 
 ## 先分清四种目录
 
@@ -147,7 +149,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [business-logic-orientation](../plugins/team-standards/skills/business-logic-orientation/SKILL.md) | [references/](../plugins/team-standards/skills/business-logic-orientation/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [business-ontology-modeling](../plugins/team-standards/skills/business-ontology-modeling/SKILL.md) | [模板](../plugins/team-standards/skills/business-ontology-modeling/assets/templates/)、[跨项目使用](../plugins/team-standards/skills/business-ontology-modeling/references/adoption.md)、[六问示例](../plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md) | Agent按问题建模与核实可回答性；不绑定数据库、工具或本体运行引擎 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | [references/](../plugins/team-standards/skills/change-readiness/references/)；[rules/](../plugins/team-standards/skills/change-readiness/rules/) | 规则编排；OpenSpec 与治理程序见下一节 |
-| [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) | 主入口自包含；按需引用设计内容契约和 clear-design-docs | 独立内容评审；不新增执行器或机器门禁 |
+| [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) | references/examples.md 与 references/review-mode.md | 编写、精简和独立评审；独立评审默认只读 |
 | [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 按需[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)；共用工程宪法 | 需求求真与最小充分决策；不新增阶段、固定输出或技术阶梯 |
 | [plain-writing（人话）](../plugins/team-standards/skills/plain-writing/SKILL.md) | 按需 [改写与失真反例](../plugins/team-standards/skills/plain-writing/references/examples.md) | 后置表达；保留决策与事实，不反向开启架构循环 |
 | [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) | 视图与主线在入口；按需加载视觉语言、draw.io 操作、三套原生模板、自带图标对照和验收清单 | 统一信息提炼、形象表达、绘制与实际验收；不内置绘图引擎 |
@@ -171,8 +173,8 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | Bug 最小修复与记录模板 | [repair-rules.md](../plugins/team-standards/skills/bug-doc-required/references/repair-rules.md) / [template.md](../plugins/team-standards/skills/bug-doc-required/template.md) |
 | SQL 正确性 / 查询性能 / 领域规格候选 | [sql-correctness-gate.md](../plugins/team-standards/skills/backend-evidence/references/sql-correctness-gate.md) / [query-performance-gate.md](../plugins/team-standards/skills/backend-evidence/references/query-performance-gate.md) / [domain-spec-mining.md](../plugins/team-standards/skills/backend-evidence/references/domain-spec-mining.md) |
 | 分层边界 / 结构质量 / 语义分包 | [layers-and-boundaries.md](../plugins/team-standards/skills/architecture-ddd-lite-fullstack/references/layers-and-boundaries.md) / [structure-quality-gates.md](../plugins/team-standards/skills/architecture-ddd-lite-fullstack/rules/structure-quality-gates.md) |
-| UI 绑定解析（guardian 复用 bootstrap 的 resolver）/ 视觉评审 | [resolver.md](../plugins/team-standards/skills/design-system/references/resolver.md) / [review-workflow.md](../plugins/team-standards/skills/design-system/references/review-workflow.md) |
-| 设计偏好 / 模式候选 | [evidence-capture.md](../plugins/team-standards/skills/design-system/references/evidence-capture.md) / [pattern-mining.md](../plugins/team-standards/skills/design-system/references/pattern-mining.md) |
+| UI 绑定解析（guardian 复用 bootstrap 的 resolver）/ 视觉评审 | [resolver.md](../plugins/team-standards/skills/frontend-excellence/references/resolver.md) / [review-workflow.md](../plugins/team-standards/skills/frontend-excellence/references/review-workflow.md) |
+| 设计偏好 / 模式候选 | [evidence-capture.md](../plugins/team-standards/skills/frontend-excellence/references/evidence-capture.md) / [pattern-mining.md](../plugins/team-standards/skills/frontend-excellence/references/pattern-mining.md) |
 | 初始化输出 / onboarding / 刷新 | [initialization-output.md](../plugins/team-standards/skills/init-project-docs/references/initialization-output.md) / [onboard-workflow.md](../plugins/team-standards/skills/init-project-docs/references/onboard-workflow.md) / [update-workflow.md](../plugins/team-standards/skills/init-project-docs/references/update-workflow.md) |
 | 文档归属索引 / Markdown 格式 | [document-index-workflow.md](../plugins/team-standards/skills/markdown-writing-standards/references/document-index-workflow.md) / [markdown-format.md](../plugins/team-standards/skills/markdown-writing-standards/references/markdown-format.md) |
 
@@ -411,7 +413,7 @@ Go 源码 → `coding-standards-common` + `go-coding-standards`；业务边界�
 
 | 通用入口 | 按需源码 | 职责 |
 |---|---|---|
-| [design-system](../plugins/team-standards/skills/design-system/SKILL.md) | references/bootstrap.md、review-mode.md、review-workflow.md、evidence-capture.md、pattern-mining.md；assets/ 与 schema 保留 | 设计复用、初始化、评审和偏好；不强制创建 Registry |
+| [frontend-excellence：设计系统](../plugins/team-standards/skills/frontend-excellence/SKILL.md) | references/bootstrap.md、review-mode.md、review-workflow.md、evidence-capture.md、pattern-mining.md；assets/ 与 schema 保留 | 设计复用、初始化、评审和偏好；不强制创建 Registry |
 | coding-standards-common | references/comment-maintenance.md、feedback.md | 显式清理和纠正，不创建计数式违规日志 |
 | business-logic-orientation | references/terminology.md | 术语核对与已有知识源维护 |
 | git-commit-standards | references/work-summary.md | 按需查询汇总，不自动写日报 |
@@ -424,7 +426,7 @@ Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成�
 
 ## 设计表达与结构的分工
 
-编写概设详设时，由 change-readiness 的内容契约确定结构与生命周期，再使用 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 完成逐段试讲、关系图、字段说明与语义核对。绘制产品能力、领域能力或系统协作图时，叠加 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 按受众选择 L1/L2/L3，提炼问题、主角与阅读路径，再组织图形与配色；后续架构说明图默认继承已确认三套模板的形象化风格，区分主体、支撑和注释；draw.io 优先复用自带 iOS7 Icons，统一图标家族；以实际打开、图标改色/缩放、文字和端点抽查及轻量清单验收，逐笔画编辑仅按明确需求验证，具体格式沿用项目选择。独立评审概设、详设或技术方案由 [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) 核实本期事实、矛盾、关键缺口和过度设计；表达问题按需叠加 clear-design-docs。未来规模和冷门场景默认提醒，不作为当前硬指标。markdown-writing-standards 检查格式和导航，delivery-verification 核对受影响设计的实际审读范围。纯设计咨询不自动实施；普通文字编辑不要求启动设计治理。
+编写概设详设时，由 change-readiness 的内容契约确定结构与生命周期，再使用 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 完成逐段试讲、关系图、字段说明与语义核对。绘制产品能力、领域能力或系统协作图时，叠加 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 按受众选择 L1/L2/L3，提炼问题、主角与阅读路径，再组织图形与配色；后续架构说明图默认继承已确认三套模板的形象化风格，区分主体、支撑和注释；draw.io 优先复用自带 iOS7 Icons，统一图标家族；以实际打开、图标改色/缩放、文字和端点抽查及轻量清单验收，逐笔画编辑仅按明确需求验证，具体格式沿用项目选择。独立评审概设、详设或技术方案由 [设计独立评审](../plugins/team-standards/skills/clear-design-docs/references/review-mode.md) 核实本期事实、矛盾、关键缺口和过度设计；获授权改写时使用同入口编写模式。未来规模和冷门场景默认提醒，不作为当前硬指标。markdown-writing-standards 检查格式和导航，delivery-verification 核对受影响设计的实际审读范围。纯设计咨询不自动实施；普通文字编辑不要求启动设计治理。
 
 ER 表达按 clear-design-docs 核对模型对象、同表自关联及关联两端；逻辑对象与物理表分开，不以图中别名制造新表。
 

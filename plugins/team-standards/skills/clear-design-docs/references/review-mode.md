@@ -1,11 +1,6 @@
----
-name: reviewing-design-plainly
-description: 评审概要设计、详细设计、技术实现文档或实施方案，核实当前范围内的明显矛盾、关键缺口、未经证实的前提和过度设计，给出有依据的最小修改建议。适用于独立方案评审；普通文案润色或已授权开发任务的常规就绪检查不单独触发。
----
-
 # 务实的设计文档评审
 
-目标：判断当前方案能否支撑本期开发与验收，提出有证据的最小修正。共同准则见[工程宪法](../change-readiness/references/engineering-principles.md)。
+目标：判断当前方案能否支撑本期开发与验收，提出有证据的最小修正。共同准则见[工程宪法](../../change-readiness/references/engineering-principles.md)。
 
 ## 判断准则
 
@@ -30,4 +25,4 @@ description: 评审概要设计、详细设计、技术实现文档或实施方�
 - 为凑评审深度新增多个模型和组件：只修会影响本期结果的问题。
 - 文档字段齐全就标记设计正确：核对规则是否相容、路径能否闭合。
 
-表达与图示问题按需用[清晰设计文档](../clear-design-docs/SKILL.md)，结构归[设计内容契约](../change-readiness/references/design-output-contract.md)。行业对照只核对能改变当前判断的适用条款。
+表达与图示问题按需用[清晰设计文档](../SKILL.md)，结构归[设计内容契约](../../change-readiness/references/design-output-contract.md)。行业对照只核对能改变当前判断的适用条款。

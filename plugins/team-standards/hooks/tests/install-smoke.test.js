@@ -15,6 +15,19 @@ test('isolated installed layout discovers and executes every configured hook', (
     assert.equal(manifest.name, fixture.pluginName);
     assert.equal(Object.hasOwn(manifest, 'hooks'), false);
 
+    // The installed artifact must expose only current owners and retain moved resources.
+    const installedSkills = path.join(fixture.pluginCopy, 'skills');
+    for (const retired of ['design-system', 'reviewing-design-plainly']) {
+      assert.equal(fs.existsSync(path.join(installedSkills, retired, 'SKILL.md')), false);
+    }
+    for (const resource of [
+      'clear-design-docs/references/review-mode.md',
+      'frontend-excellence/references/design-system.md',
+      'frontend-excellence/references/bootstrap.md',
+      'frontend-excellence/assets/registry-template/registry.json',
+      'frontend-excellence/assets/profile-template/profile.json',
+    ]) assert.ok(fs.existsSync(path.join(installedSkills, resource)), resource);
+
     const hooksPath = path.join(fixture.pluginCopy, 'hooks', 'hooks.json');
     const hooks = readJson(hooksPath);
     const commands = configuredCommands(hooks);

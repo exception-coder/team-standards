@@ -1,12 +1,12 @@
 # 团队工具套件全景：按工程职责域看链路与节点
 
-共同准则与证据分工统一归[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。4.16.0 的 23 个 Skill 入口保留专项目标、判断、必要约束和精炼反例，具体格式与操作协议按需读取。架构路径与注释 Hook 仍默认提醒。
+共同准则与证据分工统一归[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。5.0.0 的 21 个 Skill 入口保留专项目标、判断、必要约束和精炼反例，具体格式与操作协议按需读取。架构路径与注释 Hook 仍默认提醒。
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
 这套工具帮助 AI 把自然语言目标转成有依据、边界明确、可验证、可交接的工程成果。它同时管理“怎样工作”和“依据什么工作”：前者是工程规范，后者是项目事实、业务知识与行为规格。
 
-本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。当前 team-standards 提供 23 个 Skill；任务分级入口为 openspec-auto。两页可编辑执行图及当前审查见 [执行流程](skill-flow.md#总流程)。
+本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。当前 team-standards 提供 21 个 Skill；任务分级入口为 openspec-auto。两页可编辑执行图及当前审查见 [执行流程](skill-flow.md#总流程)。
 
 需要从节点找到实际文件、理解 Skill 与程序的关系时，先看 [链路源码导航](skill-flow.md#总图节点对应哪些源码)。
 
@@ -16,7 +16,7 @@
 
 | 组件 | 在整套中扮演什么角色 | 保存或提供什么 |
 |---|---|---|
-| team-standards | 工程工作方法与质量约束 | 23 个 Skill、Hook、状态契约工具及套件维护脚本 |
+| team-standards | 工程工作方法与质量约束 | 21 个 Skill、Hook、状态契约工具及套件维护脚本 |
 | project-coding-profiles | 遗留项目编码保护 | encoding-guard、项目识别画像、逐文件编码约定与写前/提交检查 |
 | project-domain-knowledge | 业务知识内容与 MCP 查询引擎 | 经确认的术语、规则、状态语义，以及与正式知识分开的规格候选 |
 | cross-project-topology | 系统连接知识内容 | 跨项目调用、数据流、提供方/消费方和接口契约；复用知识引擎作为第二个 MCP 实例 |
@@ -110,7 +110,7 @@ flowchart TD
 
 | 节点 | 输入 | 做什么 | 输出与下一站 |
 |---|---|---|---|
-| [design-system](../plugins/team-standards/skills/design-system/references/review-mode.md) | 有意义的 UI 修改或视觉审查 | 读取项目绑定、Profile 和既有实现，控制复用与探索，核对漂移 | UI 约束与视觉验收结论 |
+| [frontend-excellence：视觉评审](../plugins/team-standards/skills/frontend-excellence/references/review-mode.md) | 有意义的 UI 修改或视觉审查 | 读取项目绑定、Profile 和既有实现，控制复用与探索，核对漂移 | UI 约束与视觉验收结论 |
 | [business-visualization-advisor](../plugins/team-standards/skills/business-visualization-advisor/SKILL.md) | 业务图表、指标概览、管理看板与选图评审 | 探索对象与状态，核实指标，发现洞察并选择清晰表达 | 信息层次与可追溯 Dashboard Spec；随后进入视觉系统和前端实现 |
 | [frontend-excellence](../plugins/team-standards/skills/frontend-excellence/SKILL.md) | 新建、重做或显著改善 Web 前端 | 设计并实现布局、组件、响应式、可访问性与完整交互状态 | 可运行页面及真实浏览器验证结果 |
 
@@ -214,4 +214,4 @@ flowchart TD
 
 部署、生产权限、数据库连接、业务启动和项目专属脚手架由目标项目拥有。套件提供方法、证据路由和检查能力，具体业务结果必须由当前项目的实际执行来证明。
 
-概设详设的表达质量由 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 承接；产品能力、领域边界与系统协作图的默认模板风格、架构表达、视觉主次、自带图标优先和可编辑交付由 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 承接；独立方案问题评审由 [reviewing-design-plainly](../plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) 承接。结构与生命周期继续归 change-readiness，不新增执行策略或 Hook。
+概设详设的表达质量由 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 承接；产品能力、领域边界与系统协作图的默认模板风格、架构表达、视觉主次、自带图标优先和可编辑交付由 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 承接；独立方案问题评审由 [设计独立评审](../plugins/team-standards/skills/clear-design-docs/references/review-mode.md) 承接。结构与生命周期继续归 change-readiness，不新增执行策略或 Hook。

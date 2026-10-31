@@ -17,14 +17,14 @@ description: "悟道：在功能名称代替需求、方案未定或担心过度
 
 ## 输出与停止条件
 
-分析深度沿用项目实际影响及现有 S/M/L 判断，不另设分级流程。明确小改直接实施；局部方案用短段落说明目标、建议和关键边界；跨模块或实质风险再展开依赖、失败处理与验证。判断可以在内部完成，不强制四栏模板、多方案比较、分析文件或用户确认。
+复用 openspec-auto 已有的规格深度与风险判断，只补影响方案取舍的未知，不另设分级流程。明确小改直接实施；局部方案用短段落说明目标、建议和关键边界；跨模块或实质风险再展开依赖、失败处理与验证。判断可以在内部完成，不强制四栏模板、多方案比较、分析文件或用户确认。
 
 覆盖当前目标和必要保证、关键取舍有依据后即进入设计或实施。只有目标、约束或事实实质变化才重开判断，继续推进不依赖未决事项的已授权工作。
 
 ## 与现有入口分工
 
 - [change-readiness](../change-readiness/SKILL.md) 定位实现并按影响维护规格与设计；OpenSpec 仅在项目已采用时沿用，不因本 Skill 自动初始化。
-- [architecture-ddd-lite-fullstack](../architecture-ddd-lite-fullstack/SKILL.md) 负责分层和依赖；[clear-design-docs](../clear-design-docs/SKILL.md) 负责设计表达；独立审查用 [reviewing-design-plainly](../reviewing-design-plainly/SKILL.md)。已有阶段规划复用同一份决策。
+- [architecture-ddd-lite-fullstack](../architecture-ddd-lite-fullstack/SKILL.md) 负责分层和依赖；[clear-design-docs](../clear-design-docs/SKILL.md) 负责设计表达；独立审查用 [clear-design-docs 独立评审模式](../clear-design-docs/references/review-mode.md)。已有阶段规划复用同一份决策。
 - [plain-writing](../plain-writing/SKILL.md) 整理表达，不反向重开设计。本 Skill 不新增 Hook、机器 PASS、绑定或审批，也不扩大任务授权。
 
 需要校准判断或人工试用时读取[条件与反例](references/examples.md)。

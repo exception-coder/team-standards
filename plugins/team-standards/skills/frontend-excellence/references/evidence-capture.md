@@ -1,6 +1,6 @@
 ---
 name: design-evidence-capture-reference
-description: "Internal preference-evidence capture rules loaded by design-system."
+description: "Internal preference-evidence capture rules loaded by frontend-excellence design-system mode."
 ---
 
 # Design Observer

@@ -14,13 +14,13 @@
 
 架构图统一使用 [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md)：按受众选择 L1 汇报、L2 设计或 L3 实施视图，组织语义、布局、图形与配色；后续架构说明图默认沿用已确认三套模板的形象化风格，用主体、支撑资源和注释形成主次；draw.io 优先复用内置 iOS7 Icons，同图统一图标；实际打开并抽查图标改色/缩放、文字与连线，不默认要求逐笔画拆分。不把可选步骤画成必经流程，也不把规划画成已实现；沿用项目格式，不另建同职责美化 Skill。
 
-独立审查概设、详设或技术方案使用 [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md)：核实当前事实，只指出本期实质缺口、矛盾与未决选择；未来规模和冷门场景以提醒为主，不以扩展设计充当评审结果。表达问题按需叠加 clear-design-docs；不新增机器阻断或审批。
+独立审查概设、详设或技术方案使用 [设计独立评审](plugins/team-standards/skills/clear-design-docs/references/review-mode.md)：核实当前事实，只指出本期实质缺口、矛盾与未决选择；未来规模和冷门场景以提醒为主，不以扩展设计充当评审结果。表达问题使用同入口的编写模式，不重复启动评审；不新增机器阻断或审批。
 
 提交 Hook 仅检查可静态取得的消息合同，统一接受 Bash.command 与 exec_command.cmd；不以 staged 文件数、行数或调用过某个 Skill 作为准入条件。隔离 Agent 任务的运行方法与证据见[行为回归](docs/maintenance/behavior-regression.md)，结构测试通过不等于任务效果改善。
 
 ## 工程使命
 
-以最小复杂度，持续交付可靠、可维护的软件。[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护共同准则与证据分工。23 个 Skill 入口聚焦目标、专项判断、必要约束和精炼反例；格式、命令与采用条件保留在所属参考，按需读取。固定结构只服务实际契约，不把这些段落当作用户回复模板；安全、权限、数据完整性和项目明确采用的质量要求继续适用。
+以最小复杂度，持续交付可靠、可维护的软件。[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护共同准则与证据分工。21 个 Skill 入口聚焦目标、专项判断、必要约束和精炼反例；格式、命令与采用条件保留在所属参考，按需读取。固定结构只服务实际契约，不把这些段落当作用户回复模板；安全、权限、数据完整性和项目明确采用的质量要求继续适用。
 
 ## 分层维护入口
 
@@ -59,7 +59,7 @@ flowchart TD
 
 主流程原则：
 
-1. `openspec-auto` 统一判断 L1/L2/L3 规格深度，项目内置版本优先；高风险强制 L3，开发中发现扩大风险即升级，不重复分级或初始化。L1 直接开发验证，L2 轻量计划，L3 复用项目 OpenSpec；项目明确要求的更严格流程继续适用。`change-readiness` 是实施准备方法入口，Forge 负责适用策略与执行裁决；先探索既有规格与实现，再判断行为影响。行为变化复用或创建相关 change，行为保持且有证据时无需空 change；M/L 风险不自动要求全部文档，概设与详设独立按影响维护。
+1. `openspec-auto` 统一判断 L1/L2/L3 规格深度，项目内置版本优先；高风险强制 L3，开发中发现扩大风险即升级，不重复分级或初始化。L1 直接开发验证，L2 轻量计划，L3 复用项目 OpenSpec；项目明确要求的更严格流程继续适用。`change-readiness` 是实施准备方法入口，Forge 负责适用策略与执行裁决；先探索既有规格与实现，再判断行为影响。仅 L3 或项目明确要求完整规格时，行为变化复用或创建相关 change，行为保持且有证据时无需空 change；M/L 风险不自动要求全部文档，概设与详设独立按影响维护。
 2. `bug-doc-required` 是 Bug 唯一入口，覆盖证据、根因、最小修复和回归；未获修复授权时只调查。简单 Bug 不另建报告，复杂或高风险问题复用唯一持久记录，图表和独立报告按需生成。
 3. `backend-evidence` 是单服务后端证据唯一入口；代码事实和反向影响使用 Graphify 即时查询，不维护第二套手工索引。
 4. `markdown-writing-standards` 维护唯一文档归属、Markdown/Mermaid 结构与受影响的已有导航。
@@ -107,7 +107,7 @@ flowchart TD
 | 功能名代替需求、方案取舍、阶段规划或担心过度设计 | `architecture-reasoning`（悟道）；分清目标、候选实现和约束，再判断最小充分方案；明确小改不加阶段 |
 | 面向人的说明、去套话或要求说人话 | `plain-writing`（人话）；按载体改表达，保护事实和技术决策 |
 | 跨项目规划或估算 | 使用项目声明的证据源；Forge 专属协议不在通用插件内 |
-| 初始化、评审设计或记录明确视觉偏好 | `design-system` 的对应模式；已有设计资产优先 |
+| 初始化设计系统、评审视觉一致性或记录明确视觉偏好 | `frontend-excellence` 的对应模式；已有设计资产优先 |
 | 业务术语歧义 | `business-logic-orientation` 的术语模式 |
 | 用户要求批量清理注释或纠正规范 | `coding-standards-common` 的对应模式 |
 | 用户要求工作汇总 | `git-commit-standards` 的工作汇总模式 |
@@ -121,12 +121,12 @@ flowchart TD
 | Java 源码 | `java-coding-standards` |
 | Go 源码 | `go-coding-standards`；业务代码叠加 DDD-lite 的 Go 章节 |
 | LLM SDK、Agent、Prompt、工具调用或结构化模型输出 | `llm-agent-coding-standards` |
-| 创建、重做或显著提升生产 Web 前端 | `frontend-excellence`；视觉一致性复用 `design-system` |
+| 创建、重做或显著提升生产 Web 前端 | `frontend-excellence`；视觉一致性复用 `frontend-excellence` 的设计系统模式 |
 | Web 业务图表、指标概览、管理看板创建、改造或选图评审 | `business-visualization-advisor`；先业务语义与信息设计，再视觉系统和前端实现；优化统计总览/看板时编码前形成目的—指标—图表—行动映射及选图清单，完成前反向验证业务改善 |
 | 后端表、SQL、状态、字段、事件、API、领域闭环或查询性能 | `backend-evidence` |
 | 编写或精简概设详设 | `clear-design-docs` 配合现有设计内容契约 |
 | 绘制、重绘或美化架构说明图，包括 draw.io/drawio | `architecture-diagram-design`；统一信息提炼、三级视图、视觉语言、原生模板与轻量验收；文档正文仍按 `clear-design-docs` |
-| 独立评审概设、详设、技术方案或实施方案 | `reviewing-design-plainly`；表达与图示问题按需叠加 `clear-design-docs` |
+| 独立评审概设、详设、技术方案或实施方案 | `clear-design-docs` 的独立评审模式；获授权改写时使用同入口编写模式 |
 | 套件或项目更新的文档同步；新建或结构性修改 Markdown、Mermaid、复杂表格 | `markdown-writing-standards` |
 | 初始化 AI 工程结构/AI 目录；初始化新项目、一键 onboard、接入新系统；或刷新上下文状态 | `init-project-docs` |
 | 可执行改动完成、准备最终回复 | `delivery-verification` |
@@ -144,9 +144,9 @@ flowchart TD
 
 ## Skill 分类
 
-- 分析：change-readiness、reviewing-design-plainly、bug-doc-required、business-logic-orientation（含术语）、business-ontology-modeling。
+- 分析：change-readiness、clear-design-docs（含独立评审）、bug-doc-required、business-logic-orientation（含术语）、business-ontology-modeling。
 - 编码：architecture-ddd-lite-fullstack、coding-standards-common（含清理/反馈）、java-coding-standards、go-coding-standards、llm-agent-coding-standards。
-- 前端设计：business-visualization-advisor（指标与信息设计）、design-system（视觉系统）、frontend-excellence（实现与验收）；业务事实仍归现有证据入口。
+- 前端设计：business-visualization-advisor（指标与信息设计）、frontend-excellence（实施、视觉评审、设计系统与验收）；业务事实仍归现有证据入口。
 - 证据与接入：backend-evidence、init-project-docs、markdown-writing-standards。
 - 交付：delivery-verification、git-commit-standards（含按需工作汇总）。
 
@@ -177,7 +177,7 @@ flowchart TD
 | `llm-agent-coding-standards` | LLM/Agent 信任边界、确定性契约和循环兜底 | 仅 LLM 集成代码触发 |
 | `clear-design-docs` | 通俗表达、关系图、字段中文说明与语义保持 | 不覆盖设计结构、生命周期或授权边界 |
 | `architecture-diagram-design` | 架构表达、L1/L2/L3 视图、视觉语言、三套 draw.io 模板与轻量验收 | 交付原生可编辑源图；不代替架构决策，不新增绘图引擎或门禁 |
-| `reviewing-design-plainly` | 当前范围内的矛盾、关键缺口、未决前提与过度设计审查 | 未来规模与冷门场景默认提醒，不新增硬门禁 |
+| `clear-design-docs` 的独立评审模式 | 当前范围内的矛盾、关键缺口、未决前提与过度设计审查 | 未来规模与冷门场景默认提醒，不新增硬门禁 |
 | `markdown-writing-standards` | 唯一归属、Markdown/Mermaid 结构与必要导航 | 不强制新建索引或日报 |
 
 ## 辅助资源索引

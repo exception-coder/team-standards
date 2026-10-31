@@ -1,6 +1,8 @@
 # team-standards
 
-Platform template handoff: [Project foundation pack 1.0.0](templates/project-foundation/README.md) includes six repo-local skills, required code documentation, and agent entry files. Projects can use it without a preinstalled suite; existing plugin entry points remain compatible.
+**5.0.0:** 21 skills. `reviewing-design-plainly` is now the read-only review mode of `clear-design-docs`; `design-system` is now a mode of `frontend-excellence`. Retired names are no longer discoverable. Update explicit invocations; existing registries and profiles remain unchanged. Classification and valid task evidence are reused across modes.
+
+Platform template handoff: [Project foundation pack 1.1.0](templates/project-foundation/README.md) includes six foundation skills plus openspec-auto, required code documentation, and agent entry files. Projects can use it without a preinstalled suite; existing plugin entry points remain compatible.
 
 Version 4.14.3 normalizes Bash and exec_command commit payloads and retires gates based on diff size or recorded Skill calls. Commit-message validation remains active; all 22 Skills retain the shared constitution. A small reproducible comparison runs real agents on disposable executable tasks; see [behavior regression methods and results](docs/maintenance/behavior-regression.md).
 
@@ -46,7 +48,7 @@ Version 4.3 adds eight business overview chapters, nine sections per detailed fu
 
 Version 4.9 adds [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md) for plain-language design writing, relationship diagrams, Chinese field descriptions and meaning-preserving simplification. Existing design structure, bindings and review lifecycle remain authoritative; no new automated gate is introduced. Update the host plugin before retiring a same-name personal skill; pushing source does not update running sessions.
 
-Version 4.9.3 adds [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md) for independent overview, detailed-design and technical-plan reviews. It prioritizes material contradictions, current-scope gaps and minimal remedies; speculative scale and rare scenarios remain advisory unless confirmed requirements or correctness risks make them relevant.
+Version 4.9.3 adds [independent design review](plugins/team-standards/skills/clear-design-docs/references/review-mode.md) for independent overview, detailed-design and technical-plan reviews. It prioritizes material contradictions, current-scope gaps and minimal remedies; speculative scale and rare scenarios remain advisory unless confirmed requirements or correctness risks make them relevant.
 
 Version 4.10.0 adds [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md) for product capability maps, domain boundaries, and system collaboration diagrams. It separates viewpoints, establishes a reading path, and requires rendered visual review; version 4.15.0 adds native draw.io editing and export guidance while reusing available diagram tools.
 
@@ -82,11 +84,11 @@ The main consolidated entry points are:
 - `business-ontology-modeling`: reverse modeling from code and databases, or question-driven model completion, with evidence and answerability boundaries; see [adoption and templates](plugins/team-standards/skills/business-ontology-modeling/references/adoption.md) and the [six-question worked example](plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md).
 - `markdown-writing-standards`: document ownership, Markdown/Mermaid structure, and affected existing navigation.
 - `init-project-docs`: idempotently initializes Agent entrypoints, document indexes, OpenSpec, `.graphifyignore`, and the Graphify Git sharing boundary, then routes project rules and evidence without duplicate fact projections.
-- `design-system`: registry/profile initialization and evidence-based preference learning.
+- `frontend-excellence` design-system mode: registry/profile initialization and evidence-based preference learning.
 - `business-visualization-advisor`: business-object and lifecycle driven metrics, insights, chart selection, and dashboard information design. Management dashboards connect targets, gaps, evidence-backed breakdowns, and actionable details.
-- `frontend-excellence`: UI implementation, responsive interactions, accessibility, and real-browser verification. It routes business charts to the advisor; design-system owns visual consistency. Ordinary pages do not load the full chart workflow. Dashboard and statistical-overview optimization requires explicit users, discovery goals, actions and first-screen questions, plus purpose–metric–visualization–action mappings and a visible candidate/decision list before coding, a rationale when charts remain unchanged, and delivery that distinguishes information architecture, visualization changes, and interactions. Preview limitations must be disclosed. Completion requires evidence of improved decision-making, insights, comparisons, issue localization or drill-down, verified against business goals; cosmetic changes alone do not qualify.
+- `frontend-excellence`: UI implementation, responsive interactions, accessibility, and real-browser verification. It routes business charts to the advisor; its design-system mode owns visual consistency. Ordinary pages do not load the full chart workflow. Dashboard and statistical-overview optimization requires explicit users, discovery goals, actions and first-screen questions, plus purpose–metric–visualization–action mappings and a visible candidate/decision list before coding, a rationale when charts remain unchanged, and delivery that distinguishes information architecture, visualization changes, and interactions. Preview limitations must be disclosed. Completion requires evidence of improved decision-making, insights, comparisons, issue localization or drill-down, verified against business goals; cosmetic changes alone do not qualify.
 
-See [README.md](README.md) for the complete 22-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+See [README.md](README.md) for the complete 21-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
 
 ## Bug records
 
@@ -147,7 +149,7 @@ Version 3.5.0 adds [Go coding standards](plugins/team-standards/skills/go-coding
 
 ## 4.0.0 migration
 
-The distributed plugin now has 15 skills. Comment cleanup and coding feedback become common-coding modes; terminology becomes a business-orientation mode; work summaries become a commit mode. Design bootstrap and review share one design-system entry. Suite decision logging is repository-local; the Forge planning contract lives under docs/platform-integrations and is not distributed. Update old invocations using the Chinese README migration table. Existing logs and registries are preserved.
+The earlier 4.0 consolidation reduced the plugin to 15 skills; 5.0.0 now provides 21. Comment cleanup and coding feedback become common-coding modes; terminology becomes a business-orientation mode; work summaries become a commit mode. Design bootstrap and review now belong to frontend-excellence modes. Suite decision logging is repository-local; the Forge planning contract lives under docs/platform-integrations and is not distributed. Update old invocations using the Chinese README migration table. Existing logs and registries are preserved.
 
 Version 4.9.1 aligns ER nodes with modeled entities, uses self-relations for hierarchies, labels external references, and requires both ends of association entities. Logical entities do not imply one physical table each.
 

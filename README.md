@@ -1,5 +1,7 @@
 # team-standards
 
+**5.0.0：**入口从 23 个收敛为 21 个：`reviewing-design-plainly` 合入 `clear-design-docs` 的独立评审模式；`design-system` 合入 `frontend-excellence` 的设计系统模式。旧名称退出发现列表，项目显式调用需改为新入口。资产和证据按需复用，评审保持只读；现有 Registry/Profile 不迁移。
+
 **4.16.0：**新增独立可复制的 [openspec-auto](plugins/team-standards/skills/openspec-auto/SKILL.md)，支持 L1/L2/L3 自动分级、风险升级及项目优先；[适配与验收说明](docs/maintenance/openspec-auto.md)覆盖 Codex/Claude 的实际去重边界。Plan S 使用 [项目模板 1.1.0](templates/project-foundation/README.md)。
 
 
@@ -41,7 +43,7 @@ OpenSpec 治理命令默认等待 30 秒，慢环境可通过 `TEAM_STANDARDS_OP
 
 4.9.1 整合 [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md)：概设详设逐段试讲，复杂关系配图，对外字段补中文含义，简化时保持业务和安全规则。沿用现有结构与审阅流程，不增加机器门禁。个人旧版可在确认插件升级可用后停用，避免同名入口混用；源码推送不代表宿主自动升级。
 
-4.9.3 增加 [reviewing-design-plainly](plugins/team-standards/skills/reviewing-design-plainly/SKILL.md)：独立审查概设、详设和技术方案的本期矛盾、关键缺口、待决策前提与过度设计，按事实给最小修正建议。未来高流量和冷门场景默认只提醒，不增加机器门禁。
+4.9.3 增加 [设计独立评审](plugins/team-standards/skills/clear-design-docs/references/review-mode.md)：独立审查概设、详设和技术方案的本期矛盾、关键缺口、待决策前提与过度设计，按事实给最小修正建议。未来高流量和冷门场景默认只提醒，不增加机器门禁。
 
 4.10.0 增加 [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md)：绘制产品能力、领域能力和系统协作图前，先确定图要回答的问题，分开语义视角，设计清晰阅读路径，并以实际渲染检查交付。4.15.0 补齐原生 draw.io 编辑、导出和模板用法，实际绘制仍优先使用环境已有工具。
 
@@ -51,7 +53,7 @@ OpenSpec 治理命令默认等待 30 秒，慢环境可通过 `TEAM_STANDARDS_OP
 
 - **先看整套做什么** → [按领域的全景链路与节点字典](docs/suite-panorama.md)
 - **理解统一流程** → [主流程](#主流程)、[Skill 链路与源码导航](docs/skill-flow.md)、[两页可编辑 draw.io](docs/diagrams/team-standards-execution.drawio)
-- **查看能力清单** → [23 个 Skill](#23-个-skill)、[合并后的入口](#合并后的入口)
+- **查看能力清单** → [21 个 Skill](#21-个-skill)、[合并后的入口](#合并后的入口)
 - **给其他业务建模** → [业务本体建模](plugins/team-standards/skills/business-ontology-modeling/SKILL.md)、[三个模板与跨项目使用](plugins/team-standards/skills/business-ontology-modeling/references/adoption.md)、[新品六问完整示例](plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md)
 - **编码与门禁** → [编码规范叠加层级](#编码规范叠加层级)、[Hook 边界](#hook-边界)
 - **未来上下文架构** → [Graphify 与 OpenSpec](#graphify-与-openspec)
@@ -96,7 +98,7 @@ flowchart TD
 
 ---
 
-## 23 个 Skill
+## 21 个 Skill
 
 4.13.2 根据老ERP代码与实际Oracle只读试用补充数据源身份/时间、不可读来源及Graphify枢纽查询的处理；增加[Agent与MCP消费分工](plugins/team-standards/skills/business-ontology-modeling/references/agent-consumption.md)，复用现有语义查询、能力Schema和领域事实，多运行时共用业务规则，实际接线逐项验收。
 
@@ -114,9 +116,8 @@ flowchart TD
 |---|---|---|
 | 分析设计 | `architecture-reasoning`（悟道） | 分清真实目标、候选实现和约束，选择最小充分方案；条件与反例按需读取 |
 | 知识文档 | `plain-writing`（人话） | 按读者与载体解释对象、动作和结果，保留事实、条件与技术含义 |
-| 分析设计 | `clear-design-docs` | 常见基础版范围、清晰表达、关系图、中文字段与语义审读 |
+| 分析设计 | `clear-design-docs` | 编写、精简与独立评审设计；清晰表达、关系图、中文字段与语义核对 |
 | 分析设计 | `architecture-diagram-design` | 架构可视化：L1/L2/L3、统一图形与配色、三套可编辑 draw.io 模板及轻量验收 |
-| 分析设计 | `reviewing-design-plainly` | 独立审查本期设计矛盾、关键缺口和过度设计；未来规模与冷门场景作提醒 |
 | 任务分级 | `openspec-auto` | 项目版本优先；L1 直接开发、L2 轻量计划、L3 项目 OpenSpec；高风险强制升级 |
 | 分析设计 | `change-readiness` | 沿用任务分级，核实实施依据与设计影响；需要 OpenSpec 时匹配或创建 change，不重复分类和初始化 |
 | 分析设计 | `bug-doc-required` | 证据驱动的 Bug 调查、最小修复与回归；简单问题不另建报告 |
@@ -127,9 +128,8 @@ flowchart TD
 | 架构编码 | `java-coding-standards` | Java 与关系数据库专属规范 |
 | 架构编码 | `go-coding-standards` | Go 整洁编码、错误、并发与验证；架构复用 DDD-lite |
 | 架构编码 | `llm-agent-coding-standards` | LLM/Agent 信任边界和循环安全 |
-| 前端设计 | `design-system` | 复用项目设计；按需初始化、评审与偏好学习 |
 | 前端设计 | `business-visualization-advisor` | 业务对象与状态驱动的指标、洞察、选图及管理看板信息设计 |
-| 前端设计 | `frontend-excellence` | 生产 Web 前端质量和浏览器验收 |
+| 前端设计 | `frontend-excellence` | 生产 Web 前端实施、视觉评审、设计系统与偏好模式；按范围浏览器验收 |
 | 知识文档 | `backend-evidence` | 单服务数据事实、Graphify 即时影响、领域规格与查询性能 |
 | 知识文档 | `markdown-writing-standards` | 写前查重、Markdown/Mermaid 和写后索引 |
 | 知识文档 | `init-project-docs` | 在当前目录幂等初始化 Agent、文档索引、OpenSpec、`.graphifyignore` 与 Graphify Git 共享边界，再编排上下文状态 |
@@ -140,7 +140,7 @@ flowchart TD
 
 ## 前端设计分层
 
-业务图表与看板先由 [business-visualization-advisor](plugins/team-standards/skills/business-visualization-advisor/SKILL.md) 确定“看什么、怎么算、如何表达”；design-system 统一视觉语言，frontend-excellence 实现交互、响应式与浏览器验收。后端事实与业务语义复用现有证据入口。普通 CRUD 页面不加载整套图表规则。
+业务图表与看板先由 [business-visualization-advisor](plugins/team-standards/skills/business-visualization-advisor/SKILL.md) 确定“看什么、怎么算、如何表达”；frontend-excellence 按设计系统模式复用视觉语言，再按实施模式实现交互、响应式与浏览器验收。后端事实与业务语义复用现有证据入口。普通 CRUD 页面不加载整套图表规则。
 
 管理看板围绕目标与结果、差距与风险、原因分解和行动明细；目标、历史趋势和归因必须有证据，缺数据时选择摘要或明细。可直接提出“根据采购对象及状态设计领导看板”，也可调用 `$business-visualization-advisor`。这是 Agent 设计能力，不是已部署的自动看板服务。统计总览或看板优化时，编码前必须明确受众、发现目标、后续行动和首屏问题，建立“目的—指标—图表—行动”映射及逐项候选选图清单；没有改变图表需提前说明理由，交付区分信息架构、图表化与交互改造，并提供视觉证据或缺口。完成前按业务目的反向验证；不能仅以换标题、数字卡或布局配色宣称看板优化完成，至少证明一项决策、洞察、比较、定位或行动能力的实际改善。
 
@@ -317,7 +317,7 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 | `daily-work-log` | git-commit-standards → references/work-summary.md |
 | `comment-cleanup` / `coding-violation-log` | coding-standards-common → references/comment-maintenance.md / feedback.md |
 | `glossary-required` | business-logic-orientation → references/terminology.md |
-| `design-system-bootstrap` / `design-system-guardian` | design-system → 初始化、评审、偏好模式 |
+| `design-system-bootstrap` / `design-system-guardian` | frontend-excellence → 初始化、评审、偏好模式 |
 
 保留历史日志与知识数据；不再强制个人 ai-docs、违规计数或无 Registry 时的初始化。Graphify、OpenSpec 和真实验证边界不变。平台协议只是移出通用分发，本轮没有假称已部署到 Forge。
 

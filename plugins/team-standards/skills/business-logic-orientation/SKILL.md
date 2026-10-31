@@ -7,6 +7,8 @@ description: "Use to understand existing business logic before refactoring, rewr
 
 目标：重构、复写、迁移或回归审查前，理解当前业务实际怎样运行及哪些行为需要保持。共同准则与证据分工见[工程宪法](../change-readiness/references/engineering-principles.md)。
 
+沿用当前任务已核实的来源、范围和有效证据，只补本模式需要的缺口；切换 Skill 不重新扫描项目、不重复建立事实清单，输入变化时仅复核受影响事实。
+
 ## 判断准则
 
 - 从项目入口确定业务边界和权威来源；Graphify 定位入口、依赖与读写链路，检查其对当前 HEAD 和工作区的覆盖，缺口用定向源码、DDL、测试或运行证据补齐。

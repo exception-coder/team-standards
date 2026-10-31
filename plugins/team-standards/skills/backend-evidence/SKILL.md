@@ -7,6 +7,8 @@ description: "Use for backend changes or analysis involving DDL, SQL, data relat
 
 目标：用真实数据与运行证据核实单服务的 SQL、状态、不变量和查询性能。共同准则及证据分工见[工程宪法](../change-readiness/references/engineering-principles.md)。
 
+沿用当前任务已核实的来源、范围和有效证据，只补本模式需要的缺口；切换 Skill 不重新扫描项目、不重复建立事实清单，输入变化时仅复核受影响事实。
+
 ## 判断准则
 
 - 明确所属服务、受影响对象和消费者；新鲜 Graphify 定位读写点及反向影响，定向源码补齐覆盖缺口。新接口先核对现有能力。

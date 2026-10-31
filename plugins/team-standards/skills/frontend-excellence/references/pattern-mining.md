@@ -1,6 +1,6 @@
 ---
 name: design-pattern-mining-reference
-description: "Internal pattern-mining rules loaded by design-system; not a standalone Skill."
+description: "Internal pattern-mining rules loaded by frontend-excellence design-system mode; not a standalone Skill."
 ---
 
 # Design Pattern Miner

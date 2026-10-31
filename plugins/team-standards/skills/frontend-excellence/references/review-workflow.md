@@ -1,6 +1,6 @@
 ---
 name: design-review-workflow-reference
-description: "Internal visual-review rules loaded by design-system; not a standalone Skill."
+description: "Internal visual-review rules loaded by frontend-excellence design-system mode; not a standalone Skill."
 ---
 
 # Design Reviewer

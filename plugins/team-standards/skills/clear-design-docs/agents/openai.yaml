@@ -1,5 +1,5 @@
 interface:
-  display_name: "清晰实用的概设与详设"
+  display_name: "设计文档编写与评审"
   short_description: "编写和评审简洁易懂的概设详设，明确首期范围并用图解释对象关系"
   default_prompt: "使用 $clear-design-docs 编写或评审当前概设详设，收敛基础版范围，用图解释复杂对象关系，并保持设计与验收一致。"
 policy:

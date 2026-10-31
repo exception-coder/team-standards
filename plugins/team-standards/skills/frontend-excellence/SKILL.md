@@ -1,13 +1,20 @@
 ---
 name: frontend-excellence
-description: "Use when creating, redesigning, or substantially improving production Web frontends, including React, Vue, Next.js, dashboards, portals, landing pages, component libraries, or screenshot/Figma-to-code work. Enforces product-level visual direction, deliberate anti-generic composition, design systems, responsive behavior, accessibility, complete recoverable UI states, maintainable component architecture, and real-browser visual verification. Do not use for pure backend work, native mobile UI, or copy-only changes with no layout or interaction impact."
+description: "Build or improve production Web interfaces; review visual consistency; initialize a design system or record explicit visual preferences. Select implementation, review, or design-system mode from the request. Pure backend work and copy-only edits are excluded."
 ---
 
 # Frontend Excellence
 
 Goal: deliver a coherent, usable product interface with recoverable interactions and browser evidence. Shared decisions follow the [engineering constitution](../change-readiness/references/engineering-principles.md).
 
-## Decision criteria
+## Select the requested mode
+
+- **Implementation:** use the criteria below for pages, interactions and reusable components. Reuse project assets and only load references needed for the current change.
+- **Visual consistency review:** read [review mode](references/review-mode.md); default to read-only findings. Review alone does not authorize redesign or code changes.
+- **Design system or preference work:** read [design-system mode](references/design-system.md). Initialize or bind Registry/Profile only when requested or required by the project; read [bootstrap](references/bootstrap.md) then. Missing Registry never blocks ordinary UI work. Record explicit preferences at their actual scope; frequency alone does not promote a team rule.
+- Reuse the same task context, visual evidence and verification results across modes. A review or preference-only task does not inherit implementation acceptance steps or require a second browser run without changed inputs.
+
+## Implementation decision criteria
 
 - Use the repository's stack, tokens, components, data patterns and supplied visual references. Define a concise visual direction where none exists; create only the missing design decisions.
 - Organize around the audience's primary task, content hierarchy, comparison needs and realistic density. For material workspace changes, make the page anatomy, first useful mobile content and scroll ownership clear before implementation.
@@ -34,7 +41,7 @@ Use [delivery verification](../delivery-verification/SKILL.md#执行范围与证
 ## Read when needed
 
 - Routes, features, forms or state: [architecture and state](references/architecture-and-state.md) and [DDD-lite](../architecture-ddd-lite-fullstack/SKILL.md).
-- New visual language or reusable components: [aesthetics](references/design-system-and-aesthetics.md) and [design-system](../design-system/SKILL.md).
+- New visual language or reusable components: [aesthetics](references/design-system-and-aesthetics.md) and [design-system](references/design-system.md).
 - Interaction states: [interaction and states](references/interaction-and-states.md).
 - Workspace composition: [enterprise UI cases](references/enterprise-ui-failure-patterns.md).
 - Completion evidence: [quality gates](references/quality-gates.md), especially its workspace viewport contract; visual inspection: [review checklist](references/visual-review-checklist.md).

@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.0] - 2026-10-31
+
+- Consolidate 23 public Skill entries into 21: move independent design review into `clear-design-docs`, and design-system review/bootstrap/preferences into `frontend-excellence`. Retired names are no longer registered; update explicit project invocations.
+- Preserve read-only review boundaries, Registry/Profile assets and schemas. Load mode-specific references only when relevant; ordinary UI work does not require registry initialization.
+- Reuse task classification, current facts and valid verification across Skills. Qualify OpenSpec change creation by L3 or explicit project requirements.
+- Update routing, bilingual documentation, native draw.io diagrams and installed-layout regressions. No Forge execution protocol or Hook blocking behavior changes.
+
 ## [4.15.3] - 2026-10-29
 
 - Adopt the user-approved three-template visual style as the default for subsequent architecture illustrations; reuse built-in iOS7 Icons, clear hierarchy, whitespace and semantic colors.

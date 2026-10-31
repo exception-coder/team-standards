@@ -9,10 +9,10 @@ Treat approved existing UI as the visual source of truth and use design evidence
 3. Choose `CONSERVATIVE` when mature implementation, components, established patterns, references, or tokens cover the task. Choose `EXPLORATION` only for uncovered structures or component families.
 4. In Conservative mode prefer `Reuse → Extend → Compose → Invent`.
 5. In Exploration mode keep changes bounded. Vary layout, hierarchy, or interaction—not color alone—when offering alternatives.
-6. For production Web work, also apply `frontend-excellence` for architecture, accessibility, responsive states, and browser verification.
+6. For production Web work, use this skill’s implementation mode when implementation is authorized for architecture, accessibility, responsive states, and browser verification.
 7. Scale validation to scope. Do not run a full visual loop for copy, tiny spacing, or obvious alignment fixes.
 8. For new pages, major refactors, new component systems, navigation, responsive redesign or release acceptance, render a representative state and read [review-workflow.md](review-workflow.md) to check profile, reference, visual and engineering drift.
-9. Explicit aesthetic feedback is handed to design-system 的偏好记录模式处理，不在实施阶段直接改规则。
+9. Explicit aesthetic feedback is handed to 本 Skill 的偏好记录模式处理，不在实施阶段直接改规则。
 
 ## Anti-drift guardrails
 

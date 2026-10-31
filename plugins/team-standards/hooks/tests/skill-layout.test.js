@@ -26,13 +26,13 @@ test('distributed skill modes resolve local references without repository-only d
 });
 
 test('retired entrypoints are not distributed and replacement modes are reachable', () => {
-  for (const name of ['planning-evidence-discovery', 'dev-log', 'daily-work-log', 'comment-cleanup', 'coding-violation-log', 'glossary-required', 'design-system-bootstrap', 'design-system-guardian']) {
+  for (const name of ['planning-evidence-discovery', 'dev-log', 'daily-work-log', 'comment-cleanup', 'coding-violation-log', 'glossary-required', 'design-system-bootstrap', 'design-system-guardian', 'design-system', 'reviewing-design-plainly']) {
     assert.equal(fs.existsSync(path.join(skills, name)), false, name);
   }
   for (const [owner, file] of [
     ['coding-standards-common', 'comment-maintenance.md'], ['coding-standards-common', 'feedback.md'],
     ['git-commit-standards', 'work-summary.md'], ['business-logic-orientation', 'terminology.md'],
-    ['design-system', 'bootstrap.md'], ['design-system', 'review-mode.md'],
+    ['frontend-excellence', 'bootstrap.md'], ['frontend-excellence', 'review-mode.md'], ['clear-design-docs', 'review-mode.md'],
   ]) {
     assert.ok(fs.readFileSync(path.join(skills, owner, 'SKILL.md'), 'utf8').includes(`references/${file}`));
     assert.ok(fs.existsSync(path.join(skills, owner, 'references', file)));

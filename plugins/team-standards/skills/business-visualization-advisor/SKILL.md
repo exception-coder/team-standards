@@ -26,7 +26,7 @@ description: "涉及 Web 前端业务图表、统计概览、数据可视化或�
 
 看板优化或图表化改造前读取[选图规则](references/visual-rules.md)，在当前回复或已有设计中说明核心区域的“目的 → 指标 → 表达 → 行动”，以及相关候选采用或舍弃的理由和数据依据。无需独立报告，也不要求必有新增图表；没有实质图表变化时，在实施前说清保留理由及将改善的阅读或操作结果。
 
-同一状态的名称、颜色与排序一致，颜色之外保留文字或符号。KPI、图和明细同口径，筛选/钻取带上对象、状态、时间与组织条件并可重置；没有真实明细能力不得伪造跳转。多图或跨端交接按需用 [Dashboard Spec](references/dashboard-spec.md)，视觉及实现复用[设计系统](../design-system/SKILL.md)与[前端质量](../frontend-excellence/SKILL.md)。
+同一状态的名称、颜色与排序一致，颜色之外保留文字或符号。KPI、图和明细同口径，筛选/钻取带上对象、状态、时间与组织条件并可重置；没有真实明细能力不得伪造跳转。多图或跨端交接按需用 [Dashboard Spec](references/dashboard-spec.md)，视觉及实现复用[设计系统](../frontend-excellence/references/design-system.md)与[前端质量](../frontend-excellence/SKILL.md)。
 
 ## 精炼反例
 
