@@ -2,6 +2,14 @@
 
 仅在交付 draw.io 时读取。默认使用现有连接器、MCP 或本地编辑器；没有专项 Skill 时可直接生成原生 XML，不强制安装新插件、桌面程序或渲染服务。
 
+## 图件归属与命名
+
+- 用户明确要求、项目 AGENTS/README 和既有图件约定优先。没有约定时，项目级架构图默认放项目根 `docs/diagrams/`；不能仅因从前端目录启动作业就放到 `frontend/docs/`。模块专属图可沿用模块约定，多项目仓库按图件实际归属确定根目录。
+- 中文项目默认使用中文业务文件名，如 `业务能力整体架构.drawio`，避免无含义的 `diagram1`、`final-v2`。沿用项目术语，必要的 API、SDK 等技术缩写可保留；项目有英文命名规范或目标工具确实限制路径时遵从该约定，说明实际限制，不臆测中文不兼容。
+- 源图与预览默认同目录、同名主干，如 `业务能力整体架构.drawio` 与 `业务能力整体架构.png`。多页预览加语义后缀，如 `业务能力整体架构-权限边界.png`，记录对应页面；不要只靠不稳定页码辨认内容。插件内通用模板保留其资源路径，复制到业务项目后按项目命名。
+- 迁移或改名仅处理本次范围：先查旧路径的引用和生成脚本，再一起更新源图、各页预览、README/已有图件索引、Markdown 图片链接及导出路径。核对新路径存在、旧引用无遗漏、源图与预览对应，目标同名文件不得覆盖。仅移动且内容未变可复用已有预览；源图内容变更须重新导出。不为一次迁移新建多层索引或复制一套正文。
+- 如实说明生成方式：核对源码与业务合同后生成或编辑原生 XML，再用实际可用工具导出、检查；只有已接入并执行项目脚本/构建时才称为自动生成。单次制图不默认接入项目构建。
+
 ## 可编辑源图
 
 新建时优先 UTF-8、未压缩 XML，便于审阅和修改。已有图可保留原格式；解压应使用实际工具并保留原图。以下是文件结构示意，不是业务模板：
@@ -50,11 +58,11 @@
 2. 在交付尺寸检查溢出、重叠、裁切和箭头；必要时调整后重新打开。
 3. 从同一最终源图导出 PNG 或 SVG，逐页选择正确页码并明确命名；源图改变后重导出。普通预览图不能替代源图。
 
-有 draw.io Desktop CLI 时可使用其导出功能。PowerShell 示例（`$drawioExe` 指向已发现的实际可执行文件）：
+有 draw.io Desktop CLI 时可使用其导出功能。PowerShell 示例（在项目根目录执行，`$drawioExe` 指向已发现的实际可执行文件；路径按项目实际约定替换）：
 
 ```powershell
-& $drawioExe --export --format png --page-index 1 --output 'architecture.png' 'architecture.drawio'
-& $drawioExe --export --format svg --page-index 1 --output 'architecture.svg' 'architecture.drawio'
+& $drawioExe --export --format png --page-index 1 --output 'docs/diagrams/业务能力整体架构.png' 'docs/diagrams/业务能力整体架构.drawio'
+& $drawioExe --export --format svg --page-index 1 --output 'docs/diagrams/业务能力整体架构.svg' 'docs/diagrams/业务能力整体架构.drawio'
 ```
 
 `--page-index` 在 v27.0.2 起从 1 开始，更早版本从 0 开始；上述命令适用新版，仍按实际安装版本核对支持项。也可在编辑器使用 File → Export as；需要图像本身也能回到 draw.io 编辑时，选择包含图表数据的导出选项。中文字体、富文本和 SVG 查看器兼容性仍需在实际目标中检查。

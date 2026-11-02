@@ -431,3 +431,7 @@ Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成�
 ER 表达按 clear-design-docs 核对模型对象、同表自关联及关联两端；逻辑对象与物理表分开，不以图中别名制造新表。
 
 ER 图的关键字段和中文含义须留在对象框内，完整约束放字段表；按 clear-design-docs 检查字段密度、关联可追溯和真实渲染。
+
+### 图件归属与命名（5.0.2）
+
+架构图优先遵循用户和项目约定；无约定时项目级图放根 `docs/diagrams/`，中文项目使用中文业务文件名。迁移或改名同步源图、预览与已有引用，不自动整理全部历史图件或接入构建。细则唯一维护在[制图参考](../plugins/team-standards/skills/architecture-diagram-design/references/drawio.md#图件归属与命名)。
