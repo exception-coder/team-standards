@@ -1,0 +1,4 @@
+interface:
+  display_name: "团队跨系统交接"
+  short_description: "将跨系统变更整理成可直接转交、供同事及AI快速执行的简明任务说明"
+  default_prompt: "使用 Team Standards 插件内的 $cross-system-handoff 根据当前变更及已验证状态，生成可直接转发给目标系统同事或其 AI 的交接说明。"

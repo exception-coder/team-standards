@@ -1,5 +1,7 @@
 # team-standards
 
+**5.1.0：**纳入 [cross-system-handoff](plugins/team-standards/skills/cross-system-handoff/SKILL.md)，共 22 个 Skill；生成可直接转发的交接正文，不重复要求已完成动作。个人版与插件版同名不会自动去重，详见[交接 Skill 共存与迁移](docs/maintenance/handoff-skill.md)。
+
 **5.0.2：**补齐架构制图的目录与命名规则：项目约定优先；项目级图默认放根 `docs/diagrams/`，中文项目使用中文业务文件名。改名或迁移同步源图、预览和引用，不自动迁移历史图或接入构建。详见[图件归属与命名](plugins/team-standards/skills/architecture-diagram-design/references/drawio.md#图件归属与命名)。
 
 **5.0.1：**普通说明文件跳过写前 Worker；文档内 SQL、循环数据访问及混合源码改动仍保留检查。性能基准统一为相同六项，不以固定耗时比阻断。Forge 启动去重已完成源码接入与回归，运行部署另行核验；[适配状态](docs/maintenance/openspec-auto.md)。
@@ -33,7 +35,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本：**5.0.2**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本：**5.1.0**。它只保留团队层面稳定复用的分析、设计、架构、编码、文档和交付能力；项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目自身维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -119,6 +121,7 @@ flowchart TD
 | 类别 | Skill | 核心价值 |
 |---|---|---|
 | 分析设计 | `architecture-reasoning`（悟道） | 分清真实目标、候选实现和约束，选择最小充分方案；条件与反例按需读取 |
+| 知识文档 | `cross-system-handoff` | 跨系统、跨团队与 AI 接手；核实当前状态，交付最小步骤及可观察验收 |
 | 知识文档 | `plain-writing`（人话） | 按读者与载体解释对象、动作和结果，保留事实、条件与技术含义 |
 | 分析设计 | `clear-design-docs` | 编写、精简与独立评审设计；清晰表达、关系图、中文字段与语义核对 |
 | 分析设计 | `architecture-diagram-design` | 架构可视化：L1/L2/L3、统一图形与配色、三套可编辑 draw.io 模板及轻量验收 |

@@ -435,3 +435,7 @@ ER 图的关键字段和中文含义须留在对象框内，完整约束放字�
 ### 图件归属与命名（5.0.2）
 
 架构图优先遵循用户和项目约定；无约定时项目级图放根 `docs/diagrams/`，中文项目使用中文业务文件名。迁移或改名同步源图、预览与已有引用，不自动整理全部历史图件或接入构建。细则唯一维护在[制图参考](../plugins/team-standards/skills/architecture-diagram-design/references/drawio.md#图件归属与命名)。
+
+### 跨系统交接（5.1.0）
+
+用户要求交给其他同事、系统或 AI 时，使用 [cross-system-handoff](../plugins/team-standards/skills/cross-system-handoff/SKILL.md)，核实已完成动作、发布与验收状态，只列接手方尚需完成的步骤。项目规则和用户明确选择优先，同一任务不叠加两个交接入口。个人全局副本不是项目规则；真实发现与停用方式见[共存说明](maintenance/handoff-skill.md)。

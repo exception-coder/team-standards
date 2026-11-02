@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<mxfile host="app.diagrams.net" agent="Team Standards" version="5.0.1">
+<mxfile host="app.diagrams.net" agent="Team Standards" version="5.1.0">
   <diagram id="execution" name="01 轻量执行主线">
     <mxGraphModel dx="1800" dy="1080" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1080" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="eyebrow" value="TEAM STANDARDS  /  5.0.1" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#2563EB;fontStyle=1;">
+        <mxCell id="eyebrow" value="TEAM STANDARDS  /  5.1.0" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#2563EB;fontStyle=1;">
           <mxGeometry as="geometry" x="60" y="32" width="1250" height="30" />
         </mxCell>
         <mxCell id="title" value="按风险加深工作，让已授权任务连续推进" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=42;fontColor=#14213D;fontStyle=1;">
@@ -14,7 +14,7 @@
         <mxCell id="subtitle" value="规格深度由 L1 / L2 / L3 决定；验证范围由真实影响决定。项目规则优先，过程不重复审批。" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=21;fontColor=#66758B;fontStyle=0;">
           <mxGeometry as="geometry" x="60" y="152" width="1680" height="40" />
         </mxCell>
-        <mxCell id="footer" value="2026-10-31 · 以工程宪法、21 个 Skill 入口与 hooks.json 为依据 · 实线：任务推进；虚线：按需引用或风险反馈" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=16;fontColor=#66758B;fontStyle=0;">
+        <mxCell id="footer" value="2026-11-02 · 以工程宪法、22 个 Skill 入口与 hooks.json 为依据 · 实线：任务推进；虚线：按需引用或风险反馈" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=16;fontColor=#66758B;fontStyle=0;">
           <mxGeometry as="geometry" x="60" y="1030" width="1680" height="30" />
         </mxCell>
         <mxCell id="principles" value="" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;rounded=1;absoluteArcSize=1;arcSize=18;fillColor=#F8FAFC;strokeColor=none;strokeWidth=2;">
@@ -202,16 +202,16 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="eyebrow" value="TEAM STANDARDS  /  5.0.1" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#2563EB;fontStyle=1;">
+        <mxCell id="eyebrow" value="TEAM STANDARDS  /  5.1.0" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#2563EB;fontStyle=1;">
           <mxGeometry as="geometry" x="60" y="32" width="1250" height="30" />
         </mxCell>
-        <mxCell id="title" value="21 个 Skill，按当前任务组合调用" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=42;fontColor=#14213D;fontStyle=1;">
+        <mxCell id="title" value="22 个 Skill，按当前任务组合调用" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=42;fontColor=#14213D;fontStyle=1;">
           <mxGeometry as="geometry" x="60" y="80" width="1680" height="65" />
         </mxCell>
         <mxCell id="subtitle" value="主入口承担当前任务；辅助能力有实际触发条件才读取。具体协议与模板按需展开。" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=21;fontColor=#66758B;fontStyle=0;">
           <mxGeometry as="geometry" x="60" y="152" width="1680" height="40" />
         </mxCell>
-        <mxCell id="footer" value="2026-10-31 · 以工程宪法、21 个 Skill 入口与 hooks.json 为依据 · 实线：任务推进；虚线：按需引用或风险反馈" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=16;fontColor=#66758B;fontStyle=0;">
+        <mxCell id="footer" value="2026-11-02 · 以工程宪法、22 个 Skill 入口与 hooks.json 为依据 · 实线：任务推进；虚线：按需引用或风险反馈" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=16;fontColor=#66758B;fontStyle=0;">
           <mxGeometry as="geometry" x="60" y="1030" width="1680" height="30" />
         </mxCell>
         <mxCell id="routing" value="" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;rounded=1;absoluteArcSize=1;arcSize=18;fillColor=#F8FAFC;strokeColor=none;strokeWidth=2;">
@@ -280,10 +280,10 @@
         <mxCell id="delivery-icon" value="" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;shape=mxgraph.ios7.icons.document;aspect=fixed;fillColor=none;strokeColor=#0D9488;strokeWidth=2.3;">
           <mxGeometry as="geometry" x="1242" y="623" width="32" height="32" />
         </mxCell>
-        <mxCell id="delivery-title" value="验证与交付  /  2" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=26;fontColor=#0D9488;fontStyle=1;">
+        <mxCell id="delivery-title" value="验证与交付  /  3" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=26;fontColor=#0D9488;fontStyle=1;">
           <mxGeometry as="geometry" x="1290" y="618" width="430" height="43" />
         </mxCell>
-        <mxCell id="delivery-list" value="delivery-verification · 真实验证&#10;git-commit-standards · 原子提交&#10;验证输入未变时复用结果；推送独立授权" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#14213D;fontStyle=0;">
+        <mxCell id="delivery-list" value="delivery-verification · 真实验证&#10;git-commit-standards · 原子提交&#10;cross-system-handoff · 跨系统交接&#10;验证输入未变时复用结果；推送独立授权" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#14213D;fontStyle=0;">
           <mxGeometry as="geometry" x="1244" y="669" width="472" height="116" />
         </mxCell>
         <mxCell id="orchestrator" value="" vertex="1" parent="1" style="fontFamily=Microsoft YaHei;html=0;fontColor=#14213D;rounded=1;absoluteArcSize=1;arcSize=18;fillColor=#2563EB;strokeColor=none;strokeWidth=2;">
