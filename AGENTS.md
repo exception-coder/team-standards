@@ -115,7 +115,7 @@ flowchart TD
 | 初始化设计系统、评审视觉一致性或记录明确视觉偏好 | `frontend-excellence` 的对应模式；已有设计资产优先 |
 | 业务术语歧义 | `business-logic-orientation` 的术语模式 |
 | 用户要求批量清理注释或纠正规范 | `coding-standards-common` 的对应模式 |
-| 交接给其他系统、团队或 AI | `cross-system-handoff`；区分已完成与待办，只整理本次必要材料；用户明确选择及项目规则优先 |
+| 交接给其他系统、团队或 AI | `cross-system-handoff`；区分已完成与待办，末段总结交接目的、各方待办与完成标志；用户明确选择及项目规则优先 |
 | 用户要求工作汇总 | `git-commit-standards` 的工作汇总模式 |
 | 已授权实施的方案、需求、重构或源码修改 | 项目优先的 `openspec-auto` 分级；`change-readiness` 准备实施，不重复分类 |
 | 只咨询方案可行性、审查或影响 | 按问题对象探查；不自动进入实施 |
