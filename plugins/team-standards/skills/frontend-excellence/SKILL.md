@@ -1,14 +1,17 @@
 ---
 name: frontend-excellence
-description: "Build or improve production Web interfaces; review visual consistency; initialize a design system or record explicit visual preferences. Select implementation, review, or design-system mode from the request. Pure backend work and copy-only edits are excluded."
+description: "Build or improve Web/H5 interfaces; simplify forms, approvals, search, navigation and workflows that feel complex. Supports interaction design, implementation, visual review and design-system modes. Pure backend work and copy-only edits are excluded."
 ---
 
 # Frontend Excellence
 
 Goal: deliver a coherent, usable product interface with recoverable interactions and browser evidence. Shared decisions follow the [engineering constitution](../change-readiness/references/engineering-principles.md).
 
+Interaction decisions follow the [interaction constitution](references/interaction-constitution.md): users should understand the purpose, state, next action and outcome without learning the system’s internals. Prefer valid project rules and an explicitly selected project skill; reuse one task analysis, and do not claim that guidance physically deduplicates host discovery.
+
 ## Select the requested mode
 
+- **Interaction design or simplification:** for new task flows, confusing or cumbersome pages, forms, approvals, search/filter/navigation changes and interaction-changing mobile adaptations, read [interaction design mode](references/interaction-design.md). This mode stays inside this skill. Pure color/spacing/copy changes do not trigger full task analysis; backend work does not trigger this skill.
 - **Implementation:** use the criteria below for pages, interactions and reusable components. Reuse project assets and only load references needed for the current change.
 - **Visual consistency review:** read [review mode](references/review-mode.md); default to read-only findings. Review alone does not authorize redesign or code changes.
 - **Design system or preference work:** read [design-system mode](references/design-system.md). Initialize or bind Registry/Profile only when requested or required by the project; read [bootstrap](references/bootstrap.md) then. Missing Registry never blocks ordinary UI work. Record explicit preferences at their actual scope; frequency alone does not promote a team rule.
@@ -42,6 +45,7 @@ Use [delivery verification](../delivery-verification/SKILL.md#执行范围与证
 
 - Routes, features, forms or state: [architecture and state](references/architecture-and-state.md) and [DDD-lite](../architecture-ddd-lite-fullstack/SKILL.md).
 - New visual language or reusable components: [aesthetics](references/design-system-and-aesthetics.md) and [design-system](references/design-system.md).
+- User tasks, hierarchy and interaction choices: [interaction design](references/interaction-design.md); it reuses states and verification below.
 - Interaction states: [interaction and states](references/interaction-and-states.md).
 - Workspace composition: [enterprise UI cases](references/enterprise-ui-failure-patterns.md).
 - Completion evidence: [quality gates](references/quality-gates.md), especially its workspace viewport contract; visual inspection: [review checklist](references/visual-review-checklist.md).

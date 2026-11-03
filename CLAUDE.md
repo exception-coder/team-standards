@@ -8,6 +8,8 @@
 
 > 首次进入仓库或上下文缺失时读取本文件；同一作业可复用已读且仍适用的内容。团队插件只保留跨项目稳定能力；项目特有架构、路由、脚手架和拓扑规则必须由实际项目声明。
 
+前端交互以[交互宪法](plugins/team-standards/skills/frontend-excellence/references/interaction-constitution.md)为专项原则：用户任务优先，主次清晰，复杂度须有价值，反馈与恢复明确。`frontend-excellence` 的交互设计模式按需承接，不另注册同职责入口；纯样式、文案和后端任务不展开完整交互分析。项目有效规则优先，不把提示词优先级当作宿主物理去重。
+
 生产 Web UI 的重大新建或改造由 `frontend-excellence` 先明确 Page Anatomy、比较密度、移动端首个有用内容与滚动归属；业务看板由 `business-visualization-advisor` 决定是否使用图表。证据、审查与 Eval 见[企业 UI 失败模式](plugins/team-standards/skills/frontend-excellence/references/enterprise-ui-failure-patterns.md)，不把个别项目尺寸写成通用阈值。
 
 概设详设的清晰表达统一使用 [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md)：逐段试讲、复杂对象配关系图、ER 对象与模型一致、同表层级用自关联且框内保留关键字段中文说明、接口字段有中文说明、简化措辞保持语义。结构和生命周期继续遵循设计内容契约。
@@ -122,6 +124,7 @@ flowchart TD
 | Java 源码 | `java-coding-standards` |
 | Go 源码 | `go-coding-standards`；业务代码叠加 DDD-lite 的 Go 章节 |
 | LLM SDK、Agent、Prompt、工具调用或结构化模型输出 | `llm-agent-coding-standards` |
+| 页面复杂、不直观，或表单、审批、搜索、导航及移动交互优化 | `frontend-excellence` → 交互设计模式；先识别任务与决策，再选模式并复用关键路径验证 |
 | 创建、重做或显著提升生产 Web 前端 | `frontend-excellence`；视觉一致性复用 `frontend-excellence` 的设计系统模式 |
 | Web 业务图表、指标概览、管理看板创建、改造或选图评审 | `business-visualization-advisor`；先业务语义与信息设计，再视觉系统和前端实现；优化统计总览/看板时编码前形成目的—指标—图表—行动映射及选图清单，完成前反向验证业务改善 |
 | 后端表、SQL、状态、字段、事件、API、领域闭环或查询性能 | `backend-evidence` |

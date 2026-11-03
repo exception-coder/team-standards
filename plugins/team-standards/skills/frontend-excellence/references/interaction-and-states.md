@@ -2,6 +2,8 @@
 
 Use this reference when an experience can load, fail, be empty, reject input, deny access, expire, or otherwise interrupt the user's current task.
 
+Principles belong to the [interaction constitution](interaction-constitution.md); task hierarchy and pattern selection use [interaction design mode](interaction-design.md). This reference owns state and recovery details.
+
 ## Design states inside the workflow
 
 Treat a state as part of the current task, not as a decorative poster. Preserve enough surrounding context for the user to understand where they are and what the state affects.

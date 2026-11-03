@@ -18,7 +18,7 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 整套组件、工程职责域及全部节点的输入输出见 [套件全景](suite-panorama.md)；本文保留任务路由和阶段规则。
 
-21 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
+22 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
 
 ## 执行适配源码导航
 
@@ -439,3 +439,9 @@ ER 图的关键字段和中文含义须留在对象框内，完整约束放字�
 ### 跨系统交接（5.1.0）
 
 用户要求交给其他同事、系统或 AI 时，使用 [cross-system-handoff](../plugins/team-standards/skills/cross-system-handoff/SKILL.md)，核实已完成动作、发布与验收状态，只列接手方尚需完成的步骤；最后一段独立总结交接目的、谁做什么及完成标志。项目规则和用户明确选择优先，同一任务不叠加两个交接入口。个人全局副本不是项目规则；真实发现与停用方式见[共存说明](maintenance/handoff-skill.md)。
+
+### 前端交互宪法与执行模式（5.2.0）
+
+交互原则唯一维护在[交互宪法](../plugins/team-standards/skills/frontend-excellence/references/interaction-constitution.md)。`frontend-excellence` 按描述发现任务，交互设计模式识别角色/任务与核心决策，确定 P0/P1/P2，削减冗余，选择合适模式并复用状态和浏览器验证。专家建议中的 interaction-design 能力合入此入口，保持 22 个 Skill，不重复分析或注册；纯样式/文案不展开完整方法，纯后端不触发。项目有效规则优先，实际宿主去重仍是独立边界。
+
+一份原则、一个前端主入口、按需参考；不引入评分器、额外审批或分析报告。采购报价审批、样衣管理及后端负例仅用于校准规则，真实页面效果须用目标项目和等价任务数据验证，不能将规则审读当作联调通过。

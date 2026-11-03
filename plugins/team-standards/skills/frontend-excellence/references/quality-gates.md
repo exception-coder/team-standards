@@ -15,6 +15,10 @@ These are evidence requirements, not a fixed command sequence. Recheck affected 
 
 When no target sizes are supplied, use approximately 375 pixels wide for a mobile pass and 1440 pixels wide for a desktop pass, then inspect any breakpoint where composition changes.
 
+## User-task outcome checks
+
+For material interaction changes, use the six questions in [interaction design mode](interaction-design.md#关键任务验证). Compare the same role, task and equivalent data before/after where a baseline exists; record the specific reduction in comprehension, decision or operation burden while preserving necessary risk controls. Reuse the primary-route and failure checks above, not a second browser pass. Screenshots and click counts alone do not prove task success; unavailable baseline or business execution remains an explicit gap. Pure styling changes do not require a full workflow study.
+
 ## Responsive checks
 
 - For list-heavy mobile pages, inspect the initial view: primary task, search/essential filters, and first useful object. Record why any large header or navigation stack is necessary; do not use a universal pixel threshold.

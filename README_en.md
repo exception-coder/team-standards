@@ -1,5 +1,7 @@
 # team-standards
 
+**5.2.0:** Adds a single [interaction constitution](plugins/team-standards/skills/frontend-excellence/references/interaction-constitution.md) and an interaction-design mode inside `frontend-excellence`. The catalog remains at 22 skills. Task hierarchy, necessary complexity, feedback and recovery reuse existing state and browser checks; pure styling and backend work avoid full workflow analysis. Rule validation does not establish real-page usability.
+
 **5.1.1:** Handoffs end with a self-contained paragraph stating the purpose, each party’s remaining action, and completion criteria. Unknown owners are marked unassigned; completed work is not reassigned.
 
 **5.1.0:** Adds `cross-system-handoff` for actionable cross-team and AI handoffs, bringing the catalog to 22 skills. Personal and plugin copies do not automatically deduplicate; see [coexistence and migration](docs/maintenance/handoff-skill.md).
@@ -24,7 +26,7 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **5.1.1**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **5.2.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Version 4.15.3 makes the user-approved three-template style the default for subsequent architecture illustrations: a recognizable primary subject, supporting resources, consistent line icons, whitespace and semantic colors. Reuse native templates and built-in iOS7 Icons unless project conventions or explicit instructions call for another style. Standard engineering notation remains applicable. The approved source diagrams and four-page previews are unchanged; see the [default style](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格).
 

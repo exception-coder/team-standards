@@ -1,4 +1,4 @@
 interface:
   display_name: "Frontend Excellence"
-  short_description: "Build or review Web interfaces and manage project design-system modes"
+  short_description: "Design intuitive interactions, build or review Web interfaces"
   default_prompt: "Use $frontend-excellence to build a polished, responsive, production-ready frontend in the current project."
