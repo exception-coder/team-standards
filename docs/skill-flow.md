@@ -18,7 +18,7 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 整套组件、工程职责域及全部节点的输入输出见 [套件全景](suite-panorama.md)；本文保留任务路由和阶段规则。
 
-22 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
+24 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
 
 ## 执行适配源码导航
 
@@ -38,7 +38,7 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 图件验证：draw.io 31.5.3.0 原生导出两页 PNG，并逐页目视核对文字、图标和连线；XML 节点及引用检查通过。桌面自动化读取最小化窗口失败，尚未完成鼠标编辑抽查。
 
-第一页面向任务推进，第二页展开全部 21 个 Skill 与实际 Hook。实线表示任务推进，虚线表示按需引用和风险反馈；箭头不表示每个节点都启动脚本。
+图件记录 2026-11-02 的流程快照。第一页展示任务推进，第二页展示按需能力与 Hook。实线表示任务推进，虚线表示按需引用和风险反馈。现行入口见下方 Skill 文件索引。
 
 ![轻量执行主线](diagrams/team-standards-execution.png)
 
@@ -150,6 +150,8 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [business-ontology-modeling](../plugins/team-standards/skills/business-ontology-modeling/SKILL.md) | [模板](../plugins/team-standards/skills/business-ontology-modeling/assets/templates/)、[跨项目使用](../plugins/team-standards/skills/business-ontology-modeling/references/adoption.md)、[六问示例](../plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md) | Agent按问题建模与核实可回答性；不绑定数据库、工具或本体运行引擎 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | [references/](../plugins/team-standards/skills/change-readiness/references/)；[rules/](../plugins/team-standards/skills/change-readiness/rules/) | 规则编排；OpenSpec 与治理程序见下一节 |
 | [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) | references/examples.md 与 references/review-mode.md | 编写、精简和独立评审；独立评审默认只读 |
+| [database-design](../plugins/team-standards/skills/database-design/SKILL.md) | 库表概设与详设模板 | 设计数据模型、约束、访问方式和迁移，复用后端证据 |
+| [technical-implementation-design](../plugins/team-standards/skills/technical-implementation-design/SKILL.md) | 技术实现概设与详设模板 | 设计模块、契约、调用、失败恢复和验证，复用实施定位 |
 | [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 按需[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)；共用工程宪法 | 需求求真与最小充分决策；不新增阶段、固定输出或技术阶梯 |
 | [plain-writing（人话）](../plugins/team-standards/skills/plain-writing/SKILL.md) | 按需 [改写与失真反例](../plugins/team-standards/skills/plain-writing/references/examples.md) | 后置表达；保留决策与事实，不反向开启架构循环 |
 | [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) | 视图与主线在入口；按需加载视觉语言、draw.io 操作、三套原生模板、自带图标对照和验收清单 | 统一信息提炼、形象表达、绘制与实际验收；不内置绘图引擎 |
@@ -431,6 +433,10 @@ Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成�
 ER 表达按 clear-design-docs 核对模型对象、同表自关联及关联两端；逻辑对象与物理表分开，不以图中别名制造新表。
 
 ER 图的关键字段和中文含义须留在对象框内，完整约束放字段表；按 clear-design-docs 检查字段密度、关联可追溯和真实渲染。
+
+需要作出设计决策时，按[工程设计输出规则](../plugins/team-standards/skills/change-readiness/references/engineering-design-output.md)识别库表、技术实现或组合方案。依风险选择 L0–L3 的输出深度，按需使用专业模板。已有实施授权时，复用项目 OpenSpec 或 Forge 中的本期范围与验收，并把实际证据和偏差回写到所属设计或 change。
+
+正式方案开头用一张[全景图](../plugins/team-standards/skills/change-readiness/references/engineering-design-output.md#全景图与正文)说明范围和主线，优先交付可编辑 draw.io 与同源预览。组合方案共用全景图，专项图按需展开。
 
 ### 图件归属与命名（5.0.2）
 

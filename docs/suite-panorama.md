@@ -1,12 +1,12 @@
 # 团队工具套件全景：按工程职责域看链路与节点
 
-共同准则与证据分工统一归[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。5.0.0 的 21 个 Skill 入口保留专项目标、判断、必要约束和精炼反例，具体格式与操作协议按需读取。架构路径与注释 Hook 仍默认提醒。
+共同准则与证据分工统一归[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)。各 Skill 入口保留专项目标、判断、必要约束和精炼反例，具体格式与操作协议按需读取。架构路径与注释 Hook 仍默认提醒。
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
 这套工具帮助 AI 把自然语言目标转成有依据、边界明确、可验证、可交接的工程成果。它同时管理“怎样工作”和“依据什么工作”：前者是工程规范，后者是项目事实、业务知识与行为规格。
 
-本文按工程职责域组织，不要求每个任务跑完全部节点。它是导航与职责说明，执行细则仍以各 Skill、项目规则和工具契约为准。当前 team-standards 提供 21 个 Skill；任务分级入口为 openspec-auto。两页可编辑执行图及当前审查见 [执行流程](skill-flow.md#总流程)。
+本文按工程职责域组织，执行细则以各 Skill、项目规则和工具契约为准。当前 team-standards 提供 24 个 Skill，规格深度由 openspec-auto 判断。两页可编辑执行图及当前审查见 [执行流程](skill-flow.md#总流程)。
 
 需要从节点找到实际文件、理解 Skill 与程序的关系时，先看 [链路源码导航](skill-flow.md#总图节点对应哪些源码)。
 
@@ -16,7 +16,7 @@
 
 | 组件 | 在整套中扮演什么角色 | 保存或提供什么 |
 |---|---|---|
-| team-standards | 工程工作方法与质量约束 | 21 个 Skill、Hook、状态契约工具及套件维护脚本 |
+| team-standards | 工程工作方法与质量约束 | 24 个 Skill、Hook、状态契约工具及套件维护脚本 |
 | project-coding-profiles | 遗留项目编码保护 | encoding-guard、项目识别画像、逐文件编码约定与写前/提交检查 |
 | project-domain-knowledge | 业务知识内容与 MCP 查询引擎 | 经确认的术语、规则、状态语义，以及与正式知识分开的规格候选 |
 | cross-project-topology | 系统连接知识内容 | 跨项目调用、数据流、提供方/消费方和接口契约；复用知识引擎作为第二个 MCP 实例 |
@@ -71,6 +71,8 @@ flowchart TD
 | [business-ontology-modeling](../plugins/team-standards/skills/business-ontology-modeling/SKILL.md) | 代码和数据库，或真实业务问题 | 复用成熟工具提结构，交叉核实对象、关系、状态、规则及证据 | 无知识库可起步，形成模型与能力问题；已授权时分步实施与回验 |
 | [bug-doc-required](../plugins/team-standards/skills/bug-doc-required/SKILL.md) | 现象、预期、日志或失败测试 | 调查根因；有授权才做最小修复；按风险选择记录载体 | 诊断结论，或修复依据与回归结果；简单 Bug 不强制独立报告 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | 已授权变更目标、影响与项目规则 | 审视方案、分档、定位；按项目 OpenSpec 或合法兼容路径准备实施 | 设计依据、活动切片和代码坐标；进入架构与实现 |
+| [database-design](../plugins/team-standards/skills/database-design/SKILL.md) | 数据场景、访问路径、现有结构与约束 | 确定模型、物理结构、索引和演进路径 | 库表设计与迁移验收 |
+| [technical-implementation-design](../plugins/team-standards/skills/technical-implementation-design/SKILL.md) | 需求、当前代码与系统边界 | 确定模块职责、接口契约和执行链路 | 技术实现方案与可执行验收 |
 
 入口细则见 [CLAUDE 的意图规则](../CLAUDE.md#意图授权与风险)，成对请求见 [路由场景](skill-flow.md#易混淆请求的预期路由)。
 

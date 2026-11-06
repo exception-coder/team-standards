@@ -1,5 +1,9 @@
 # team-standards
 
+**5.3.0** adds [database design](plugins/team-standards/skills/database-design/SKILL.md) and [technical implementation design](plugins/team-standards/skills/technical-implementation-design/SKILL.md), each with conceptual and detailed templates. The [shared output guidance](plugins/team-standards/skills/change-readiness/references/engineering-design-output.md) scales the design to its decisions and risks. Module baselines retain their existing structure and lifecycle.
+
+Formal designs open with a short conclusion and one overview diagram, preferably with editable draw.io source and a matching preview. The text focuses on rules, trade-offs, and acceptance.
+
 **5.2.0:** Adds a single [interaction constitution](plugins/team-standards/skills/frontend-excellence/references/interaction-constitution.md) and an interaction-design mode inside `frontend-excellence`. The catalog remains at 22 skills. Task hierarchy, necessary complexity, feedback and recovery reuse existing state and browser checks; pure styling and backend work avoid full workflow analysis. Rule validation does not establish real-page usability.
 
 **5.1.1:** Handoffs end with a self-contained paragraph stating the purpose, each party’s remaining action, and completion criteria. Unknown owners are marked unassigned; completed work is not reassigned.
@@ -26,7 +30,7 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Current version: **5.2.0**. The plugin exposes 22 user-intent-level Skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.3.0** exposes 24 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Version 4.15.3 makes the user-approved three-template style the default for subsequent architecture illustrations: a recognizable primary subject, supporting resources, consistent line icons, whitespace and semantic colors. Reuse native templates and built-in iOS7 Icons unless project conventions or explicit instructions call for another style. Standard engineering notation remains applicable. The approved source diagrams and four-page previews are unchanged; see the [default style](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格).
 
@@ -52,7 +56,7 @@ The [enterprise UI failure patterns and Evals](plugins/team-standards/skills/fro
 
 Operational workspaces use the width and height allocated by their shell with explicit scroll ownership. Reading content may retain a readable maximum width. The [workspace viewport contract](plugins/team-standards/skills/frontend-excellence/references/quality-gates.md#workspace-viewport-contract) requires real-browser checks of tall, short and narrow viewports, live resizing, and sparse/overflowing content; it does not imply an automatic layout checker exists.
 
-See the [suite panorama by engineering domain](docs/suite-panorama.md) for all 22 public Skills, evidence sources, hook checkpoints, maintenance tools and end-to-end task paths.
+See the [suite panorama by engineering domain](docs/suite-panorama.md) for skills, evidence sources, hook checkpoints, maintenance tools and end-to-end task paths.
 
 Version 4.3 adds eight business overview chapters, nine sections per detailed function, stable function IDs, specification/evidence links, delivery states and named content reviews. Existing bindings remain compatible through gradual adoption. Machine coverage does not establish business correctness; see the [content contract and garment-sample examples](plugins/team-standards/skills/change-readiness/references/design-output-contract.md) and [checker protocol](plugins/team-standards/skills/change-readiness/references/design-content-governance.md).
 
@@ -98,7 +102,7 @@ The main consolidated entry points are:
 - `business-visualization-advisor`: business-object and lifecycle driven metrics, insights, chart selection, and dashboard information design. Management dashboards connect targets, gaps, evidence-backed breakdowns, and actionable details.
 - `frontend-excellence`: UI implementation, responsive interactions, accessibility, and real-browser verification. It routes business charts to the advisor; its design-system mode owns visual consistency. Ordinary pages do not load the full chart workflow. Dashboard and statistical-overview optimization requires explicit users, discovery goals, actions and first-screen questions, plus purpose–metric–visualization–action mappings and a visible candidate/decision list before coding, a rationale when charts remain unchanged, and delivery that distinguishes information architecture, visualization changes, and interactions. Preview limitations must be disclosed. Completion requires evidence of improved decision-making, insights, comparisons, issue localization or drill-down, verified against business goals; cosmetic changes alone do not qualify.
 
-See [README.md](README.md) for the complete 22-Skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+See [README.md](README.md) for the complete 24-skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
 
 ## Bug records
 

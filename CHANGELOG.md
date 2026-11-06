@@ -1,5 +1,11 @@
 # Changelog
 
+## [5.3.0] - 2026-11-06
+
+- Add database design and technical implementation design as separate skills, with a conceptual and detailed template for each.
+- Route by design subject and choose output depth from the decision and risk. Reuse existing module baselines, project execution workflows, and verification evidence.
+- Open formal designs with an overview diagram, preferring editable draw.io source and a matching preview. Keep the body focused on rules, decisions, risks, and acceptance.
+
 ## [5.0.0] - 2026-10-31
 
 - Consolidate 23 public Skill entries into 21: move independent design review into `clear-design-docs`, and design-system review/bootstrap/preferences into `frontend-excellence`. Retired names are no longer registered; update explicit project invocations.
