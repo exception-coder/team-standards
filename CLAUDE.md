@@ -28,7 +28,7 @@
 
 ## 工程使命
 
-以最小复杂度，持续交付可靠、可维护的软件。[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护共同准则与证据分工。25 个 Skill 入口聚焦目标、专项判断、必要约束和精炼反例；格式、命令与采用条件保留在所属参考，按需读取。固定结构只服务实际契约，不把这些段落当作用户回复模板；安全、权限、数据完整性和项目明确采用的质量要求继续适用。
+以最小复杂度，持续交付可靠、可维护的软件。[工程宪法](plugins/team-standards/skills/change-readiness/references/engineering-principles.md)统一维护共同准则与证据分工。26 个 Skill 入口聚焦目标、专项判断、必要约束和精炼反例；格式、命令与采用条件保留在所属参考，按需读取。固定结构只服务实际契约，不把这些段落当作用户回复模板；安全、权限、数据完整性和项目明确采用的质量要求继续适用。
 
 ## 分层维护入口
 
@@ -71,7 +71,7 @@ flowchart TD
 2. `bug-doc-required` 是 Bug 唯一入口，覆盖证据、根因、最小修复和回归；未获修复授权时只调查。简单 Bug 不另建报告，复杂或高风险问题复用唯一持久记录，图表和独立报告按需生成。
 3. `backend-evidence` 是单服务后端证据唯一入口；代码事实和反向影响使用 Graphify 即时查询，不维护第二套手工索引。
 4. `markdown-writing-standards` 维护唯一文档归属、Markdown/Mermaid 结构与受影响的已有导航。
-5. `init-project-docs` 在当前目录幂等初始化六层 AI 工程入口、`.graphifyignore` 与 Graphify Git 共享边界，并覆盖通用项目 onboarding 与上下文状态；不生成平行事实投影。
+5. `init-project-docs` 默认补缺失入口、复用现有业务文档，从关键代码整理主要能力、流程和规则并标待确认，交付一张 draw.io 全景图与同源预览；仅 structure 模式只补入口，Graphify/OpenSpec 按需启用。
 6. 小改按风险缩短流程，但不得跳过通用编码规范；项目专属规则由项目内 Skill 或 `AGENTS.md` 叠加。
 7. Graphify 提供带新鲜度边界的当前实现事实，OpenSpec 提供项目行为规格与活动变更；Skill 提供意图路由与质量引导，不复制图谱或建立平行规格。
 8. OpenSpec 文档按阶段准出和当前切片推进；change-readiness 维护概设详设、评审意见及交接，delivery-verification 提供真实验证。共享治理检查器检查绑定、范围、视图及证据新鲜度，仅由明确采用治理的项目按需运行，插件默认不注册此检查；同步归档仍使用官方 OpenSpec。
@@ -221,9 +221,9 @@ flowchart TD
 | `skills/clear-design-docs/references/examples.md` | `clear-design-docs` | 对象关系、规则拆分与术语替换反例 |
 | `skills/architecture-diagram-design/assets/templates/`、`references/` | `architecture-diagram-design` | 三套 draw.io 模板、自带图标对照、视觉主次、格式操作及四案例轻量验收；自建图标仅备用 |
 | `skills/init-project-docs/references/` | `init-project-docs` | onboarding、权威来源刷新与可选轻量画像流程 |
-| `skills/init-project-docs/references/initialization-output.md` | `init-project-docs` | structure/init 的完整初始化清单、保留策略和不生成边界 |
+| `skills/init-project-docs/references/initialization-output.md` | `init-project-docs` | 默认业务知识与全景图、结构脚本的入口清单、保留策略和完成边界 |
 | `skills/init-project-docs/onboard-pipeline.mjs` | `init-project-docs` | 九阶段可续跑状态与关卡脚本 |
-| `skills/init-project-docs/init-ai-structure.mjs` | `init-project-docs` | 当前目录六层 AI 工程结构的 plan/apply/status 初始化器 |
+| `skills/init-project-docs/init-ai-structure.mjs` | `init-project-docs` | 当前目录缺失入口的 plan/apply/status 初始化器；业务整理由 Agent 继续完成 |
 | `skills/init-project-docs/assets/project-ai-structure/` | `init-project-docs` | 写入目标项目的最小 Agent、Docs 与 OpenSpec 模板 |
 
 ## 插件维护规则
@@ -263,4 +263,4 @@ init-project-docs 将业务知识留在所属项目现有文档或 docs/domain�
 
 ## 业务知识自动维护
 
-新增 `business-knowledge-maintenance`，见 [业务知识维护](plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认仅补 Agent 与文档索引，OpenSpec/Graphify 显式按需启用；RAG 索引未来可重建，不增加维护副本。
+新增 `business-knowledge-maintenance`，见 [业务知识维护](plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认整理现有业务知识，复用文档、从代码补缺并标待确认，交付一张 draw.io 全景图及同源预览；结构脚本只负责补入口。后续随业务语义变化原位维护正文与图，OpenSpec/Graphify 按需，RAG 索引可重建。

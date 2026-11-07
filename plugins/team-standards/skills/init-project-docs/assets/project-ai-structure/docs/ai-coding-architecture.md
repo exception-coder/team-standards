@@ -2,7 +2,7 @@
 
 本规范定义 Agent 如何在项目规则、长期知识、行为规格、代码事实、执行能力和实现代码之间选择上下文。六层是职责模型，不要求每层都复制为同名目录。
 
-## 目录速览
+## 完整接入的可选目录
 
 ```text
 {{PROJECT_NAME}}/
@@ -25,7 +25,9 @@
 └── source and tests              最终实现与验证证据
 ```
 
-不提前创建空的项目 Skill、领域、设计、决策或规格目录。初始化脚本只创建 `.graphifyignore` 和 `.gitignore` 共享边界；`graphify-out/` 及其内容由 Graphify 生成，不由初始化脚本伪造。
+默认结构脚本仅补 `AGENTS.md`、`CLAUDE.md` 和 `docs/INDEX.md`；Agent 继续整理现有业务知识，从代码补缺并标待确认，复用或创建一张 draw.io 全景图及同源预览。正文优先沿用现有位置，无概览时用 `docs/domain/overview.md`，图件无约定时用 `docs/diagrams/`。
+
+上图 OpenSpec、Graphify 与完整架构入口按明确采用情况补齐，不提前创建空的项目 Skill、设计或规格目录。启用 Graphify 入口时脚本才创建 `.graphifyignore` 和 `.gitignore` 共享边界；`graphify-out/` 由 Graphify 按需生成。业务正文、源图与预览随相关语义变化一起维护，图谱不是另一份手工知识。
 
 ---
 

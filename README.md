@@ -1,6 +1,6 @@
 # team-standards
 
-**5.5.1** 业务知识随项目维护：init-project-docs 默认使用项目现有文档或 docs/domain；不依赖集中 Domain Knowledge，跨项目仅引用。
+**5.6.0** 初始化默认整理现有业务知识：复用文档，从代码补缺并标待确认，配一张 draw.io 全景图及预览；正文与图随项目维护，不依赖集中知识仓。
 
 **5.4.3** 页面计划 Excel 默认使用紧凑缩略图，点击图片或“查看大图”进入工作簿内的对应大图页，配返回清单入口；验证图片点击、定位和大图可读性。
 
@@ -53,7 +53,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.5.1**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.6.0**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -160,7 +160,7 @@ flowchart TD
 | 前端设计 | `frontend-excellence` | 生产 Web 前端交互设计、实施、视觉评审、设计系统与偏好模式；按任务和范围浏览器验收 |
 | 知识文档 | `backend-evidence` | 单服务数据事实、Graphify 即时影响、领域规格与查询性能 |
 | 知识文档 | `markdown-writing-standards` | 写前查重、Markdown/Mermaid 和写后索引 |
-| 知识文档 | `init-project-docs` | 在当前目录幂等初始化 Agent、文档索引、OpenSpec、`.graphifyignore` 与 Graphify Git 共享边界，再编排上下文状态 |
+| 知识文档 | `init-project-docs` | 补缺失入口，复用现有业务文档、从代码补缺并标待确认，交付一张 draw.io 全景图；Graphify/OpenSpec 按需 |
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，按影响验证并如实报告通过、失败或未验证 |
 | 日志交付 | `git-commit-standards` | 按最小完整逻辑单元实现、验证、提交；正文讲清原问题、关键做法与实际结果，独立判断 push |
 
@@ -359,4 +359,4 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 
 ## 业务知识自动维护
 
-新增 [business-knowledge-maintenance](plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认仅补 Agent 与文档索引，OpenSpec/Graphify 显式按需启用；RAG 索引未来可重建，不增加维护副本。
+新增 [business-knowledge-maintenance](plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认整理现有业务知识，复用文档、从代码补缺并标待确认，交付一张 draw.io 全景图及同源预览；结构脚本只负责补入口。后续随业务语义变化原位维护正文与图，OpenSpec/Graphify 按需，RAG 索引可重建。

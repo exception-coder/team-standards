@@ -274,7 +274,7 @@ hooks/check-openspec-governance.js                    宿主事件入口
 | `backend-evidence` | 领域规格 | 状态密集业务缺少不变量、终态或下一动作证据 |
 | `markdown-writing-standards` | 文档同步 / 写前 / 写中 / 写后 | 套件或项目更新核对文档影响，唯一归属、结构与 Mermaid、必要已有链接 |
 | `git-commit-standards` | 完成收尾 / 提交 | 文档和验证完成后自动提交本次范围；独立判断推送授权 |
-| `init-project-docs` | structure / onboard / init / refresh / status / profile | 当前目录 Agent/Docs/OpenSpec 入口、Graphify 输入与 Git 共享边界、九阶段接入、增量刷新、状态或可选画像 |
+| `init-project-docs` | structure / onboard / init / refresh / status / profile | 默认整理主要业务知识与 draw.io 全景图，补入口；只读状态、结构限定、可选工具及增量维护分别处理 |
 | `delivery-verification` | completion | 可执行改动完成后、最终回复前调用 Forge 并检查最新 PASS 证据 |
 
 ---
@@ -376,7 +376,7 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 | 上轮已要求修复，本轮补充报错日志 | 继续原修复任务 | 不把最新短句视作撤销已有授权 |
 | 分析怎么重构 / 按方案重构 | 前者方案探查，后者 change-readiness / 纯重构 | 实施才进入设计生命周期，回归支持行为保持 |
 | 为什么 SQL 慢 / 优化 SQL | 前者后端探查，后者演进；已知性能退化归修复 | 查询负载与数据访问风险独立评估 |
-| 检查接入状态 / 初始化项目 | init-project-docs / status 或 init | status 不写入修复，init 仅改约定基线 |
+| 检查接入状态 / 初始化项目 | init-project-docs / status 或 onboard | status 只读；默认 onboard 整理业务知识与全景图，只有明确 structure 才仅补入口 |
 | 查线上订单金额不一致 | bug-doc-required 调查 + backend-evidence | 不将只读等同低风险，不默认授权修数据 |
 | 只更新 README / 提交已完成改动 | markdown-writing-standards / git-commit-standards | 直接进入专门动作，不新增需求生命周期 |
 | 已授权修复但发现需删除生产数据 | 继续安全调查，补齐具体操作授权 | 修复授权不自动覆盖破坏性数据操作 |
@@ -394,19 +394,17 @@ change-readiness → backend-evidence / business-logic-orientation → delivery-
 
 实际源码：文档规则见上方 references 表；旧 `hooks/check-ai-doc-location.js` 仅兼容旧宿主调用，当前 dispatcher 不再加载。`hooks/governance/evidence.js` 接受可选 dedup/handoff、无需正文的不适用视图及原始验证文件；`service.js` 执行策略版本迁移、范围和新鲜度检查。升级步骤见 [治理协议](../plugins/team-standards/skills/change-readiness/references/governance-checker.md#6-策略版本与升级)。
 
-## 项目知识候选链路与源码
+## 项目业务知识接入与维护
 
-项目接入后先消费已有 MCP 上下文，缺口或已授权初始化才进入探索。初始化以各项目 Graphify 导航，源码核验后起草候选；不把代码事实直接提升成业务规则。
+默认初始化复用现有文档，从关键代码补齐主要能力、主流程和规则，推断标待确认；交付一张 draw.io 全景图与同源预览。项目正文是唯一维护来源，代码图谱与检索索引按需派生。
 
-| 环节 | 套件中的源码 | 输出与约束 |
+| 环节 | 当前入口 | 输出与约束 |
 |---|---|---|
-| 模块候选 | `project-domain-knowledge/scripts/lib/module-bootstrap.mjs`、`graphify-input.mjs` | 模块节点、关联、源码指纹与覆盖缺口；图谱新鲜度未经证明为 unknown |
-| 业务挖掘 | `project-domain-knowledge/scripts/spec-mining.mjs` | 现有候选与评审；accepted 当前证据版本仅晋升 draft |
-| 拓扑候选 | `project-domain-knowledge/scripts/lib/topology-candidates.mjs` | 双方项目、环境、协议和契约唯一匹配；缺失/多义保留 unresolved |
-| 证据核对 | `project-domain-knowledge/src/evidence-provenance.ts`、`scripts/evidence-check.mjs` | 捕获文件字节指纹变化为 stale；不改变业务 stability |
-| 按任务消费 | `project-domain-knowledge/src/consult-evidence.ts`、`src/topology-candidates.ts` | MCP 返回有限摘要、缺口与新鲜度，Agent 只补查相关部分 |
-
-格式与执行命令统一维护在 [知识引擎 README](../../project-domain-knowledge/README.md#项目图谱到候选知识的闭环)。文件指纹不涵盖新增文件和外部系统变化；Graphify 不可用允许模块扫描降级。CI、Semgrep、OTel 的各业务项目接入按需实施，不宣称已自动覆盖全部项目。
+| 补项目入口 | init-project-docs/init-ai-structure.mjs | 保留已有文件；结构 status 不代表业务整理完成 |
+| 整理业务知识 | init-project-docs/references/onboard-workflow.md | 复用原文，从代码补缺，给出来源、冲突与待确认项 |
+| 全景图 | architecture-diagram-design | 一张可编辑 draw.io 图与同源预览，嵌入概览并实际检查 |
+| 后续维护 | business-knowledge-maintenance、init-project-docs/references/update-workflow.md | 业务语义变化时原位更新正文与受影响图件，不维护副本 |
+| 跨项目关系 | 独立 cross-project-topology | 仅连接与所属项目来源引用，不依赖 Domain Knowledge |
 
 ## Go 编码链路
 
@@ -461,4 +459,4 @@ init-project-docs 将业务知识留在所属项目现有文档或 docs/domain�
 
 ## 业务知识自动维护
 
-新增 [business-knowledge-maintenance](../plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认仅补 Agent 与文档索引，OpenSpec/Graphify 显式按需启用；RAG 索引未来可重建，不增加维护副本。
+新增 [business-knowledge-maintenance](../plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认整理现有业务知识，复用文档、从代码补缺并标待确认，交付一张 draw.io 全景图及同源预览；结构脚本只负责补入口。后续随业务语义变化原位维护正文与图，OpenSpec/Graphify 按需，RAG 索引可重建。
