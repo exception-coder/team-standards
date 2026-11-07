@@ -1,5 +1,7 @@
 # team-standards
 
+**5.4.4** adds a persisted-fields column to page delivery plans. List the business data each feature saves, reuses, or calculates; mark schema coverage as unverified until checked against actual structures. Keep one row per feature without expanding into a full data dictionary.
+
 **5.4.3** keeps the Excel feature list compact with thumbnails. Click an image or its link to open a matching full-size view inside the workbook, then return to the list. Verify navigation, positioning, and readability.
 
 **5.4.2** embeds readable prototype images directly beside each feature in Excel. Use multi-row blocks when needed and show related states side by side; external image links are supplementary.
@@ -38,7 +40,7 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.4.3** exposes 25 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.4.4** exposes 25 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Version 4.15.3 makes the user-approved three-template style the default for subsequent architecture illustrations: a recognizable primary subject, supporting resources, consistent line icons, whitespace and semantic colors. Reuse native templates and built-in iOS7 Icons unless project conventions or explicit instructions call for another style. Standard engineering notation remains applicable. The approved source diagrams and four-page previews are unchanged; see the [default style](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格).
 
