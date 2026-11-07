@@ -18,7 +18,7 @@ OpenSpec 文档推进由 change-readiness 的 [生命周期参考](../plugins/te
 
 整套组件、工程职责域及全部节点的输入输出见 [套件全景](suite-panorama.md)；本文保留任务路由和阶段规则。
 
-24 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
+25 个 Skill 的共同准则与证据分工统一引用[工程宪法](../plugins/team-standards/skills/change-readiness/references/engineering-principles.md)，入口保留专项判断、必要约束及精炼反例，参考承接具体格式和操作合同。功能名代替目标或方案未定时，由[悟道](../plugins/team-standards/skills/architecture-reasoning/SKILL.md)核实结果、约束与最小充分方案，再按实际影响推进。入口结构不是用户回复模板；[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)用于校准判断。
 
 ## 执行适配源码导航
 
@@ -152,6 +152,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) | references/examples.md 与 references/review-mode.md | 编写、精简和独立评审；独立评审默认只读 |
 | [database-design](../plugins/team-standards/skills/database-design/SKILL.md) | 库表概设与详设模板 | 设计数据模型、约束、访问方式和迁移，复用后端证据 |
 | [technical-implementation-design](../plugins/team-standards/skills/technical-implementation-design/SKILL.md) | 技术实现概设与详设模板 | 设计模块、契约、调用、失败恢复和验证，复用实施定位 |
+| [page-delivery-plan](../plugins/team-standards/skills/page-delivery-plan/SKILL.md) | 计划模板、执行与多视图规则 | 页面功能清单、批次与依赖、验收和续接，复用现有主清单 |
 | [architecture-reasoning（悟道）](../plugins/team-standards/skills/architecture-reasoning/SKILL.md) | 按需[条件与反例](../plugins/team-standards/skills/architecture-reasoning/references/examples.md)；共用工程宪法 | 需求求真与最小充分决策；不新增阶段、固定输出或技术阶梯 |
 | [plain-writing（人话）](../plugins/team-standards/skills/plain-writing/SKILL.md) | 按需 [改写与失真反例](../plugins/team-standards/skills/plain-writing/references/examples.md) | 后置表达；保留决策与事实，不反向开启架构循环 |
 | [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) | 视图与主线在入口；按需加载视觉语言、draw.io 操作、三套原生模板、自带图标对照和验收清单 | 统一信息提炼、形象表达、绘制与实际验收；不内置绘图引擎 |
@@ -437,6 +438,8 @@ ER 图的关键字段和中文含义须留在对象框内，完整约束放字�
 需要作出设计决策时，按[工程设计输出规则](../plugins/team-standards/skills/change-readiness/references/engineering-design-output.md)识别库表、技术实现或组合方案。依风险选择 L0–L3 的输出深度，按需使用专业模板。已有实施授权时，复用项目 OpenSpec 或 Forge 中的本期范围与验收，并把实际证据和偏差回写到所属设计或 change。
 
 正式方案开头用一张[全景图](../plugins/team-standards/skills/change-readiness/references/engineering-design-output.md#全景图与正文)说明范围和主线，优先交付可编辑 draw.io 与同源预览。组合方案共用全景图，专项图按需展开。
+
+开发交付计划由 [page-delivery-plan](../plugins/team-standards/skills/page-delivery-plan/SKILL.md)承接。需求或原型先映射角色、页面和用户结果，再按依赖编排交付批次，当前批次细化验收。已授权实施经 change-readiness 推进，delivery-verification 的实际结果回写同一主清单。正式计划配 draw.io 全景图，Excel 按需导出，状态和证据沿功能 ID 关联。
 
 ### 图件归属与命名（5.0.2）
 

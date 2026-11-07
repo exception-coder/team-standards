@@ -1,5 +1,7 @@
 # team-standards
 
+**5.4.0** 新增[页面功能交付计划](plugins/team-standards/skills/page-delivery-plan/SKILL.md)，将需求、原型或已有页面组织成全景图、功能清单和当前批次执行验收。支持人和 AI 按依赖续接，主清单复用项目已有任务，Excel 按需导出。
+
 **5.3.0** 新增[库表设计](plugins/team-standards/skills/database-design/SKILL.md)和[技术实现设计](plugins/team-standards/skills/technical-implementation-design/SKILL.md)，各提供概设、详设模板。按[工程设计输出规则](plugins/team-standards/skills/change-readiness/references/engineering-design-output.md)选择范围和深度，小改可简述，存量、兼容和恢复风险按需展开。专项方案可直接用于交接，进入模块长期基线时沿用现有目录和生命周期。
 
 正式方案开头用简短结论和一张全景图说明范围与主线。优先交付可编辑 draw.io 和同源预览，正文集中写规则、取舍和验收。
@@ -43,7 +45,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.3.0**，共 24 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.4.0**，共 25 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -134,6 +136,7 @@ flowchart TD
 | 分析设计 | `clear-design-docs` | 编写、精简与独立评审设计；清晰表达、关系图、中文字段与语义核对 |
 | 分析设计 | `database-design` | 数据所有权、模型、约束、访问场景、索引与可验证的迁移 |
 | 分析设计 | `technical-implementation-design` | 模块职责、接口契约、执行流程、失败恢复与交付验证 |
+| 交付计划 | `page-delivery-plan` | 页面与用户结果、批次依赖、执行验收与人/AI 续接 |
 | 分析设计 | `architecture-diagram-design` | 架构可视化：L1/L2/L3、统一图形与配色、三套可编辑 draw.io 模板及轻量验收 |
 | 任务分级 | `openspec-auto` | 项目版本优先；L1 直接开发、L2 轻量计划、L3 项目 OpenSpec；高风险强制升级 |
 | 分析设计 | `change-readiness` | 沿用任务分级，核实实施依据与设计影响；需要 OpenSpec 时匹配或创建 change，不重复分类和初始化 |

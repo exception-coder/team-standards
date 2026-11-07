@@ -14,6 +14,7 @@ description: "Guide implementation preparation: understand the existing behavior
 - 明确当前目标和已确认约束，定位入口、关键条件、依赖与测试；Graphify 或工具不可用时用定向源码补齐。
 - 规格、概设和详设分别按实际影响维护。已有设计原位更新，缺失只补本次所需部分；行为保持不建空 change。
 - 遇到需要设计的库表或技术实现问题，按[工程设计输出规则](references/engineering-design-output.md)选择专项入口和输出深度，复用已核实的风险与现有正文。
+- 从页面功能计划进入实施时，复用 [page-delivery-plan](../page-delivery-plan/SKILL.md) 的功能编号、依赖和验收，按最新主清单推进当前已授权条目。
 - L3 或项目明确要求 OpenSpec 时按现有生命周期维护增量；设计中的目标与已验证能力分别记录。
 
 ## 必要约束与完成边界

@@ -1,5 +1,7 @@
 # team-standards
 
+**5.4.0** adds [page delivery planning](plugins/team-standards/skills/page-delivery-plan/SKILL.md). It organizes requirements, prototypes, and existing pages into an overview diagram, a feature list, and execution and acceptance details for the current delivery batch. People and AI continue from the same authoritative tasks, with optional Excel exports.
+
 **5.3.0** adds [database design](plugins/team-standards/skills/database-design/SKILL.md) and [technical implementation design](plugins/team-standards/skills/technical-implementation-design/SKILL.md), each with conceptual and detailed templates. The [shared output guidance](plugins/team-standards/skills/change-readiness/references/engineering-design-output.md) scales the design to its decisions and risks. Module baselines retain their existing structure and lifecycle.
 
 Formal designs open with a short conclusion and one overview diagram, preferably with editable draw.io source and a matching preview. The text focuses on rules, trade-offs, and acceptance.
@@ -30,7 +32,7 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.3.0** exposes 24 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.4.0** exposes 25 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Version 4.15.3 makes the user-approved three-template style the default for subsequent architecture illustrations: a recognizable primary subject, supporting resources, consistent line icons, whitespace and semantic colors. Reuse native templates and built-in iOS7 Icons unless project conventions or explicit instructions call for another style. Standard engineering notation remains applicable. The approved source diagrams and four-page previews are unchanged; see the [default style](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格).
 
@@ -102,7 +104,7 @@ The main consolidated entry points are:
 - `business-visualization-advisor`: business-object and lifecycle driven metrics, insights, chart selection, and dashboard information design. Management dashboards connect targets, gaps, evidence-backed breakdowns, and actionable details.
 - `frontend-excellence`: UI implementation, responsive interactions, accessibility, and real-browser verification. It routes business charts to the advisor; its design-system mode owns visual consistency. Ordinary pages do not load the full chart workflow. Dashboard and statistical-overview optimization requires explicit users, discovery goals, actions and first-screen questions, plus purpose–metric–visualization–action mappings and a visible candidate/decision list before coding, a rationale when charts remain unchanged, and delivery that distinguishes information architecture, visualization changes, and interactions. Preview limitations must be disclosed. Completion requires evidence of improved decision-making, insights, comparisons, issue localization or drill-down, verified against business goals; cosmetic changes alone do not qualify.
 
-See [README.md](README.md) for the complete 24-skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
+See [README.md](README.md) for the complete 25-skill catalog and [docs/skill-flow.md](docs/skill-flow.md) for routing details.
 
 ## Bug records
 

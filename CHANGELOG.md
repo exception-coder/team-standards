@@ -1,5 +1,10 @@
 # Changelog
 
+## [5.4.0] - 2026-11-07
+
+- Add page-delivery-plan with a reusable plan template and execution guidance for people and AI. Organize user outcomes by page and schedule delivery batches through explicit dependencies and acceptance criteria.
+- Reuse the project's authoritative task list, connect the overview diagram through stable feature IDs, and provide Excel exports when requested. Track real validation and handoff state.
+
 ## [5.3.0] - 2026-11-06
 
 - Add database design and technical implementation design as separate skills, with a conceptual and detailed template for each.
