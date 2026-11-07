@@ -37,10 +37,15 @@ test('opt-in hook metrics contain only the approved minimal fields', () => {
 function runDispatcher(extraEnvironment) {
   return spawnSync(process.execPath, [dispatcher], {
     encoding: 'utf8',
-    input: JSON.stringify({ tool_name: 'noop', tool_input: {} }),
+    input: JSON.stringify({ tool_name: 'Edit', tool_input: {
+      file_path: path.join(extraEnvironment.TEAM_STANDARDS_HOOK_METRICS_DIR, 'example.js'),
+      old_string: 'const value = 1;', new_string: 'const value = 2;',
+    } }),
     env: {
       ...process.env,
       TEAM_STANDARDS_SPEC_RESOLUTION_HOOK: 'off',
+      TEAM_STANDARDS_HOOK_METRICS: 'off',
+      TEAM_STANDARDS_COMMENT_HOOK: 'warn',
       TEAM_STANDARDS_CHANGE_READINESS_HOOK: 'off',
       TEAM_STANDARDS_ARCH_BOUNDARY_HOOK: 'off',
       TEAM_STANDARDS_BACKEND_EVIDENCE_HOOK: 'off',

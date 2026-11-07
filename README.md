@@ -1,6 +1,6 @@
 # team-standards
 
-**5.5.0** 业务知识随项目维护：init-project-docs 默认使用项目现有文档或 docs/domain；不依赖集中 Domain Knowledge，跨项目仅引用。
+**5.5.1** 业务知识随项目维护：init-project-docs 默认使用项目现有文档或 docs/domain；不依赖集中 Domain Knowledge，跨项目仅引用。
 
 **5.4.3** 页面计划 Excel 默认使用紧凑缩略图，点击图片或“查看大图”进入工作簿内的对应大图页，配返回清单入口；验证图片点击、定位和大图可读性。
 
@@ -53,7 +53,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.5.0**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.5.1**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
