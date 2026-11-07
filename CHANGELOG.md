@@ -1,5 +1,10 @@
 # Changelog
 
+## [5.6.1] - 2026-11-07
+
+- Add project meeting mode to clear-design-docs: business blocks pair real prototype screenshots with editable draw.io logic or sequence diagrams, short explanations and local discussion points.
+- Route meeting requests from the existing design and page-plan entries. Preserve source-document traceability, distinguish old prototypes from proposed changes, and verify source-derived previews without adding a new Skill or approval workflow.
+
 ## [5.4.0] - 2026-11-07
 
 - Add page-delivery-plan with a reusable plan template and execution guidance for people and AI. Organize user outcomes by page and schedule delivery batches through explicit dependencies and acceptance criteria.
