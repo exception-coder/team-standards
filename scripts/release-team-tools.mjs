@@ -20,7 +20,6 @@ const plugins = [
   plugin('project-coding-profiles', 'project-coding-profiles'),
   plugin('yoooni-daily-plugin', 'yoooni-daily-plugin'),
 ];
-const domainRepository = path.join(workspace, 'project-domain-knowledge');
 const topologyRepository = path.join(workspace, 'cross-project-topology');
 
 assertOutputDirectory(output);
@@ -61,11 +60,9 @@ function validateWorkspaceContracts() {
 }
 
 function validateKnowledgeRepositories() {
-  assertDirectory(domainRepository);
-  assertDirectory(path.join(domainRepository, 'knowledge'));
   assertDirectory(path.join(topologyRepository, 'knowledge'));
-  assertFile(path.join(domainRepository, 'package.json'));
-  assertFile(path.join(domainRepository, 'scripts', 'knowledge-health.mjs'));
+  assertFile(path.join(topologyRepository, 'package.json'));
+  assertFile(path.join(topologyRepository, 'scripts', 'knowledge-health.mjs'));
 }
 
 function validatePluginMetadata(item) {
@@ -113,14 +110,9 @@ function runRepositoryTests() {
     run(process.execPath, [path.join(plugin.repositoryRoot, 'scripts', 'check-runtime-version-bump.js'), '--base', 'HEAD'], plugin.repositoryRoot);
   }
 
-  runNpm(['test'], domainRepository);
-  runNpm(['run', 'smoke'], domainRepository);
-  run(process.execPath, [path.join(domainRepository, 'scripts', 'knowledge-health.mjs')], domainRepository);
-  run(process.execPath, [path.join(domainRepository, 'scripts', 'knowledge-health.mjs'), '--knowledge', path.join(topologyRepository, 'knowledge')], domainRepository);
-  run(process.execPath, [path.join(domainRepository, 'scripts', 'smoke.mjs')], domainRepository, {
-    DOMAIN_KB_DIR: path.join(topologyRepository, 'knowledge'),
-    DOMAIN_SMOKE_QUERY: 'SRM',
-  });
+  runNpm(['test'], topologyRepository);
+  runNpm(['run', 'smoke'], topologyRepository);
+  runNpm(['run', 'health'], topologyRepository);
 
   if (process.platform === 'win32') {
     const daily = plugins[2];

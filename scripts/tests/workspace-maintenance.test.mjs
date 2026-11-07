@@ -120,14 +120,14 @@ const components = [
 ];
 const overview = '# Suite\n\n[21 个工程治理 Skill](#21-个工程治理-skill)\n' +
   components.map(({ name }) => `| \`${name}\` | \`0.0.0\` | summary |`).join('\n') +
-  '\n| `project-domain-knowledge` | `0.0.0` | MCP |\n公共层合计 **24 个 Skill**：旧摘要。\n\nUser prose stays.\n';
+  '\n| `cross-project-topology` | `0.0.0` | MCP |\n公共层合计 **24 个 Skill**：旧摘要。\n\nUser prose stays.\n';
 
 test('overview updates versions/counts/anchors, preserves prose, and is idempotent', () => {
   const output = renderOverview(overview, components, '0.5.0');
   assert.match(output, /\*\*19 个 Skill\*\*/);
   assert.match(output, /#16-个工程治理-skill/);
   assert.match(output, /`team-standards` \| `9.0.0`/);
-  assert.match(output, /`project-domain-knowledge` \| `0.5.0`/);
+  assert.match(output, /`cross-project-topology` \| `0.5.0`/);
   assert.ok(output.endsWith('User prose stays.\n'));
   assert.equal(renderOverview(output, components, '0.5.0'), output);
   assert.throws(() => renderOverview(overview + overview, components, '0.5.0'), /expected one/);
@@ -154,7 +154,7 @@ test('overview CLI detects drift, writes explicitly, and preserves the root READ
     write(root, `${name}/.claude-plugin/marketplace.json`, JSON.stringify({ plugins: [{ name, version }] }));
     write(root, `${name}/plugins/${name}/skills/only/SKILL.md`, 'skill');
   }
-  write(root, 'project-domain-knowledge/package.json', JSON.stringify({ version: '0.5.0' }));
+  write(root, 'cross-project-topology/package.json', JSON.stringify({ version: '0.5.0' }));
   write(root, 'README.md', overview);
   const run = (...args) => spawnSync(process.execPath, [path.join(repository, 'scripts/sync-workspace-overview.mjs'), '--workspace', root, ...args], { encoding: 'utf8' });
   assert.notEqual(run().status, 0);

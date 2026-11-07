@@ -11,7 +11,8 @@ description: "Internal implementation-orientation rules loaded by change-readine
 
 ## 定位步骤
 
-1. **确定来源。** 使用当前会话已验证的诊断坐标、新鲜 Graphify、相关 OpenSpec change 或已有设计/问题记录。设计依据仍由 change-readiness 决定；会话坐标不能绕过 OpenSpec 或设计要求。
+1. **确定来源。** 使用当前会话已验证坐标、定向搜索/LSP/Git、相关 OpenSpec change 或已有设计/问题记录。设计依据仍由 change-readiness 决定；会话坐标不能绕过 OpenSpec 或设计要求。
+复杂关系可选用已有 Graphify，不因缺图先建图。
 2. **检查新鲜度。** 对照 Git HEAD 和工作区改动，确认坐标指向当前实现。行号只用于导航，代码可能移动；以真实文件和符号为准，不能凭记忆填写。
 3. **补齐必要缺口。** 已有可靠坐标时直接读取目标附近代码；缺失、过期或引用不符时用定向搜索补齐，不重复扫描整库。按项目语言引用函数、组件或配置，不强制使用 Java 全类名。
 4. **核对修改边界。** 确认入口、受影响调用方、关键条件和相关测试。涉及后端事实时按 backend-evidence 取证，不把代码推断当成数据库或业务真理。

@@ -454,3 +454,11 @@ ER 图的关键字段和中文含义须留在对象框内，完整约束放字�
 交互原则唯一维护在[交互宪法](../plugins/team-standards/skills/frontend-excellence/references/interaction-constitution.md)。`frontend-excellence` 按描述发现任务，交互设计模式识别角色/任务与核心决策，确定 P0/P1/P2，削减冗余，选择合适模式并复用状态和浏览器验证。专家建议中的 interaction-design 能力合入此入口，保持 22 个 Skill，不重复分析或注册；纯样式/文案不展开完整方法，纯后端不触发。项目有效规则优先，实际宿主去重仍是独立边界。
 
 一份原则、一个前端主入口、按需参考；不引入评分器、额外审批或分析报告。采购报价审批、样衣管理及后端负例仅用于校准规则，真实页面效果须用目标项目和等价任务数据验证，不能将规则审读当作联调通过。
+
+## 项目内知识维护
+
+init-project-docs 将业务知识留在所属项目现有文档或 docs/domain，随实现提交；同主题只维护一个正文。新项目不依赖集中 Domain Knowledge，不要求全模块候选。cross-topology 只维护跨项目连接及来源引用。
+
+## 业务知识自动维护
+
+新增 [business-knowledge-maintenance](../plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认仅补 Agent 与文档索引，OpenSpec/Graphify 显式按需启用；RAG 索引未来可重建，不增加维护副本。

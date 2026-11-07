@@ -9,7 +9,7 @@ on:
 
 jobs:
   release-dry-run:
-    name: Validate three plugins and two MCP knowledge domains
+    name: Validate three plugins and independent topology MCP
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -38,11 +38,6 @@ jobs:
           path: yoooni-daily-plugin
       - uses: actions/checkout@v4
         with:
-          repository: exception-coder/project-domain-knowledge
-          ref: master
-          path: project-domain-knowledge
-      - uses: actions/checkout@v4
-        with:
           repository: exception-coder/cross-project-topology
           ref: master
           path: cross-project-topology
@@ -52,17 +47,17 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: project-domain-knowledge/package-lock.json
+          cache-dependency-path: cross-project-topology/package-lock.json
       - run: npm ci
-        working-directory: project-domain-knowledge
+        working-directory: cross-project-topology
       - name: Create disposable workspace overview
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           import { readComponents } from './team-standards/scripts/sync-workspace-overview.mjs';
           const components = readComponents(process.cwd());
-          const domain = JSON.parse(fs.readFileSync('project-domain-knowledge/package.json', 'utf8'));
-          const rows = [...components, { name: 'project-domain-knowledge', version: domain.version }]
+          const topology = JSON.parse(fs.readFileSync('cross-project-topology/package.json', 'utf8'));
+          const rows = [...components, { name: 'cross-project-topology', version: topology.version }]
             .map(({ name, version }) => `| \`${name}\` | \`${version}\` |`).join('\n');
           const total = components.reduce((sum, item) => sum + item.skills, 0);
           const counts = components.map(({ name, skills }) => `\`${name}\` ${skills} 个`).join('、');

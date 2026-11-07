@@ -12,12 +12,7 @@ const TEMPLATE_ROOT = path.join(SCRIPT_DIR, 'assets', 'project-ai-structure');
 const TEMPLATE_TARGETS = [
   'AGENTS.md',
   'CLAUDE.md',
-  '.graphifyignore',
-  'docs/README.md',
   'docs/INDEX.md',
-  'docs/ai-coding-architecture.md',
-  'openspec/AGENTS.md',
-  'openspec/config.yaml',
 ];
 const GRAPHIFY_OUTPUTS = [
   'graphify-out/graph.json',
@@ -50,6 +45,9 @@ function parseArguments(argv) {
     json: argv.includes('--json'),
     baselines: argv.includes('--baselines'),
     bindings: readOption(argv, '--bindings'),
+    graphify: argv.includes('--with-graphify') || argv.includes('--full'),
+    openspec: argv.includes('--with-openspec') || argv.includes('--full'),
+    full: argv.includes('--full'),
   };
 }
 
@@ -103,15 +101,19 @@ function inspectGraphify(root) {
   }));
 }
 
-function inspectStructure(root, projectName) {
+function inspectStructure(root, projectName, options = {}) {
+  const targets = [...TEMPLATE_TARGETS];
+  if (options.full) targets.push('docs/README.md', 'docs/ai-coding-architecture.md');
+  if (options.openspec) targets.push('openspec/AGENTS.md', 'openspec/config.yaml');
+  if (options.graphify) targets.push('.graphifyignore');
   return {
     root,
     projectName,
     files: [
-      ...TEMPLATE_TARGETS.map((target) => inspectTemplateTarget(root, target, projectName)),
-      inspectGitignore(root),
+      ...targets.map((target) => inspectTemplateTarget(root, target, projectName)),
+      ...(options.graphify ? [inspectGitignore(root)] : []),
     ],
-    generated: inspectGraphify(root),
+    generated: options.graphify ? inspectGraphify(root) : [],
   };
 }
 
@@ -125,8 +127,8 @@ function replaceManagedBlock(content) {
   return `${content}${separator}\n${GRAPHIFY_BLOCK}\n`;
 }
 
-function applyStructure(root, projectName) {
-  const before = inspectStructure(root, projectName);
+function applyStructure(root, projectName, options = {}) {
+  const before = inspectStructure(root, projectName, options);
   const changes = [];
   for (const entry of before.files.filter((item) => item.path !== '.gitignore')) {
     if (entry.state !== 'missing') continue;
@@ -136,13 +138,13 @@ function applyStructure(root, projectName) {
     changes.push({ path: entry.path, action: 'created' });
   }
   const gitignore = before.files.find((entry) => entry.path === '.gitignore');
-  if (gitignore.state === 'missing' || gitignore.state === 'update') {
+  if (gitignore && (gitignore.state === 'missing' || gitignore.state === 'update')) {
     const targetPath = path.join(root, '.gitignore');
     const current = fs.existsSync(targetPath) ? fs.readFileSync(targetPath, 'utf8') : '';
     fs.writeFileSync(targetPath, replaceManagedBlock(current), 'utf8');
     changes.push({ path: '.gitignore', action: gitignore.state === 'missing' ? 'created' : 'updated' });
   }
-  return { ...inspectStructure(root, projectName), changes };
+  return { ...inspectStructure(root, projectName, options), changes };
 }
 
 function summarize(result, command) {
@@ -151,7 +153,7 @@ function summarize(result, command) {
   for (const entry of result.generated) lines.push(`- ${entry.state.padEnd(9)} ${entry.path}`);
   if (result.changes) lines.push(`changes: ${result.changes.length}`);
   if (result.generated.some((entry) => entry.state === 'pending')) {
-    lines.push('next: run Graphify in the project root, then validate OpenSpec.');
+    lines.push('next: link existing project rules; build Graphify and validate OpenSpec only when adopted and needed.');
   }
   return lines.join('\n');
 }
@@ -167,8 +169,8 @@ function run(argv = process.argv.slice(2)) {
   }
   const projectName = resolveProjectName(options.root, options.projectName);
   const result = options.command === 'apply'
-    ? applyStructure(options.root, projectName)
-    : inspectStructure(options.root, projectName);
+    ? applyStructure(options.root, projectName, options)
+    : inspectStructure(options.root, projectName, options);
   process.stdout.write(options.json ? `${JSON.stringify(result, null, 2)}\n` : `${summarize(result, options.command)}\n`);
   if (options.command === 'status' && result.files.some((entry) => entry.state === 'missing')) {
     process.exitCode = 2;

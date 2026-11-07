@@ -1,6 +1,6 @@
 ---
 name: init-project-docs
-description: "用于接入新代码项目或系统，以及初始化、刷新或检查项目上下文；安全幂等地建立 Agent、文档索引、OpenSpec、Graphify 输入与 Git 共享边界，并编排领域知识和新鲜度状态。"
+description: "用于接入新代码项目或系统，以及初始化、刷新或检查项目上下文；安全幂等地建立最小 Agent 与文档索引，OpenSpec 和 Graphify 按需启用，在项目内维护业务知识并核对新鲜度，不依赖集中知识服务。"
 ---
 
 # 项目上下文接入
@@ -13,10 +13,12 @@ description: "用于接入新代码项目或系统，以及初始化、刷新或
 |---|---|
 | 检查状态 `status` | 只读检查项目入口、图谱覆盖、规格与知识缺口 |
 | 初始化工程结构 `structure` | 用 [init-ai-structure](references/initialization-output.md) 创建缺失入口，保留既有内容 |
-| 完整初始化 `init` | 完成 structure，再构建/校验 Graphify、严格校验 OpenSpec，核对领域与运行证据入口 |
+| 完整初始化 `init` | 仅在明确要求完整初始化时，在 structure 后按项目采用情况构建/校验 Graphify、校验 OpenSpec，核对业务与运行证据入口 |
 | 新系统接入 `onboard` | 按[接入流程](references/onboard-workflow.md)使用 onboard-pipeline 断点续跑 |
 | 刷新 `refresh` | 按 [Git 变化](references/update-workflow.md)刷新受影响权威产物 |
 | 独立画像 `profile` | 仅在明确要求时按[画像规则](references/project-profile-generation.md)保存轻量导航 |
+
+只说“初始化项目/项目上下文”时，默认采用轻量 `onboard`：补缺失入口，链接已有规则；图谱、规格挖掘和运行证据按需，不自动执行完整初始化。
 
 检查状态不因缺项升级为初始化。明确初始化时，默认根目录为当前项目，用户指定其他路径才覆盖；创建范围不能扩到父目录或其他仓库。
 
@@ -24,15 +26,25 @@ description: "用于接入新代码项目或系统，以及初始化、刷新或
 
 - 复用项目规则和已有事实入口，不生成平行代码清单或 00–10 文档树；项目专属架构和业务规范留在项目内。
 - 初始化器按字节保留已有正文与配置，管理标记区按其合同处理；禁止强制覆盖。初始化不写业务代码、不安装升级工具、不改全局配置或创建定时任务。
-- Graphify 按当前可用 Skill 构建或增量更新，核对 HEAD 与相关工作区覆盖；缺失时报告 pending，确定性扫描降级标 fallback。
+- 默认以定向搜索、LSP（可用时）和 Git 理解代码；Graphify 仅明确采用且复杂关系需要时构建，缺失不阻断轻量初始化。
 - OpenSpec 按项目采用情况初始化或链接；空配置标 initialized-empty，不伪造 specs/changes。领域候选、缺失 DDL 和未取得运行证据分别报告。
 - 当前设计接入用[基线指引](references/design-baseline-adoption.md)及既有 status/plan/apply 协议；仅在项目明确采用绑定治理时使用[设计准备](../change-readiness/references/automatic-design-maintenance.md)，不因普通模块修改初始化全项目。
+
+业务知识仅在语义变化时按 [business-knowledge-maintenance](../business-knowledge-maintenance/SKILL.md) 原位更新，Markdown + 轻量 YAML 为正文来源，不强制知识图谱。
+
+## 项目内知识归属
+
+- 业务术语、规则、状态与理由留在所属项目现有 docs；无既有位置时用 docs/domain，并从既有文档入口链接。只有真实内容才创建目录。
+- 同主题已有设计或 OpenSpec 时更新原文，不再维护知识副本；表结构优先复用迁移脚本及实际 Schema，历史快照必须保留来源和日期。
+- 新项目不注册 Domain Knowledge、不创建集中库 project 条目、不依赖外部 bootstrap/catalog/reload。代码索引由 Graphify 按需生成，不手工同步第二套模块事实。
+- 跨项目共享内容选择一个所属项目作为唯一正文，消费者只引用；cross-topology 仅登记连接关系，不复制项目业务内容。
+- 迁入旧资料时先比对重复和归属，保留草稿、证据与历史状态，验证文件和引用后退役旧正文；备份只用于回退。
 
 ## 初始化操作边界
 
 `structure/init` 按[初始化契约](references/initialization-output.md)先 plan、核对 missing/preserved/update 后 apply，再 status；这是保护既有文件的操作顺序。已授权初始化无需再次审批。
 
-最小结构覆盖 Agent 入口、既有文档导航与架构入口、OpenSpec 配置、Graphify 输入排除及 Git 共享边界。具体文件清单、保留策略和命令归上述契约。
+最小结构仅含 AGENTS.md、CLAUDE.md、docs/INDEX.md；Graphify、OpenSpec 与完整架构入口通过显式参数按需补齐。具体文件清单、保留策略和命令归上述契约。
 
 ## 精炼反例
 

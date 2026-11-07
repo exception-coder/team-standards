@@ -8,7 +8,7 @@
 {{PROJECT_NAME}}/
 ├── AGENTS.md                     项目规则与上下文总入口
 ├── CLAUDE.md                     Claude 适配器
-├── docs/                         人工维护的长期知识
+├── docs/                         人与 AI 共同维护的业务 Markdown
 │   ├── README.md                 面向人的阅读入口
 │   ├── INDEX.md                  面向 Agent 的权威文档索引
 │   └── ai-coding-architecture.md 本规范
@@ -36,7 +36,7 @@
 | L1 Instructions | 强制规则与任务路由 | `AGENTS.md`、适配器 | Agent 必须遵守什么 |
 | L2 Knowledge | 人工确认的知识与理由 | `docs/` | 为什么这样设计 |
 | L3 Specification | 已接受行为与计划变更 | OpenSpec | 系统应该怎样工作或变化 |
-| L4 Code Intelligence | 当前模块、调用、依赖与影响 | Graphify | 代码现在怎样连接 |
+| L4 Code Intelligence | 当前模块、调用、依赖与影响 | 定向搜索、LSP、Git；Graphify 可选 | 代码现在怎样连接 |
 | L5 Agent Capability | 可复用执行方法 | 项目内 Skills 和脚本 | Agent 怎样完成任务 |
 | L6 Implementation | 源码、测试与运行配置 | 项目工程目录 | 精确实现是什么 |
 
@@ -58,8 +58,8 @@ flowchart TD
 
 1. 先读根或最近作用域的 `AGENTS.md`。
 2. 架构原因、术语、开发约定和 ADR 经 `docs/INDEX.md` 定位。
-3. 当前接受行为和活动变更分别查询 `openspec/specs/` 与 `openspec/changes/`。
-4. 陌生代码入口、调用链和影响范围先查询新鲜 Graphify。
+3. 项目已采用 OpenSpec 时查询已接受规格和活动变更；否则读取既有需求或业务文档。
+4. 源码入口、调用链与影响默认用定向搜索、LSP 和 Git；复杂关系且已采用时才用新鲜 Graphify。
 5. 最后只读取任务相关源码、测试、DDL、数据库或运行证据。
 
 不得把宽泛全仓扫描作为陌生项目的默认第一步。Graphify 查询只用于缩小范围，编辑前仍须核对目标源码。
@@ -70,7 +70,7 @@ flowchart TD
 
 - 项目规则冲突时，以作用域最近且明确适用的 `AGENTS.md` 为准。
 - OpenSpec 与代码不一致时，先确认 change 状态；不要自动把任一侧覆盖另一侧。
-- Graphify 与源码不一致时，以当前源码为实现事实并刷新图谱。
+- Graphify 与源码不一致时，以当前源码为实现事实；确需继续用图谱时再刷新。
 - 文档业务语义与运行证据冲突时，记录候选差异并交由 owner 确认。
 - OpenSpec、Graphify、测试和发布制品必须分别验证，不能相互代替。
 
@@ -78,7 +78,8 @@ flowchart TD
 
 ## 目录落位规则
 
-- 项目特有规则和能力归项目仓；团队通用规范只引用，不复制。
+- 项目特有规则、业务知识和能力归项目仓；团队通用规范只引用，不复制。
+- 业务术语、规则和决策优先更新现有文档；必要时使用 docs/domain。跨项目共享知识只有一个所属项目，消费者只引用；不依赖集中 Domain Knowledge 服务。
 - 长期文档必须登记到 `docs/INDEX.md`，临时分析不自动升级为权威文档。
 - OpenSpec 只承载可观察行为与变更，不复制代码结构报告。
 - `.graphifyignore` 固定团队共同的扫描输入边界；项目特有的生成物或 vendor 路径在这里追加。

@@ -256,3 +256,11 @@ node scripts/audit-skills.js --warnings --ci
 ## Existing Spec Resolution
 
 已有功能变更在创建 Capability/Delta 前按[解析协议](plugins/team-standards/skills/change-readiness/references/existing-spec-resolution.md)找回 Requirement。薄 Hook 调用已配置的外部 resolver，不复制 Graphify 或规格分类算法；默认 warn，真实宿主验收后启用 block。
+
+## 项目内知识维护
+
+init-project-docs 将业务知识留在所属项目现有文档或 docs/domain，随实现提交；同主题只维护一个正文。新项目不依赖集中 Domain Knowledge，不要求全模块候选。cross-topology 只维护跨项目连接及来源引用。
+
+## 业务知识自动维护
+
+新增 `business-knowledge-maintenance`，见 [业务知识维护](plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认仅补 Agent 与文档索引，OpenSpec/Graphify 显式按需启用；RAG 索引未来可重建，不增加维护副本。

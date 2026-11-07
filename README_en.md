@@ -1,6 +1,6 @@
 # team-standards
 
-**5.4.4** adds a persisted-fields column to page delivery plans. List the business data each feature saves, reuses, or calculates; mark schema coverage as unverified until checked against actual structures. Keep one row per feature without expanding into a full data dictionary.
+**5.5.0** Keep business knowledge in its owning project; initialization no longer depends on a central knowledge service.
 
 **5.4.3** keeps the Excel feature list compact with thumbnails. Click an image or its link to open a matching full-size view inside the workbook, then return to the list. Verify navigation, positioning, and readability.
 
@@ -40,7 +40,7 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.4.4** exposes 25 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.5.0** exposes 26 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Version 4.15.3 makes the user-approved three-template style the default for subsequent architecture illustrations: a recognizable primary subject, supporting resources, consistent line icons, whitespace and semantic colors. Reuse native templates and built-in iOS7 Icons unless project conventions or explicit instructions call for another style. Standard engineering notation remains applicable. The approved source diagrams and four-page previews are unchanged; see the [default style](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格).
 
@@ -178,3 +178,9 @@ The earlier 4.0 consolidation reduced the plugin to 15 skills; 5.0.0 now provide
 Version 4.9.1 aligns ER nodes with modeled entities, uses self-relations for hierarchies, labels external references, and requires both ends of association entities. Logical entities do not imply one physical table each.
 
 Version 4.9.2 keeps identifying, relationship and relevant lifecycle fields with Chinese meanings inside ER entities. Logical field categories do not invent physical keys or database column types.
+
+Business knowledge belongs in the owning project docs, with one maintained source per topic. New project initialization requires no central knowledge service. Cross-project consumers link to the owner.
+
+## Local business knowledge
+
+[business-knowledge-maintenance](plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md) updates project Markdown and minimal YAML only when business meaning changes. Keep one source, evidence and verified/inferred/deprecated trust. Default initialization adds only Agent entrypoints and the document index; Graphify and OpenSpec are opt-in. Retrieval indexes are rebuildable derivatives.

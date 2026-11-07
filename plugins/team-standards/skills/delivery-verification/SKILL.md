@@ -32,4 +32,6 @@ description: "Guide proportionate verification and honest delivery reporting aft
 - 每次 Commit 再跑一次相同检查：复用范围匹配且输入未变的结果。
 - 编译通过就说业务已上线：分别说明实现、验证及发布状态。
 
+业务语义改变时，按 [业务知识维护](../business-knowledge-maintenance/SKILL.md) 核对受影响正文、可信度与来源；纯技术改动不要求知识产物。
+
 结果报告实际变更、检查、结果和未验证项；受影响设计与文档分别用[变更引导](../change-readiness/SKILL.md)和[文档规范](../markdown-writing-standards/SKILL.md)。证据足以支撑本次结论即结束验证，提交按项目约定处理。

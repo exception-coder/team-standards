@@ -22,12 +22,12 @@ export function readComponents(workspace) {
   });
 }
 
-export function renderOverview(text, components, domainVersion) {
+export function renderOverview(text, components, topologyVersion) {
   let result = text;
   for (const { name, version } of components) {
     result = replaceOnce(result, new RegExp('(\\| `' + name + '` \\| )`[^`]+`( \\|)'), `$1\`${version}\`$2`);
   }
-  result = replaceOnce(result, /(\| `project-domain-knowledge` \| )`[^`]+`( \|)/g, `$1\`${domainVersion}\`$2`);
+  result = replaceOnce(result, /(\| `cross-project-topology` \| )`[^`]+`( \|)/g, `$1\`${topologyVersion}\`$2`);
   const teamCount = components[0].skills;
   result = result.replace(/\d+ 个工程治理 Skill/g, `${teamCount} 个工程治理 Skill`)
     .replace(/#\d+-个工程治理-skill/g, `#${teamCount}-个工程治理-skill`);
@@ -49,10 +49,10 @@ function main() {
   const file = path.join(workspace, 'README.md');
   if (fs.realpathSync(file) !== file) throw new Error('README symlinks are unsupported');
   const components = readComponents(workspace);
-  const domainVersion = JSON.parse(fs.readFileSync(path.join(workspace, 'project-domain-knowledge', 'package.json'), 'utf8')).version;
-  if (!domainVersion) throw new Error('domain package version is missing');
+  const topologyVersion = JSON.parse(fs.readFileSync(path.join(workspace, 'cross-project-topology', 'package.json'), 'utf8')).version;
+  if (!topologyVersion) throw new Error('topology package version is missing');
   const before = fs.readFileSync(file, 'utf8');
-  const after = renderOverview(before, components, domainVersion);
+  const after = renderOverview(before, components, topologyVersion);
   if (before !== after) {
     if (!process.argv.includes('--write')) throw new Error('workspace README metadata is stale; run with --write to synchronize only metadata');
     fs.writeFileSync(file, after);

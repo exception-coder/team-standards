@@ -11,13 +11,7 @@ const INITIALIZER = fileURLToPath(new URL('../../skills/init-project-docs/init-a
 const REQUIRED_FILES = [
   'AGENTS.md',
   'CLAUDE.md',
-  '.graphifyignore',
-  '.gitignore',
-  'docs/README.md',
   'docs/INDEX.md',
-  'docs/ai-coding-architecture.md',
-  'openspec/AGENTS.md',
-  'openspec/config.yaml',
 ];
 
 function createProject(t) {
@@ -46,17 +40,16 @@ test('plan reports the structure without writing files', (t) => {
   assert.equal(fs.readdirSync(root).length, 0);
 });
 
-test('apply creates the minimal six-layer entry structure', (t) => {
+test('default apply creates only local entrypoints without graph or spec prerequisites', (t) => {
   const root = createProject(t);
   const result = run(root, 'apply', '--name', 'Demo Project');
 
   assert.equal(result.status, 0, result.stderr);
   for (const relativePath of REQUIRED_FILES) assert.equal(fs.existsSync(path.join(root, relativePath)), true);
   assert.match(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8'), /Demo Project Agent Guide/);
-  assert.match(fs.readFileSync(path.join(root, 'openspec/config.yaml'), 'utf8'), /Demo Project uses AGENTS\.md/);
-  assert.match(fs.readFileSync(path.join(root, '.graphifyignore'), 'utf8'), /graphify-out\//);
-  assert.match(fs.readFileSync(path.join(root, '.graphifyignore'), 'utf8'), /\*\*\/target\//);
-  assert.match(fs.readFileSync(path.join(root, '.gitignore'), 'utf8'), /!graphify-out\/graph\.json/);
+  for (const optional of ['openspec', '.graphifyignore', '.gitignore', 'docs/README.md', 'docs/ai-coding-architecture.md']) {
+    assert.equal(fs.existsSync(path.join(root, optional)), false, optional);
+  }
   assert.equal(fs.existsSync(path.join(root, 'graphify-out')), false);
   assert.equal(fs.existsSync(path.join(root, '.codex', 'skills')), false);
   assert.equal(fs.existsSync(path.join(root, 'docs', 'domain')), false);
@@ -77,7 +70,7 @@ test('apply is idempotent and preserves existing project documents', (t) => {
   assert.deepEqual(snapshot(root), firstSnapshot);
   assert.equal(fs.readFileSync(path.join(root, 'docs', 'INDEX.md'), 'utf8'), '# Human index\n');
   assert.equal(fs.readFileSync(path.join(root, '.graphifyignore'), 'utf8'), '# Project-owned Graphify scope\nspecial-generated/\n');
-  assert.equal((fs.readFileSync(path.join(root, '.gitignore'), 'utf8').match(/team-standards:graphify:start/g) || []).length, 1);
+  assert.equal(fs.existsSync(path.join(root, '.gitignore')), false);
   assert.match(second.stdout, /changes: 0/);
 });
 
@@ -89,5 +82,31 @@ test('status fails when required entry files are missing and succeeds after appl
   assert.equal(run(root, 'apply').status, 0);
   const after = run(root, 'status');
   assert.equal(after.status, 0, after.stderr);
-  assert.match(after.stdout, /pending\s+graphify-out\/graph\.json/);
+  assert.doesNotMatch(after.stdout, /pending|graphify-out/);
+});
+
+test('optional graph and spec support are independent and preserve existing configuration', (t) => {
+  const root = createProject(t);
+  fs.writeFileSync(path.join(root, '.gitignore'), '# existing\nsecrets/\n', 'utf8');
+  assert.equal(run(root, 'apply', '--with-openspec').status, 0);
+  assert.ok(fs.existsSync(path.join(root, 'openspec/config.yaml')));
+  assert.equal(fs.existsSync(path.join(root, '.graphifyignore')), false);
+  assert.equal(fs.readFileSync(path.join(root, '.gitignore'), 'utf8'), '# existing\nsecrets/\n');
+  assert.equal(run(root, 'apply', '--with-graphify').status, 0);
+  const gitignore = fs.readFileSync(path.join(root, '.gitignore'), 'utf8');
+  assert.ok(gitignore.startsWith('# existing\nsecrets/\n'));
+  assert.match(gitignore, /!graphify-out\/graph\.json/);
+  assert.equal(run(root, 'apply', '--with-graphify').status, 0);
+  assert.equal(fs.readFileSync(path.join(root, '.gitignore'), 'utf8'), gitignore);
+  assert.equal(fs.existsSync(path.join(root, 'graphify-out')), false);
+});
+
+test('explicit full initialization retains the expanded entrypoints without fabricating knowledge', (t) => {
+  const root = createProject(t);
+  assert.equal(run(root, 'apply', '--full').status, 0);
+  for (const p of ['.graphifyignore', '.gitignore', 'openspec/config.yaml', 'docs/ai-coding-architecture.md']) {
+    assert.ok(fs.existsSync(path.join(root, p)), p);
+  }
+  assert.equal(run(root, 'status', '--full').status, 0);
+  assert.equal(fs.existsSync(path.join(root, 'docs/domain')), false);
 });

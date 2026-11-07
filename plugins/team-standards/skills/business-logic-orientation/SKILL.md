@@ -1,6 +1,6 @@
 ---
 name: business-logic-orientation
-description: "Use to understand existing business logic before refactoring, rewriting, migration, or regression review, or when aligning ambiguous business terminology or explicitly documenting current logic. Prefers Graphify and accepted OpenSpec specs over rebuilding parallel code indexes."
+description: "Use to understand existing business logic before refactoring, rewriting, migration, or regression review, or when aligning ambiguous business terminology or explicitly documenting current logic. Uses project documents and targeted source evidence; Graphify is optional for complex relationships."
 ---
 
 # 业务逻辑现状理解
@@ -11,7 +11,7 @@ description: "Use to understand existing business logic before refactoring, rewr
 
 ## 判断准则
 
-- 从项目入口确定业务边界和权威来源；Graphify 定位入口、依赖与读写链路，检查其对当前 HEAD 和工作区的覆盖，缺口用定向源码、DDL、测试或运行证据补齐。
+- 从项目入口确定业务边界和权威来源；先用定向搜索、LSP 和 Git 定位入口、依赖与读写链路；复杂关系才复用新鲜 Graphify，并用源码、DDL、测试或运行证据核对。
 - 分开说明当前实现、已接受规则、活动变更和推断。业务术语、状态语义及失败行为需要对应证据，调用关系本身不足以证明。
 - 围绕本次问题还原主要路径与关键消费者，不生成平行代码索引。长期基线只有实际接手或迁移需要时才保存。
 

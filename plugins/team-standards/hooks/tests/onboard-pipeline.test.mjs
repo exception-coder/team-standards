@@ -104,7 +104,7 @@ test('mark rejects unknown stages and lifecycle statuses without changing state'
 
   const badStage = runPipeline(home, ['mark', '--name', 'guarded', '--stage', 'unknown', '--status', 'done']);
   const badStatus = runPipeline(home, ['mark', '--name', 'guarded', '--stage', 'evidence', '--status', 'complete']);
-  const badSkip = runPipeline(home, ['mark', '--name', 'guarded', '--stage', 'evidence', '--status', 'skipped']);
+  const badSkip = runPipeline(home, ['mark', '--name', 'guarded', '--stage', 'knowledge', '--status', 'skipped']);
 
   assert.notEqual(badStage.status, 0);
   assert.match(badStage.stderr, /未知阶段/);
@@ -153,4 +153,14 @@ test('verify cannot complete until every preceding gate is closed', (t) => {
   assert.equal(completed.status, 0, completed.stderr);
   const finalState = JSON.parse(fs.readFileSync(file, 'utf8'));
   assert.equal(finalState.stages.verify.status, 'done');
+});
+
+test('minimal local onboarding can finish without unused graph/spec/runtime services', (t) => {
+  const home = createTestHome(t);
+  assert.equal(runPipeline(home, ['plan', '--repos', home, '--name', 'local']).status, 0);
+  for (const stage of ['fetch', 'profile', 'knowledge'])
+    assert.equal(runPipeline(home, ['mark', '--name', 'local', '--stage', stage, '--status', 'done']).status, 0);
+  for (const stage of ['coding', 'graphify', 'core-spec', 'evidence', 'topology'])
+    assert.equal(runPipeline(home, ['mark', '--name', 'local', '--stage', stage, '--status', 'skipped']).status, 0);
+  assert.equal(runPipeline(home, ['mark', '--name', 'local', '--stage', 'verify', '--status', 'done']).status, 0);
 });

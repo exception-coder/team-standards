@@ -25,7 +25,7 @@ description: "init-project-docs 的内部增量刷新细则，不作为独立 Sk
 |---|---|
 | 模块、调用、API、数据访问、依赖 | Graphify |
 | 需求、接口契约、状态机、行为变更 | OpenSpec change |
-| 稳定术语、业务规则、状态语义 | Domain Knowledge，经人工确认 |
+| 稳定术语、业务规则、状态语义 | 所属项目现有业务文档或 docs/domain；同主题 OpenSpec/设计只保留原文 |
 | 表结构与执行事实 | DDL、真实数据库、日志或执行计划 |
 | 项目特有开发规则、命令、入口 | 项目 `AGENTS.md` / 项目内 Skill |
 | 跨仓调用关系 | cross-project-topology |

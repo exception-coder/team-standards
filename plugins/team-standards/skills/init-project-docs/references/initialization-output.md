@@ -1,15 +1,11 @@
 ---
 name: init-project-docs-initialization-output
-description: "Exact files, follow-up products, preservation rules, and exclusions for init-project-docs structure and init modes."
+description: "项目初始化的轻量默认产物、可选 Graphify/OpenSpec 入口及保留契约。"
 ---
 
-# 项目初始化输出清单
+# 项目初始化输出
 
-在用户要求查看初始化内容、执行 `structure` / `init`，或判断现有项目是否符合统一结构时读取本文件。
-
-## 执行命令
-
-`<skill-root>` 为 init-project-docs 所在目录，`<project-root>` 为用户指定目录或当前项目根。已授权初始化时先核对 plan 的 missing/preserved/update，再 apply，最后 status：
+默认先 plan，再 apply，最后 status；已授权初始化不重复询问。仅查看时只运行 status。
 
 ```text
 node <skill-root>/init-ai-structure.mjs plan --root <project-root>
@@ -17,39 +13,28 @@ node <skill-root>/init-ai-structure.mjs apply --root <project-root>
 node <skill-root>/init-ai-structure.mjs status --root <project-root>
 ```
 
-只请求检查时仅执行 status。init 的图谱与规格验证在 apply 后、最终 status 前按下文完成。
+## 默认只补三个入口
 
-## `structure` 直接创建或补齐
+- `AGENTS.md`：项目规则和检索、业务知识维护边界。
+- `CLAUDE.md`：复用 Agent 入口。
+- `docs/INDEX.md`：链接已有文档，同主题只维护一处。
 
-| 目标 | 初始化内容 | 约束 |
-|---|---|---|
-| Agent 入口 | `AGENTS.md`、`CLAUDE.md` | 根入口只声明项目规则、上下文路由和适配关系；不复制团队通用规范 |
-| 长期知识入口 | `docs/README.md`、`docs/INDEX.md`、`docs/ai-coding-architecture.md` | 只建立索引和六层职责模型，不创建空领域、设计、决策或开发目录 |
-| OpenSpec 入口 | `openspec/AGENTS.md`、`openspec/config.yaml` | 只建立项目上下文和 artifact 规则；不伪造 specs、changes 或完成状态 |
-| Graphify 输入边界 | `.graphifyignore` | 排除依赖、构建物、压缩前端产物和 Graphify 自身输出；已有项目规则完整保留 |
-| Graphify Git 边界 | `.gitignore` 的 `team-standards:graphify` 标记块 | 默认只允许提交 `graph.json`、`manifest.json` 与 `GRAPH_REPORT.md`，本地缓存和个人状态继续忽略 |
+已有文件按字节保留；不生成业务正文、空 docs/domain、图谱、OpenSpec 或派生索引。Agent 发现已有业务文档时，经本次授权在既有索引补必要链接，不复制正文；初始化器本身不扫描或重写业务文档。
 
-`plan` 只报告 `missing`、`managed`、`preserved`、`update` 和 Graphify `pending/ready` 状态，不写文件。`apply` 只创建缺失模板，并只更新 `.gitignore` 中由本 Skill 管理的标记块；其它已有文件按字节保留。
+## 明确需要时选择
 
-## `init` 在结构之后继续完成
+| 参数 | 补齐内容 |
+|---|---|
+| `--with-openspec` | openspec/AGENTS.md、config.yaml；不伪造 specs、changes 或完成状态 |
+| `--with-graphify` | .graphifyignore 和 .gitignore 内受管标记块；报告已有图谱状态，不自动建图 |
+| `--full` | 上述两项及 docs/README.md、docs/ai-coding-architecture.md；仅用于明确完整接入 |
 
-`init` 不是再复制一套模板，而是在 `structure` 之后编排当前安装的官方能力：
+plan/apply/status 使用相同参数。未启用的工具缺失不计为 pending；status 只对所选入口缺失返回非零。
 
-1. 使用当前 Graphify Skill 首次构建或增量刷新 `graphify-out/graph.json`、`manifest.json` 与 `GRAPH_REPORT.md`。
-2. 检查图谱覆盖的 Git HEAD 和任务相关工作区改动；过期或不完整时标记缺口。
-3. 对 `openspec/config.yaml` 执行严格校验，区分真实项目上下文与 `initialized-empty`。
-4. 识别领域知识、DDL、数据库、日志和项目验证命令的权威入口，只报告连接状态，不生成猜测内容。
-5. 运行初始化器 `status`，输出 Agent、Graphify、OpenSpec、领域知识和运行证据状态。
+Graphify 只在项目明确采用且复杂代码问题需要时生成，使用前核对 Git 与工作区覆盖。图谱与向量索引都是可重建产物；是否提交沿用项目约定。OpenSpec 仅在已采用项目按原流程校验。业务知识维护按 [business-knowledge-maintenance](../../business-knowledge-maintenance/SKILL.md)，表结构沿用迁移和实际 Schema。
 
-Graphify 核心共享产物由 Graphify 生成后进入 Git；初始化脚本本身不创建空 `graphify-out/`，也不生成假的图谱或指纹。
+## 保留与边界
 
-## 明确不初始化
+plan 不写文件；apply 仅创建所选缺失入口，Graphify 启用时只更新 .gitignore 受管标记块；其余已有文件完整保留，重复执行无变化。已有文档正文和机器配置不强制迁移。
 
-- 空 `.codex/skills/`、`.claude/` 或项目 Skill 占位目录。
-- `docs/domain/`、`docs/design/`、`docs/decisions/`、`docs/development/` 等无内容目录。
-- OpenSpec `specs/`、`changes/`、proposal、design、tasks 或归档记录。
-- 业务术语、领域规则、DDL 快照、数据库结果、日志或项目画像正文。
-- Graphify 缓存、个人 memory/reflections、HTML、Obsidian、成本记录或机器路径文件。
-- 全局 MCP、IDE、定时任务、Graphify/OpenSpec 安装或版本升级。
-
-这些内容只有在项目真实需要、存在权威证据并获得相应授权时，才由对应 Skill 或工具创建。
+不安装工具、创建全局 MCP、定时任务、中央知识条目或空知识目录。不要求数据库、Graphify、RAG 服务才能完成初始化；没有实际证据的业务结论保留待确认状态。

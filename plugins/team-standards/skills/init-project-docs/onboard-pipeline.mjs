@@ -4,7 +4,7 @@
 //   把项目接入、画像、编码约束、实现图谱、领域知识、Core Spec、运行证据与拓扑
 //   这条初始化流水线的【确定性步骤】串起来；【需判断的步骤】留给 skill 里的 AI + 人。
 //
-//   设计红线（与 domain-knowledge-bootstrap 同源）：
+//   设计红线（项目内维护）：
 //     - 脚本只做机械活：clone/定位、探测分离、生成阶段清单与状态。
 //     - 不自动抽业务内容、不自动判模块/技术栈/stable —— 那些是 skill 关卡里人/AI 的事。
 //     - 幂等：已存在的不重复 clone；可断点续跑。
@@ -25,7 +25,7 @@ import os from 'node:os';
 const STATE_DIR = path.join(os.homedir(), '.kai-toolbox');
 const STATE_SCHEMA_VERSION = 3;
 const STAGE_STATUSES = new Set(['pending', 'needs-review', 'waiting-evidence', 'done', 'skipped']);
-const SKIPPABLE_STAGE_IDS = new Set(['topology']);
+const SKIPPABLE_STAGE_IDS = new Set(['coding', 'graphify', 'core-spec', 'evidence', 'topology']);
 
 // 流水线九阶段（与 SKILL.md 对齐）。schema v3 移除项目专属的多仓聚合阶段。
 const STAGES = [
@@ -33,11 +33,11 @@ const STAGES = [
   { id: 'profile',   name: '② 项目画像 + Agent 入口',  auto: 'semi',  gate: '确认技术栈、分层、启动方式与编码' },
   { id: 'coding',    name: '③ 编码 profile',           auto: 'semi',  gate: '确认 rootMarkers 与编码/框架定性' },
   { id: 'graphify',  name: '④ Graphify 实现事实图谱',  auto: 'semi',  gate: 'graph.json 存在且健康检查已记录' },
-  { id: 'knowledge', name: '⑤ 领域知识与 DDL 基线',    auto: 'human', gate: '模块边界、路径与业务真理候选已确认' },
-  { id: 'core-spec', name: '⑥ Core Spec 静态候选',     auto: 'semi',  gate: '全模块候选已生成，未经评审不升 stable' },
+  { id: 'knowledge', name: '⑤ 领域知识与 DDL 基线',    auto: 'human', gate: '项目内知识入口与来源已核对' },
+  { id: 'core-spec', name: '⑥ Core Spec 静态候选',     auto: 'semi',  gate: '按项目需要核对规格；未经评审不升 stable' },
   { id: 'evidence',  name: '⑦ 运行证据与规格挖掘',     auto: 'semi',  gate: '证据可追溯；无数据时标记 waiting-evidence' },
   { id: 'topology',  name: '⑧ 跨项目拓扑登记',         auto: 'human', gate: '集成关系已登记；无跨项目调用可跳过' },
-  { id: 'verify',    name: '⑨ 验证、评审与发布',       auto: 'human', gate: '必选阶段闭环，索引/MCP/交付报告已完成' },
+  { id: 'verify',    name: '⑨ 验证、评审与发布',       auto: 'human', gate: '适用阶段完成，项目内入口与交付结果已核对' },
 ];
 const STAGE_IDS = new Set(STAGES.map((stage) => stage.id));
 
@@ -84,7 +84,7 @@ function validateStageStatus(status) {
 
 function validateStageTransition(state, stage, status) {
   if (status === 'skipped' && !SKIPPABLE_STAGE_IDS.has(stage)) {
-    die(`阶段 ${stage} 不允许 skipped；只有 topology 可跳过`);
+    die(`阶段 ${stage} 不允许 skipped；coding/graphify/core-spec/evidence/topology 按适用情况可跳过`);
   }
   if (stage !== 'verify' || status !== 'done') return;
   const blockers = STAGES
