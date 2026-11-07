@@ -18,7 +18,7 @@
 
 正式设计开头先给结论和一张[全景图](plugins/team-standards/skills/change-readiness/references/engineering-design-output.md#全景图与正文)，优先用可编辑 draw.io 和同源预览。正文补充图上的关键规则、取舍、风险及验收，按需引用细节。
 
-把需求、原型或已有页面排成开发交付计划时，使用 [page-delivery-plan](plugins/team-standards/skills/page-delivery-plan/SKILL.md)。默认一张全景图和一张简明功能表，直接写页面、要补的功能、完成标准和交付顺序，详细实施按需展开。登录、菜单和资源权限由中台承担，不列入页面计划；相关数据范围集中简述。主清单沿用项目载体，Excel 按需导出，有原型时在对应功能旁嵌入可直接阅读的大图，原图链接仅作补充。
+把需求、原型或已有页面排成开发交付计划时，使用 [page-delivery-plan](plugins/team-standards/skills/page-delivery-plan/SKILL.md)。默认一张全景图和一张简明功能表，直接写页面、要补的功能、完成标准和交付顺序，详细实施按需展开。登录、菜单和资源权限由中台承担，不列入页面计划；相关数据范围集中简述。主清单沿用项目载体，Excel 按需导出，有原型时在对应功能旁放紧凑缩略图，点击进入工作簿内对应大图页，并提供返回清单入口。
 
 架构图统一使用 [architecture-diagram-design](plugins/team-standards/skills/architecture-diagram-design/SKILL.md)：按受众选择 L1 汇报、L2 设计或 L3 实施视图，组织语义、布局、图形与配色；后续架构说明图默认沿用已确认三套模板的形象化风格，用主体、支撑资源和注释形成主次；draw.io 优先复用内置 iOS7 Icons，同图统一图标；实际打开并抽查图标改色/缩放、文字与连线，不默认要求逐笔画拆分。不把可选步骤画成必经流程，也不把规划画成已实现；沿用项目格式，不另建同职责美化 Skill。图件目录和命名优先遵循用户及项目约定；无约定时项目级图放根 `docs/diagrams/`，中文项目使用中文业务文件名，迁移同步源图、预览与引用。
 

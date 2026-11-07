@@ -439,7 +439,7 @@ ER 图的关键字段和中文含义须留在对象框内，完整约束放字�
 
 正式方案开头用一张[全景图](../plugins/team-standards/skills/change-readiness/references/engineering-design-output.md#全景图与正文)说明范围和主线，优先交付可编辑 draw.io 与同源预览。组合方案共用全景图，专项图按需展开。
 
-开发交付计划由 [page-delivery-plan](../plugins/team-standards/skills/page-delivery-plan/SKILL.md)承接。默认以一张 draw.io 全景图和简明功能表说明页面、要补的功能、完成标准及顺序，同页相关操作合并表达。中台登录、菜单和资源权限不重复安排，数据范围集中简述。详细实施与测试按实际需要展开；已授权实施经 change-readiness 推进，delivery-verification 的实际结果回写原任务。Excel 按需导出同一张表，有原型时嵌入对应功能大图，在 100% 查看比例下可直接阅读，原图链接仅作补充。
+开发交付计划由 [page-delivery-plan](../plugins/team-standards/skills/page-delivery-plan/SKILL.md)承接。默认以一张 draw.io 全景图和简明功能表说明页面、要补的功能、完成标准及顺序，同页相关操作合并表达。中台登录、菜单和资源权限不重复安排，数据范围集中简述。详细实施与测试按实际需要展开；已授权实施经 change-readiness 推进，delivery-verification 的实际结果回写原任务。Excel 按需导出同一张表，有原型时放紧凑缩略图，点击进入工作簿内对应大图页并可返回清单；实际核对点击定位和大图可读性。
 
 ### 图件归属与命名（5.0.2）
 
