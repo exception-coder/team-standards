@@ -1,5 +1,10 @@
 # Changelog
 
+## [5.6.2] - 2026-11-07
+
+- Include business object semantics and table models in project meeting briefs, with editable draw.io object/ER diagrams, cardinality, key fields, state/version meaning, ownership and storage mapping.
+- Distinguish conceptual objects from physical tables and logical relationships from verified foreign keys. Reuse shared models and evidence; keep model questions beside the relevant business block without expanding into a complete data dictionary.
+
 ## [5.6.1] - 2026-11-07
 
 - Add project meeting mode to clear-design-docs: business blocks pair real prototype screenshots with editable draw.io logic or sequence diagrams, short explanations and local discussion points.

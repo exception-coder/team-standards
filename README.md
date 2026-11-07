@@ -1,5 +1,7 @@
 # team-standards
 
+**5.6.2** 过会模式补齐[业务对象本体与表模型](plugins/team-standards/skills/clear-design-docs/references/meeting-brief.md#业务对象本体与表模型)：在各业务块讲清对象含义、关键状态、关系基数、数据归属及实际存储映射，用draw.io对象关系图/简化ER图表达。共享模型只讲一次，完整字段仍归原设计，模型问题放在对应块下。
+
 **5.6.1** 在 [clear-design-docs](plugins/team-standards/skills/clear-design-docs/SKILL.md) 增加[项目过会模式](plugins/team-standards/skills/clear-design-docs/references/meeting-brief.md)：基于功能清单、业务设计和技术方案，按业务大块展示原型图＋draw.io逻辑图/时序图，简短讲解后就地讨论问题。会议正文减少编号和表格，原清单与详设继续保留追溯及验收；不新增 Skill 或审批流程。
 
 **5.6.0** 初始化默认整理现有业务知识：复用文档，从代码补缺并标待确认，配一张 draw.io 全景图及预览；正文与图随项目维护，不依赖集中知识仓。
@@ -55,7 +57,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.6.1**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.6.2**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 

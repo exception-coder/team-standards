@@ -1,5 +1,7 @@
 # team-standards
 
+**5.6.2** extends meeting briefs with business objects and table models: show object meaning, key states, relationship cardinality, ownership and storage mappings through editable draw.io object/ER diagrams. Reference shared models instead of repeating them per page; keep model questions beside the relevant business area.
+
 **5.6.1** adds a [project meeting mode](plugins/team-standards/skills/clear-design-docs/references/meeting-brief.md) to clear-design-docs. Summarize feature lists and designs by business area, pairing prototype screenshots with editable draw.io logic or sequence diagrams, brief explanations, and questions directly below each area. Keep detailed IDs and acceptance criteria in the source documents; no new Skill or approval workflow.
 
 **5.6.0** Initialization now organizes existing business knowledge, fills gaps from code with pending-confirmation labels, and delivers one draw.io panorama and preview alongside the project.
