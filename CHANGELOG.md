@@ -1,5 +1,10 @@
 # Changelog
 
+## [5.6.9] - 2026-11-09
+
+- Strengthen incremental design across engineering principles, architecture reasoning, technical and database design: justify added complexity against current needs, preserve essential guarantees, and evolve from evidence rather than speculative features.
+- Add conditional examples for current records, configuration, recoverable sync tasks and safe retirement of existing tables.
+
 ## [5.6.8] - 2026-11-09
 
 - Require Chinese business names alongside physical or proposed names and status in each ER table header, with a readable layout.
