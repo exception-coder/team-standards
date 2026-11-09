@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.10] - 2026-11-09
+
+- Assess anticipated detail-level queries, lifecycle, constraints and migration before merging related records into fields or JSON; use concrete visit products and participants as a conditional example.
+
 ## [5.6.9] - 2026-11-09
 
 - Strengthen incremental design across engineering principles, architecture reasoning, technical and database design: justify added complexity against current needs, preserve essential guarantees, and evolve from evidence rather than speculative features.
