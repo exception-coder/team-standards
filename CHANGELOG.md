@@ -1,5 +1,10 @@
 # Changelog
 
+## [5.6.4] - 2026-11-09
+
+- Separate business relationship maps, concise logical ER diagrams and field-rule documentation; use native Crow's Foot symbols and distinguish verified physical foreign keys from logical and cross-system references.
+- Apply the same layering to meeting briefs; retain editable draw.io sources, evidence and rendered visual checks.
+
 ## [5.6.2] - 2026-11-07
 
 - Include business object semantics and table models in project meeting briefs, with editable draw.io object/ER diagrams, cardinality, key fields, state/version meaning, ownership and storage mapping.
