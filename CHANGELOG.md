@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.8] - 2026-11-09
+
+- Require Chinese business names alongside physical or proposed names and status in each ER table header, with a readable layout.
+
 ## [5.6.7] - 2026-11-09
 
 - Organize meeting briefs around clear topics, merge redundant headings, and use a decision index that points to context and open issues in each business block.
