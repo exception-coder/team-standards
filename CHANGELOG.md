@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.13] - 2026-11-09
+
+- Clarify the purpose, applicable situations and flexible sequence of requirement notes, feature plans, business and technical designs, meeting briefs and supporting diagrams; choose only what the task needs.
+
 ## [5.6.12] - 2026-11-09
 
 - Resolve each requirement to its own project and iteration, support multiple discoverable requirements within one iteration, and maintain the appropriate project and iteration navigation.

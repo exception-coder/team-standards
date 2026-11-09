@@ -7,6 +7,8 @@ description: 编写、精简或独立评审概设、详设与技术方案；将�
 
 目标：业务同事能讲清设计，开发者能据此实现并验收当前范围。共同准则见[工程宪法](../change-readiness/references/engineering-principles.md)，通用措辞归[人话](../plain-writing/SKILL.md)。
 
+需求说明、功能清单、业务/页面设计、技术方案和过会稿的用途与适用场景，按[材料选择与顺序](../change-readiness/references/engineering-design-output.md#需求方案与过会材料怎么选)按需裁剪；不要求每次输出全套。
+
 ## 按请求选择模式
 
 - **编写或精简**：使用下方设计表达规则，维护当前范围的模型、接口和验收；不自动实施设计中的功能。

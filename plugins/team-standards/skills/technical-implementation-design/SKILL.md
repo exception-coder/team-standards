@@ -7,6 +7,8 @@ description: 设计需求在现有系统中的技术实现、模块职责、接�
 
 把已确认的需求落到现有系统的职责、契约和调用链，让接手人能从具体入口开始实现和验证。按[工程设计输出规则](../change-readiness/references/engineering-design-output.md)裁剪深度。
 
+技术方案与需求说明、页面功能清单、业务设计及过会稿的职责和常见顺序见[材料选择](../change-readiness/references/engineering-design-output.md#需求方案与过会材料怎么选)，不因编写技术方案自动生成其他材料。
+
 新增迭代设计沿用项目既有目录和导航，按[文档归属](../markdown-writing-standards/references/document-index-workflow.md#需求与迭代方案的归属)追加或更新，避免另起平行方案。
 
 ## 从现有能力到目标实现
