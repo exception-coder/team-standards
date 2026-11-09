@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.12] - 2026-11-09
+
+- Resolve each requirement to its own project and iteration, support multiple discoverable requirements within one iteration, and maintain the appropriate project and iteration navigation.
+
 ## [5.6.11] - 2026-11-09
 
 - Continue new requirement and iteration plans within existing project directories and navigation, keeping current documents, linked attachments and confirmed decisions consistent across authorized destinations.
