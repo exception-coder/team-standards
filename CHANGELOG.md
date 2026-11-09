@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.6] - 2026-11-09
+
+- Use compact precision topology as the default for system architecture and collaboration diagrams; prioritize verified relationships, readable connectors, restrained shapes, and rules outside nodes.
+
 ## [5.6.5] - 2026-11-09
 
 - Make entity headers and field rows the standard presentation whenever diagrams describe database tables; use logical ER relationships when supported by evidence, and split crowded models by domain.
