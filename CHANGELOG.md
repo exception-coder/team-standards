@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.5] - 2026-11-09
+
+- Make entity headers and field rows the standard presentation whenever diagrams describe database tables; use logical ER relationships when supported by evidence, and split crowded models by domain.
+
 ## [5.6.4] - 2026-11-09
 
 - Separate business relationship maps, concise logical ER diagrams and field-rule documentation; use native Crow's Foot symbols and distinguish verified physical foreign keys from logical and cross-system references.
