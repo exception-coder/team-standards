@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.11] - 2026-11-09
+
+- Continue new requirement and iteration plans within existing project directories and navigation, keeping current documents, linked attachments and confirmed decisions consistent across authorized destinations.
+
 ## [5.6.10] - 2026-11-09
 
 - Assess anticipated detail-level queries, lifecycle, constraints and migration before merging related records into fields or JSON; use concrete visit products and participants as a conditional example.

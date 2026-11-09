@@ -7,6 +7,8 @@ description: 设计需求在现有系统中的技术实现、模块职责、接�
 
 把已确认的需求落到现有系统的职责、契约和调用链，让接手人能从具体入口开始实现和验证。按[工程设计输出规则](../change-readiness/references/engineering-design-output.md)裁剪深度。
 
+新增迭代设计沿用项目既有目录和导航，按[文档归属](../markdown-writing-standards/references/document-index-workflow.md#需求与迭代方案的归属)追加或更新，避免另起平行方案。
+
 ## 从现有能力到目标实现
 
 - 按[实施定位](../change-readiness/references/code-orientation.md)核对模块、包、入口、调用方、公共组件或 Starter，以及既有接口、权限和测试。区分已有路径、拟复用能力、目标变化和待证实假设。沿用项目架构，新增职责或依赖写明原因。涉及分层时参考 [DDD-lite](../architecture-ddd-lite-fullstack/SKILL.md)。
