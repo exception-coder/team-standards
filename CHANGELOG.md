@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.14] - 2026-11-09
+
+- Add project and iteration AI development handoffs with current document links, project responsibilities, decision and delivery status, access limits, validation and a reusable action summary.
+
 ## [5.6.13] - 2026-11-09
 
 - Clarify the purpose, applicable situations and flexible sequence of requirement notes, feature plans, business and technical designs, meeting briefs and supporting diagrams; choose only what the task needs.
