@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.7] - 2026-11-09
+
+- Organize meeting briefs around clear topics, merge redundant headings, and use a decision index that points to context and open issues in each business block.
+
 ## [5.6.6] - 2026-11-09
 
 - Use compact precision topology as the default for system architecture and collaboration diagrams; prioritize verified relationships, readable connectors, restrained shapes, and rules outside nodes.
