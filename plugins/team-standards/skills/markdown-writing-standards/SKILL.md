@@ -1,11 +1,32 @@
 ---
 name: markdown-writing-standards
-description: "Use when delivering suite or project updates to synchronize affected documentation, and when creating or structurally editing Markdown. Covers documentation impact, deduplication, Markdown/Mermaid validation, and existing navigation maintenance."
+description: "团队文档统一写作入口。编写、精简、同步或发布项目文档时先选读者和文档类型，再核对正文、归属、图件及发布位置。覆盖方案、过会稿、Quickstart、交接和 Markdown 维护。"
 ---
 
 # Markdown 编写规范
 
 目标：文档内容准确、入口可发现、格式可阅读，维护同一主题的唯一权威正文。共同准则见[工程宪法](../change-readiness/references/engineering-principles.md)。
+
+## 按读者选择文档
+
+| 文档 | 读者要完成的事 | 正文重点 |
+|---|---|---|
+| 需求与交付清单 | 业务和研发对齐范围与交付顺序 | 问题、范围、功能、顺序和完成标准。多个页面按需用[页面交付计划](../page-delivery-plan/SKILL.md) |
+| 概要设计 | 业务和技术负责人看懂整体方案 | 目标、分工、主流程、本期边界及关键取舍。需要说明关系时配全景图 |
+| 详细设计 | 研发和测试实现并验收 | 流程、接口、数据、规则、异常和验收。技术实施、库表、页面交互可按需要放在对应章节 |
+| 过会稿 | 与会人作出决定 | 按业务块讲方案、影响和待确认事项，引用详设。见[过会模式](../clear-design-docs/references/meeting-brief.md) |
+| 接入指南（Quickstart） | 使用方或接入方独立完成首个可验证场景 | 前置条件、最小配置或调用、操作步骤、成功标志和常见故障 |
+| 交接说明 | 接手方知道接下来做什么 | 当前结果、遗留事项、负责人、资料入口和完成标志。见[跨系统交接](../cross-system-handoff/SKILL.md) |
+
+需求可与功能清单合写，概设可与详设同稿分节。已有设计按[内容契约](../change-readiness/references/design-output-contract.md)维护。过会稿提炼决策，Quickstart 从使用方操作出发，交接说明聚焦下一棒。几种用途共用事实时引用同一正文。图纸和导航随正文维护，故障分析、发布记录和验收证据按实际用途另行归档。
+
+对外提供 SDK、API 或跨系统接入能力时，准备可查找的 Quickstart。每步写操作和可见结果，按需要补前置条件及排查方式。复制用的命令和配置以已验证版本为准。能力仍在设计时，明确哪些步骤和结果是拟定的。
+
+## 正文写给读者
+
+- 开头直接说明解决的问题和预期结果。方案接着讲谁负责、怎么走和本期范围。按[人话](../plain-writing/SKILL.md)用具体的人、动作和结果表达。
+- Git 哈希、设计深度、任务分级、工具输出、AI 自检和内部验收流水号留在变更记录或验证证据中。需要锁定版本、复现或追溯时，在相关位置按需引用。保留会影响实现的状态、接口标识、业务编号、关键限制和验收条件。
+- 正式方案用[全景图](../change-readiness/references/engineering-design-output.md#全景图与正文)解释关键关系。复杂细节放在详设或相应操作步骤。发布前逐段问它是否帮助读者理解、决策、操作或验收，删除过程说明、重复内容和无用途的模板项。
 
 ## 判断准则
 

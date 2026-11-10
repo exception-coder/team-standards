@@ -165,7 +165,7 @@ flowchart TD
 | 前端设计 | `business-visualization-advisor` | 业务对象与状态驱动的指标、洞察、选图及管理看板信息设计 |
 | 前端设计 | `frontend-excellence` | 生产 Web 前端交互设计、实施、视觉评审、设计系统与偏好模式；按任务和范围浏览器验收 |
 | 知识文档 | `backend-evidence` | 单服务数据事实、Graphify 即时影响、领域规格与查询性能 |
-| 知识文档 | `markdown-writing-standards` | 写前查重、Markdown/Mermaid 和写后索引 |
+| 知识文档 | [markdown-writing-standards](plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | 六类常用文档、读者正文、文档归属与发布核对 |
 | 知识文档 | `init-project-docs` | 补缺失入口，复用现有业务文档、从代码补缺并标待确认，交付一张 draw.io 全景图；Graphify/OpenSpec 按需 |
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，按影响验证并如实报告通过、失败或未验证 |
 | 日志交付 | `git-commit-standards` | 按最小完整逻辑单元实现、验证、提交；正文讲清原问题、关键做法与实际结果，独立判断 push |

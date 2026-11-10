@@ -165,7 +165,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [java-coding-standards](../plugins/team-standards/skills/java-coding-standards/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
 | [go-coding-standards](../plugins/team-standards/skills/go-coding-standards/SKILL.md) | 直接阅读主入口；架构复用 DDD-lite 的 Go 章节 | Go 语言规则；没有独立 Go Hook |
 | [llm-agent-coding-standards](../plugins/team-standards/skills/llm-agent-coding-standards/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
-| [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | [references/](../plugins/team-standards/skills/markdown-writing-standards/references/) | Agent 读取的规则；没有独立同名执行器 |
+| [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | [文档类型与正文准则](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#按读者选择文档) | 动笔先选读者、类型与归属，交付核对正文、图件和云端位置 |
 
 ### 按模式找具体参考文件
 
@@ -272,7 +272,7 @@ hooks/check-openspec-governance.js                    宿主事件入口
 | `backend-evidence` | 数据与运行事实 | DDL、真实数据库、SQL、日志、执行计划和性能问题 |
 | `backend-evidence` | 即时影响 | 修改状态、字段、事件或 API 前用新鲜 Graphify 查询；不回写手工索引 |
 | `backend-evidence` | 领域规格 | 状态密集业务缺少不变量、终态或下一动作证据 |
-| `markdown-writing-standards` | 文档同步 / 写前 / 写中 / 写后 | 套件或项目更新核对文档影响，唯一归属、结构与 Mermaid、必要已有链接 |
+| `markdown-writing-standards` | 文档选型、编写、同步与发布 | 共用正文准则，已有项目归属与导航，发布前后核对目录和配图 |
 | `git-commit-standards` | 完成收尾 / 提交 | 文档和验证完成后自动提交本次范围；独立判断推送授权 |
 | `init-project-docs` | structure / onboard / init / refresh / status / profile | 默认整理主要业务知识与 draw.io 全景图，补入口；只读状态、结构限定、可选工具及增量维护分别处理 |
 | `delivery-verification` | completion | 可执行改动完成后、最终回复前调用 Forge 并检查最新 PASS 证据 |

@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.6.15] - 2026-11-10
+
+- Unify audience-based document selection, reader-facing content, Quickstarts and cloud publication checks. Keep internal design depth and verification metadata in their own records.
+
 ## [5.6.14] - 2026-11-09
 
 - Add project and iteration AI development handoffs with current document links, project responsibilities, decision and delivery status, access limits, validation and a reusable action summary.
