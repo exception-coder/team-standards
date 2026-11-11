@@ -1,6 +1,8 @@
 # team-standards
 
-**5.6.3** 过会稿按业务块用表格逐项讲清页面字段、指标和判断规则；待拍板问题紧跟对应块，技术字段、接口和实现细节留在技术方案。保留原型、对象/表模型及draw.io逻辑图，避免精简时丢掉阈值、权限和业务边界。
+**5.7.0** 文档采用[图解主稿与按需详查](plugins/team-standards/skills/markdown-writing-standards/SKILL.md#图解主稿与按需详查)：过会讲结论、主图、重点难点和待定事项；技术方案保留完整实现参考；Quickstart 从接入方最小场景与代码开始。新增[过会模板](plugins/team-standards/skills/clear-design-docs/assets/meeting-brief.md)和[接入模板](plugins/team-standards/skills/markdown-writing-standards/assets/quickstart.md)，精简旧模板，技术模板路由到唯一维护源。原型、字段表、对象模型和时序按问题选用，不再逐块强制铺满；既有固定设计绑定继续兼容。
+
+历史更新摘要（现行要求以各 Skill 为准）：
 
 **5.6.2** 过会模式补齐[业务对象本体与表模型](plugins/team-standards/skills/clear-design-docs/references/meeting-brief.md#业务对象本体与表模型)：在各业务块讲清对象含义、关键状态、关系基数、数据归属及实际存储映射，用draw.io对象关系图/简化ER图表达。共享模型只讲一次，完整字段仍归原设计，模型问题放在对应块下。
 

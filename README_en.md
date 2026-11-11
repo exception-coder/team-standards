@@ -1,6 +1,8 @@
 # team-standards
 
-Use the [team writing standard](plugins/team-standards/skills/markdown-writing-standards/SKILL.md) to choose a document by audience, keep project metadata out of the opening, and verify the destination and embedded diagrams when publishing.
+**5.7.0** adopts [visual briefs with on-demand implementation references](plugins/team-standards/skills/markdown-writing-standards/SKILL.md#图解主稿与按需详查). Meeting material uses message headlines, editable draw.io diagrams, key trade-offs and decisions. Detailed designs retain implementation contracts; Quickstarts show what the consumer writes and how to verify the first scenario. New [meeting](plugins/team-standards/skills/clear-design-docs/assets/meeting-brief.md) and [Quickstart](plugins/team-standards/skills/markdown-writing-standards/assets/quickstart.md) templates replace repetitive outlines. Select prototypes, object models and sequences for the actual question; existing governed design bindings remain compatible.
+
+Earlier release notes (current Skill instructions take precedence):
 
 **5.6.2** extends meeting briefs with business objects and table models: show object meaning, key states, relationship cardinality, ownership and storage mappings through editable draw.io object/ER diagrams. Reference shared models instead of repeating them per page; keep model questions beside the relevant business area.
 

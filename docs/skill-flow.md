@@ -149,7 +149,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [business-logic-orientation](../plugins/team-standards/skills/business-logic-orientation/SKILL.md) | [references/](../plugins/team-standards/skills/business-logic-orientation/references/) | Agent 读取的规则；没有独立同名执行器 |
 | [business-ontology-modeling](../plugins/team-standards/skills/business-ontology-modeling/SKILL.md) | [模板](../plugins/team-standards/skills/business-ontology-modeling/assets/templates/)、[跨项目使用](../plugins/team-standards/skills/business-ontology-modeling/references/adoption.md)、[六问示例](../plugins/team-standards/skills/business-ontology-modeling/references/new-product-launch-example.md) | Agent按问题建模与核实可回答性；不绑定数据库、工具或本体运行引擎 |
 | [change-readiness](../plugins/team-standards/skills/change-readiness/SKILL.md) | [references/](../plugins/team-standards/skills/change-readiness/references/)；[rules/](../plugins/team-standards/skills/change-readiness/rules/) | 规则编排；OpenSpec 与治理程序见下一节 |
-| [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) | references/examples.md 与 references/review-mode.md | 编写、精简和独立评审；独立评审默认只读 |
+| [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) | references/meeting-brief.md、assets/meeting-brief.md 与 references/review-mode.md | 结论与图解讲重点难点；详设按需查阅；独立评审默认只读 |
 | [database-design](../plugins/team-standards/skills/database-design/SKILL.md) | 库表概设与详设模板 | 设计数据模型、约束、访问方式和迁移，复用后端证据 |
 | [technical-implementation-design](../plugins/team-standards/skills/technical-implementation-design/SKILL.md) | 技术实现概设与详设模板 | 设计模块、契约、调用、失败恢复和验证，复用实施定位 |
 | [page-delivery-plan](../plugins/team-standards/skills/page-delivery-plan/SKILL.md) | 简明计划模板、执行与多视图规则 | 页面、功能、入库字段、完成标准和顺序，复用现有主清单，数据范围按需简述 |
@@ -165,7 +165,7 @@ team-tools/                              本机多仓工作区，本身不是 Gi
 | [java-coding-standards](../plugins/team-standards/skills/java-coding-standards/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
 | [go-coding-standards](../plugins/team-standards/skills/go-coding-standards/SKILL.md) | 直接阅读主入口；架构复用 DDD-lite 的 Go 章节 | Go 语言规则；没有独立 Go Hook |
 | [llm-agent-coding-standards](../plugins/team-standards/skills/llm-agent-coding-standards/SKILL.md) | 直接阅读主入口；无上述下钻目录 | Agent 读取的规则；没有独立同名执行器 |
-| [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | [文档类型与正文准则](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#按读者选择文档) | 动笔先选读者、类型与归属，交付核对正文、图件和云端位置 |
+| [markdown-writing-standards](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | [文档类型与正文准则](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#按读者选择文档) | 动笔先选读者、类型与归属；图解主稿、实现参考和接入场景分层；交付核对正文、图件和云端位置 |
 
 ### 按模式找具体参考文件
 
@@ -427,11 +427,11 @@ Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成�
 
 ## 设计表达与结构的分工
 
-编写概设详设时，由 change-readiness 的内容契约确定结构与生命周期，再使用 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 完成逐段试讲、关系图、字段说明与语义核对。绘制产品能力、领域能力或系统协作图时，叠加 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 按受众选择 L1/L2/L3，提炼问题、主角与阅读路径，再组织图形与配色；后续架构说明图默认继承已确认三套模板的形象化风格，区分主体、支撑和注释；draw.io 优先复用自带 iOS7 Icons，统一图标家族；以实际打开、图标改色/缩放、文字和端点抽查及轻量清单验收，逐笔画编辑仅按明确需求验证，具体格式沿用项目选择。独立评审概设、详设或技术方案由 [设计独立评审](../plugins/team-standards/skills/clear-design-docs/references/review-mode.md) 核实本期事实、矛盾、关键缺口和过度设计；获授权改写时使用同入口编写模式。未来规模和冷门场景默认提醒，不作为当前硬指标。markdown-writing-standards 检查格式和导航，delivery-verification 核对受影响设计的实际审读范围。纯设计咨询不自动实施；普通文字编辑不要求启动设计治理。
+编写概设详设时，已采用绑定的项目由 change-readiness 的内容契约确定结构与生命周期，普通方案按统一写作规范裁剪；再使用 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 完成逐段试讲、关系图、字段说明与语义核对。绘制产品能力、领域能力或系统协作图时，叠加 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 按受众选择 L1/L2/L3，提炼问题、主角与阅读路径，再组织图形与配色；后续架构说明图默认继承已确认三套模板的形象化风格，区分主体、支撑和注释；draw.io 优先复用自带 iOS7 Icons，统一图标家族；以实际打开、图标改色/缩放、文字和端点抽查及轻量清单验收，逐笔画编辑仅按明确需求验证，具体格式沿用项目选择。独立评审概设、详设或技术方案由 [设计独立评审](../plugins/team-standards/skills/clear-design-docs/references/review-mode.md) 核实本期事实、矛盾、关键缺口和过度设计；获授权改写时使用同入口编写模式。未来规模和冷门场景默认提醒，不作为当前硬指标。markdown-writing-standards 检查格式和导航，delivery-verification 核对受影响设计的实际审读范围。纯设计咨询不自动实施；普通文字编辑不要求启动设计治理。
 
 ER 表达按 clear-design-docs 核对模型对象、同表自关联及关联两端；逻辑对象与物理表分开，不以图中别名制造新表。
 
-ER 图的关键字段和中文含义须留在对象框内，完整约束放字段表；按 clear-design-docs 检查字段密度、关联可追溯和真实渲染。
+设计参考中的 ER 图保留关键字段和中文含义，完整约束放字段表；过会只展示影响当前问题的模型并回链详设；按 clear-design-docs 检查字段密度、关联可追溯和真实渲染。
 
 需要作出设计决策时，按[工程设计输出规则](../plugins/team-standards/skills/change-readiness/references/engineering-design-output.md)识别库表、技术实现或组合方案。依风险选择 L0–L3 的输出深度，按需使用专业模板。已有实施授权时，复用项目 OpenSpec 或 Forge 中的本期范围与验收，并把实际证据和偏差回写到所属设计或 change。
 
