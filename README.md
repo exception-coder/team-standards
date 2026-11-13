@@ -1,5 +1,7 @@
 # team-standards
 
+**5.7.1** 精简套件维护入口：一个主 Skill 推进，专项按缺口加载；复用当前判断、定位与验证，合并必要进度说明。安全与相关测试保持，Hook 行为不变；不承诺未经测量的提速比例。
+
 **5.7.0** 文档采用[图解主稿与按需详查](plugins/team-standards/skills/markdown-writing-standards/SKILL.md#图解主稿与按需详查)：过会讲结论、主图、重点难点和待定事项；技术方案保留完整实现参考；Quickstart 从接入方最小场景与代码开始。新增[过会模板](plugins/team-standards/skills/clear-design-docs/assets/meeting-brief.md)和[接入模板](plugins/team-standards/skills/markdown-writing-standards/assets/quickstart.md)，精简旧模板，技术模板路由到唯一维护源。原型、字段表、对象模型和时序按问题选用，不再逐块强制铺满；既有固定设计绑定继续兼容。
 
 历史更新摘要（现行要求以各 Skill 为准）：

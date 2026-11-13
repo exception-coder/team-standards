@@ -1,5 +1,7 @@
 # Skill 链路全景图
 
+5.7.1：一个主入口推进，专项仅补缺口；已读规则、当前分级与有效验证复用。定位和分级并入必要进度或最终说明，不单独增加汇报。独立读取按工具能力批量执行，安全与风险验证不缩减。
+
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
 已授权业务开发按实际影响维护设计；明确采用绑定治理的项目使用[设计发现、补建、绑定、同步与验证](../plugins/team-standards/skills/change-readiness/references/automatic-design-maintenance.md)。Agent 负责真实内容，内部入口安全合并绑定；纯咨询只读，普通开发不因插件存在而初始化治理。

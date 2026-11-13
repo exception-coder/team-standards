@@ -7,7 +7,7 @@ description: "Guide implementation preparation: understand the existing behavior
 
 目标：在已授权任务内取得足够实施依据，维护受影响的行为和设计后推进交付。共同准则见[工程宪法](references/engineering-principles.md)。
 
-规格深度统一由项目优先的 `openspec-auto` 判断。复用当前任务的 L1/L2/L3 与理由，本 Skill 只补实施依据和设计影响，不重复分类或初始化。项目自有更严格流程继续适用。
+规格深度统一由项目优先的 `openspec-auto` 判断。复用当前任务的 L1/L2/L3 与理由，本 Skill 只补实施依据和设计影响，不重复分类或初始化。已有诊断、定位及约束足以实施时直接复用，不额外加载全部参考或另走准备流程。项目自有更严格流程继续适用。
 
 ## 判断准则
 
