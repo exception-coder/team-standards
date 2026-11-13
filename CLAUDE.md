@@ -67,11 +67,11 @@
 | 编写或精简概设详设 | `clear-design-docs` 配合现有设计内容契约 |
 | 项目过会、方案宣讲、汇总功能清单与设计供讨论 | `clear-design-docs` 的过会模式；按业务块配原型、对象本体与表模型、draw.io逻辑图/时序图，问题放在对应块下 |
 | 设计数据库模型、结构、索引或数据演进 | [database-design](plugins/team-standards/skills/database-design/SKILL.md) |
-| 设计模块、接口、流程或事务的技术实现 | [technical-implementation-design](plugins/team-standards/skills/technical-implementation-design/SKILL.md) |
+| 解释技术原理，或设计模块、接口、流程与事务的业务实现 | [technical-implementation-design](plugins/team-standards/skills/technical-implementation-design/SKILL.md) |
 | 根据需求、原型或页面制定交付计划，或按计划续接 | [page-delivery-plan](plugins/team-standards/skills/page-delivery-plan/SKILL.md)；维护功能编号、批次依赖、验收与当前进展 |
 | 绘制、重绘或美化架构说明图，包括 draw.io/drawio | `architecture-diagram-design`；统一信息提炼、三级视图、视觉语言、原生模板与轻量验收；文档正文仍按 `clear-design-docs` |
 | 独立评审概设、详设、技术方案或实施方案 | `clear-design-docs` 的独立评审模式；获授权改写时使用同入口编写模式 |
-| 编写、精简、同步或发布项目文档，包括方案、过会稿、Quickstart 和交接 | `markdown-writing-standards` 先选文档类型和读者；技术思想文章、白皮书走技术出版物模式，按需选专项 |
+| 编写、精简、同步或发布项目文档，包括方案、过会稿、Quickstart 和交接 | `markdown-writing-standards` 先选文档类型和读者；区分技术原理、业务实现、过会决策与科普理念；出版物模式只辅助表达，不限制实现深度 |
 | 初始化 AI 工程结构/AI 目录；初始化新项目、一键 onboard、接入新系统；或刷新上下文状态 | `init-project-docs` |
 | 可执行改动完成、准备最终回复 | `delivery-verification` |
 | 本次作业完成且有可提交改动；任何 git commit 或生成提交信息 | `git-commit-standards` |

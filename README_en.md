@@ -1,5 +1,7 @@
 # team-standards
 
+**5.7.3** distinguishes technical explanations, business implementation designs, decision briefs, and educational articles. Preserve mechanisms and execution paths for technical readers; editorial styling does not impose a diagram count or remove implementation detail.
+
 **5.7.2** adds a [technical publication mode](plugins/team-standards/skills/markdown-writing-standards/references/technical-publication.md) for engineering essays and white papers: lead with the argument, give each section one question, show architectural relationships and feedback loops, and keep comparisons in native tables. Compression and diagram counts are task-specific; detailed designs and Quickstarts retain their own completeness requirements.
 
 **5.7.1** Streamlines the maintenance entry point: one primary skill, supporting guidance only for current gaps, shared decisions and evidence, and consolidated progress updates. Required verification and hook behavior are preserved; no unmeasured speedup is claimed.

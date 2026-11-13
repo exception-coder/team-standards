@@ -1,5 +1,7 @@
 # Skill 链路全景图
 
+5.7.3：按[文档选型](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#按读者选择文档)区分技术原理、业务实现、过会与科普。技术机制以 technical-implementation-design 为主，过会服务决策；出版物模式仅辅助表达，按解释任务选择图数和深度。
+
 5.7.2：技术思想文章与白皮书由 markdown-writing-standards 的[技术出版物模式](../plugins/team-standards/skills/markdown-writing-standards/references/technical-publication.md)组织；架构绘图按关系、决策与反馈表达，不默认卡片堆叠。压缩幅度按任务约定，详细设计和操作指南保留各自契约。继续复用当前判断和有效验证。
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
