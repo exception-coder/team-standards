@@ -1,6 +1,6 @@
 # Skill 链路全景图
 
-5.7.1：一个主入口推进，专项仅补缺口；已读规则、当前分级与有效验证复用。定位和分级并入必要进度或最终说明，不单独增加汇报。独立读取按工具能力批量执行，安全与风险验证不缩减。
+5.7.2：技术思想文章与白皮书由 markdown-writing-standards 的[技术出版物模式](../plugins/team-standards/skills/markdown-writing-standards/references/technical-publication.md)组织；架构绘图按关系、决策与反馈表达，不默认卡片堆叠。压缩幅度按任务约定，详细设计和操作指南保留各自契约。继续复用当前判断和有效验证。
 
 4.11.0 起，change-readiness 与 delivery-verification 默认提供开发和验证引导。插件不再注册 SessionStart、规格/就绪写前检查及交付 Stop 检查；缺少绑定、指纹、治理 JSON 或 Forge PASS 不单独阻止作业。真实失败与未验证项仍如实报告，项目独立配置的 CI、权限和 Forge 门禁由项目决定。
 
@@ -429,7 +429,7 @@ Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成�
 
 ## 设计表达与结构的分工
 
-编写概设详设时，已采用绑定的项目由 change-readiness 的内容契约确定结构与生命周期，普通方案按统一写作规范裁剪；再使用 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 完成逐段试讲、关系图、字段说明与语义核对。绘制产品能力、领域能力或系统协作图时，叠加 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 按受众选择 L1/L2/L3，提炼问题、主角与阅读路径，再组织图形与配色；后续架构说明图默认继承已确认三套模板的形象化风格，区分主体、支撑和注释；draw.io 优先复用自带 iOS7 Icons，统一图标家族；以实际打开、图标改色/缩放、文字和端点抽查及轻量清单验收，逐笔画编辑仅按明确需求验证，具体格式沿用项目选择。独立评审概设、详设或技术方案由 [设计独立评审](../plugins/team-standards/skills/clear-design-docs/references/review-mode.md) 核实本期事实、矛盾、关键缺口和过度设计；获授权改写时使用同入口编写模式。未来规模和冷门场景默认提醒，不作为当前硬指标。markdown-writing-standards 检查格式和导航，delivery-verification 核对受影响设计的实际审读范围。纯设计咨询不自动实施；普通文字编辑不要求启动设计治理。
+编写概设详设时，已采用绑定的项目由 change-readiness 的内容契约确定结构与生命周期，普通方案按统一写作规范裁剪；再使用 [clear-design-docs](../plugins/team-standards/skills/clear-design-docs/SKILL.md) 完成逐段试讲、关系图、字段说明与语义核对。绘制产品能力、领域能力或系统协作图时，叠加 [architecture-diagram-design](../plugins/team-standards/skills/architecture-diagram-design/SKILL.md) 按受众选择 L1/L2/L3，提炼问题、主角与阅读路径，再组织图形与配色；按问题选择图型，技术思想文章与白皮书采用技术出版物模式，既有模板作为可选样板，区分主体、支撑和注释；draw.io 优先复用自带 iOS7 Icons，统一图标家族；以实际打开、图标改色/缩放、文字和端点抽查及轻量清单验收，逐笔画编辑仅按明确需求验证，具体格式沿用项目选择。独立评审概设、详设或技术方案由 [设计独立评审](../plugins/team-standards/skills/clear-design-docs/references/review-mode.md) 核实本期事实、矛盾、关键缺口和过度设计；获授权改写时使用同入口编写模式。未来规模和冷门场景默认提醒，不作为当前硬指标。markdown-writing-standards 检查格式和导航，delivery-verification 核对受影响设计的实际审读范围。纯设计咨询不自动实施；普通文字编辑不要求启动设计治理。
 
 ER 表达按 clear-design-docs 核对模型对象、同表自关联及关联两端；逻辑对象与物理表分开，不以图中别名制造新表。
 

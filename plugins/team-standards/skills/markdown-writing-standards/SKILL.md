@@ -11,6 +11,7 @@ description: "团队文档统一写作入口。编写、精简、同步或发布
 
 | 文档 | 读者要完成的事 | 正文重点 |
 |---|---|---|
+| 技术思想文章 / 白皮书 | 理解工程思想、体系关系与取舍 | 观点前置、一节一问，关系图与反馈闭环引导；详细规范外链。见[技术出版物模式](references/technical-publication.md) |
 | 需求与交付清单 | 业务和研发对齐范围与交付顺序 | 问题、范围、功能、顺序和完成标准。多个页面按需用[页面交付计划](../page-delivery-plan/SKILL.md) |
 | 概要设计 | 业务和技术负责人看懂整体方案 | 目标、分工、主流程、本期边界及关键取舍。需要说明关系时配全景图 |
 | 详细设计 | 研发和测试实现并验收 | 流程、接口、数据、规则、异常和验收。技术实施、库表、页面交互可按需要放在对应章节 |
@@ -38,7 +39,7 @@ description: "团队文档统一写作入口。编写、精简、同步或发布
 - 关键数据正确性、权限、事务、失败恢复和兼容条件在对应位置保留；完整字段字典、SQL、接口和代码按需查阅。每段只保留帮助本读者理解、决策、执行或验收的信息，基础概念无需重复教学。
 - 所有新绘或改绘的方案图默认使用可编辑 draw.io，并在正文嵌入清晰同源预览；用户明确指定其他格式时遵从。发布时检查实际显示尺寸、文字与连线，不以文件上传成功代替可读性。飞书沿用项目约定的二级目录；已核实归属直接复用，不每次重问。
 
-过会图文模板见[过会模式](../clear-design-docs/references/meeting-brief.md)，工程概设和详设模板见[专业设计入口](../change-readiness/references/engineering-design-output.md#按要解决的问题选择入口)。所谓 PPT 式表达指阅读结构，不默认另建 PPT 文件。
+技术思想文章与白皮书按[技术出版物模式](references/technical-publication.md)组织论述，避免套用逐屏卡片。过会图文模板见[过会模式](../clear-design-docs/references/meeting-brief.md)，工程概设和详设模板见[专业设计入口](../change-readiness/references/engineering-design-output.md#按要解决的问题选择入口)。过会的逐屏结构不要求大色块、等大卡片或另建 PPT 文件。
 
 方法依据：[Assertion–Evidence](https://writing.engr.psu.edu/assertion_evidence_EA.html)支持结论标题与视觉证据；[Mayer 多媒体学习研究](https://bjorklab.psych.ucla.edu/wp-content/uploads/sites/13/2016/04/DDAndErrorsEnhanceLearning.pdf#page=68)支持删无关信息、重点提示和图文就近；[Diátaxis](https://www.diataxis.fr/start-here/)区分讲解、操作与参考；[C4](https://c4model.com/diagrams)按受众选择视图。以上用于指导表达，学习研究不等于企业过会的效果承诺，也未规定固定页数。
 

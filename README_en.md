@@ -1,5 +1,7 @@
 # team-standards
 
+**5.7.2** adds a [technical publication mode](plugins/team-standards/skills/markdown-writing-standards/references/technical-publication.md) for engineering essays and white papers: lead with the argument, give each section one question, show architectural relationships and feedback loops, and keep comparisons in native tables. Compression and diagram counts are task-specific; detailed designs and Quickstarts retain their own completeness requirements.
+
 **5.7.1** Streamlines the maintenance entry point: one primary skill, supporting guidance only for current gaps, shared decisions and evidence, and consolidated progress updates. Required verification and hook behavior are preserved; no unmeasured speedup is claimed.
 
 **5.7.0** adopts [visual briefs with on-demand implementation references](plugins/team-standards/skills/markdown-writing-standards/SKILL.md#图解主稿与按需详查). Meeting material uses message headlines, editable draw.io diagrams, key trade-offs and decisions. Detailed designs retain implementation contracts; Quickstarts show what the consumer writes and how to verify the first scenario. New [meeting](plugins/team-standards/skills/clear-design-docs/assets/meeting-brief.md) and [Quickstart](plugins/team-standards/skills/markdown-writing-standards/assets/quickstart.md) templates replace repetitive outlines. Select prototypes, object models and sequences for the actual question; existing governed design bindings remain compatible.

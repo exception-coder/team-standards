@@ -1,5 +1,7 @@
 # team-standards
 
+**5.7.2** 文档新增[技术出版物模式](plugins/team-standards/skills/markdown-writing-standards/references/technical-publication.md)：技术思想文章与白皮书观点前置、一节一问，架构表达关系，流程呈现反馈，普通对比使用原生表格。减少重复解释与卡片堆叠；压缩比例和图数仅按具体任务确定，不影响详细设计与 Quickstart 的完整性。
+
 **5.7.1** 精简套件维护入口：一个主 Skill 推进，专项按缺口加载；复用当前判断、定位与验证，合并必要进度说明。安全与相关测试保持，Hook 行为不变；不承诺未经测量的提速比例。
 
 **5.7.0** 文档采用[图解主稿与按需详查](plugins/team-standards/skills/markdown-writing-standards/SKILL.md#图解主稿与按需详查)：过会讲结论、主图、重点难点和待定事项；技术方案保留完整实现参考；Quickstart 从接入方最小场景与代码开始。新增[过会模板](plugins/team-standards/skills/clear-design-docs/assets/meeting-brief.md)和[接入模板](plugins/team-standards/skills/markdown-writing-standards/assets/quickstart.md)，精简旧模板，技术模板路由到唯一维护源。原型、字段表、对象模型和时序按问题选用，不再逐块强制铺满；既有固定设计绑定继续兼容。
@@ -169,7 +171,7 @@ flowchart TD
 | 前端设计 | `business-visualization-advisor` | 业务对象与状态驱动的指标、洞察、选图及管理看板信息设计 |
 | 前端设计 | `frontend-excellence` | 生产 Web 前端交互设计、实施、视觉评审、设计系统与偏好模式；按任务和范围浏览器验收 |
 | 知识文档 | `backend-evidence` | 单服务数据事实、Graphify 即时影响、领域规格与查询性能 |
-| 知识文档 | [markdown-writing-standards](plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | 六类常用文档、读者正文、文档归属与发布核对 |
+| 知识文档 | [markdown-writing-standards](plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | 文档选型、技术出版物、读者正文、文档归属与发布核对 |
 | 知识文档 | `init-project-docs` | 补缺失入口，复用现有业务文档、从代码补缺并标待确认，交付一张 draw.io 全景图；Graphify/OpenSpec 按需 |
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，按影响验证并如实报告通过、失败或未验证 |
 | 日志交付 | `git-commit-standards` | 按最小完整逻辑单元实现、验证、提交；正文讲清原问题、关键做法与实际结果，独立判断 push |
