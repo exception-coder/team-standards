@@ -1,6 +1,6 @@
 # team-standards
 
-**5.8.0** 将[工作汇总](plugins/team-standards/skills/git-commit-standards/references/work-summary.md#成果价值汇报)升级为成果价值分析：按业务目标归并任务，说明问题、能力变化、价值证据和交付状态；保留关键数据，以本周重点、项目进展、整体价值和下一阶段重点组织周报。第一期只改分析、模板和自检，不新增系统或持久台账，项目和个人映射仍由使用方维护。
+**5.8.1** 收紧[成果汇报](plugins/team-standards/skills/git-commit-standards/references/work-summary.md#成果价值汇报)的信息筛选：按业务影响分为 S/A/B/C，核心成果最多三条、每项目最多两条成果、待办与风险最多四条；结论与事实互补，已完成与未完成分开，不再单列整体价值。保留关键数据及准确交付状态，以具体变化替代泛化价值，不新增系统或持久台账，项目和个人映射仍由使用方维护。
 
 **5.7.3**：文档先区分技术原理、业务实现、过会决策与科普理念。技术原理保留机制、调用链和运行条件，业务方案贯通规则与验收；出版物风格只辅助表达，不固定图数或压缩深度。
 
@@ -69,7 +69,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.8.0**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.8.1**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -178,7 +178,7 @@ flowchart TD
 | 知识文档 | [markdown-writing-standards](plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | 文档选型、技术出版物、读者正文、文档归属与发布核对 |
 | 知识文档 | `init-project-docs` | 补缺失入口，复用现有业务文档、从代码补缺并标待确认，交付一张 draw.io 全景图；Graphify/OpenSpec 按需 |
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，按影响验证并如实报告通过、失败或未验证 |
-| 提交与成果汇报 | `git-commit-standards` | 按完整逻辑单元验证提交；成果汇报按问题、能力、价值和交付证据归并，保留数据并区分实际效果，独立判断 push |
+| 提交与成果汇报 | `git-commit-standards` | 按完整逻辑单元验证提交；成果先分级筛选，结论与事实互补、待办独立呈现，保留数据和准确状态，独立判断 push |
 
 ---
 

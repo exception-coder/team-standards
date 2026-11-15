@@ -1,6 +1,6 @@
 # Skill 链路全景图
 
-5.8.0：[成果价值汇报](../plugins/team-standards/skills/git-commit-standards/references/work-summary.md#成果价值汇报)由现有工作汇总模式承接，先整理临时事实，再按问题、能力变化、价值与状态提炼。保留关键数据，区分开发、发布、验证、应用和实际效果；默认四部分并按用户格式裁剪，不新增服务、持久台账或强制门禁。
+5.8.1：[成果价值汇报](../plugins/team-standards/skills/git-commit-standards/references/work-summary.md#成果价值汇报)由现有工作汇总模式承接，事实收集后识别成果、按 S/A/B/C 分级、编排主次并压缩质检。默认核心成果最多三条、每项目最多两条成果、待办与风险最多四条；结论与事实互补，完成与待办分开，删除独立整体价值。保留关键数据，区分开发、发布、验证、应用和效果，用户明确格式优先；不新增服务、持久台账或强制门禁。
 
 5.7.3：按[文档选型](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#按读者选择文档)区分技术原理、业务实现、过会与科普。技术机制以 technical-implementation-design 为主，过会服务决策；出版物模式仅辅助表达，按解释任务选择图数和深度。
 
@@ -423,7 +423,7 @@ Go 源码 → `coding-standards-common` + `go-coding-standards`；业务边界�
 | [frontend-excellence：设计系统](../plugins/team-standards/skills/frontend-excellence/SKILL.md) | references/bootstrap.md、review-mode.md、review-workflow.md、evidence-capture.md、pattern-mining.md；assets/ 与 schema 保留 | 设计复用、初始化、评审和偏好；不强制创建 Registry |
 | coding-standards-common | references/comment-maintenance.md、feedback.md | 显式清理和纠正，不创建计数式违规日志 |
 | business-logic-orientation | references/terminology.md | 术语核对与已有知识源维护 |
-| git-commit-standards | references/work-summary.md | 按需查询与成果价值汇报；保留数据、准确标注状态，不自动写日报 |
+| git-commit-standards | references/work-summary.md | 按需查询；成果分级筛选，核心结论、项目事实及待办分开，保留数据与准确状态，不自动写日报 |
 
 Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成区](platform-integrations/planning-evidence-discovery/SKILL.md) 保留；只有实际平台接入才使用，不阻断一般跨项目分析。本仓决策流程见 [维护规则](maintenance/decision-log.md)。旧入口与迁移表以 README 的 4.0.0 章节为准。
 
