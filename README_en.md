@@ -1,5 +1,7 @@
 # team-standards
 
+**5.8.0** upgrades [work summaries](plugins/team-standards/skills/git-commit-standards/references/work-summary.md) into evidence-backed outcome reports: group work by goals, explain capability changes and value, preserve meaningful figures, and distinguish implementation, deployment, verification, business use, and measured effects. Weekly reports cover priorities, project progress, overall value, and critical next steps. This phase adds no persistent ledger or new service; project and personal mappings remain with consumers.
+
 **5.7.3** distinguishes technical explanations, business implementation designs, decision briefs, and educational articles. Preserve mechanisms and execution paths for technical readers; editorial styling does not impose a diagram count or remove implementation detail.
 
 **5.7.2** adds a [technical publication mode](plugins/team-standards/skills/markdown-writing-standards/references/technical-publication.md) for engineering essays and white papers: lead with the argument, give each section one question, show architectural relationships and feedback loops, and keep comparisons in native tables. Compression and diagram counts are task-specific; detailed designs and Quickstarts retain their own completeness requirements.
@@ -54,7 +56,7 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.6.0** exposes 26 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.8.0** exposes 26 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Version 4.15.3 makes the user-approved three-template style the default for subsequent architecture illustrations: a recognizable primary subject, supporting resources, consistent line icons, whitespace and semantic colors. Reuse native templates and built-in iOS7 Icons unless project conventions or explicit instructions call for another style. Standard engineering notation remains applicable. The approved source diagrams and four-page previews are unchanged; see the [default style](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格).
 
