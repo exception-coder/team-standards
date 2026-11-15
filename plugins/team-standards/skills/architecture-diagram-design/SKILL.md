@@ -25,6 +25,8 @@ description: 绘制、重绘或美化架构说明图（含 draw.io/drawio）时�
 
 绘制或重画 ER 时读取[ER 分层与关系标记](references/er-design.md)：业务对象、逻辑表关系和字段规则分开表达；使用可编辑的标准 Crow's Foot 关系符号，证据不足的关系或约束明确标待核实。
 
+技术文档的图源按[图文技术设计](../markdown-writing-standards/references/technical-design.md#图源与视觉)选择：Mermaid/PlantUML 便于版本维护，draw.io 支持精确布局；不为统一风格转换已有图。C4 分层按受众选择，不要求画齐四层。
+
 ## 组织内容与视觉
 
 - 一图一事，标题尽量表达结论；分开静态结构、动态执行、配置管理与部署关系。长清单和例外归正文，名称与编号能够回链。

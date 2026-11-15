@@ -7,6 +7,8 @@ description: 设计关系型数据库、业务实体关系、物理库表、索�
 
 把数据所有权、业务约束和访问场景落到可实现、可审核的模型及演进方案。按[工程设计输出规则](../change-readiness/references/engineering-design-output.md)裁剪深度。
 
+图文组织采用[图文技术设计](../markdown-writing-standards/references/technical-design.md)：先用核心 ER 说明实体、关联与数据归属，再按表展开字段、索引、约束和迁移。物理定义在本方案维护，技术实现方案引用，不重复复制。
+
 ## 从访问场景到结构
 
 - 明确业务对象、数据归属、生命周期、关键读写、事务和必须保持的不变量。对涉及的现有表与约束，用[后端证据](../backend-evidence/SKILL.md)核对目标环境元数据或可追溯 DDL、迁移版本与读写消费者。只有仓库证据时标出版本和覆盖，目标环境未核实则保留差异风险。实体类或 Mapper 只能证明代码映射。

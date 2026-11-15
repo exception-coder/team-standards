@@ -1,5 +1,7 @@
 # team-standards
 
+**5.7.4**: [Visual technical design](plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md) organizes architecture, execution and data views with concise contracts and key implementation excerpts. Reuses the two existing design skills, selects editable diagram sources for the project, and keeps small changes lightweight.
+
 **5.7.3** distinguishes technical explanations, business implementation designs, decision briefs, and educational articles. Preserve mechanisms and execution paths for technical readers; editorial styling does not impose a diagram count or remove implementation detail.
 
 **5.7.2** adds a [technical publication mode](plugins/team-standards/skills/markdown-writing-standards/references/technical-publication.md) for engineering essays and white papers: lead with the argument, give each section one question, show architectural relationships and feedback loops, and keep comparisons in native tables. Compression and diagram counts are task-specific; detailed designs and Quickstarts retain their own completeness requirements.
@@ -26,7 +28,7 @@ Earlier release notes (current Skill instructions take precedence):
 
 **5.3.0** adds [database design](plugins/team-standards/skills/database-design/SKILL.md) and [technical implementation design](plugins/team-standards/skills/technical-implementation-design/SKILL.md), each with conceptual and detailed templates. The [shared output guidance](plugins/team-standards/skills/change-readiness/references/engineering-design-output.md) scales the design to its decisions and risks. Module baselines retain their existing structure and lifecycle.
 
-Formal designs open with a short conclusion and one overview diagram, preferably with editable draw.io source and a matching preview. The text focuses on rules, trade-offs, and acceptance.
+Formal designs open with a short conclusion and one overview diagram, with editable source selected for the project and native rendering or a matching preview. The text focuses on rules, trade-offs, and acceptance.
 
 **5.2.0:** Adds a single [interaction constitution](plugins/team-standards/skills/frontend-excellence/references/interaction-constitution.md) and an interaction-design mode inside `frontend-excellence`. The catalog remains at 22 skills. Task hierarchy, necessary complexity, feedback and recovery reuse existing state and browser checks; pure styling and backend work avoid full workflow analysis. Rule validation does not establish real-page usability.
 

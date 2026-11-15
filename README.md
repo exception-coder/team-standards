@@ -1,5 +1,7 @@
 # team-standards
 
+5.7.4：统一[图文技术设计](plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md)，复用数据库与技术实现两个专项入口；先图后文、短表与关键代码、按需章节和可维护图源。
+
 **5.7.3**：文档先区分技术原理、业务实现、过会决策与科普理念。技术原理保留机制、调用链和运行条件，业务方案贯通规则与验收；出版物风格只辅助表达，不固定图数或压缩深度。
 
 **5.7.2** 文档新增[技术出版物模式](plugins/team-standards/skills/markdown-writing-standards/references/technical-publication.md)：技术思想文章与白皮书观点前置、一节一问，架构表达关系，流程呈现反馈，普通对比使用原生表格。减少重复解释与卡片堆叠；压缩比例和图数仅按具体任务确定，不影响详细设计与 Quickstart 的完整性。
@@ -26,7 +28,7 @@
 
 **5.3.0** 新增[库表设计](plugins/team-standards/skills/database-design/SKILL.md)和[技术实现设计](plugins/team-standards/skills/technical-implementation-design/SKILL.md)，各提供概设、详设模板。按[工程设计输出规则](plugins/team-standards/skills/change-readiness/references/engineering-design-output.md)选择范围和深度，小改可简述，存量、兼容和恢复风险按需展开。专项方案可直接用于交接，进入模块长期基线时沿用现有目录和生命周期。
 
-正式方案开头用简短结论和一张全景图说明范围与主线。优先交付可编辑 draw.io 和同源预览，正文集中写规则、取舍和验收。
+正式方案开头用简短结论和一张全景图说明范围与主线。按项目与载体选择可编辑图源及原生渲染或同源预览，正文集中写规则、取舍和验收。
 
 **5.2.0：**新增[前端交互宪法](plugins/team-standards/skills/frontend-excellence/references/interaction-constitution.md)，十条原则由现有 `frontend-excellence` 的[交互设计模式](plugins/team-standards/skills/frontend-excellence/references/interaction-design.md)执行；保持 22 个 Skill。任务优先、主次分明、按需呈现与明确反馈，复用现有状态和浏览器验证；不新增独立 interaction-design 入口或评分门禁。规则校验不等于真实业务页面体验验收。
 

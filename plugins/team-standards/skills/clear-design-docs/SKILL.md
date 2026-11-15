@@ -27,7 +27,7 @@ description: 编写、精简或独立评审概设、详设与技术方案；将�
 - 新增需求或迭代方案先沿用项目已有导航和目录，按[文档归属与最小维护](../markdown-writing-standards/references/document-index-workflow.md#需求与迭代方案的归属)追加或原位更新，并维护受影响的入口及当前版本。
 - 本期能力、默认实现、扩展边界与后置方向清楚即可；尚未确定方案才用[悟道](../architecture-reasoning/SKILL.md)，已定方案不重开取舍。
 - 每段让读者能说明相关的人、资料、动作、条件与结果。条件复杂时用决策表，关系复杂时配图；术语保留准确标识并就地解释。
-- 正式方案先给结论与[全景图](../change-readiness/references/engineering-design-output.md#全景图与正文)，优先交付可编辑 draw.io。正文补图上未展开的规则、取舍与验收，共用内容引用唯一正文。
+- 正式方案先给结论与[全景图](../change-readiness/references/engineering-design-output.md#全景图与正文)，图源按[图文技术设计](../markdown-writing-standards/references/technical-design.md#图源与视觉)选择，保留可编辑源。正文补图上未展开的规则、取舍与验收，共用内容引用唯一正文。
 - 按本次范围逐段核对语义，包括对象、承诺、生效时点、责任与失败行为；外部建议也需核对，不能因标注“只改表达”就直接接受。
 
 ## 必要约束

@@ -1,5 +1,7 @@
 # Skill 链路全景图
 
+5.7.4：统一[图文技术设计](../plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md)，复用数据库与技术实现两个专项入口；先图后文、短表与关键代码、按需章节和可维护图源。
+
 5.7.3：按[文档选型](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#按读者选择文档)区分技术原理、业务实现、过会与科普。技术机制以 technical-implementation-design 为主，过会服务决策；出版物模式仅辅助表达，按解释任务选择图数和深度。
 
 5.7.2：技术思想文章与白皮书由 markdown-writing-standards 的[技术出版物模式](../plugins/team-standards/skills/markdown-writing-standards/references/technical-publication.md)组织；架构绘图按关系、决策与反馈表达，不默认卡片堆叠。压缩幅度按任务约定，详细设计和操作指南保留各自契约。继续复用当前判断和有效验证。
@@ -439,7 +441,7 @@ ER 表达按 clear-design-docs 核对模型对象、同表自关联及关联两�
 
 需要作出设计决策时，按[工程设计输出规则](../plugins/team-standards/skills/change-readiness/references/engineering-design-output.md)识别库表、技术实现或组合方案。依风险选择 L0–L3 的输出深度，按需使用专业模板。已有实施授权时，复用项目 OpenSpec 或 Forge 中的本期范围与验收，并把实际证据和偏差回写到所属设计或 change。
 
-正式方案开头用一张[全景图](../plugins/team-standards/skills/change-readiness/references/engineering-design-output.md#全景图与正文)说明范围和主线，优先交付可编辑 draw.io 与同源预览。组合方案共用全景图，专项图按需展开。
+正式方案开头用一张[全景图](../plugins/team-standards/skills/change-readiness/references/engineering-design-output.md#全景图与正文)说明范围和主线，按项目与载体选择可编辑图源及原生渲染或同源预览。组合方案共用全景图，专项图按需展开。
 
 开发交付计划由 [page-delivery-plan](../plugins/team-standards/skills/page-delivery-plan/SKILL.md)承接。默认以一张 draw.io 全景图和简明功能表说明页面、要补的功能、入库字段、完成标准及顺序，同页相关操作合并表达。中台登录、菜单和资源权限不重复安排，数据范围集中简述。详细实施与测试按实际需要展开；已授权实施经 change-readiness 推进，delivery-verification 的实际结果回写原任务。Excel 按需导出同一张表，有原型时放紧凑缩略图，点击进入工作簿内对应大图页并可返回清单；实际核对点击定位和大图可读性。
 
