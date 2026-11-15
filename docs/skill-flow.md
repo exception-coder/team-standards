@@ -1,6 +1,6 @@
 # Skill 链路全景图
 
-5.8.1：[成果价值汇报](../plugins/team-standards/skills/git-commit-standards/references/work-summary.md#成果价值汇报)由现有工作汇总模式承接，事实收集后识别成果、按 S/A/B/C 分级、编排主次并压缩质检。默认核心成果最多三条、每项目最多两条成果、待办与风险最多四条；结论与事实互补，完成与待办分开，删除独立整体价值。保留关键数据，区分开发、发布、验证、应用和效果，用户明确格式优先；不新增服务、持久台账或强制门禁。
+5.8.2：[成果价值汇报](../plugins/team-standards/skills/git-commit-standards/references/work-summary.md#成果价值汇报)先按 S/A/B/C 筛选，再编排、压缩质检。核心成果最多三条，每条一句“动词＋对象＋结果”；每项目最多两条，每条一事、使用短句；待办最多四个主题，将未完成项与下周动作分栏或分块。保留关键数字、专名及准确交付状态，统一中文标点，不新增事实、独立整体价值、服务或门禁；用户明确格式优先。
 
 5.7.3：按[文档选型](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#按读者选择文档)区分技术原理、业务实现、过会与科普。技术机制以 technical-implementation-design 为主，过会服务决策；出版物模式仅辅助表达，按解释任务选择图数和深度。
 
