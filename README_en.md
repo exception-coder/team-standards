@@ -1,6 +1,6 @@
 # team-standards
 
-**5.8.2** tightens [outcome reporting](plugins/team-standards/skills/git-commit-standards/references/work-summary.md): retain S/A/B/C selection, write each core conclusion as one action–object–result sentence, and cover one outcome per project item using short sentences. Separate unfinished work from next-week actions in columns or blocks. Keep at most three core conclusions, two items per project, and four open themes; preserve figures, names and delivery states, use consistent punctuation, and add no unverified information or new system.
+**5.9.0** adds [report modes](plugins/team-standards/skills/git-commit-standards/references/work-summary.md): keep the management brief as the default, with a detailed project report or both available on request. Both views share one fact set and agree on dates, figures, environments and states. The brief selects outcomes and risks; the detailed view retains important deliveries, functions and acceptance evidence without inheriting brief item limits. Preserve important production deliveries in both, link paired files when requested, and retain existing scheduled-task modes.
 
 **5.7.3** distinguishes technical explanations, business implementation designs, decision briefs, and educational articles. Preserve mechanisms and execution paths for technical readers; editorial styling does not impose a diagram count or remove implementation detail.
 
@@ -56,7 +56,7 @@ Version 4.4 introduced design discovery, authoring, binding and synchronization.
 
 Current design baselines and independent changes: module bindings, slice synchronization, shared ownership and content fingerprints. Adoption: [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.8.2** exposes 26 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
+Cross-project engineering governance for Claude Code, Codex, and Cursor. Version **5.9.0** exposes 26 skills and keeps project-specific routing, scaffolding, architecture linting, and topology rules in the projects that own them.
 
 Version 4.15.3 makes the user-approved three-template style the default for subsequent architecture illustrations: a recognizable primary subject, supporting resources, consistent line icons, whitespace and semantic colors. Reuse native templates and built-in iOS7 Icons unless project conventions or explicit instructions call for another style. Standard engineering notation remains applicable. The approved source diagrams and four-page previews are unchanged; see the [default style](plugins/team-standards/skills/architecture-diagram-design/references/visual-language.md#团队默认风格).
 
