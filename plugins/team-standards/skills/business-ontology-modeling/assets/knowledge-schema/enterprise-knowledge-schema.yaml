@@ -1,0 +1,204 @@
+schema_id: urn:team-standards:enterprise-knowledge-schema
+version: 1.0.0
+kind: internal-engineering-contract
+scope: Explicit project knowledge graph initialization and maintenance; ERP, CRM and other enterprise systems.
+standards:
+  representation: RDF 1.1 / Turtle
+  taxonomy: SKOS ConceptScheme / Concept
+  provenance: PROV-O Entity / Activity / Agent
+  constraints: SHACL
+  ontology: RDFS / OWL subset declared by the project; no full reasoning claim
+  processes: BPMN semantics when applicable; ordinary diagrams are not executable BPMN
+  decisions: DMN semantics when applicable; ordinary tables are not executable DMN
+organization:
+  navigation: [Enterprise, BusinessDomain, BoundedContext, ContextSection]
+  optional_intermediate: Subdomain
+  rules:
+    - Systems and applications map to contexts; they are not business domains by default.
+    - Identify boundaries from language, responsibility, invariants and evidence; menus and tables are only clues.
+    - One context may span applications, and one application may contain multiple contexts.
+    - Shared objects have one owner identity with references or explicit context-specific mappings, not copied definitions.
+    - Unknown domain/context remains null with a knowledge gap; do not invent a boundary to fill a directory.
+project_views:
+  '01':
+    name: Enterprise Architecture
+    label: 企业与系统全景
+    legacy_label: Business Architecture
+    topics: [企业与组织, 业务域地图, 业务能力地图, 系统与应用地图, 业务域协作关系]
+  '02':
+    name: Domain Model
+    label: 业务领域模型
+    legacy_label: Business Ontology
+    topics: [业务域, 子域, 限界上下文, 业务对象, 业务属性, 业务对象关系, 业务状态, 业务事件]
+  '03':
+    name: Business Process & Rules
+    label: 业务流程与规则
+    legacy_label: Process & Rules
+    topics: [业务流程, 业务活动, 角色与参与者, 状态转换, 业务规则, 业务策略, 业务异常与边界条件]
+  '04':
+    name: Data Assets & Semantics
+    label: 数据资产与语义
+    legacy_label: Data Assets
+    topics: [数据源, 数据库与Schema, 表与字段, 数据关系, 数据血缘, 数据质量, 业务对象与数据映射]
+  '05':
+    name: System Implementation
+    label: 系统实现与能力
+    legacy_label: System Capabilities
+    topics: [应用与模块, 菜单与页面, API与接口, 分层实现, 核心调用链, 权限与访问控制, 系统配置, 外部系统集成]
+    implementation_note: Controller/Service/Mapper are examples; preserve project-native Action/Manage/DAO or other layers.
+  '06':
+    name: Business Intelligence
+    label: 经营指标与决策
+    topics: [业务指标, 指标口径, 分析维度, 经营问题, 决策规则, 经营机会]
+  '07':
+    name: AI Capabilities
+    label: AI能力与知识服务
+    topics: [业务意图, AI工具, 技能, 业务知识检索, 业务问答能力, AI可执行操作]
+  '08':
+    name: Knowledge Governance
+    label: 知识治理与演进
+    topics: [知识来源, 证据, 置信度, 验证状态, 知识版本, 变更影响, 知识冲突, 知识缺口]
+context_sections:
+  '01': {name: Overview, topics: [业务目的, 职责, 边界], views: ['01', '02']}
+  '02': {name: Capabilities, topics: [业务能力], views: ['01']}
+  '03': {name: Ontology, topics: [对象, 属性, 关系, 事件, 状态], views: ['02']}
+  '04': {name: Processes, topics: [流程, 活动, 参与者], views: ['03']}
+  '05': {name: Rules, topics: [校验, 约束, 策略, 异常], views: ['03']}
+  '06': {name: Metrics, topics: [指标, 维度, 计算口径, 决策依据], views: ['06']}
+  '07': {name: Data Mapping, topics: [表, 字段, SQL依据, 数据血缘], views: ['04']}
+  '08': {name: Implementation, topics: [API, 代码, 页面, 权限, 配置, AI接入能力], views: ['05', '07']}
+  '09': {name: Dependencies, topics: [上下游业务, 系统依赖], views: ['01', '05']}
+  '10': {name: Governance, topics: [证据, 验证, 版本, 冲突, 缺口], views: ['08']}
+types:
+  - Enterprise
+  - Organization
+  - BusinessDomain
+  - Subdomain
+  - BoundedContext
+  - BusinessCapability
+  - BusinessEntity
+  - BusinessAttribute
+  - BusinessState
+  - BusinessEvent
+  - BusinessProcess
+  - BusinessActivity
+  - BusinessActor
+  - StateTransition
+  - BusinessRule
+  - BusinessPolicy
+  - BusinessException
+  - DataSource
+  - DatabaseSchema
+  - Table
+  - Column
+  - DataRelationship
+  - DataLineage
+  - DataQualityRule
+  - DataMapping
+  - Application
+  - Module
+  - Menu
+  - Page
+  - Endpoint
+  - CodeSymbol
+  - CallChain
+  - Permission
+  - Configuration
+  - Integration
+  - BusinessMetric
+  - MetricDefinition
+  - Dimension
+  - BusinessQuestion
+  - DecisionRule
+  - BusinessOpportunity
+  - BusinessIntent
+  - Tool
+  - Skill
+  - KnowledgeRetrieval
+  - BusinessQA
+  - AgentAction
+  - Evidence
+  - VerificationRecord
+  - KnowledgeVersion
+  - ChangeImpact
+  - KnowledgeConflict
+  - KnowledgeGap
+relations:
+  belongsTo: owner domain/context; never inferred from a directory alone
+  hasPart: explicit composition; cardinality must be evidenced
+  hasAttribute: business entity to attribute definition
+  hasState: entity to state definition
+  transitionsTo: state transition with rule/evidence references
+  emits: activity or capability to business event
+  participatesIn: actor to activity or process
+  governedBy: entity/activity to rule or policy
+  measuredBy: entity/capability to metric
+  definedBy: metric to versioned metric definition
+  mapsTo: semantic object to data mapping; no identity equivalence implied
+  implementedBy: capability/rule to evidenced implementation
+  storedIn: object to evidenced table/column mapping
+  dependsOn: directional dependency with evidence and scope
+  derivedFrom: provenance relation; map to prov:wasDerivedFrom
+  revises: version relation; map to prov:wasRevisionOf
+  # Domain-specific relationships use a registered namespaced extension, not a renamed core type.
+extensions:
+  policy: Versioned explicit project extension with definition, source/target types and evidence; AI must not silently change core categories/types.
+  domain_relationships: Define actual business predicates from evidence; the core relation list is not an exhaustive business ontology.
+node_fields:
+  required: [id, type, name, enterprise, domain, context, description, properties, relationships, business_rules, processes, data_mappings, implementation_refs, evidence_refs, verification_status, confidence]
+  identity: Stable IRI or registered compact ID mapped to IRI; preserve across renames.
+  scope: enterprise/domain/context are reference IDs or null; null requires a gap record, except globally scoped metadata.
+  reference_arrays: [properties, relationships, business_rules, processes, data_mappings, implementation_refs, evidence_refs]
+  references: Arrays contain stable IDs of separately owned records; relationships point to statements, not duplicated inline triples.
+  empty_arrays: Empty means no entries recorded; coverage records distinguish not explored from searched-and-not-found or not applicable.
+  confidence: Null by default; numeric values require documented method, scale, source and calibration limitations. Never substitute for evidence or acceptance.
+statement_fields:
+  required: [id, subject, predicate, object, basis, evidence_refs, verification_status]
+  basis: [observed, inferred]
+  note: Mixed-trust nodes keep per-statement status; a confirmed name does not confirm all rules or relations.
+evidence_fields:
+  required: [id, source_ref, source_revision, captured_at, scope, locator]
+  optional: [content_hash, environment, permission_scope, query_ref, completeness, collector]
+  restrictions: No credentials; database environment and snapshot freshness distinct; query truncation and inaccessible sources explicit.
+status_mapping:
+  CANDIDATE: candidate
+  ACCEPTED: accepted
+  DEPRECATED: deprecated
+  acceptance: Requires referenced review with responsible actor and authorization; repeating extraction or high confidence does not accept a claim.
+rdf_mapping:
+  id: IRI
+  type: rdf:type; local schema types require declared project namespace and mappings
+  name: rdfs:label or skos:prefLabel according to node type
+  description: dct:description
+  classification: skos:ConceptScheme / skos:Concept with stable notation
+  statement: rdf:Statement with rdf:subject / rdf:predicate / rdf:object; does not assert its business triple
+  evidence_refs: prov:wasDerivedFrom
+  source_ref: dct:source
+  source_revision: dct:identifier
+  generation: prov:wasGeneratedBy
+  verification_status: kg:status via status_mapping
+  basis: kg:basis
+  yaml_role: Optional authoring/projection profile; choose one authoritative representation per fact, do not dual-write YAML and RDF.
+coverage:
+  statuses: [not_explored, partial, covered, not_found, not_applicable, blocked]
+  row_fields: [scope_id, section_id, status, source_refs, artifact_refs, gaps, reason]
+  context_requirement: Every discovered candidate context has all ten section IDs assessed, including inaccessible and disputed contexts.
+  project_requirement: All eight project views assessed; no sample-only completion for a full-project request.
+  covered: Relevant topics investigated with scoped evidence and actual output; not business approval and not just file existence.
+  not_found: Scoped search performed with evidence and explicit limits; not proof of universal absence.
+  not_applicable: Explanation and supporting evidence required; no automatic N/A for unknown content.
+  blocked: Missing permission/source/tool; preserve gap and do not count as covered.
+  reporting: Report counts per state plus unclassified assets; catalog complete, exploration complete and business accepted are separate results.
+execution:
+  phases: [asset_inventory, system_structure, domain_and_context_discovery, business_semantics, processes_and_rules, metrics_and_decisions, cross_domain_links, evidence_validation, unified_graph, acceptance]
+  iteration: Semantics/processes/metrics run for every discovered context, not only a sample; revisit boundaries as evidence changes.
+  access: Full-project scope means all authorized assets, not unlimited database rows or unauthorized cross-project access.
+  completion: All scope accounted for; unresolved or blocked sections remain partial initialization, never a fabricated complete ontology.
+maintenance:
+  triggers: [source_change, schema_change, api_change, business_rule_change, context_split_merge, evidence_withdrawal, schema_version_change]
+  rules:
+    - Recheck affected statements and coverage only; retain unchanged identities and valid evidence.
+    - Deletion, renamed fields, revoked permissions and conflicts invalidate dependent answers where appropriate.
+    - Preserve history and replacements; do not overwrite reviewed semantics during generated observation refresh.
+    - Pin schema version/hash in project manifest; upgrades require explicit mapping, not silent relabeling.
+    - Legacy view IDs 01–08 keep identity; old labels are aliases, not new parallel views.

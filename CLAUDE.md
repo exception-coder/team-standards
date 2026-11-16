@@ -78,7 +78,7 @@
 
 图文技术方案复用[统一 TDD 表达](plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md)：架构、流程与数据关系按需分图，短表和关键实现承接细节，图源按项目与载体选择，不新增日常文档门禁。
 
-明确初始化或维护知识图谱时，复用[标准知识图谱合同](plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md)，交付 RDF、证据基线、SHACL 与可读视图；普通初始化保持轻量，业务来源、结构化语义与派生图各自归属明确。
+明确初始化或维护知识图谱时，按[企业知识大纲](plugins/team-standards/skills/business-ontology-modeling/references/enterprise-knowledge-schema.md)统一八视图与上下文十项，项目两个引擎入口引用同一冻结版本；复用[标准知识图谱合同](plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md)，交付 RDF、证据基线、SHACL 与可读视图；普通初始化保持轻量，业务来源、结构化语义与派生图各自归属明确。
 
 ## 本仓维护
 

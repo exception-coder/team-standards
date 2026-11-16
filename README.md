@@ -1,5 +1,7 @@
 # team-standards
 
+**5.8.0**：知识图谱初始化采用[企业 Knowledge Schema V1.0](plugins/team-standards/skills/business-ontology-modeling/references/enterprise-knowledge-schema.md)，固定全项目八视图、每个限界上下文十项内容、公共节点和证据字段；全范围覆盖不能用单样板替代。标准与覆盖检查器随插件分发，普通初始化保持轻量。
+
 **5.7.5**：明确知识图谱初始化时，复用三个现有入口交付 RDF/SKOS/PROV/SHACL 知识包、证据与增量维护；普通初始化不增加负担。见[输出合同](plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md)。
 
 5.7.4：统一[图文技术设计](plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md)，复用数据库与技术实现两个专项入口；先图后文、短表与关键代码、按需章节和可维护图源。

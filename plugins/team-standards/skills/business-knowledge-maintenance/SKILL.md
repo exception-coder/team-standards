@@ -56,6 +56,8 @@ related: [sample-query-capabilities]
 
 ## 已采用知识图谱的增量维护
 
+沿用项目固定的[企业知识大纲](../business-ontology-modeling/references/enterprise-knowledge-schema.md)版本。来源、上下文拆分/合并或标准升级时，更新受影响陈述、范围映射和十项覆盖；未归属资产保留缺口。生成观察不得覆盖审核语义，schema 变更先登记迁移映射，两个引擎入口继续指向同一项目标准。
+
 按[知识图谱合同](../business-ontology-modeling/references/knowledge-graph-output.md#验证与增量维护)核对源码、文档、数据库与接口来源的版本差异，定位受影响陈述；保持未变 IRI，处理删除、撤销及替代，失效结论退出正式视图并保留历史。候选重新抽取不自动变为已确认。先更新唯一源，再更新派生图和索引，执行相关 RDF/SHACL 与代表问题回验；没有监听服务时明确为任务触发维护。
 
 ## 完成前核对

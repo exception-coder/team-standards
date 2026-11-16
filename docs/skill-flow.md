@@ -1,5 +1,7 @@
 # Skill 链路全景图
 
+5.8.0：显式知识图谱由 init-project-docs 按[统一企业大纲](../plugins/team-standards/skills/business-ontology-modeling/references/enterprise-knowledge-schema.md)推进；本体建模和维护共用 schema，按全部候选上下文登记十项覆盖，不增加新 Skill。
+
 5.7.5：init-project-docs 明确建图时调用 business-ontology-modeling 的[知识图谱合同](../plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md)，business-knowledge-maintenance 维护来源变化和派生视图。复用 26 个 Skill，不新增 Runtime、数据库或 Hook。
 
 5.7.4：统一[图文技术设计](../plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md)，复用数据库与技术实现两个专项入口；先图后文、短表与关键代码、按需章节和可维护图源。

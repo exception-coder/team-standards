@@ -1,5 +1,7 @@
 # team-standards
 
+**5.8.0**: Explicit knowledge graph initialization uses the [Enterprise Knowledge Schema V1.0](plugins/team-standards/skills/business-ontology-modeling/references/enterprise-knowledge-schema.md): eight project views, ten sections per bounded context, shared node/evidence fields and coverage validation. A sample does not replace project-wide coverage. Ordinary onboarding stays lightweight.
+
 **5.7.5**: Explicit knowledge-graph requests reuse existing onboarding, ontology and maintenance skills to deliver RDF, provenance, SHACL constraints and incremental updates. Ordinary onboarding stays lightweight. See the [exchange contract](plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md).
 
 **5.7.4**: [Visual technical design](plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md) organizes architecture, execution and data views with concise contracts and key implementation excerpts. Reuses the two existing design skills, selects editable diagram sources for the project, and keeps small changes lightweight.
