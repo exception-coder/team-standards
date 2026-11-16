@@ -1,0 +1,33 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix kg: <urn:team-standards:knowledge:> .
+
+# Exchange contract v1: structure only, not source truth or reviewer authorization.
+kg:StatementShape a sh:NodeShape ;
+    sh:targetClass rdf:Statement ;
+    sh:nodeKind sh:IRI ;
+    sh:property [ sh:path rdf:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path rdf:predicate ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path rdf:object ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRIOrLiteral ] ;
+    sh:property [ sh:path kg:basis ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ("observed" "inferred") ] ;
+    sh:property [ sh:path kg:status ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ("candidate" "accepted" "deprecated") ] ;
+    sh:property [ sh:path prov:wasDerivedFrom ; sh:minCount 1 ; sh:node kg:SourceShape ] ;
+    sh:property [ sh:path prov:wasGeneratedBy ; sh:minCount 1 ; sh:nodeKind sh:IRI ; sh:class prov:Activity ] ;
+    sh:or (
+        [ sh:property [ sh:path kg:status ; sh:in ("candidate" "deprecated") ] ]
+        [ sh:property [ sh:path kg:status ; sh:hasValue "accepted" ] ;
+          sh:property [ sh:path kg:review ; sh:minCount 1 ; sh:node kg:ReviewShape ] ]
+    ) .
+
+kg:SourceShape a sh:NodeShape ;
+    sh:nodeKind sh:IRI ; sh:class prov:Entity ;
+    sh:property [ sh:path dct:source ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path dct:identifier ; sh:minCount 1 ; sh:nodeKind sh:Literal ; sh:minLength 1 ] .
+
+kg:ReviewShape a sh:NodeShape ;
+    sh:nodeKind sh:IRI ; sh:class prov:Entity ;
+    sh:property [ sh:path dct:source ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path dct:identifier ; sh:minCount 1 ; sh:nodeKind sh:Literal ; sh:minLength 1 ] ;
+    sh:property [ sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:nodeKind sh:IRI ; sh:class prov:Agent ] .

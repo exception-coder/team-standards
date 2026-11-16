@@ -78,6 +78,8 @@
 
 图文技术方案复用[统一 TDD 表达](plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md)：架构、流程与数据关系按需分图，短表和关键实现承接细节，图源按项目与载体选择，不新增日常文档门禁。
 
+明确初始化或维护知识图谱时，复用[标准知识图谱合同](plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md)，交付 RDF、证据基线、SHACL 与可读视图；普通初始化保持轻量，业务来源、结构化语义与派生图各自归属明确。
+
 ## 本仓维护
 
 新增/移除 Skill 或改变核心规则时按 [决策记录](docs/maintenance/decision-log.md) 留下原因；此规则仅适用于套件维护。Forge 专属协议保留在 [平台集成区](docs/platform-integrations/planning-evidence-discovery/SKILL.md)，不作为通用插件能力加载。

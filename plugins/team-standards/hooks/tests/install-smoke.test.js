@@ -22,6 +22,10 @@ test('isolated installed layout discovers and executes every configured hook', (
     }
     for (const resource of [
       'clear-design-docs/references/review-mode.md',
+      'business-ontology-modeling/references/knowledge-graph-output.md',
+      'business-ontology-modeling/assets/knowledge-graph/example.ttl',
+      'business-ontology-modeling/assets/knowledge-graph/shapes.ttl',
+      'business-ontology-modeling/assets/knowledge-graph/example-evidence.md',
       'frontend-excellence/references/design-system.md',
       'frontend-excellence/references/bootstrap.md',
       'frontend-excellence/assets/registry-template/registry.json',

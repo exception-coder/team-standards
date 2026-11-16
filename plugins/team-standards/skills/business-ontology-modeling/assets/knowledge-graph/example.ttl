@@ -1,0 +1,37 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix kg: <urn:team-standards:knowledge:> .
+@prefix ex: <urn:example:discovery:> .
+
+# Synthetic fixture, not enterprise knowledge. No accepted business triple is asserted.
+ex:vocabulary a owl:Ontology ; owl:versionInfo "synthetic-v1" .
+ex:Order a owl:Class ; rdfs:label "示例订单类型"@zh .
+ex:Customer a owl:Class ; rdfs:label "示例客户类型"@zh .
+ex:submittedBy a owl:ObjectProperty ; rdfs:label "提交方（示例）"@zh .
+ex:order-sample a ex:Order ; rdfs:label "示例订单"@zh .
+ex:customer-sample a ex:Customer ; rdfs:label "示例客户"@zh .
+
+ex:views a skos:ConceptScheme ; skos:prefLabel "合成分类示例"@zh .
+ex:view02 a skos:Concept ; skos:inScheme ex:views ;
+    skos:notation "02" ; skos:prefLabel "Business Ontology"@en .
+
+ex:source-v1 a prov:Entity ;
+    dct:source <example-evidence.md> ;
+    dct:identifier "synthetic-fixture-v1" .
+ex:extract-v1 a prov:Activity ;
+    rdfs:label "合成夹具的候选提取示例，非真实执行"@zh ;
+    prov:used ex:source-v1 .
+
+ex:statement-1 a rdf:Statement, prov:Entity ;
+    rdf:subject ex:order-sample ;
+    rdf:predicate ex:submittedBy ;
+    rdf:object ex:customer-sample ;
+    dct:subject ex:view02 ;
+    kg:basis "inferred" ;
+    kg:status "candidate" ;
+    prov:wasDerivedFrom ex:source-v1 ;
+    prov:wasGeneratedBy ex:extract-v1 .

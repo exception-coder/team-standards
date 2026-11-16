@@ -1,5 +1,7 @@
 # team-standards
 
+**5.7.5**：明确知识图谱初始化时，复用三个现有入口交付 RDF/SKOS/PROV/SHACL 知识包、证据与增量维护；普通初始化不增加负担。见[输出合同](plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md)。
+
 5.7.4：统一[图文技术设计](plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md)，复用数据库与技术实现两个专项入口；先图后文、短表与关键代码、按需章节和可维护图源。
 
 **5.7.3**：文档先区分技术原理、业务实现、过会决策与科普理念。技术原理保留机制、调用链和运行条件，业务方案贯通规则与验收；出版物风格只辅助表达，不固定图数或压缩深度。
@@ -376,3 +378,7 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 ## 业务知识自动维护
 
 新增 [business-knowledge-maintenance](plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认整理现有业务知识，复用文档、从代码补缺并标待确认，交付一张 draw.io 全景图及同源预览；结构脚本只负责补入口。后续随业务语义变化原位维护正文与图，OpenSpec/Graphify 按需，RAG 索引可重建。
+
+### 知识图谱合同的维护验证
+
+仅修改 RDF/SHACL 资产或其合同测试时，在隔离 Python 环境安装 RDFLib 与 pySHACL 后运行 `python scripts/tests/knowledge-graph-output.test.py -v`。已验证版本为 RDFLib 7.6.0、pySHACL 0.40.2；不作为所有开发或普通初始化的依赖。该测试验证合成交换样例与拒绝路径，不证明真实业务知识已确认。

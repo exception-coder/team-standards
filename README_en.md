@@ -1,5 +1,7 @@
 # team-standards
 
+**5.7.5**: Explicit knowledge-graph requests reuse existing onboarding, ontology and maintenance skills to deliver RDF, provenance, SHACL constraints and incremental updates. Ordinary onboarding stays lightweight. See the [exchange contract](plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md).
+
 **5.7.4**: [Visual technical design](plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md) organizes architecture, execution and data views with concise contracts and key implementation excerpts. Reuses the two existing design skills, selects editable diagram sources for the project, and keeps small changes lightweight.
 
 **5.7.3** distinguishes technical explanations, business implementation designs, decision briefs, and educational articles. Preserve mechanisms and execution paths for technical readers; editorial styling does not impose a diagram count or remove implementation detail.
@@ -200,3 +202,7 @@ Business knowledge belongs in the owning project docs, with one maintained sourc
 ## Local business knowledge
 
 [business-knowledge-maintenance](plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md) updates project Markdown and minimal YAML only when business meaning changes. Keep one source, evidence and verified/inferred/deprecated trust. Default initialization also organizes business knowledge and one draw.io panorama with a preview; only the structure helper is limited to entrypoints. Update affected prose and diagrams with business changes. Graphify and OpenSpec are opt-in; retrieval indexes are rebuildable derivatives.
+
+### Knowledge graph contract verification
+
+When changing RDF/SHACL assets, run `python scripts/tests/knowledge-graph-output.test.py -v` in an isolated environment with RDFLib and pySHACL. Verified with RDFLib 7.6.0 and pySHACL 0.40.2. These are optional maintenance dependencies; fixture validation does not establish business truth.

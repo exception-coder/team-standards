@@ -1,5 +1,7 @@
 # Skill 链路全景图
 
+5.7.5：init-project-docs 明确建图时调用 business-ontology-modeling 的[知识图谱合同](../plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md)，business-knowledge-maintenance 维护来源变化和派生视图。复用 26 个 Skill，不新增 Runtime、数据库或 Hook。
+
 5.7.4：统一[图文技术设计](../plugins/team-standards/skills/markdown-writing-standards/references/technical-design.md)，复用数据库与技术实现两个专项入口；先图后文、短表与关键代码、按需章节和可维护图源。
 
 5.7.3：按[文档选型](../plugins/team-standards/skills/markdown-writing-standards/SKILL.md#按读者选择文档)区分技术原理、业务实现、过会与科普。技术机制以 technical-implementation-design 为主，过会服务决策；出版物模式仅辅助表达，按解释任务选择图数和深度。

@@ -33,6 +33,10 @@ node <skill-root>/init-ai-structure.mjs status --root <project-root>
 
 完成前确认主要能力有正文或原文链接、推断有依据和待确认标记，图与正文一致，实际打开预览检查可读性与连线；核对索引链接及同主题唯一正文。空仓或证据无法取得时明确未完成的知识/图件，不以占位文件冒充完成。重复初始化只补真实缺口，不复制文档、重画未变化的图或空改日期。
 
+## 明确要求知识图谱时
+
+采用[标准知识图谱输出](../../business-ontology-modeling/references/knowledge-graph-output.md)，在同一项目交付可解析 RDF、证据与版本基线、SHACL 约束、可读视图及真实验证结果。复用已有业务正文，结构脚本不负责生成语义关系；没有新增 CLI 参数，不因 status 成功就声称知识包已完成。普通初始化不强制建图。
+
 ## 结构脚本的可选参数
 
 | 参数 | 补齐内容 |
@@ -43,7 +47,7 @@ node <skill-root>/init-ai-structure.mjs status --root <project-root>
 
 plan/apply/status 使用相同参数。未启用的工具缺失不计为 pending；status 只对所选入口缺失返回非零。
 
-Graphify 只在项目明确采用且复杂代码问题需要时生成，使用前核对 Git 与工作区覆盖。图谱与向量索引都是可重建产物；是否提交沿用项目约定。OpenSpec 仅在已采用项目按原流程校验。业务知识维护按 [business-knowledge-maintenance](../../business-knowledge-maintenance/SKILL.md)，表结构沿用迁移和实际 Schema。
+Graphify 只在项目明确采用且复杂代码问题需要时生成，使用前核对 Git 与工作区覆盖。代码图谱与向量索引都是可重建产物；是否提交沿用项目约定。显式交付的业务语义知识源按下方图谱模式维护。OpenSpec 仅在已采用项目按原流程校验。业务知识维护按 [business-knowledge-maintenance](../../business-knowledge-maintenance/SKILL.md)，表结构沿用迁移和实际 Schema。
 
 ## 保留与边界
 

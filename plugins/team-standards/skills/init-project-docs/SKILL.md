@@ -1,6 +1,6 @@
 ---
 name: init-project-docs
-description: "用于接入项目，以及初始化、刷新或检查项目上下文；默认复用现有业务文档、从代码补齐知识缺口并标注待确认，交付简明业务概览和 draw.io 全景图，随项目维护；OpenSpec 和 Graphify 按需使用。"
+description: "用于接入项目，以及初始化、刷新或检查项目上下文；默认复用现有业务文档、从代码补齐知识缺口并标注待确认，交付简明业务概览和 draw.io 全景图，随项目维护；明确初始化知识图谱时交付 RDF、证据与 SHACL 知识包，支持增量维护；OpenSpec 和 Graphify 按需使用。"
 ---
 
 # 项目上下文接入
@@ -15,10 +15,11 @@ description: "用于接入项目，以及初始化、刷新或检查项目上下
 | 仅初始化工程结构 `structure` | 仅在明确只要目录或入口时，用 [init-ai-structure](references/initialization-output.md) 创建缺失入口，保留既有内容 |
 | 完整初始化 `init` | 先完成默认业务知识与全景图，再按项目采用情况构建/校验 Graphify、校验 OpenSpec，核对运行证据入口 |
 | 项目初始化/接入 `onboard` | 按[接入流程](references/onboard-workflow.md)补入口、整理业务知识并配一张 draw.io 全景图；复杂接入才使用进度脚本 |
+| 初始化知识图谱 / 企业探索 | 按[知识图谱合同](../business-ontology-modeling/references/knowledge-graph-output.md)复用已有知识，产出标准 RDF 知识包、证据、约束与可读视图；这是 Agent 工作模式，不是结构脚本新参数 |
 | 刷新 `refresh` | 按 [Git 变化](references/update-workflow.md)刷新受影响权威产物 |
 | 独立画像 `profile` | 仅在明确要求时按[画像规则](references/project-profile-generation.md)保存轻量导航 |
 
-只说“初始化项目/项目知识/项目上下文”时，默认采用轻量 `onboard`：补缺失入口，复用已有文档，从代码补齐主要业务知识，标注推断与缺口，交付一张 draw.io 全景图及同源预览。不能在三个入口文件生成后就报告初始化完成；不默认展开全模块详设或构建知识图谱。
+只说“初始化项目/项目知识/项目上下文”时，默认采用轻量 `onboard`：补缺失入口，复用已有文档，从代码补齐主要业务知识，标注推断与缺口，交付一张 draw.io 全景图及同源预览。不能在三个入口文件生成后就报告初始化完成；不默认展开全模块详设或构建知识图谱。明确说“初始化知识图谱”“企业探索建图”时采用上表专项模式，不能只交付概览或空目录。
 
 检查状态不因缺项升级为初始化。明确初始化时，默认根目录为当前项目，用户指定其他路径才覆盖；创建范围不能扩到父目录或其他仓库。
 
@@ -30,7 +31,7 @@ description: "用于接入项目，以及初始化、刷新或检查项目上下
 - OpenSpec 按项目采用情况初始化或链接；空配置标 initialized-empty，不伪造 specs/changes。领域候选、缺失 DDL 和未取得运行证据分别报告。
 - 当前设计接入用[基线指引](references/design-baseline-adoption.md)及既有 status/plan/apply 协议；仅在项目明确采用绑定治理时使用[设计准备](../change-readiness/references/automatic-design-maintenance.md)，不因普通模块修改初始化全项目。
 
-首次初始化整理现状，后续在业务语义变化或明确要求知识整理时，按 [business-knowledge-maintenance](../business-knowledge-maintenance/SKILL.md) 原位更新受影响正文和全景图。Markdown + 轻量 YAML 为正文来源，不强制知识图谱。
+首次初始化整理现状，后续在业务语义变化或明确要求知识整理时，按 [business-knowledge-maintenance](../business-knowledge-maintenance/SKILL.md) 原位更新受影响正文和全景图。普通初始化以 Markdown + 轻量 YAML 为正文来源；明确图谱交付时按知识图谱合同登记结构化源与派生视图，仍引用已有权威正文。
 
 ## 项目内知识归属
 

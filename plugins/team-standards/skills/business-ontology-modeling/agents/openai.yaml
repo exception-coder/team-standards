@@ -1,4 +1,4 @@
 interface:
   display_name: "业务本体建模"
-  short_description: "从原始代码和数据库提炼业务对象、关系、规则与证据，支持逐步补全"
+  short_description: "从代码和数据库提炼业务模型，初始化有证据的标准知识图谱并增量维护"
   default_prompt: "使用 $business-ontology-modeling，优先复用Graphify与现有数据库工具，从当前源码和数据库还原业务模型，核实对象、关系、规则及证据，并用业务问题回验。"

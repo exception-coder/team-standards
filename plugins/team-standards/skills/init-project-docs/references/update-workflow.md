@@ -19,6 +19,8 @@ description: "init-project-docs 的内部增量刷新细则，不作为独立 Sk
 6. 项目自有规则、构建命令或权威入口真实变化时，更新 `AGENTS.md` 或既有索引；检查正文、图和链接一致，不另建同主题副本。
 7. 用户明确维护独立画像时，只增量更新一份 `project-profile.md`。
 
+已采用标准知识图谱时，按[图谱增量维护](../../business-ontology-modeling/references/knowledge-graph-output.md#验证与增量维护)处理来源版本、陈述失效、替代和重建；数据库/API变更另核快照，不能只查 Git。复用相同的证据与验证，不另启动全量建图。
+
 ## 变化路由
 
 | 变化 | 刷新位置 |

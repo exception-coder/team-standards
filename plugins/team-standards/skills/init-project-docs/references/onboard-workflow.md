@@ -7,6 +7,8 @@ description: "init-project-docs 的项目内接入流程；复用已有文档，
 
 接入目标是让人和 AI 看懂现有主要业务：默认完成简明业务知识和一张 draw.io 全景图，不要求先做完整模块设计。
 
+用户明确要求知识图谱时转入[标准知识图谱合同](../../business-ontology-modeling/references/knowledge-graph-output.md)，在此接入流程上补结构化源、证据与约束，不将普通概览交付冒称为图谱初始化。
+
 ## 默认路径
 
 1. **确认项目边界**：定位实际代码仓和现有 AGENTS、README、docs、迁移脚本、OpenSpec；聚合工作区只作导航，正文进入所属代码仓。
