@@ -1,7 +1,6 @@
 ---
 name: yoooni-ponytail
-description: 仅在明确启用 Yoooni Ponytail 试点的当前开发任务中使用；引用固定版本 Ponytail 核心辅助选择最小充分实现，遵守项目宪法与适用工程规范。
-disable-model-invocation: true
+description: 编写、修复、重构、评审代码或选择依赖时自动使用；用户提到 ponytail、YAGNI、最简实现或过度设计时也使用。引入 Ponytail 原版核心，遵守 Yoooni 工程规范。
 ---
 
 # Yoooni Ponytail（试点）
@@ -10,9 +9,9 @@ disable-model-invocation: true
 
 ## 生效范围
 
-仅在用户明确启用本试点的当前任务中生效，任务结束或用户要求停用时结束。默认 full；lite、ultra 只在用户选择时使用。不沿用上游默认的整会话持续生效与广泛自动触发。宿主不支持显式调用控制时，仍按这一范围选择，不能声称配置已从机制上禁用自动加载。
+沿用上游默认：适用编码任务自动触发，无需用户报 Skill 名或逐任务批准；默认 full，触发后持续本会话，直到用户说“stop ponytail”“normal mode”或“停用 Ponytail”。用户可选择 lite / full / ultra / off。停用后本会话不因下一个编码任务再次自动启用，除非用户重新启用。自动选择取决于宿主发现和 Agent 遵循规则，不代表已验证所有宿主。
 
-启用前检查当前可见 Skill/插件是否已加载原版 Ponytail 或另一项目副本；若已生效，不再加载第二份核心，明确提示选择一个入口后再开展对照。不要自动卸载用户插件。卸载或关闭插件后的清洁会话才可作为无 Ponytail 对照，无法核实的任务标为对照受污染。
+启用前检查当前可见 Skill/插件是否已加载原版 Ponytail 或另一项目副本；若已生效，不再加载第二份核心，优先采用项目内适配边界，不重复加载核心。不要自动卸载用户插件。卸载或关闭插件后的清洁会话才可作为无 Ponytail 对照，无法核实的任务标为对照受污染。
 
 ## Yoooni 适配边界
 

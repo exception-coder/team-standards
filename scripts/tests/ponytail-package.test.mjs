@@ -37,8 +37,8 @@ test('only adapter is discoverable; payload has no hooks and all relative links 
   const files = readdirSync(pkg, { recursive: true }).map(String);
   assert.deepEqual(files.filter(f => /(^|[\\/])SKILL\.md$/.test(f)), ['skills/yoooni-ponytail/SKILL.md'].map(p => p.replaceAll('/', process.platform === 'win32' ? '\\' : '/')));
   assert.ok(!files.some(f => /(^|[\\/])hooks([\\/]|$)/.test(f)));
-  assert.match(readFileSync(resolve(pkg, 'skills/yoooni-ponytail/SKILL.md'), 'utf8'), /disable-model-invocation: true/);
-  assert.match(readFileSync(resolve(pkg, 'skills/yoooni-ponytail/agents/openai.yaml'), 'utf8'), /allow_implicit_invocation: false/);
+  assert.doesNotMatch(readFileSync(resolve(pkg, 'skills/yoooni-ponytail/SKILL.md'), 'utf8'), /disable-model-invocation: true/);
+  assert.match(readFileSync(resolve(pkg, 'skills/yoooni-ponytail/agents/openai.yaml'), 'utf8'), /allow_implicit_invocation: true/);
   for (const file of files.filter(f => f.endsWith('.md'))) {
     for (const [, target] of readFileSync(resolve(pkg, file), 'utf8').matchAll(/\]\(([^)]+)\)/g)) {
       if (!/^https?:/.test(target)) assert.ok(existsSync(resolve(dirname(resolve(pkg, file)), target)), `${file}: ${target}`);

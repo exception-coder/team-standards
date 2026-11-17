@@ -130,4 +130,6 @@ init-project-docs 将业务知识留在所属项目现有文档或 docs/domain�
 
 ## 可选独立试点包
 
-明确启用 Ponytail 试点时使用 [yoooni-ponytail](plugins/yoooni-ponytail/skills/yoooni-ponytail/SKILL.md)，引入上游原版核心并应用 Yoooni 边界。该包独立安装、任务内显式生效，不加入通用主动触发链；原版素材不作为第二个 Skill 注册。维护与试点见[包说明](plugins/yoooni-ponytail/README.md)。
+编码任务采用 Ponytail 时使用 [yoooni-ponytail](plugins/yoooni-ponytail/skills/yoooni-ponytail/SKILL.md)，引入上游原版核心并应用 Yoooni 边界。该包独立安装、会话内生效直至用户停用，安装或项目内携带后按编码任务自动选择；原版素材不作为第二个 Skill 注册。维护与试点见[包说明](plugins/yoooni-ponytail/README.md)。
+
+当前调用策略：编码任务自动触发，默认 full，持续会话直至用户停用；安装独立包后无需逐任务调用。对照组仍须禁用并使用新会话。

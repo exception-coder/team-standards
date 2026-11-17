@@ -387,4 +387,6 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 
 ## 可选 Ponytail 试点包
 
-[yoooni-ponytail](plugins/yoooni-ponytail/README.md) 独立分发 Ponytail 原版核心及 Yoooni 适配，版本 0.1.0。显式启用，不随 Team Standards 默认加载，不含 Hooks；试点与上游版权、版本记录见包内说明。
+[yoooni-ponytail](plugins/yoooni-ponytail/README.md) 独立分发 Ponytail 原版核心及 Yoooni 适配，版本 0.1.1。自动触发，不随 Team Standards 默认加载，不含 Hooks；试点与上游版权、版本记录见包内说明。
+
+当前调用策略：编码任务自动触发，默认 full，持续会话直至用户停用；安装独立包后无需逐任务调用。对照组仍须禁用并使用新会话。

@@ -1,7 +1,7 @@
 {
   "name": "yoooni-ponytail",
-  "version": "0.1.0",
-  "description": "可选试点：引入 Ponytail 原版核心与 Yoooni 轻量适配；显式启用，不含 Hooks。",
+  "version": "0.1.1",
+  "description": "引入 Ponytail 原版核心与 Yoooni 适配，编码任务自动触发，不含 Hooks。",
   "license": "MIT",
   "repository": "https://gitee.com/wyoooni/team-standards.git"
 }

@@ -211,4 +211,6 @@ When changing RDF/SHACL assets, run `python scripts/tests/knowledge-graph-output
 
 ## Optional Ponytail pilot
 
-[yoooni-ponytail](plugins/yoooni-ponytail/README.md) 0.1.0 is a separate opt-in package containing the unmodified Ponytail core and a Yoooni adapter. It adds no hooks or runtime dependencies and is not enabled with Team Standards. Host verification and paired task trials remain pending.
+[yoooni-ponytail](plugins/yoooni-ponytail/README.md) 0.1.1 is a separately installable package with automatic coding-task invocation containing the unmodified Ponytail core and a Yoooni adapter. It adds no hooks or runtime dependencies and is not enabled with Team Standards. Host verification and paired task trials remain pending.
+
+Once installed, coding tasks invoke it automatically in full mode until the user turns it off.
