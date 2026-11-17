@@ -208,3 +208,7 @@ Business knowledge belongs in the owning project docs, with one maintained sourc
 ### Knowledge graph contract verification
 
 When changing RDF/SHACL assets, run `python scripts/tests/knowledge-graph-output.test.py -v` in an isolated environment with RDFLib and pySHACL. Verified with RDFLib 7.6.0 and pySHACL 0.40.2. These are optional maintenance dependencies; fixture validation does not establish business truth.
+
+## Optional Ponytail pilot
+
+[yoooni-ponytail](plugins/yoooni-ponytail/README.md) 0.1.0 is a separate opt-in package containing the unmodified Ponytail core and a Yoooni adapter. It adds no hooks or runtime dependencies and is not enabled with Team Standards. Host verification and paired task trials remain pending.

@@ -470,3 +470,13 @@ init-project-docs 将业务知识留在所属项目现有文档或 docs/domain�
 ## 业务知识自动维护
 
 新增 [business-knowledge-maintenance](../plugins/team-standards/skills/business-knowledge-maintenance/SKILL.md)：仅在业务语义变化时维护项目内 Markdown + 轻量 YAML，保留可信度和来源。五类内容按需创建，已有正文原位更新；默认检索源码用定向搜索、LSP 和 Git，Graphify 可选。初始化默认整理现有业务知识，复用文档、从代码补缺并标待确认，交付一张 draw.io 全景图及同源预览；结构脚本只负责补入口。后续随业务语义变化原位维护正文与图，OpenSpec/Graphify 按需，RAG 索引可重建。
+
+## 可选实现决策试点
+
+显式启用 → `yoooni-ponytail` 适配入口 → 固定版本 Ponytail 核心 → 当前任务原有实施与验证流程。它是独立可选包，不替代上述主链路，不自动叠加原版插件。是否正式采用由 8～12 个真实任务的对照决定，详见[试点说明](../plugins/yoooni-ponytail/README.md)。
+
+| 包 / 入口 | 触发 | 职责 |
+|---|---|---|
+| yoooni-ponytail | 当前任务明确启用试点 | 最小充分实现建议，项目规范优先 |
+
+与原版同时安装怎么办？先选择一个生效入口；无干预对照需禁用两者并开启新会话，不以文件声明推定宿主已去重。

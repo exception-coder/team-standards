@@ -384,3 +384,7 @@ OpenSpec 已启用时设计与任务复用实际工件；未启用时只维护�
 ### 知识图谱合同的维护验证
 
 仅修改 RDF/SHACL 资产或其合同测试时，在隔离 Python 环境安装 RDFLib 与 pySHACL 后运行 `python scripts/tests/knowledge-graph-output.test.py -v`。已验证版本为 RDFLib 7.6.0、pySHACL 0.40.2；不作为所有开发或普通初始化的依赖。该测试验证合成交换样例与拒绝路径，不证明真实业务知识已确认。
+
+## 可选 Ponytail 试点包
+
+[yoooni-ponytail](plugins/yoooni-ponytail/README.md) 独立分发 Ponytail 原版核心及 Yoooni 适配，版本 0.1.0。显式启用，不随 Team Standards 默认加载，不含 Hooks；试点与上游版权、版本记录见包内说明。

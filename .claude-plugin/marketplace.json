@@ -15,6 +15,12 @@
         "name": "张凯",
         "email": ""
       }
+    },
+    {
+      "name": "yoooni-ponytail",
+      "description": "Ponytail 原版核心与 Yoooni 适配，可选试点，不含 Hooks",
+      "version": "0.1.0",
+      "source": "./plugins/yoooni-ponytail"
     }
   ]
 }
