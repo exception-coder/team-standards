@@ -1,5 +1,9 @@
 # Skill 链路全景图
 
+5.9.1：合并企业知识大纲、同源双报告和可选 Ponytail 0.1.1，保留双方功能。
+
+5.9.0：[成果价值汇报](../plugins/team-standards/skills/git-commit-standards/references/work-summary.md#成果价值汇报)共用临时事实底稿，默认管理层精简版，按需项目详细版或同源双份。精简版保留最多三项核心结论、项目关键交付及关注事项；详细版按能力展开重要功能、数字、验收、缺口及动作，不受精简版条数限制。两版核对周期、数据、环境和状态，重要生产交付均保留；文件交付可相互关联，既有定时模式不自动扩展，不新增服务或台账。
+
 5.8.0：显式知识图谱由 init-project-docs 按[统一企业大纲](../plugins/team-standards/skills/business-ontology-modeling/references/enterprise-knowledge-schema.md)推进；本体建模和维护共用 schema，按全部候选上下文登记十项覆盖，不增加新 Skill。
 
 5.7.5：init-project-docs 明确建图时调用 business-ontology-modeling 的[知识图谱合同](../plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md)，business-knowledge-maintenance 维护来源变化和派生视图。复用 26 个 Skill，不新增 Runtime、数据库或 Hook。
@@ -427,7 +431,7 @@ Go 源码 → `coding-standards-common` + `go-coding-standards`；业务边界�
 | [frontend-excellence：设计系统](../plugins/team-standards/skills/frontend-excellence/SKILL.md) | references/bootstrap.md、review-mode.md、review-workflow.md、evidence-capture.md、pattern-mining.md；assets/ 与 schema 保留 | 设计复用、初始化、评审和偏好；不强制创建 Registry |
 | coding-standards-common | references/comment-maintenance.md、feedback.md | 显式清理和纠正，不创建计数式违规日志 |
 | business-logic-orientation | references/terminology.md | 术语核对与已有知识源维护 |
-| git-commit-standards | references/work-summary.md | 按需查询汇总，不自动写日报 |
+| git-commit-standards | references/work-summary.md | 按需查询；成果分级筛选，核心结论、项目事实及待办分开，保留数据与准确状态，不自动写日报 |
 
 Forge resolver、统一查询、trace-v2 和完成性协议仅在 [平台集成区](platform-integrations/planning-evidence-discovery/SKILL.md) 保留；只有实际平台接入才使用，不阻断一般跨项目分析。本仓决策流程见 [维护规则](maintenance/decision-log.md)。旧入口与迁移表以 README 的 4.0.0 章节为准。
 

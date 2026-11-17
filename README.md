@@ -1,5 +1,9 @@
 # team-standards
 
+5.9.1：合并企业知识大纲、同源双报告和可选 Ponytail 0.1.1，保留双方功能。
+
+**5.9.0** 为[成果汇报](plugins/team-standards/skills/git-commit-standards/references/work-summary.md#成果价值汇报)增加输出模式：默认管理层精简版，按需项目详细版或同时两份。两版共用事实底稿，核对日期、数据、环境和状态；精简版保留重要结论与风险，详细版展开交付、功能、数据及验收，不受精简版条数限制。重要生产交付两份均保留，文件交付可关联详细版，既有定时模式不自动改变。
+
 **5.8.0**：知识图谱初始化采用[企业 Knowledge Schema V1.0](plugins/team-standards/skills/business-ontology-modeling/references/enterprise-knowledge-schema.md)，固定全项目八视图、每个限界上下文十项内容、公共节点和证据字段；全范围覆盖不能用单样板替代。标准与覆盖检查器随插件分发，普通初始化保持轻量。
 
 **5.7.5**：明确知识图谱初始化时，复用三个现有入口交付 RDF/SKOS/PROV/SHACL 知识包、证据与增量维护；普通初始化不增加负担。见[输出合同](plugins/team-standards/skills/business-ontology-modeling/references/knowledge-graph-output.md)。
@@ -73,7 +77,7 @@
 
 当前设计基线与独立增量：支持模块概设/详设绑定、切片同步、共享影响和内容指纹检查。4.3.0 补齐面向业务读者的八章概设、九项功能详设与功能编号链路；机器覆盖检查配合具名内容审阅，旧项目渐进迁移。接入步骤见 [AI 原生项目适配指引](plugins/team-standards/skills/init-project-docs/references/design-baseline-adoption.md)。
 
-面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.6.3**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
+面向 AI 原生项目的跨项目工程治理插件。当前版本 **5.9.0**，共 26 个 Skill。团队层面维护跨项目复用的分析、设计、架构、编码、文档和交付能力。项目特有的路由、脚手架、架构 lint、编码例外和系统拓扑由项目维护。
 
 4.11.1 明确测试覆盖独立风险、验证采用最小充分范围：先复用已有套件与准备过程，独立风险缺口才新增测试；构建隐式检查计入证据，任务完成、提交、进度回报及归档不单独触发重验。公共协议、安全、迁移及消费者输入改变时重验对应风险。规则见[测试资产](plugins/team-standards/skills/coding-standards-common/references/testing-assets.md)和[执行范围示例](plugins/team-standards/skills/delivery-verification/SKILL.md#精炼反例)；不新增 Hook、扫描器或验证平台，项目自定义生成入口和强制 CI 仍需项目接线。
 
@@ -182,7 +186,7 @@ flowchart TD
 | 知识文档 | [markdown-writing-standards](plugins/team-standards/skills/markdown-writing-standards/SKILL.md) | 文档选型、技术出版物、读者正文、文档归属与发布核对 |
 | 知识文档 | `init-project-docs` | 补缺失入口，复用现有业务文档、从代码补缺并标待确认，交付一张 draw.io 全景图；Graphify/OpenSpec 按需 |
 | 质量反馈 | `delivery-verification` | 编码完成后调用真实验证，按影响验证并如实报告通过、失败或未验证 |
-| 日志交付 | `git-commit-standards` | 按最小完整逻辑单元实现、验证、提交；正文讲清原问题、关键做法与实际结果，独立判断 push |
+| 提交与成果汇报 | `git-commit-standards` | 按完整逻辑单元验证提交；默认精简、按需详细或同源双份，保留重要交付、数据和准确状态，两版核对一致性，独立判断 push |
 
 ---
 
